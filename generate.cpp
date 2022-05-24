@@ -25,7 +25,7 @@ double stoppingDistanceMean = 10.0;
 double stoppingDistanceStdDev = 2.0;
 std::normal_distribution<double> stoppingDistanceDistr(stoppingDistanceMean, stoppingDistanceStdDev);
 double xErrMean = 0.0;
-double xErrStdDev = 1.0;
+double xErrStdDev = 0.0;
 std::normal_distribution<double> xErrDistr(xErrMean, xErrStdDev);
 
 double epsilon = 10E-14;
@@ -55,9 +55,9 @@ class Robot {
   void changeState(){
     double xToTarget = target - x - stoppingDistance;
 
-    bool cond1 = v >= vMax;                           // is at max velocity
-    bool cond2 = xToTarget < (-v * v)/(2 * decMax);   // needs to decelerate or else it will pass target
-    bool cond3 = v <= epsilon;                        // is at min velocity
+    bool cond1 = v >= vMax;                                   // is at max velocity
+    bool cond2 = xToTarget < (-1.0/2.0) * v * (v / decMax);   // needs to decelerate or else it will pass target
+    bool cond3 = v <= epsilon;                                // is at min velocity
 
     if(cond2 && !cond3){
       st = DEC;
@@ -75,7 +75,6 @@ class Robot {
     double xPrev = x;
 
     double xErr = xErrDistr(gen);
-    cout << xErr << " ";
 
     a = st == DEC ? decMax :
               (st == ACC ? accMax : 0);
@@ -93,6 +92,7 @@ int main() {
 
 
   if(genCsv){
+    cout << "generating csv\n";
     Robot r = Robot();
     ofstream csvFile;
     csvFile.open("data.csv");
@@ -107,6 +107,7 @@ int main() {
 
 
   if(genJson){
+    cout << "generating json\n";
     Robot r = Robot();
     ofstream jsonFile;
     jsonFile.open("data.json");
