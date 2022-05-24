@@ -4,6 +4,11 @@
 
 using namespace std;
 
+
+bool genCsv = true;
+bool genJson = true;
+
+
 enum State {
   ACC,
   DEC,
@@ -85,17 +90,42 @@ class Robot {
 
 int main() {
   
-  Robot r = Robot();
-  ofstream file;
 
-  file.open("data.csv");
-  file << "time, x, v" << "\n";
-  for(double t=0; t<T_TOT/T_STEP; t++){
-    r.changeState();
-    r.updatePhysics();
-    file << t << ", " << r.x << ", " << r.v << "\n";
+
+  if(genCsv){
+    Robot r = Robot();
+    ofstream csvFile;
+    csvFile.open("data.csv");
+    csvFile << "time, x, v" << "\n";
+    for(double t=0; t<T_TOT/T_STEP; t++){
+      r.changeState();
+      r.updatePhysics();
+      csvFile << t << ", " << r.x << ", " << r.v << "\n";
+    }
+    csvFile.close();
   }
-  file.close();
+
+
+  if(genJson){
+    Robot r = Robot();
+    ofstream jsonFile;
+    jsonFile.open("data.json");
+    jsonFile << "[";
+    for(double t=0; t<T_TOT/T_STEP; t++){
+      r.changeState();
+      r.updatePhysics();
+      if(t > 0) jsonFile << ",";
+      jsonFile << R"({"x":{"dim":[1,0,0],"type":"NUM","name":"x","value":)";
+      jsonFile << r.x;
+      jsonFile << R"(},"v":{"dim":[1,-1,0],"type":"NUM","name":"v","value":)";
+      jsonFile << r.v;
+      jsonFile << R"(},"target":{"dim":[1,0,0],"type":"NUM","name":"target","value":)";
+      jsonFile << r.target;
+      jsonFile << R"(},"start":{"dim":[0,0,0],"type":"STATE","name":"output","value":"ACC"},"output":{"dim":[0,0,0],"type":"STATE","name":"output","value":"DEC"}})";
+    }
+    jsonFile << "]";
+    jsonFile.close();
+  }
 
   return 0;
 }
