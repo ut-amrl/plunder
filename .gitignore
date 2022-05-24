@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Other
+gen
+data.csv
