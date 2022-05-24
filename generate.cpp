@@ -112,8 +112,12 @@ int main() {
     jsonFile.open("data.json");
     jsonFile << "[";
     for(double t=0; t<T_TOT/T_STEP; t++){
+      string prevStateStr = r.st == 0 ? "ACC" : 
+                        (r.st == 1 ? "DEC" : "CON");
       r.changeState();
       r.updatePhysics();
+      string curStateStr = r.st == 0 ? "ACC" : 
+                        (r.st == 1 ? "DEC" : "CON");
       if(t > 0) jsonFile << ",";
       jsonFile << R"({"x":{"dim":[1,0,0],"type":"NUM","name":"x","value":)";
       jsonFile << r.x;
@@ -121,7 +125,11 @@ int main() {
       jsonFile << r.v;
       jsonFile << R"(},"target":{"dim":[1,0,0],"type":"NUM","name":"target","value":)";
       jsonFile << r.target;
-      jsonFile << R"(},"start":{"dim":[0,0,0],"type":"STATE","name":"output","value":"ACC"},"output":{"dim":[0,0,0],"type":"STATE","name":"output","value":"DEC"}})";
+      jsonFile << R"(},"start":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
+      jsonFile << prevStateStr;
+      jsonFile << R"("},"output":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
+      jsonFile << curStateStr;
+      jsonFile << R"("}})";
     }
     jsonFile << "]";
     jsonFile.close();
