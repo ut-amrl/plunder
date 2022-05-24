@@ -29,3 +29,14 @@ necessary:
 v / a = t
 v * t = x
 x * i = x
+v - v = v
+x - x = x
+
+
+physics:
+
+kinematic equations:
+
+xTraveledInAcceleration
+x = (v^2-v^2)/(2a)
+(v1, v2, a) -> x
