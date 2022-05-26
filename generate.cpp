@@ -8,6 +8,13 @@ using namespace std;
 bool genCsv = true;
 bool genJson = true;
 
+double T_STEP = .05;
+double T_TOT = 15;
+double stoppingDistanceMean = 10.0;
+double stoppingDistanceStdDev = 0.0;
+double vErrMean = 0.0;
+double vErrStdDev = 0.2;
+
 
 enum State {
   ACC,
@@ -15,18 +22,10 @@ enum State {
   CON
 };
 
-double T_STEP = .02;
-double T_TOT = 15;
-
 std::random_device rd;
 std::default_random_engine gen(rd());
-
-double stoppingDistanceMean = 10.0;
-double stoppingDistanceStdDev = 2.0;
 std::normal_distribution<double> stoppingDistanceDistr(stoppingDistanceMean, stoppingDistanceStdDev);
-double xErrMean = 0.0;
-double xErrStdDev = 0.0;
-std::normal_distribution<double> xErrDistr(xErrMean, xErrStdDev);
+std::normal_distribution<double> vErrDistr(vErrMean, vErrStdDev);
 
 double epsilon = 10E-14;
 
@@ -43,6 +42,15 @@ class Robot {
   double target = 100;
   double stoppingDistance = stoppingDistanceDistr(gen);
 
+  Robot(){}
+
+  Robot(double _accMax, double _decMax, double _vMax, double _target){
+    accMax = _accMax;
+    decMax = _decMax;
+    vMax = _vMax;
+    target = _target;
+  }
+
   double a = 0;
   double v = 0;
   double x = 0;
@@ -50,14 +58,15 @@ class Robot {
   State st = CON;
 
 
-
-
   void changeState(){
     double xToTarget = target - x - stoppingDistance;
 
     bool cond1 = v >= vMax;                                   // is at max velocity
+    // synthesis: v - vMax > 0
     bool cond2 = xToTarget < (-1.0/2.0) * v * (v / decMax);   // needs to decelerate or else it will pass target
+    // synthesis: (oneHalf * (v * (v / decMax))) + (target - x) < stoppingDistanceMean
     bool cond3 = v <= epsilon;                                // is at min velocity
+    // synthesis: v < 0
 
     if(cond2 && !cond3){
       st = DEC;
@@ -74,16 +83,21 @@ class Robot {
     double vPrev = v;
     double xPrev = x;
 
-    double xErr = xErrDistr(gen);
+    double vErr = vErrDistr(gen);
 
     a = st == DEC ? decMax :
               (st == ACC ? accMax : 0);
     v = vPrev + a * T_STEP;
-    bool vIsZero = abs(v) <= epsilon;
-    x = xPrev + (v + vPrev)/2 * T_STEP + (vIsZero ? 0 : xErr);
+    bool vIsZero = v <= epsilon;
+    v = vIsZero ? 0 : v+vErr;
+    x = xPrev + (v + vPrev)/2 * T_STEP;
   }
 
 };
+
+void writeJson(){
+  
+}
 
 
 
@@ -126,6 +140,12 @@ int main() {
       jsonFile << r.v;
       jsonFile << R"(},"target":{"dim":[1,0,0],"type":"NUM","name":"target","value":)";
       jsonFile << r.target;
+      jsonFile << R"(},"oneHalf":{"dim":[0,0,0],"type":"NUM","name":"oneHalf","value":)";
+      jsonFile << 0.5;
+      jsonFile << R"(},"vMax":{"dim":[1,-1,0],"type":"NUM","name":"vMax","value":)";
+      jsonFile << r.vMax;
+      jsonFile << R"(},"decMax":{"dim":[1,-2,0],"type":"NUM","name":"decMax","value":)";
+      jsonFile << r.decMax;
       jsonFile << R"(},"start":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
       jsonFile << prevStateStr;
       jsonFile << R"("},"output":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
