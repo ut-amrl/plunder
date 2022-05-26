@@ -34,8 +34,6 @@
 # Other
 gen
 generate
-data.csv
-data.json
 
 # Binaries and CMake
 bin/
