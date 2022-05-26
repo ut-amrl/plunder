@@ -51,9 +51,3 @@ compile_commands.json
 
 # VSCode
 .vscode/
-
-# Data
-examples/
-ops/
-features.txt
-

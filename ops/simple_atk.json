@@ -1,0 +1,90 @@
+[
+  {
+    "op": "Minus",
+    "inputType": [
+      "VEC",
+      "VEC"
+    ],
+    "inputDim": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "outputType": "VEC",
+    "outputDim": [
+      1,
+      0,
+      0
+    ]
+  },
+  {
+    "op": "Minus",
+    "inputType": [
+      "VEC",
+      "VEC"
+    ],
+    "inputDim": [
+      [
+        1,
+        -1,
+        0
+      ],
+      [
+        1,
+        -1,
+        0
+      ]
+    ],
+    "outputType": "VEC",
+    "outputDim": [
+      1,
+      -1,
+      0
+    ]
+  },
+  {
+    "op": "NormSq",
+    "inputType": [
+      "VEC"
+    ],
+    "inputDim": [
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "outputType": "NUM",
+    "outputDim": [
+      1,
+      0,
+      0
+    ]
+  },
+  {
+    "op": "NormSq",
+    "inputType": [
+      "VEC"
+    ],
+    "inputDim": [
+      [
+        1,
+        -1,
+        0
+      ]
+    ],
+    "outputType": "NUM",
+    "outputDim": [
+      1,
+      -1,
+      0
+    ]
+  }
+]
