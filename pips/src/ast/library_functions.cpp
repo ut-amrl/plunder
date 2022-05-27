@@ -166,20 +166,17 @@ ast_ptr DividedBy(ast_ptr left, ast_ptr right) {
   }
 }
 
-ast_ptr DistTraveled(ast_ptr v1, ast_ptr v2, ast_ptr a) {
+ast_ptr DistTraveled(ast_ptr v1, ast_ptr a) {
   ASSERT_TYPE(v1, Type::NUM);
-  ASSERT_TYPE(v2, Type::NUM);
   ASSERT_TYPE(a, Type::NUM);
 
   ASSERT_DIM(v1, Vector3i(1, -1, 0));
-  ASSERT_DIM(v2, Vector3i(1, -1, 0));
   ASSERT_DIM(a, Vector3i(1, -2, 0));
   
   num_ptr vel1 = dynamic_pointer_cast<Num>(v1);
-  num_ptr vel2 = dynamic_pointer_cast<Num>(v2);
   num_ptr accel = dynamic_pointer_cast<Num>(a);
 
-  Num result( (vel2->value_ * vel2->value_ - vel1->value_ * vel1->value_) / (2.0 * accel->value_), {1, 0, 0});
+  Num result( -(vel1->value_ * vel1->value_) / (2.0 * accel->value_), {1, 0, 0});
   return make_shared<Num>(result);
 }
 

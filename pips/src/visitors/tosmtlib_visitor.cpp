@@ -35,6 +35,8 @@ ast_ptr ToSMTLIB::Visit(BinOp* node) {
     binop_smtlib += "(* ";
   } else if (op == "DividedBy") {
     binop_smtlib += "(safe-div ";
+  } else if (op == "DistTraveled") {
+    binop_smtlib += "(* -0.5 (safe-div (^ ";
   } else if (op == "Pow") {
     binop_smtlib += "(^ ";
   } else if (op == "Cross") {
@@ -63,8 +65,16 @@ ast_ptr ToSMTLIB::Visit(BinOp* node) {
   output_ += binop_smtlib;
   node->left_->Accept(this);
   output_ += " ";
+
+  if(op == "DistTraveled"){
+    output_ += "2)";
+  }
   node->right_->Accept(this);
   output_ += ")";
+
+  if(op == "DistTraveled"){
+    output_ += ")";
+  }
 
   return make_shared<BinOp>(*node);
 }

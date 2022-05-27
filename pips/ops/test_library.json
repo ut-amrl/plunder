@@ -22,8 +22,8 @@
     },
     {
         "op": "DistTraveled",
-        "inputType": ["NUM", "NUM", "NUM"],
-        "inputDim": [[1, -1, 0], [1, -1, 0], [1, -2, 0]],
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -2, 0]],
         "outputType": "NUM",
         "outputDim": [1, 0, 0]
     }
