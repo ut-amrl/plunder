@@ -56,6 +56,10 @@ class Robot {
 
   State st = CON; // Initial state
 
+  double DistTraveled(double v, double dec){
+    return - v * v / (2 * dec);
+  }
+
   /*
    * Transition robot state based on current global state. Runs once per time step
    */
@@ -63,7 +67,7 @@ class Robot {
     double xToTarget = target - x - stoppingDistance;             // distance to the target
 
     bool cond1 = v - vMax >= 0;                                   // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget + v * v / (2 * decMax) < 0;            // needs to decelerate or else it will pass target
+    bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;            // needs to decelerate or else it will pass target
     bool cond3 = v <= 0;                                          // is at min velocity (can no longer decelerate)
 
     if(st == CON){
