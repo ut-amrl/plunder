@@ -2,7 +2,8 @@
 #include <random>
 #include <fstream>
 
-#define epsilon 10E-14 // ~= 0
+#define PRECISION 6
+#define epsilon 10E-6
 
 using namespace std;
 
@@ -64,11 +65,11 @@ class Robot {
    * Transition robot state based on current global state. Runs once per time step
    */
   void changeState(){
-    double xToTarget = target - x - stoppingDistance;             // distance to the target
+    double xToTarget = target - x;             // distance to the target
 
-    bool cond1 = v - vMax >= 0;                                   // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;            // needs to decelerate or else it will pass target
-    bool cond3 = v <= 0;                                          // is at min velocity (can no longer decelerate)
+    bool cond1 = v - vMax >= 0;                                           // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - DistTraveled(v, decMax) < stoppingDistance;  // needs to decelerate or else it will pass target
+    bool cond3 = v <= 0;                                                  // is at min velocity (can no longer decelerate)
 
     if(st == CON){
       if(!cond1 && !cond2){
@@ -136,8 +137,19 @@ class Robot {
 
     // Update velocity and displacement accordingly
     v = vPrev + a * T_STEP;
-    bool vIsZero = v <= epsilon;
-    v = vIsZero ? 0 : v+vErr;
+
+    if(abs(v) >= epsilon){ // v != 0
+      v += vErr;
+    }
+    
+    if(abs(v) < epsilon){ // Round to 0
+      v = 0;
+    }
+
+    if(abs(v - vMax) < epsilon){ // Round to vMax
+      v = vMax;
+    }
+
     x = xPrev + (v + vPrev)/2 * T_STEP;
   }
 
@@ -158,9 +170,10 @@ int main() {
   robots.push_back(Robot(2, -2, 15, 100));
   robots.push_back(Robot(3, -1, 12, 200));
   robots.push_back(Robot(6, -2, 30, 50));
-  robots.push_back(Robot(2, -10, 10, 80));
   robots.push_back(Robot(1, -1, 3, 30));
   robots.push_back(Robot(2, -1, 4, 20));
+  robots.push_back(Robot(0.5, -1, 1, 15));
+  robots.push_back(Robot(1, -1, 100, 300));
   
   // Setup output
   ofstream jsonFile;
@@ -177,6 +190,11 @@ int main() {
   }
 
   // Run simulations and generate json/csv files
+
+  // Set precision
+  cout << fixed;
+  cout << setprecision(PRECISION);
+
   for(int i=0; i<robots.size(); i++){
     for(double t=0; t<T_TOT/T_STEP; t++){
       string prevStateStr = robots[i].st == 0 ? "ACC" : 
@@ -189,7 +207,7 @@ int main() {
                     (robots[i].st == 1 ? "DEC" : "CON");
 
       if(genCsv) {
-        csvFile << t << ", "  << robots[i].x << ", " << robots[i].v << "\n";
+        csvFile << t << ", " << robots[i].x << ", " << robots[i].v << "\n";
       }
 
       if(genJson){
