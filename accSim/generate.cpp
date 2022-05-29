@@ -10,6 +10,7 @@ using namespace std;
 static const bool genCsv = true;
 static const bool genJson = true;
 static const bool useHand = true; // uses LDIPS-generated ASP when false
+static const int robotTestSet = 1; // which robot test set to use
 
 static const double T_STEP = .05; // time step
 static const double T_TOT = 15; // total time per simulated scenario
@@ -178,7 +179,7 @@ int main() {
   // Create some arbitrary robots
   vector<Robot> robots;
 
-  if(useHand){
+  if(robotTestSet == 1){
     robots.push_back(Robot(4, -4, 15, 150));
     robots.push_back(Robot(2, -2, 15, 100));
     robots.push_back(Robot(3, -1, 12, 200));
@@ -187,7 +188,7 @@ int main() {
     robots.push_back(Robot(2, -1, 4, 20));
     robots.push_back(Robot(0.5, -1, 1, 15));
     robots.push_back(Robot(1, -1, 100, 300));
-  } else {
+  } else if(robotTestSet == 2){
     robots.push_back(Robot(3, -1, 15, 80));
     robots.push_back(Robot(2, -2, 4, 80));
     robots.push_back(Robot(1, -3, 50, 80));
