@@ -74,40 +74,15 @@ class Robot {
     bool cond2 = xToTarget - DistTraveled(v, decMax) < stoppingDistance;  // needs to decelerate or else it will pass target
     bool cond3 = v <= 0;                                                  // is at min velocity (can no longer decelerate)
 
-    if(st == CON){
-      if(!cond1 && !cond2){
-        st = ACC;
-      } else if (cond2 && !cond3){
-        st = DEC;
-      } else {
-        st = CON;
-      }
-    } else if (st == ACC){
-      if(!cond1 && !cond2){
-        st = ACC;
-      } else if(cond2){
-        st = DEC;
-      } else {
-        st = CON;
-      }
-    } else if (st == DEC){
-      if(cond3){
-        st = CON;
-      } else {
-        st = DEC;
-      }
+    if(cond2 && !cond3){
+      st = DEC;
     }
-
-    // Simplified version
-    // if(cond2 && !cond3){
-    //   st = DEC;
-    // }
-    // if((cond1 && !cond2) || cond3){
-    //   st = CON;
-    // }
-    // if(!cond1 && !cond2){
-    //   st = ACC;
-    // }
+    if((cond1 && !cond2) || cond3){
+      st = CON;
+    }
+    if(!cond1 && !cond2){
+      st = ACC;
+    }
   }
 
   /*
