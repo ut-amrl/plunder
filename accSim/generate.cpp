@@ -7,18 +7,21 @@
 
 using namespace std;
 
-static const bool genCsv = true;
-static const bool genJson = true;
-static const bool useHand = true; // uses LDIPS-generated ASP when false
-static const int robotTestSet = 1; // which robot test set to use
+// Parameters
+static const bool genCsv = true;    // generate CSV trace file
+static const bool genJson = true;   // generate JSON trace file
+static const bool useHand = true;   // uses hand-written ASP when true, LDIPS-generated ASP when false
+static const int robotTestSet = 1;  // which robot test set to use (1-2)
+static const bool error = false;    // apply error when true
 
+// Configuration & Global variables
 static const double T_STEP = .05; // time step
-static const double T_TOT = 15; // total time per simulated scenario
+static const double T_TOT = 15;   // total time per simulated scenario
 
 // Error distribution parameters
 static const double stoppingDistanceMean = 10.0; // stopping distance distribution
 static const double stoppingDistanceStdDev = 0.0;
-static const double vErrMean = 0.0; // velocity error distribution
+static const double vErrMean = 0.0;              // velocity error distribution
 static const double vErrStdDev = 0.0;
 
 enum State {
@@ -185,14 +188,15 @@ int main() {
     csvFile << "time, x, v" << "\n";
   }
 
-  // Run simulations and generate json/csv files
-
   // Set precision
   cout << fixed;
   cout << setprecision(PRECISION);
 
+  // Run simulations and generate json/csv files
   for(int i=0; i<robots.size(); i++){
     for(double t=0; t<T_TOT/T_STEP; t++){
+
+      // Run simulation
       string prevStateStr = robots[i].st == 0 ? "ACC" : 
                         (robots[i].st == 1 ? "DEC" : "CON");
 
@@ -207,6 +211,7 @@ int main() {
       string curStateStr = robots[i].st == 0 ? "ACC" : 
                     (robots[i].st == 1 ? "DEC" : "CON");
 
+      // Print trace
       if(genCsv) {
         csvFile << t << ", " << robots[i].x << ", " << robots[i].v << "\n";
       }
