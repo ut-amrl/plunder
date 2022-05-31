@@ -49,3 +49,6 @@ compile_commands.json
 
 # VSCode
 .vscode/
+
+data.csv
+data.json
