@@ -15,6 +15,7 @@ static const bool genJson = true;   // generate JSON trace file
 static const bool useHand = true;   // uses hand-written ASP when true, LDIPS-generated ASP when false
 static const int robotTestSet = 1;  // which robot test set to use (1-2)
 static const bool error = true;    // apply error when true
+static const bool actionError = true;
 
 // Configuration & Global variables
 static const double T_STEP = .05; // time step
@@ -22,7 +23,10 @@ static const double T_TOT = 15;   // total time per simulated scenario
 
 // Error distribution parameters
 static const double vErrMean = 0.0;     // velocity error distribution
-static const double vErrStdDev = 0.1;
+static const double vErrStdDev = 0.0;
+
+// Action error probabilities
+
 
 enum State {
   ACC, // Constant acceleration
@@ -82,6 +86,13 @@ class Robot {
     if(!cond1 && !cond2){
       st = ACC;
     }
+  }
+
+  void putErrorIntoState(){
+    double r = ((double) rand()/RAND_MAX);
+    int stDif = r < .90 ? 0 :
+                (r < .95) ? 1 : 2;
+    st = static_cast<State>((st + stDif)%3);
   }
 
   /*
@@ -212,6 +223,9 @@ int main() {
         robots[i].changeState_Hand();
       } else {
         robots[i].changeState_LDIPS();
+      }
+      if(actionError){
+        robots[i].putErrorIntoState();
       }
 
       string curStateStr = robots[i].st == 0 ? "ACC" : 
