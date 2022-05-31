@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <fstream>
+#include <iomanip>
 
 #define PRECISION 6
 #define epsilon 10E-6
@@ -12,17 +13,17 @@ static const bool genCsv = true;    // generate CSV trace file
 static const bool genJson = true;   // generate JSON trace file
 static const bool useHand = true;   // uses hand-written ASP when true, LDIPS-generated ASP when false
 static const int robotTestSet = 1;  // which robot test set to use (1-2)
-static const bool error = false;    // apply error when true
+static const bool error = true;    // apply error when true
 
 // Configuration & Global variables
 static const double T_STEP = .05; // time step
 static const double T_TOT = 15;   // total time per simulated scenario
 
 // Error distribution parameters
-static const double stoppingDistanceMean = 10.0; // stopping distance distribution
+static const double stoppingDistanceMean = 0.0; // stopping distance distribution
 static const double stoppingDistanceStdDev = 0.0;
 static const double vErrMean = 0.0;              // velocity error distribution
-static const double vErrStdDev = 0.0;
+static const double vErrStdDev = 0.1;
 
 enum State {
   ACC, // Constant acceleration
@@ -53,7 +54,7 @@ class Robot {
     decMax = _decMax;
     vMax = _vMax;
     target = _target;
-    stoppingDistance = stoppingDistanceDistr(gen);
+    stoppingDistance = error ? stoppingDistanceDistr(gen) : stoppingDistanceMean;
   }
 
   double a = 0; // acceleration
@@ -129,11 +130,11 @@ class Robot {
     // Update velocity and displacement accordingly
     v = vPrev + a * T_STEP;
 
-    if(abs(v) >= epsilon){ // v != 0
+    if(error && abs(v) >= epsilon){ // v != 0
       v += vErr;
     }
     
-    if(abs(v) < epsilon){ // Round to 0
+    if(v < epsilon){ // Round to 0
       v = 0;
     }
 
@@ -179,20 +180,19 @@ int main() {
   ofstream csvFile;
   if(genJson){
     cout << "generating json\n";
+    jsonFile << fixed << setprecision(PRECISION);
     jsonFile.open("data.json");
     jsonFile << "[";
   }
   if(genCsv){
     cout << "generating csv\n";
+    csvFile << fixed << setprecision(PRECISION);
     csvFile.open("data.csv");
     csvFile << "time, x, v" << "\n";
   }
 
-  // Set precision
-  cout << fixed;
-  cout << setprecision(PRECISION);
-
   // Run simulations and generate json/csv files
+  bool first = true;
   for(int i=0; i<robots.size(); i++){
     for(double t=0; t<T_TOT/T_STEP; t++){
 
@@ -217,8 +217,8 @@ int main() {
       }
 
       if(genJson){
-        if(t != 0 || i != 0) jsonFile << ",";
-
+        if(first) first = false;
+        else jsonFile << ",";
         jsonFile << R"({"x":{"dim":[1,0,0],"type":"NUM","name":"x","value":)";
         jsonFile << robots[i].x;
         jsonFile << R"(},"v":{"dim":[1,-1,0],"type":"NUM","name":"v","value":)";
