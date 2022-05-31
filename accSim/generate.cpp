@@ -14,7 +14,7 @@ static const bool genCsv = true;    // generate CSV trace file
 static const bool genJson = true;   // generate JSON trace file
 static const bool useHand = true;   // uses hand-written ASP when true, LDIPS-generated ASP when false
 static const int robotTestSet = 1;  // which robot test set to use (1-2)
-static const bool error = false;    // apply error when true
+static const bool error = true;    // apply error when true
 
 // Configuration & Global variables
 static const double T_STEP = .05; // time step
@@ -72,12 +72,11 @@ class Robot {
 
     bool cond1 = v - vMax >= 0;                                           // is at max velocity (can no longer accelerate)
     bool cond2 = xToTarget - DistTraveled(v, decMax) < epsilon;           // needs to decelerate or else it will pass target
-    bool cond3 = v <= 0;                                                  // is at min velocity (can no longer decelerate)
 
-    if(cond2 && !cond3){
+    if(cond2){
       st = DEC;
     }
-    if((cond1 && !cond2) || cond3){
+    if(cond1 && !cond2){
       st = CON;
     }
     if(!cond1 && !cond2){
@@ -91,21 +90,21 @@ class Robot {
    */
   void changeState_LDIPS(){
     // Copy paste below
-    if(st == ACC && DistTraveled(v, decMax) + x - target > -10.220005)
+    if(st == ACC && DistTraveled(v, decMax) + x - target > -0.594997)
+      st = DEC;
+    else if(st == CON && v - vMax - (vMax - v) > -6.000000 && DistTraveled(vMax, decMax) + x - target > -0.075000)
       st = DEC;
     else if(st == ACC && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) > -0.024687)
       st = CON;
-    else if(st == CON && v > 0.975000 && DistTraveled(vMax, decMax) + x - target > -10.000000)
-      st = DEC;
     else if(st == DEC && 0-v > -0.050000)
       st = CON;
     else if(st == CON && target - x - target > -1.050000)
       st = ACC;
-    else if(st == DEC && x > 2.606250)
+    else if(st == DEC && x > 11.198750)
       st = DEC;
-    else if(st == ACC && x > -0.999375)
+    else if(st == ACC && x > -5.000000)
       st = ACC;
-    else if(st == CON && x > 0.050000)
+    else if(st == CON && x > 0.000000)
       st = CON;
   }
 
@@ -138,7 +137,18 @@ class Robot {
       v = vMax;
     }
 
+    if(abs(x - target) < epsilon){ // Round to target
+      x = target;
+    }
+
     x = xPrev + (v + vPrev)/2 * T_STEP;
+  }
+
+  /*
+   * Robot has reached target and is at rest. End simulation.
+   */
+  bool finished(){
+    return v < epsilon && x >= target - epsilon;
   }
 
   void reset(){
@@ -158,11 +168,11 @@ int main() {
     robots.push_back(Robot(4, -4, 15, 150));
     robots.push_back(Robot(2, -2, 15, 100));
     robots.push_back(Robot(3, -1, 12, 200));
-    robots.push_back(Robot(6, -2, 30, 50));
+    robots.push_back(Robot(5, -2, 30, 50));
     robots.push_back(Robot(1, -1, 3, 30));
     robots.push_back(Robot(2, -1, 4, 20));
-    robots.push_back(Robot(0.5, -1, 1, 15));
-    robots.push_back(Robot(1, -1, 100, 300));
+    robots.push_back(Robot(0.5, -1, 2, 15));
+    robots.push_back(Robot(1, -1, 40, 300));
   } else if(robotTestSet == 2){
     robots.push_back(Robot(3, -1, 15, 80));
     robots.push_back(Robot(2, -2, 4, 80));
@@ -232,6 +242,10 @@ int main() {
         jsonFile << R"("},"output":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
         jsonFile << curStateStr;
         jsonFile << R"("}})" << endl;
+      }
+
+      if(robots[i].finished()){
+        break;
       }
     }
   }
