@@ -5,6 +5,7 @@
 
 #define PRECISION 6
 #define epsilon 10E-6
+#define SEED 3256+2585
 
 using namespace std;
 
@@ -13,16 +14,14 @@ static const bool genCsv = true;    // generate CSV trace file
 static const bool genJson = true;   // generate JSON trace file
 static const bool useHand = true;   // uses hand-written ASP when true, LDIPS-generated ASP when false
 static const int robotTestSet = 1;  // which robot test set to use (1-2)
-static const bool error = true;    // apply error when true
+static const bool error = false;    // apply error when true
 
 // Configuration & Global variables
 static const double T_STEP = .05; // time step
 static const double T_TOT = 15;   // total time per simulated scenario
 
 // Error distribution parameters
-static const double stoppingDistanceMean = 0.0; // stopping distance distribution
-static const double stoppingDistanceStdDev = 0.0;
-static const double vErrMean = 0.0;              // velocity error distribution
+static const double vErrMean = 0.0;     // velocity error distribution
 static const double vErrStdDev = 0.1;
 
 enum State {
@@ -33,8 +32,7 @@ enum State {
 
 // Random error distributions
 random_device rd;
-default_random_engine gen(rd());
-normal_distribution<double> stoppingDistanceDistr(stoppingDistanceMean, stoppingDistanceStdDev);
+default_random_engine gen(SEED);
 normal_distribution<double> vErrDistr(vErrMean, vErrStdDev);
 
 class Robot {
@@ -47,14 +45,12 @@ class Robot {
   double vMax;   // Maximum velocity
 
   double target; // Target distance
-  double stoppingDistance; // Stop a certain distance before the target distance (to prevent collisions)
 
   Robot(double _accMax, double _decMax, double _vMax, double _target){
     accMax = _accMax;
     decMax = _decMax;
     vMax = _vMax;
     target = _target;
-    stoppingDistance = error ? stoppingDistanceDistr(gen) : stoppingDistanceMean;
   }
 
   double a = 0; // acceleration
@@ -75,7 +71,7 @@ class Robot {
     double xToTarget = target - x;                                        // distance to the target
 
     bool cond1 = v - vMax >= 0;                                           // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - DistTraveled(v, decMax) < stoppingDistance;  // needs to decelerate or else it will pass target
+    bool cond2 = xToTarget - DistTraveled(v, decMax) < epsilon;           // needs to decelerate or else it will pass target
     bool cond3 = v <= 0;                                                  // is at min velocity (can no longer decelerate)
 
     if(cond2 && !cond3){
