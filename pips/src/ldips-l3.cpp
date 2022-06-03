@@ -66,10 +66,6 @@ using json = nlohmann::json;
 using z3::context;
 using z3::solver;
 
-bool ExistsFile(const string& filename) {
-  ifstream infile(filename);
-  return infile.good();
-}
 
 int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, false);
