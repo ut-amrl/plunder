@@ -12,10 +12,10 @@ using namespace std;
 // Parameters
 static const bool genCsv = true;        // generate CSV trace file
 static const bool genJson = true;       // generate JSON trace file
-static const int useModel = 2;          // use hand-written ASP (0), LDIPS-generated ASP without error (1), or LDIPS-generated ASP with error (2)
-static const int robotTestSet = 2;      // which robot test set to use (1-2)
+static const int useModel = 0;          // use hand-written ASP (0), LDIPS-generated ASP without error (1), or LDIPS-generated ASP with error (2)
+static const int robotTestSet = 1;      // which robot test set to use (1-2)
 static const bool velocityError = false; // apply error to velocity
-static const bool actionError = false;   // apply error to state transitions
+static const bool actionError = true;   // apply error to state transitions
 
 // Configuration & Global variables
 static const double T_STEP = .1;  // time step
@@ -26,7 +26,7 @@ static const double vErrMean = 0.0;     // velocity error distribution
 static const double vErrStdDev = 0.1;
 
 // Action error probabilities
-static const double stProbCorrect = 0.96;
+static const double stProbCorrect = 0.6;
 
 enum State {
   ACC, // Constant acceleration
@@ -118,20 +118,20 @@ class Robot {
    */
   void changeState_LDIPS_error(){
     // Copy paste below
-    if(st == DEC && 0 - v >= 0.000000)
+    if(st == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= 9.714069)
       st = CON;
-    else if(st == CON && 0 - v >= -4.068562)
-      st = ACC;
-    else if(st == CON && DistTraveled(v, decMax) + x - target >= -0.672409)
-      st = DEC;
-    else if(st == ACC && x >= 56.625511)
-      st = DEC;
-    else if(st == ACC && v - vMax >= -0.042427)
+    else if(st == DEC && DistTraveled(v, decMax) - target >= 11.458965)
       st = CON;
-    else if(st == DEC && target - x - DistTraveled(v, decMax) >= -0.967556)
-      st = ACC;
+    else if(st == CON && x + x + x - target >= 35.615170)
+      st = DEC;
+    else if(st == ACC && DistTraveled(v, decMax) + target >= 535.545532)
+      st = CON;
     else if(st == CON)
-      st = CON;
+      st = ACC;
+    else if(st == ACC && x - target + DistTraveled(v, decMax) >= -0.138184)
+      st = DEC;
+    else if(st == DEC && DistTraveled(v, decMax) - x - x >= -49.242615)
+      st = ACC;
     else if(st == DEC)
       st = DEC;
     else if(st == ACC)
@@ -330,5 +330,3 @@ int main() {
 
   return 0;
 }
-
-// ./bin/ldips-l3 -lib_file ops/test_library.json -ex_file examples/data.json -min_accuracy 0.5 -debug true window_size 0
