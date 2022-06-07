@@ -52,3 +52,5 @@ compile_commands.json
 
 data.csv
 data.json
+
+.DS_Store
