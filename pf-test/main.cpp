@@ -27,8 +27,8 @@ int main(int argc, char **argv)
         }else if (std::atoi(argv[1]) == 4){
             run_hilb_pf_example(argv[2]);
         }else{
-            // run_my_model(argv[2]);
-            // printf("invalid input\n");
+            printf("super valid input\n");
+            run_my_model(argv[2]);
         }
 
     }
