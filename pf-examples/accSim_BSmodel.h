@@ -36,16 +36,17 @@ public:
     // ctor
     my_bs_wc(const float_t &phi, const float_t &beta, const float_t &sigma);
     
-    // required by bootstrap filter base class
+
+    auto fSamp(const ssv &xtm1, const cvsv &zt) -> ssv;
+    auto gSamp(const ssv &xt) -> osv;
+    auto q1Samp(const osv &y1, const cvsv& z1) -> ssv;
+    auto muSamp() -> ssv;
+
+    float_t logGEv(const osv &yt, const ssv &xt, const cvsv& zt);
     float_t logQ1Ev(const ssv &x1, const osv &y1, const cvsv &z1);
     float_t logMuEv(const ssv &x1, const cvsv &z1);
-    float_t logGEv(const osv &yt, const ssv &xt, const cvsv& zt);
-    auto q1Samp(const osv &y1, const cvsv& z1) -> ssv;
 
-    // required by GenForwardMod<> and GenFutureSimulator<> base class
-    auto muSamp() -> ssv;
-    auto gSamp(const ssv &xt) -> osv;
-    auto fSamp(const ssv &xtm1, const cvsv &zt) -> ssv;
+
     std::array<ssv,nparts> get_uwtd_samps() const;
 };
 
@@ -53,7 +54,7 @@ public:
 
 // MAIN CONSTRUCTOR ----------------------------
 // PASS IN ASP (DISTRIBUTION: (HIGH-LEVEL, OBS-STATE) -> (NEXT-HI-LEVEL))
-// PASS IN MOTOR-MODEL (DISTRIBUTION: (HI-LEVEL) -> (LO-LEVEL))
+// PASS IN MOTOR-MODEL (DISTRIBUTION: (HI-LEVEL, OBS-STATE) -> (LO-LEVEL))
 // PASS IN INITIAL-HI-LEVEL DISTRIBUTION
 template<size_t nparts, size_t dimx, size_t dimy, typename resampT, typename float_t>
 my_bs_wc<nparts, dimx, dimy, resampT, float_t>::my_bs_wc(const float_t &phi, const float_t &beta, const float_t &sigma) 
