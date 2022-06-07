@@ -294,8 +294,6 @@ int main() {
         jsonFile << robots[i].v;
         jsonFile << R"(},"target":{"dim":[1,0,0],"type":"NUM","name":"target","value":)";
         jsonFile << robots[i].target;
-        jsonFile << R"(},"zeroVel":{"dim":[1,-1,0],"type":"NUM","name":"zeroVel","value":)";
-        jsonFile << 0;
         jsonFile << R"(},"vMax":{"dim":[1,-1,0],"type":"NUM","name":"vMax","value":)";
         jsonFile << robots[i].vMax;
         jsonFile << R"(},"decMax":{"dim":[1,-2,0],"type":"NUM","name":"decMax","value":)";
