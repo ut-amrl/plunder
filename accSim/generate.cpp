@@ -12,10 +12,10 @@ using namespace std;
 // Parameters
 static const bool genCsv = true;        // generate CSV trace file
 static const bool genJson = true;       // generate JSON trace file
-static const int useModel = 0;          // use hand-written ASP (0), LDIPS-generated ASP without error (1), or LDIPS-generated ASP with error (2)
+static const int useModel = 3;          // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
 static const int robotTestSet = 1;      // which robot test set to use (1-2)
 static const bool velocityError = false; // apply error to velocity
-static const bool actionError = true;   // apply error to state transitions
+static const bool actionError = false;   // apply error to state transitions
 
 // Configuration & Global variables
 static const double T_STEP = .1;  // time step
@@ -72,6 +72,15 @@ class Robot {
     return - v * v / (2 * dec);
   }
 
+  double logistic(double midpoint, double steepness, double input){
+    return 1.0 / (1.0 + exp(-steepness * (input - midpoint)));
+  }
+
+  bool sampleDiscrete(double probTrue){
+    double rv = ((double) rand())/RAND_MAX;
+    return rv <= probTrue;
+  }
+
   /*
    * This is a hand-crafted action-selection policy.
    */
@@ -88,6 +97,28 @@ class Robot {
       st = CON;
     }
     if(!cond1 && !cond2){
+      st = ACC;
+    }
+  }
+
+  /*
+   * This is a probabilistic hand-crafted action-selection policy.
+   */
+  void changeState_Hand_prob(){
+    double xToTarget = target - x;                                        // distance to the target
+    bool cond1 = vMax - v < 0;                                           // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;           // needs to decelerate or else it will pass target
+
+    bool cond1smooth = sampleDiscrete(logistic(vMax*0.1, -50.0/vMax, vMax-v));
+    bool cond2smooth = sampleDiscrete(logistic(target*0.1, -50.0/target, xToTarget - DistTraveled(v, decMax)));
+
+    if(cond2smooth){
+      st = DEC;
+    }
+    if(cond1smooth && !cond2smooth){
+      st = CON;
+    }
+    if(!cond1smooth && !cond2smooth){
       st = ACC;
     }
   }
@@ -160,8 +191,12 @@ class Robot {
       changeState_Hand();
     } else if(useModel == 1){
       changeState_LDIPS();
-    } else {
+    } else if(useModel == 2){
       changeState_LDIPS_error();
+    } else if(useModel == 3){
+      changeState_Hand_prob();
+    } else{
+      exit(1);
     }
 
     if(actionError){

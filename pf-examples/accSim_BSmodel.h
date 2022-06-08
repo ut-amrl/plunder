@@ -28,23 +28,28 @@ public:
     float_t m_phi;
     float_t m_beta;
     float_t m_sigma;
+    float_t (*m_aspSamp)(float_t, float_t);
 
     // use this for sampling
     rvsamp::UnivNormSampler<float_t> m_stdNormSampler; // for sampling 
     rvsamp::UniformSampler<float_t> m_stdUniformSampler;
 
     // ctor
-    my_bs_wc(const float_t &phi, const float_t &beta, const float_t &sigma);
+    my_bs_wc(const float_t &phi, const float_t &beta, const float_t &sigma, float_t (*aspSamp)(float_t, float_t));
     
+    // f = ASP
+    // g = motor model
+    // q1 = initial distribution
+    // mu = initial distribution
 
     auto fSamp(const ssv &xtm1, const cvsv &zt) -> ssv;
     auto gSamp(const ssv &xt) -> osv;
-    auto q1Samp(const osv &y1, const cvsv& z1) -> ssv;
-    auto muSamp() -> ssv;
+    auto q1Samp(const osv &y1, const cvsv& z1) -> ssv; // (used in filter, important)
+    auto muSamp() -> ssv;                              // (used in sim_forward, not important)
 
-    float_t logGEv(const osv &yt, const ssv &xt, const cvsv& zt);
-    float_t logQ1Ev(const ssv &x1, const osv &y1, const cvsv &z1);
-    float_t logMuEv(const ssv &x1, const cvsv &z1);
+    float_t logGEv(const osv &yt, const ssv &xt, const cvsv& zt);       // (used in weight adjustments in filter)
+    float_t logQ1Ev(const ssv &x1, const osv &y1, const cvsv &z1);      // (used in weight adjustments in filter)
+    float_t logMuEv(const ssv &x1, const cvsv &z1);                     // (used in weight adjustments in filter)
 
 
     std::array<ssv,nparts> get_uwtd_samps() const;
@@ -57,8 +62,11 @@ public:
 // PASS IN MOTOR-MODEL (DISTRIBUTION: (HI-LEVEL, OBS-STATE) -> (LO-LEVEL))
 // PASS IN INITIAL-HI-LEVEL DISTRIBUTION
 template<size_t nparts, size_t dimx, size_t dimy, typename resampT, typename float_t>
-my_bs_wc<nparts, dimx, dimy, resampT, float_t>::my_bs_wc(const float_t &phi, const float_t &beta, const float_t &sigma) 
-    : m_phi(phi), m_beta(beta), m_sigma(sigma)
+my_bs_wc<nparts, dimx, dimy, resampT, float_t>::my_bs_wc(const float_t &phi, 
+                                                        const float_t &beta, 
+                                                        const float_t &sigma,
+                                                        float_t (*aspSamp)(float_t, float_t)) 
+    : m_phi(phi), m_beta(beta), m_sigma(sigma), m_aspSamp(aspSamp)
 {
 }
 
@@ -72,7 +80,8 @@ template<size_t nparts, size_t dimx, size_t dimy, typename resampT, typename flo
 auto my_bs_wc<nparts, dimx, dimy, resampT, float_t>::q1Samp(const osv &y1, const cvsv &z1) -> ssv
 {
     ssv x1samp;
-    x1samp(0) = m_stdUniformSampler.sample();
+    // x1samp(0) = m_stdUniformSampler.sample();
+    x1samp(0) = m_aspSamp(y1(0), z1(0));
     return x1samp;
 }
 
