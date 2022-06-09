@@ -297,7 +297,7 @@ int main() {
     cout << "generating csv\n";
     csvFile << fixed << setprecision(PRECISION);
     csvFile.open("data.csv");
-    csvFile << "time, x, v" << "\n";
+    csvFile << "time, x, v, LA" << "\n";
   }
 
   // Run simulations and generate json/csv files
@@ -317,7 +317,7 @@ int main() {
 
       // Print trace
       if(genCsv) {
-        csvFile << t << ", " << robots[i].x << ", " << robots[i].v << "\n";
+        csvFile << t << ", " << robots[i].x << ", " << robots[i].v << ", " << robots[i].a << "\n";
       }
 
       if(genJson){
