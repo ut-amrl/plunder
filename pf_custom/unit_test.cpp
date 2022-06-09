@@ -17,8 +17,22 @@ void testSystematicResample(){
 }
 
 
+
+void readData(){
+
+}
+
+
+void testPF(){
+    MarkovSystem ms;
+    vector<Obs> dataObs;
+    vector<LA> dataLa;
+    PF pf (ms, dataObs, dataLa);
+}
+
+
 int main(){
     srand(time(0));
-    cout << "hello" << endl;
     testSystematicResample();
+    testPF();
 }

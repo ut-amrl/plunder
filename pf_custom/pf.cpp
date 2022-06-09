@@ -32,6 +32,7 @@ FLOAT effectiveParticles(vector<FLOAT> weights){
     return 1 / sum;
 }
 
+
 vector<HA> systematicResample(vector<HA> ha, vector<FLOAT> weights){
     int n = weights.size();
     vector<FLOAT> cumulativeWeights;
@@ -41,11 +42,9 @@ vector<HA> systematicResample(vector<HA> ha, vector<FLOAT> weights){
         runningSum += w;
         cumulativeWeights.push_back(runningSum);
     }
-    cout << "cumsum " << runningSum << endl;
     FLOAT interval = 1.0 / (FLOAT) n;
     FLOAT offset = ((FLOAT) rand()) / RAND_MAX * interval;
     FLOAT pos = offset;
-    cout << "pos " << offset << endl;
     for(int i=0; i<n; i++){
         int index = lower_bound(cumulativeWeights.begin(), cumulativeWeights.end(), pos) - cumulativeWeights.begin();
         haResampled.push_back(ha.at(index));
@@ -55,7 +54,7 @@ vector<HA> systematicResample(vector<HA> ha, vector<FLOAT> weights){
 }
 
 
-
+// TODO: make into abstract class
 class MarkovSystem {
     
     private:
@@ -66,7 +65,7 @@ class MarkovSystem {
     }
 
     // ASP
-    HA motionModel(HA ha, Obs obs){
+    HA motionModel(HA prevHa, Obs prevObs){
         return ACC;
     }
 
@@ -83,18 +82,26 @@ class MarkovSystem {
     
 };
 
+
+
 class PF {
     
     private:
     public:
 
     MarkovSystem system;
+    vector<Obs> dataObs;
+    vector<LA> dataLa;
     vector<vector<HA>> particles;
     vector<vector<int>> ancestors;
 
-    PF(MarkovSystem _system){
+
+    PF(MarkovSystem _system, vector<Obs> _dataObs, vector<LA> _dataLa){
         system = _system;
+        dataObs = _dataObs;
+        dataLa = _dataLa;
     }
+
 
     void forward_filter(int numParticles, int time_steps, float resampleThreshold, FLOAT (*score_f) (Obs, Obs)){
         int N = numParticles;
@@ -103,8 +110,10 @@ class PF {
         vector<FLOAT> log_weights(N);
         // Sample from initial distribution
         for(int i = 0; i < N; i++){
-            particles[i][0] = system.sampleInitialHA();
-            ancestors[i][0] = -1;
+            particles.push_back(vector<HA>(N));
+            ancestors.push_back(vector<int>(N));
+            particles[0][i] = system.sampleInitialHA();
+            ancestors[0][i] = -1;
             log_weights[i] = -log(N);
         }
     }
