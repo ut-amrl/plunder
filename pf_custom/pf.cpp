@@ -1,23 +1,12 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
 #define FLOAT float
 
-FLOAT effectiveParticles(vector<FLOAT> weights){
-    FLOAT sum = 0;
-    for(FLOAT x: weights){
-        sum += x * x;
-    }
-    return 1 / sum;
-}
-
-void systematicResample(vector<HA> ha, vector<FLOAT> weights){
-    int n = weights.size();
-    vector<FLOAT> 
-}
 
 struct Obs {
     FLOAT pos;
@@ -33,6 +22,37 @@ enum HA {
     DEC,
     CON
 };
+
+
+FLOAT effectiveParticles(vector<FLOAT> weights){
+    FLOAT sum = 0;
+    for(FLOAT x: weights){
+        sum += x * x;
+    }
+    return 1 / sum;
+}
+
+vector<HA> systematicResample(vector<HA> ha, vector<FLOAT> weights){
+    int n = weights.size();
+    vector<FLOAT> cumulativeWeights;
+    vector<HA> haResampled;
+    FLOAT runningSum = 0;
+    for(FLOAT w: weights){
+        runningSum += w;
+        cumulativeWeights.push_back(runningSum);
+    }
+    cout << "cumsum " << runningSum << endl;
+    FLOAT interval = 1.0 / (FLOAT) n;
+    FLOAT offset = ((FLOAT) rand()) / RAND_MAX * interval;
+    FLOAT pos = offset;
+    cout << "pos " << offset << endl;
+    for(int i=0; i<n; i++){
+        int index = lower_bound(cumulativeWeights.begin(), cumulativeWeights.end(), pos) - cumulativeWeights.begin();
+        haResampled.push_back(ha.at(index));
+        pos += interval;
+    }
+    return haResampled;
+}
 
 
 
