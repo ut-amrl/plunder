@@ -31,10 +31,6 @@
 *.out
 *.app
 
-# Other
-gen
-generate
-
 # Binaries and CMake
 bin/
 build/
@@ -42,6 +38,11 @@ cmake_install.cmake
 CMakeCache.txt
 CMakeFiles/
 lib/
+
+# Other
+gen
+generate
+pf_custom/out
 
 # Clang
 .clangd/
@@ -52,5 +53,6 @@ compile_commands.json
 
 data.csv
 data.json
+pips/examples/data.json
 
 .DS_Store
