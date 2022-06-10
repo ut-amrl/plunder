@@ -5,11 +5,11 @@
 #include <cassert>
 #include <numeric>
 
+#include "../robot.h"
+
 using namespace std;
 
 #define FLOAT float
-#define epsilon 10E-6
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 FLOAT logsumexp(vector<FLOAT>& vals) {
@@ -87,6 +87,7 @@ class MarkovSystem {
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Particle filter
 template<typename HA, typename LA, typename Obs>
 class PF {
     
@@ -96,6 +97,9 @@ class PF {
     MarkovSystem<HA, LA, Obs>* system;
     vector<Obs> dataObs;
     vector<LA> dataLA;
+
+    vector<vector<HA>> particles;
+    vector<vector<int>> ancestors;
 
     PF(MarkovSystem<HA, LA, Obs>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
         system = _system;
@@ -109,20 +113,16 @@ class PF {
         int N = numParticles;
         int T = dataObs.size();
 
-        vector<vector<HA>> particles;
-        vector<vector<int>> ancestors;
-
         vector<FLOAT> log_weights(N);
         vector<FLOAT> weights(N);
         FLOAT log_obs = 0.0;
 
-
-        // Sample from initial distribution
         for(int t = 0; t < T; t++){
             particles.push_back(vector<HA>(N));
             ancestors.push_back(vector<int>(N));
         }
         
+        // Sample from initial distribution
         for(int i = 0; i < N; i++){
             particles[0][i] = system->sampleInitialHA();
             ancestors[0][i] = -1;
@@ -137,7 +137,7 @@ class PF {
 
         for(int t = 0; t < T; t++){
             
-            // Reweigh particles
+            // Reweight particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
                 FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(dataLA[t], x_i, dataObs[t]);
@@ -174,6 +174,39 @@ class PF {
                 }
             }
         }
+    }
+
+    vector<vector<HA>> retrieveTrajectories(){
+        if(particles.size() == 0){
+            cout << "Run the particle filter first!" << endl;
+            return vector<vector<HA>>();
+        }
+        assert(particles.size() == ancestors.size());
+
+        int T = particles.size(); int N = particles[0].size();
+
+        vector<vector<HA>> trajectories;
+        for(int i = 0; i < N; i++){
+            trajectories.push_back(vector<HA>(T));
+        }
+
+        vector<int> activeParticles(N);
+        for(int i = 0; i < N; i++){
+            activeParticles[i] = i;
+        }
+
+        for(int t = T - 1; t >= 0; t--){
+            for(int i = 0; i < N; i++){
+                trajectories[i][t] = particles[t][activeParticles[i]];
+            }
+            if(t != 0){
+                for(int i = 0; i < N; i++){
+                    activeParticles[i] = ancestors[t][activeParticles[i]];
+                }
+            }
+        }
+
+        return trajectories;
     }
 
 };

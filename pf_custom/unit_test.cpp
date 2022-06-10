@@ -3,7 +3,6 @@
 #include <sstream>
 
 #include "pf.cpp"
-#include "../robot.h"
 
 using namespace std;
 
@@ -99,6 +98,39 @@ void testSystematicResample(){
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+void testTrajectoryRetrieval(){
+    MarkovSystem<HA, LA, Obs> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
+    vector<Obs> dataObs;
+    vector<LA> dataLa;
+    readData(dataObs, dataLa);
+    PF<HA, LA, Obs> pf (&ms, dataObs, dataLa);
+    
+    int T = 4;
+    int N = 5;
+
+    pf.particles = {
+        { ACC, CON, ACC, DEC, CON },
+        { ACC, ACC, DEC, CON, CON },
+        { ACC, CON, DEC, DEC, DEC },
+        { DEC, DEC, CON, ACC, ACC }
+    };
+    pf.ancestors = {
+        { -1, -1, -1, -1, -1 },
+        { 0, 0, 1, 3, 4 },
+        { 0, 1, 2, 3, 4 },
+        { 0, 0, 0, 2, 3 }
+    };
+
+    vector<vector<HA>> traj = pf.retrieveTrajectories();
+
+    for(vector<HA> each: traj){
+        for(HA ha: each){
+            cout << ha << " ";
+        }
+        cout << endl;
+    }
+}
+
 void testPF(){
     MarkovSystem<HA, LA, Obs> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
     vector<Obs> dataObs;
@@ -113,5 +145,7 @@ int main(){
 
     test_logsumexp();
     testSystematicResample();
+
+    testTrajectoryRetrieval();
     testPF();
 }
