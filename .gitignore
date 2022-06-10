@@ -42,6 +42,7 @@ lib/
 # Other
 gen
 generate
+out
 pf_custom/out
 
 # Clang
