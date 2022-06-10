@@ -1,33 +1,60 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <math.h>
 
 #include "pf.cpp"
 
 using namespace std;
 
+#define PF_SEED time(0)
+
+static const double LA_stddev = 3.0;
 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 HA sampleInitialHA(){
-    return ACC;
+    // Distribution 1: Point distribution
+    // return ACC;
+
+    // Distribution 2: Uniformly Randomly Distributed
+    double rv = ((double) rand()) / RAND_MAX;
+    if(rv <= 0.33){
+        return ACC;
+    } else if (rv <= 0.67){
+        return DEC;
+    } else {
+        return CON;
+    }
 }
 
-HA ASP(HA prevHa, Obs prevObs){
-    return ACC;
+HA ASP(Robot r, HA prevHA, Obs prevObs){
+    r.x = prevObs.pos;
+    r.v = prevObs.vel;
+    r.ha = prevHA;
+
+    r.changeHA();
+    
+    return r.ha;
 }
 
-FLOAT logLikelihoodGivenMotorModel(LA la, HA ha, Obs obs){
-    // something gaussian on HA acc to get LA acc
-    return 1.0;
+FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
+    return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
 }
 
+FLOAT logLikelihoodGivenMotorModel(Robot r, LA la, HA ha, Obs obs){
 
+    double la_mean = (ha == ACC) ? r.accMax : (ha == DEC) ? r.decMax : 0;
+    double res = logpdf(la.acc, la_mean, LA_stddev);
+        
+    return res;
+}
 
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 // Read low-level action sequence and observed state sequence from file
 void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
 
@@ -37,8 +64,9 @@ void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
     // header line
     getline(infile, res);
     // data lines
-    while(getline(infile, res)){
-
+    for(int i=0; i<20; i++){
+        getline(infile, res);
+    // while(getline(infile, res)){
         istringstream iss (res);
         float time; string comma1;
         float x; string comma2;
@@ -63,6 +91,7 @@ void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 // Unit tests
 
 void test_logsumexp(){
@@ -72,7 +101,6 @@ void test_logsumexp(){
     vec.push_back(-3);
 
     FLOAT res = logsumexp(vec);
-    cout << res << endl;
 
     FLOAT sum = 0.0;
     for(FLOAT each: vec){
@@ -80,12 +108,19 @@ void test_logsumexp(){
     }
 
     assert(abs(res - log(sum)) < epsilon);
+
+    vec.push_back(-1.1);
+
+    res = logsumexp(vec);
+    sum += exp(vec[vec.size()-1]);
+
+    assert(abs(res - log(sum)) < epsilon);
 }
 
 void testSystematicResample(){
     vector<HA> ha = {ACC, DEC, CON, ACC};
     vector<FLOAT> weights = {.1, .7, .15, .05};
-    vector<int> ancestor;
+    vector<int> ancestor(4);
     vector<HA> haResampled = systematicResample<HA>(ha, weights, ancestor);
     for(HA action : haResampled){
         cout << action << " ";
@@ -93,17 +128,25 @@ void testSystematicResample(){
     cout << endl;
 }
 
+void testLogPdf(){
+    double mu = 1.0;
+    double stddev = 0.5;
+
+    for(int i = 0; i < 2; i++){
+        double x = ((double) x) / RAND_MAX * 2;
+        double pdf_gaussian = ( 1 / ( stddev * sqrt(2*M_PI) ) ) * exp( -0.5 * pow( (x-mu)/stddev, 2.0 ) );
+
+        assert(abs(log(pdf_gaussian) - logpdf(x, mu, stddev)) < epsilon);
+    }
+}
 
 
-
-
-// ---------------------------------------------------------------------------------------------------------------------
 void testTrajectoryRetrieval(){
-    MarkovSystem<HA, LA, Obs> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
+    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
     vector<Obs> dataObs;
     vector<LA> dataLa;
     readData(dataObs, dataLa);
-    PF<HA, LA, Obs> pf (&ms, dataObs, dataLa);
+    PF<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
     
     int T = 4;
     int N = 5;
@@ -132,19 +175,34 @@ void testTrajectoryRetrieval(){
 }
 
 void testPF(){
-    MarkovSystem<HA, LA, Obs> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
+    int N = 10;
+    double resample_threshold = 0.5;
+
+    Robot r (6, -5, 15, 150, normal_distribution<double>(0.0, 0.1), 0.9, 0);
+    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel, r);
     vector<Obs> dataObs;
     vector<LA> dataLa;
     readData(dataObs, dataLa);
-    PF<HA, LA, Obs> pf (&ms, dataObs, dataLa);
+    PF<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
+    pf.forward_filter(N, resample_threshold);
+    
+    vector<vector<HA>> traj = pf.retrieveTrajectories();
+    for(vector<HA> each: traj){
+        for(HA ha: each){
+            cout << ha << " ";
+        }
+        cout << endl;
+        cout << endl;
+    }
 }
 
 
 int main(){
-    srand(time(0));
+    srand(PF_SEED);
 
     test_logsumexp();
     testSystematicResample();
+    testLogPdf();
 
     testTrajectoryRetrieval();
     testPF();
