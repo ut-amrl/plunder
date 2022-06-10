@@ -15,7 +15,7 @@ using namespace std;
 static const bool genCsv = true;            // generate CSV trace file
 static const bool genJson = true;           // generate JSON trace file
 static const int useModel = 0;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
-static const int robotTestSet = 2;          // which robot test set to use (1-2)
+static const int robotTestSet = 3;          // which robot test set to use (1-3)
 static const bool velocityError = true;    // apply error to velocity
 static const bool actionError = true;      // apply error to state transitions
 
@@ -68,6 +68,8 @@ int main() {
         robots.push_back(Robot(1.5, -4, 50, 80, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(8, -6, 20, 80, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(4, -5, 100, 80, vErrDistr, _haProbCorrect, useModel));
+    } else if(robotTestSet == 3){
+        robots.push_back(Robot(6, -5, 15, 150, vErrDistr, _haProbCorrect, useModel));
     }
     
     // Setup output

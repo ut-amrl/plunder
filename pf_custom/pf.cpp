@@ -9,9 +9,11 @@
 
 using namespace std;
 
-#define FLOAT float
+#define FLOAT float // Set to double (for precision) or float (for speed)
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+// Exponentiate some values, take their sum, then take the log of the sum
 FLOAT logsumexp(vector<FLOAT>& vals) {
     if (vals.size() == 0){
         return 0;
@@ -24,6 +26,7 @@ FLOAT logsumexp(vector<FLOAT>& vals) {
     return max_elem + log(sum);
 }
 
+// Metric to calculate "active" particles
 FLOAT effectiveParticles(vector<FLOAT>& weights){
     FLOAT sum = 0;
     for(FLOAT x: weights){
@@ -32,7 +35,8 @@ FLOAT effectiveParticles(vector<FLOAT>& weights){
     return 1 / sum;
 }
 
-
+// Resample particles given their current weights. 
+// This method performs the resampling systematically to reduce variance.
 template <typename HA>
 vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int>& ancestor){
     int n = weights.size();
@@ -65,17 +69,20 @@ vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+// Setup Markov System with parameterized high-level actions, low-level actions, observed states, and robot class
 template<typename HA, typename LA, typename Obs, typename RobotClass>
 class MarkovSystem {
     
     private:
     public:
 
-    HA (*sampleInitialHA)();
-    HA (*ASP)(RobotClass r, HA prevHa, Obs prevObs);
-    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs);
+    HA (*sampleInitialHA)(); // Initial distribution
+    HA (*ASP)(RobotClass r, HA prevHa, Obs prevObs); // Provided action-selection policy
+    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs); // Calculate likelihood of observed LA given the simulated HA sequence
     RobotClass r;
 
+    // Constructor
     MarkovSystem( HA (*_sampleInitialHA)(), 
                   HA (*_ASP)(RobotClass r, HA prevHa, Obs prevObs),
                   FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs),
@@ -84,6 +91,7 @@ class MarkovSystem {
                   {
     }
     
+    // Robot-less constructor
     MarkovSystem( HA (*_sampleInitialHA)(), 
                   HA (*_ASP)(RobotClass r, HA prevHa, Obs prevObs),
                   FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs)):
@@ -94,9 +102,9 @@ class MarkovSystem {
 
 
 
-
 // ---------------------------------------------------------------------------------------------------------------------
-// Particle filter
+
+// Particle filter based off a MarkovSystem
 template<typename HA, typename LA, typename Obs, typename RobotClass>
 class PF {
     
@@ -104,11 +112,11 @@ class PF {
     public:
 
     MarkovSystem<HA, LA, Obs, RobotClass>* system;
-    vector<Obs> dataObs;
-    vector<LA> dataLA;
+    vector<Obs> dataObs;    // Observed state sequence
+    vector<LA> dataLA;      // Observed low-level action sequence
 
-    vector<vector<HA>> particles;
-    vector<vector<int>> ancestors;
+    vector<vector<HA>> particles;   // Gives the high-level trajectories of each particle
+    vector<vector<int>> ancestors;  // Stores ancestors during resampling
 
     PF(MarkovSystem<HA, LA, Obs, RobotClass>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
         system = _system;
@@ -118,7 +126,10 @@ class PF {
         assert(dataObs.size() == dataLA.size());
     }
 
+    // Run particle filter on numParticles particles (and some resampleThreshold between 0 and 1)
     void forward_filter(int numParticles, float resampleThreshold){
+
+        // Initialization
         int N = numParticles;
         int T = dataObs.size();
 
@@ -153,7 +164,24 @@ class PF {
                 log_weights[i] += log_LA_ti;
             }
 
-            // Normalization
+            // DEBUG
+            // cout << "Processing time " << t << " and LA " << dataLA[t].acc << endl;
+            // for(HA each: particles[t]){
+            //     cout << each << " ";
+            // }
+            // cout << endl;
+            // cout << "New weights: ";
+            // for(FLOAT each: log_weights){
+            //     cout << each << " ";
+            // }
+            // cout << endl;
+            // cout << "New weights: ";
+            // for(FLOAT each: log_weights){
+            //     cout << exp(each) << " ";
+            // }
+            // cout << endl;
+
+            // Normalize weights
             FLOAT log_z_t = logsumexp(log_weights);
             FLOAT sum = 0.0;
             for(int i = 0; i < N; i++){
@@ -166,31 +194,30 @@ class PF {
             // Update log observation likelihood
             log_obs += log_z_t;
 
-            cout << "WEIGHTS: ";
-            for(int i = 0; i < weights.size(); i++){
-                cout << weights[i] << " ";
-            }
-            cout << endl;
+            // DEBUG
+            // cout << "Normalized weights: ";
+            // for(FLOAT each: log_weights){
+            //     cout << exp(each) << " ";
+            // }
+            // cout << endl;
 
-            cout << "LOG WEIGHTS: ";
-            for(int i = 0; i < log_weights.size(); i++){
-                cout << log_weights[i] << " ";
-            }
-            cout << endl;
-
-            // Optionally resample
+            // Optionally resample when number of effective particles is low
             if(effectiveParticles(weights) < N * resampleThreshold){
-                cout << "resample at time=" << t << endl;
                 particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
 
-                cout << "Ancestors: ";
-                for(int i = 0; i < ancestors[t].size(); i++){
-                    cout << ancestors[t][i] << " ";
-                        // CHANGE MADE HERE
-                    log_weights[i] = log_weights[ancestors[t][i]];
-                    weights[i] = weights[ancestors[t][i]];
+                // Reset weights
+                for(int i = 0; i < N; i++){
+                    log_weights[i] = -log(N);
+                    weights[i] = exp(log_weights[i]);
                 }
-                cout << endl;
+
+                // DEBUG
+                // cout << "Resampling..." << endl;
+                // cout << "New particles: ";
+                // for(HA each: particles[t]){
+                //     cout << each << " ";
+                // }
+                // cout << endl;
             } else {
                 // Ancestor for each particle is itself
                 for(int i = 0; i < N; i++){
@@ -198,7 +225,7 @@ class PF {
                 }
             }
 
-            // Forward-propagate particles
+            // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
                     particles[t+1][i] = system->ASP(system->r, particles[t][i], dataObs[t]);
@@ -207,6 +234,7 @@ class PF {
         }
     }
 
+    // Retrieve high-level action sequences after running particle filter
     vector<vector<HA>> retrieveTrajectories(){
         if(particles.size() == 0){
             cout << "Run the particle filter first!" << endl;

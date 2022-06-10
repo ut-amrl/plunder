@@ -5,23 +5,23 @@
 
 #define PRECISION 6
 #define epsilon 10E-6
-#define SEED 3256+2585
+#define SEED 3256+2585 // Random seed
 
 using namespace std;
 
-enum HA {
+enum HA { // High-level actions
     ACC, // Constant acceleration
     DEC, // Constant deceleration
     CON  // No acceleration
 };
 
-struct Obs {
-    double pos; // position
-    double vel; // velocity
+struct LA { // Low-level actions
+    double acc; // target acceleration
 };
 
-struct LA {
-    double acc; // target acceleration
+struct Obs { // State observations
+    double pos; // position
+    double vel; // velocity
 };
 
 // Random error distributions
@@ -35,14 +35,14 @@ class Robot {
 
     double accMax; // Maximum constant acceleration
     double decMax; // Maximum constant deceleration 
-    double vMax;     // Maximum velocity
+    double vMax;   // Maximum velocity
 
     double target; // Target distance
 
 
     normal_distribution<double> vErrDistr;        // Velocity error distribution
-    double haProbCorrect;                                         // Probability of transitioning to the correct high-level action
-    int model;                                                                // Use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
+    double haProbCorrect;                         // Probability of transitioning to the correct high-level action
+    int model;                                    // Use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
 
     Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _vErrDistr, double _haProbCorrect, int _model){
         accMax = _accMax;
@@ -53,6 +53,8 @@ class Robot {
         haProbCorrect = _haProbCorrect;
         model = _model;
     }
+
+    Robot() {}
 
     double a = 0; // acceleration
     double v = 0; // velocity
@@ -78,10 +80,10 @@ class Robot {
      * This is a hand-crafted action-selection policy.
      */
     void changeHA_Hand(){
-        double xToTarget = target - x;                                                                                // distance to the target
+        double xToTarget = target - x;                                  // distance to the target
 
-        bool cond1 = v - vMax >= 0;                                                                                     // is at max velocity (can no longer accelerate)
-        bool cond2 = xToTarget - DistTraveled(v, decMax) < epsilon;                     // needs to decelerate or else it will pass target
+        bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+        bool cond2 = xToTarget - DistTraveled(v, decMax) < epsilon;     // needs to decelerate or else it will pass target
 
         if(cond2){
             ha = DEC;
@@ -98,8 +100,8 @@ class Robot {
      * This is a probabilistic hand-crafted action-selection policy.
      */
     void changeHA_Hand_prob(){
-        double xToTarget = target - x;                                                    // distance to the target
-        bool cond1 = vMax - v < 0;                                                            // is at max velocity (can no longer accelerate)
+        double xToTarget = target - x;                            // distance to the target
+        bool cond1 = vMax - v < 0;                                // is at max velocity (can no longer accelerate)
         bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;     // needs to decelerate or else it will pass target
 
         bool cond1smooth = sampleDiscrete(logistic(vMax*0.1, -50.0/vMax, vMax-v));
