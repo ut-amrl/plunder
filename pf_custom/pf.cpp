@@ -11,22 +11,11 @@ using namespace std;
 #define epsilon 10E-6
 
 
+
+
+
+
 // ---------------------------------------------------------------------------------------------------------------------
-struct Obs {
-    FLOAT pos;
-    FLOAT vel;
-};
-
-struct LA {
-    FLOAT acc;
-};
-
-enum HA {
-    ACC,
-    DEC,
-    CON
-};
-
 FLOAT logsumexp(vector<FLOAT>& vals) {
     if (vals.size() == 0){
         return 0;
@@ -40,7 +29,6 @@ FLOAT logsumexp(vector<FLOAT>& vals) {
 }
 
 
-// ---------------------------------------------------------------------------------------------------------------------
 FLOAT effectiveParticles(vector<FLOAT>& weights){
     FLOAT sum = 0;
     for(FLOAT x: weights){
@@ -50,6 +38,7 @@ FLOAT effectiveParticles(vector<FLOAT>& weights){
 }
 
 
+template <typename HA>
 vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int>& ancestor){
     int n = weights.size();
     vector<FLOAT> cumulativeWeights;
@@ -81,40 +70,40 @@ vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// TODO: make into abstract class
+template<typename HA, typename Obs, typename LA>
 class MarkovSystem {
     
     private:
     public:
 
-    HA sampleInitialHA(){
-        return ACC;
-    }
+    HA (*sampleInitialHA)();
+    HA (*ASP)(HA prevHa, Obs prevObs);
+    FLOAT (*logLikelihoodGivenMotorModel)(LA la, HA ha, Obs obs);
 
-    HA ASP(HA prevHa, Obs prevObs){
-        return ACC;
+    MarkovSystem( HA (*_sampleInitialHA)(), 
+                  HA (*_ASP)(HA prevHa, Obs prevObs),
+                  FLOAT (*_logLikelihoodGivenMotorModel)(LA la, HA ha, Obs obs)):
+                        sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel)
+                  {
     }
-
-    FLOAT logLikelihoodGivenMotorModel(LA la, HA ha, Obs obs){
-        // something gaussian on HA acc to get LA acc
-        return 1.0;
-    }
-    
 };
 
 
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
+template<typename HA, typename Obs, typename LA>
 class PF {
     
     private:
     public:
 
-    MarkovSystem system;
+    MarkovSystem<HA, Obs, LA>* system;
     vector<Obs> dataObs;
     vector<LA> dataLA;
 
-    PF(MarkovSystem _system, vector<Obs> _dataObs, vector<LA> _dataLA){
+    PF(MarkovSystem<HA, Obs, LA>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
         system = _system;
         dataObs = _dataObs;
         dataLA = _dataLA;
@@ -141,7 +130,7 @@ class PF {
         }
         
         for(int i = 0; i < N; i++){
-            particles[0][i] = system.sampleInitialHA();
+            particles[0][i] = system->sampleInitialHA();
             ancestors[0][i] = -1;
             log_weights[i] = -log(N);
             weights[i] = exp(log_weights[i]);
@@ -153,12 +142,12 @@ class PF {
         // motionModel(DEC, dataObs[t-1]);
         // motionModel(ACC, dataObs[t-1]);
 
-        for(int t = 1; t < T; t++){
+        for(int t = 0; t < T; t++){
             
-            // Reweight particles
+            // Reweigh particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
-                FLOAT log_LA_ti = system.logLikelihoodGivenMotorModel(dataLA[t], x_i, dataObs[t]);
+                FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(dataLA[t], x_i, dataObs[t]);
                 log_weights[i] += log_LA_ti;
             }
 
@@ -167,7 +156,7 @@ class PF {
             FLOAT sum = 0.0;
             for(int i = 0; i < N; i++){
                 log_weights[i] -= log_z_t;
-                sum += log_weights[i];
+                sum += log_weights[i];                  // do u mean to use weights[i] here?
                 weights[i] = exp(log_weights[i]);
             }
             assert(abs(sum - 1.0) < epsilon);
@@ -177,7 +166,7 @@ class PF {
 
             // Optionally resample
             if(effectiveParticles(weights) < N * resampleThreshold){
-                particles[t] = systematicResample(particles[t], weights, ancestors[t]);
+                particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
             } else {
                 // Ancestor for each particle is itself
                 for(int i = 0; i < N; i++){
@@ -188,7 +177,7 @@ class PF {
             // Forward-propagate particles
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = system.ASP(particles[t][i], dataObs[t]);
+                    particles[t+1][i] = system->ASP(particles[t][i], dataObs[t]);
                 }
             }
             

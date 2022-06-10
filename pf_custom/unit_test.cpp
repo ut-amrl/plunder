@@ -5,6 +5,78 @@
 
 using namespace std;
 
+
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+struct AccSimObs {
+    FLOAT pos;
+    FLOAT vel;
+};
+
+struct AccSimLA {
+    FLOAT acc;
+};
+
+enum AccSimHA {
+    ACC,
+    DEC,
+    CON
+};
+
+AccSimHA sampleInitialHA(){
+    return ACC;
+}
+
+AccSimHA ASP(AccSimHA prevHa, AccSimObs prevObs){
+    return ACC;
+}
+
+FLOAT logLikelihoodGivenMotorModel(AccSimLA la, AccSimHA ha, AccSimObs obs){
+    // something gaussian on HA acc to get LA acc
+    return 1.0;
+}
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+void readData(vector<AccSimObs>& dataObs, vector<AccSimLA>& dataLA){
+
+    ifstream infile;
+    infile.open("../accSim/data.csv");
+    string res;
+    // header line
+    getline(infile, res);
+    // data lines
+    while(getline(infile, res)){
+
+        istringstream iss (res);
+        float time; string comma1;
+        float x; string comma2;
+        float v; string comma3;
+        float a;
+        iss >> time >> comma1 >> x >> comma2 >> v >> comma3 >> a;
+
+        AccSimObs obs;
+        obs.pos = x;
+        obs.vel = v;
+        dataObs.push_back(obs);
+
+        AccSimLA la;
+        la.acc = a;
+        dataLA.push_back(la);
+    }
+}
+
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
 void test_logsumexp(){
     vector<FLOAT> vec;
     vec.push_back(-0.69);
@@ -16,63 +88,27 @@ void test_logsumexp(){
 }
 
 void testSystematicResample(){
-    // vector<HA> ha = {ACC, DEC, CON, ACC};
-    // vector<FLOAT> weights = {.1, .7, .15, .05};
-    // vector<HA> haResampled = systematicResample(ha, weights);
-    // for(HA action : haResampled){
-    //     cout << action << " ";
-    // }
-    // cout << endl;
+    vector<AccSimHA> ha = {ACC, DEC, CON, ACC};
+    vector<FLOAT> weights = {.1, .7, .15, .05};
+    vector<int> ancestor;
+    vector<AccSimHA> haResampled = systematicResample<AccSimHA>(ha, weights, ancestor);
+    for(AccSimHA action : haResampled){
+        cout << action << " ";
+    }
+    cout << endl;
 }
 
 
 
-void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
-
-    ifstream infile;
-    infile.open("../accSim/data.csv");
-    string res;
-    // header line
-    getline(infile, res);
-    // data lines
-    while(getline(infile, res)){
-
-        istringstream iss (res);
-        float time;
-        string comma1;
-        float x;
-        string comma2;
-        float v;
-        string comma3;
-        float val;
-        iss >> time >> comma1 >> x >> comma2 >> v >> comma3 >> val;
-
-        Obs obs;
-        obs.pos = x;
-        obs.vel = v;
-        dataObs.push_back(obs);
-
-        LA la;
-        la.acc = val;
-        dataLA.push_back(la);
-    }
-    for(Obs ob : dataObs){
-        cout << ob.vel << endl;
-        cout << ob.pos << endl;
-    }
-    for(LA la : dataLA){
-        cout << la.acc << endl;
-    }
-
-}
 
 
+// ---------------------------------------------------------------------------------------------------------------------
 void testPF(){
-    MarkovSystem ms;
-    vector<Obs> dataObs;
-    vector<LA> dataLa;
+    MarkovSystem<AccSimHA, AccSimObs, AccSimLA> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
+    vector<AccSimObs> dataObs;
+    vector<AccSimLA> dataLa;
     readData(dataObs, dataLa);
-    PF pf (ms, dataObs, dataLa);
+    PF<AccSimHA, AccSimObs, AccSimLA> pf (&ms, dataObs, dataLa);
 }
 
 
