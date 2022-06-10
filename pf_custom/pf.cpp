@@ -11,10 +11,6 @@ using namespace std;
 #define epsilon 10E-6
 
 
-
-
-
-
 // ---------------------------------------------------------------------------------------------------------------------
 FLOAT logsumexp(vector<FLOAT>& vals) {
     if (vals.size() == 0){
@@ -27,7 +23,6 @@ FLOAT logsumexp(vector<FLOAT>& vals) {
     
     return max_elem + log(sum);
 }
-
 
 FLOAT effectiveParticles(vector<FLOAT>& weights){
     FLOAT sum = 0;
@@ -70,7 +65,7 @@ vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-template<typename HA, typename Obs, typename LA>
+template<typename HA, typename LA, typename Obs>
 class MarkovSystem {
     
     private:
@@ -91,19 +86,18 @@ class MarkovSystem {
 
 
 
-
 // ---------------------------------------------------------------------------------------------------------------------
-template<typename HA, typename Obs, typename LA>
+template<typename HA, typename LA, typename Obs>
 class PF {
     
     private:
     public:
 
-    MarkovSystem<HA, Obs, LA>* system;
+    MarkovSystem<HA, LA, Obs>* system;
     vector<Obs> dataObs;
     vector<LA> dataLA;
 
-    PF(MarkovSystem<HA, Obs, LA>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
+    PF(MarkovSystem<HA, LA, Obs>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
         system = _system;
         dataObs = _dataObs;
         dataLA = _dataLA;
@@ -136,8 +130,7 @@ class PF {
             weights[i] = exp(log_weights[i]);
         }
 
-        // iterate through enum calculating possible future HA as optimization
-        // EX: 
+        // Extension: iterate through enum calculating possible future HA as optimization. Ex:
         // motionModel(CON, dataObs[t-1]);
         // motionModel(DEC, dataObs[t-1]);
         // motionModel(ACC, dataObs[t-1]);
@@ -180,7 +173,6 @@ class PF {
                     particles[t+1][i] = system->ASP(particles[t][i], dataObs[t]);
                 }
             }
-            
         }
     }
 

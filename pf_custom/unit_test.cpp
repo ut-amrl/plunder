@@ -1,39 +1,25 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
 #include "pf.cpp"
+#include "../robot.h"
 
 using namespace std;
 
 
 
-
-
 // ---------------------------------------------------------------------------------------------------------------------
-struct AccSimObs {
-    FLOAT pos;
-    FLOAT vel;
-};
 
-struct AccSimLA {
-    FLOAT acc;
-};
-
-enum AccSimHA {
-    ACC,
-    DEC,
-    CON
-};
-
-AccSimHA sampleInitialHA(){
+HA sampleInitialHA(){
     return ACC;
 }
 
-AccSimHA ASP(AccSimHA prevHa, AccSimObs prevObs){
+HA ASP(HA prevHa, Obs prevObs){
     return ACC;
 }
 
-FLOAT logLikelihoodGivenMotorModel(AccSimLA la, AccSimHA ha, AccSimObs obs){
+FLOAT logLikelihoodGivenMotorModel(LA la, HA ha, Obs obs){
     // something gaussian on HA acc to get LA acc
     return 1.0;
 }
@@ -43,7 +29,8 @@ FLOAT logLikelihoodGivenMotorModel(AccSimLA la, AccSimHA ha, AccSimObs obs){
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-void readData(vector<AccSimObs>& dataObs, vector<AccSimLA>& dataLA){
+// Read low-level action sequence and observed state sequence from file
+void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
 
     ifstream infile;
     infile.open("../accSim/data.csv");
@@ -60,12 +47,12 @@ void readData(vector<AccSimObs>& dataObs, vector<AccSimLA>& dataLA){
         float a;
         iss >> time >> comma1 >> x >> comma2 >> v >> comma3 >> a;
 
-        AccSimObs obs;
+        Obs obs;
         obs.pos = x;
         obs.vel = v;
         dataObs.push_back(obs);
 
-        AccSimLA la;
+        LA la;
         la.acc = a;
         dataLA.push_back(la);
     }
@@ -77,6 +64,8 @@ void readData(vector<AccSimObs>& dataObs, vector<AccSimLA>& dataLA){
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Unit tests
+
 void test_logsumexp(){
     vector<FLOAT> vec;
     vec.push_back(-0.69);
@@ -85,14 +74,21 @@ void test_logsumexp(){
 
     FLOAT res = logsumexp(vec);
     cout << res << endl;
+
+    FLOAT sum = 0.0;
+    for(FLOAT each: vec){
+        sum += exp(each);
+    }
+
+    assert(abs(res - log(sum)) < epsilon);
 }
 
 void testSystematicResample(){
-    vector<AccSimHA> ha = {ACC, DEC, CON, ACC};
+    vector<HA> ha = {ACC, DEC, CON, ACC};
     vector<FLOAT> weights = {.1, .7, .15, .05};
     vector<int> ancestor;
-    vector<AccSimHA> haResampled = systematicResample<AccSimHA>(ha, weights, ancestor);
-    for(AccSimHA action : haResampled){
+    vector<HA> haResampled = systematicResample<HA>(ha, weights, ancestor);
+    for(HA action : haResampled){
         cout << action << " ";
     }
     cout << endl;
@@ -104,17 +100,18 @@ void testSystematicResample(){
 
 // ---------------------------------------------------------------------------------------------------------------------
 void testPF(){
-    MarkovSystem<AccSimHA, AccSimObs, AccSimLA> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
-    vector<AccSimObs> dataObs;
-    vector<AccSimLA> dataLa;
+    MarkovSystem<HA, LA, Obs> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
+    vector<Obs> dataObs;
+    vector<LA> dataLa;
     readData(dataObs, dataLa);
-    PF<AccSimHA, AccSimObs, AccSimLA> pf (&ms, dataObs, dataLa);
+    PF<HA, LA, Obs> pf (&ms, dataObs, dataLa);
 }
 
 
 int main(){
     srand(time(0));
+
+    test_logsumexp();
     testSystematicResample();
     testPF();
-    test_logsumexp();
 }
