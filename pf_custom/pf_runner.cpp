@@ -96,7 +96,29 @@ void readData(const char* file, vector<Obs>& dataObs, vector<LA>& dataLA){
 }
 
 // Write high-level action sequences (trajectories) to file
+void writeData(const char* file, vector<vector<HA>> trajectories){
+    ofstream outFile;
+    outFile.open(file);
 
+    for(vector<HA> traj : trajectories){
+        for(int i = 0; i < traj.size(); i++){
+            if(traj[i] == ACC){
+                outFile << r.accMax;
+            } else if (traj[i] == DEC){
+                outFile << r.decMax;
+            } else {
+                outFile << 0;
+            }
+            if(i != traj.size() - 1){
+                outFile << ",";
+            }
+        }
+        outFile << endl;
+    }
+
+
+    outFile.close();
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,17 +130,24 @@ vector<vector<HA>> runPF(vector<Obs> dataObs, vector<LA> dataLa){
     PF<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
     pf.forward_filter(N, resampleThreshold);
     
-    vector<vector<HA>> traj = pf.retrieveTrajectories();
-    cout << "PF test - trajectories: " << endl;
-    for(vector<HA> each: traj){
-        for(HA ha: each){
-            cout << ha << " ";
+    vector<vector<HA>> trajectories = pf.retrieveTrajectories();
+    for(vector<HA> traj : trajectories){
+        for(int i = 0; i < traj.size(); i++){
+            if(traj[i] == ACC){
+                cout << r.accMax;
+            } else if (traj[i] == DEC){
+                cout << r.decMax;
+            } else {
+                cout << 0;
+            }
+            if(i != traj.size() - 1){
+                cout << ",";
+            }
         }
         cout << endl;
     }
-    cout << endl;
 
-    return traj;
+    return trajectories;
 }
 
 
@@ -130,4 +159,6 @@ int main(){
     readData(inputFile, dataObs, dataLa);
     
     vector<vector<HA>> trajectories = runPF(dataObs, dataLa);
+
+    writeData(outputFile, trajectories);
 }
