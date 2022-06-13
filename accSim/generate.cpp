@@ -28,7 +28,7 @@ static const double vErrMean = 0.0;         // velocity error distribution
 static const double vErrStdDev = 0.1;
 
 // Action error probabilities
-static const double haProbCorrect = 0.6;    // Probability of selecting the correct high-level action
+static const double haProbCorrect = 0.9;    // Probability of selecting the correct high-level action
 
 // ---------------------------------------------------------------------------------------------------------------------
 int main() {

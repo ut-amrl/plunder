@@ -9,10 +9,6 @@ using namespace std;
 
 #define PF_SEED time(0)
 
-static const double LA_stddev = 10.0;
-static const int data_steps = 20;
-
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 // Initial distribution
@@ -50,7 +46,7 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
 FLOAT logLikelihoodGivenMotorModel(Robot r, LA la, HA ha, Obs obs){
     double la_mean = (ha == ACC) ? r.accMax : (ha == DEC) ? r.decMax : 0;
-    double res = logpdf(la.acc, la_mean, LA_stddev);
+    double res = logpdf(la.acc, la_mean, 5.0);
     return res;
 }
 
@@ -67,7 +63,7 @@ void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
     // header line
     getline(infile, res);
     // data lines
-    for(int i=0; i<data_steps; i++){
+    for(int i = 0; i < 20; i++){
         if(!getline(infile, res))
             break;
         istringstream iss (res);

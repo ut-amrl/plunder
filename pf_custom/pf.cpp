@@ -26,7 +26,7 @@ FLOAT logsumexp(vector<FLOAT>& vals) {
     return max_elem + log(sum);
 }
 
-// Metric to calculate "active" particles
+// Metric to calculate "effective" particles
 FLOAT effectiveParticles(vector<FLOAT>& weights){
     FLOAT sum = 0;
     for(FLOAT x: weights){
