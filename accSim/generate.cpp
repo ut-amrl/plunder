@@ -69,7 +69,7 @@ int main() {
         robots.push_back(Robot(8, -6, 20, 80, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(4, -5, 100, 80, vErrDistr, _haProbCorrect, useModel));
     } else if(robotTestSet == 3){
-        robots.push_back(Robot(6, -5, 15, 150, vErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(6, -5, 15, 100, vErrDistr, _haProbCorrect, useModel));
     }
     
     // Setup output

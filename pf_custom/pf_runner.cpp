@@ -15,7 +15,7 @@ static const char* outputFile = "pf.csv";
 static const double LAStddev = 10.0;
 static const int maxDataSteps = 1000;
 
-static const Robot r (6, -5, 15, 150, normal_distribution<double>(0.0, 0.1), 1, 0);
+static const Robot r (6, -5, 15, 100, normal_distribution<double>(0.0, 3.0), 0.9, 0);
 static const int N = 100;
 static const double resampleThreshold = 0.5;
 
@@ -125,7 +125,6 @@ void writeData(const char* file, vector<vector<HA>> trajectories){
 vector<vector<HA>> runPF(vector<Obs> dataObs, vector<LA> dataLa){
     
     MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel, r);
-    
 
     PF<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
     pf.forward_filter(N, resampleThreshold);
