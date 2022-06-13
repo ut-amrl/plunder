@@ -30,6 +30,16 @@ static const bool actionError = true;       // apply error to state transitions
 static const double T_STEP = .1;            // time step
 static const double T_TOT = 15;             // total time per simulated scenario
 
+// File I/O
+static const string pathJson = "accSim/out/data.json";
+static const string pathCsv = "accSim/out/data.csv";
+static const bool genCsv = true;            // generate CSV trace file
+static const bool genJson = true;           // generate JSON trace file
+
+// Global variables
+static const double T_STEP = .1;            // time step
+static const double T_TOT = 15;             // total time per simulated scenario
+
 // ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char** argv) {
     // Reading parameters
@@ -69,7 +79,7 @@ int main(int argc, char** argv) {
         robots.push_back(Robot(5, -2, 12, 200, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(8, -3, 30, 50, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(1.5, -2, 3, 30, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -2, 4, 20, vErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(3, -2, 4, 20, vErrDistr, _haProbCorrect, useModel)); 
         robots.push_back(Robot(0.5, -1, 2, 15, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(1.5, -2, 40, 300, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(2, -2, 100, 300, vErrDistr, _haProbCorrect, useModel));
@@ -96,13 +106,13 @@ int main(int argc, char** argv) {
     if(genJson){
         cout << "generating json\n";
         jsonFile << fixed << setprecision(PRECISION);
-        jsonFile.open("data.json");
+        jsonFile.open(pathJson);
         jsonFile << "[";
     }
     if(genCsv){
         cout << "generating csv\n";
         csvFile << fixed << setprecision(PRECISION);
-        csvFile.open("data.csv");
+        csvFile.open(pathCsv);
         csvFile << "time, x, v, LA" << "\n";
     }
 
