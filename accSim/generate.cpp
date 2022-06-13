@@ -13,14 +13,14 @@ using namespace std;
  */
 
 static int robotTestSet = 3;          // which robot test set to use (1-3)
-static int useModel = 0;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilistic ASP (3)
+static int useModel = 2;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilistic ASP (3)
 
 // Error distribution parameters
 static double vErrMean = 0.0;         // velocity error distribution
-static double vErrStdDev = 0.1;
+static double vErrStdDev = 0.2;
 
 // Action error probabilities
-static double haProbCorrect = 0.9;    // Probability of selecting the correct high-level action
+static double haProbCorrect = 0.8;    // Probability of selecting the correct high-level action
 
 // Global variables
 static const bool genCsv = true;            // generate CSV trace file
@@ -33,12 +33,6 @@ static const double T_TOT = 15;             // total time per simulated scenario
 // File I/O
 static const string pathJson = "accSim/out/data.json";
 static const string pathCsv = "accSim/out/data.csv";
-static const bool genCsv = true;            // generate CSV trace file
-static const bool genJson = true;           // generate JSON trace file
-
-// Global variables
-static const double T_STEP = .1;            // time step
-static const double T_TOT = 15;             // total time per simulated scenario
 
 // ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char** argv) {
@@ -93,11 +87,16 @@ int main(int argc, char** argv) {
         robots.push_back(Robot(4, -5, 100, 80, vErrDistr, _haProbCorrect, useModel));
     } else if(robotTestSet == 3){
         // Custom, user-defined robot
-        if(argc != 10){
-            cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate> <accMax> <decMax> <maxSpeed> <targetDistance>" << endl;
-            exit(0);
-        }        
-        robots.push_back(Robot(stod(argv[6]), stod(argv[7]), stod(argv[8]), stod(argv[9]), vErrDistr, haProbCorrect, useModel));
+        if(argc == 1){
+            robots.push_back(Robot(6, -5, 15, 150, vErrDistr, _haProbCorrect, useModel));
+        } else {
+            if(argc != 10){
+                cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate> <accMax> <decMax> <maxSpeed> <targetDistance>" << endl;
+                exit(0);
+            }
+            robots.push_back(Robot(stod(argv[6]), stod(argv[7]), stod(argv[8]), stod(argv[9]), vErrDistr, haProbCorrect, useModel));
+        }
+       
     }
     
     // Setup output

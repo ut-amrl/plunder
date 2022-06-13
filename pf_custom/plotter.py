@@ -4,7 +4,7 @@ import sys
 
 # I/O
 inFile = open("pf.csv", "r")
-gtFile = open("../accSim/data.csv", "r")
+gtFile = open("../accSim/out/data.csv", "r")
 reader = csv.reader(inFile)
 gtReader = csv.reader(gtFile)
 

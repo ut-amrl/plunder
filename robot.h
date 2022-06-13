@@ -144,24 +144,28 @@ class Robot {
      */
     void changeHA_LDIPS_error(){
         // Copy paste below
-        if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= 9.714069)
-            ha = CON;
-        else if(ha == DEC && DistTraveled(v, decMax) - target >= 11.458965)
-            ha = CON;
-        else if(ha == CON && x + x + x - target >= 35.615170)
-            ha = DEC;
-        else if(ha == ACC && DistTraveled(v, decMax) + target >= 535.545532)
-            ha = CON;
-        else if(ha == CON)
-            ha = ACC;
-        else if(ha == ACC && x - target + DistTraveled(v, decMax) >= -0.138184)
-            ha = DEC;
-        else if(ha == DEC && DistTraveled(v, decMax) - x - x >= -49.242615)
-            ha = ACC;
-        else if(ha == DEC)
-            ha = DEC;
-        else if(ha == ACC)
-            ha = ACC;
+        // if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= 9.714069)
+        //     ha = CON;
+        // else if(ha == DEC && DistTraveled(v, decMax) - target >= 11.458965)
+        //     ha = CON;
+        // else if(ha == CON && x + x + x - target >= 35.615170)
+        //     ha = DEC;
+        // else if(ha == ACC && DistTraveled(v, decMax) + target >= 535.545532)
+        //     ha = CON;
+        // else if(ha == CON)
+        //     ha = ACC;
+        // else if(ha == ACC && x - target + DistTraveled(v, decMax) >= -0.138184)
+        //     ha = DEC;
+        // else if(ha == DEC && DistTraveled(v, decMax) - x - x >= -49.242615)
+        //     ha = ACC;
+        // else if(ha == DEC)
+        //     ha = DEC;
+        // else if(ha == ACC)
+        //     ha = ACC;
+
+        if(v > 15) ha = DEC;
+        if(v < 15) ha = ACC;
+
     }
 
     /*

@@ -16,4 +16,4 @@ $(TARGET2):
 			pips/bin/ldips-l3 $(PIPS_OPTIONS) -lib_file pips/ops/test_library.json -ex_file pips/examples/data.json
 
 clean: 
-			rm -rf accSim/out
+			rm -rf accSim/out pf_custom/plots/*

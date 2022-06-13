@@ -48,8 +48,6 @@ vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int
         cumulativeWeights.push_back(runningSum);
     }
 
-    assert(abs(runningSum - 1.0) < epsilon);
-
     FLOAT interval = 1.0 / (FLOAT) n;
     FLOAT pos = ((FLOAT) rand()) / RAND_MAX * interval; // Initial offset
     for(int i = 0, j = 0; i < n; i++){
@@ -189,7 +187,7 @@ class PF {
                 weights[i] = exp(log_weights[i]);
                 sum += weights[i];
             }
-            assert(abs(sum - 1.0) < epsilon);
+            assert(abs(sum - 1.0) < epsilon*N);
 
             // Update log observation likelihood
             log_obs += log_z_t;
