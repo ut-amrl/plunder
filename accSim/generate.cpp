@@ -2,36 +2,49 @@
 #include <random>
 #include <fstream>
 #include <iomanip>
+#include <stdlib.h>
 
 #include "../robot.h"
 
 using namespace std;
 
-
 /*
- * Configuration
+ * Configuration: Default parameters
  */
 
-static const bool genCsv = true;            // generate CSV trace file
-static const bool genJson = true;           // generate JSON trace file
-static const int useModel = 0;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
-static const int robotTestSet = 3;          // which robot test set to use (1-3)
-static const bool velocityError = true;    // apply error to velocity
-static const bool actionError = true;      // apply error to state transitions
+static int robotTestSet = 3;          // which robot test set to use (1-3)
+static int useModel = 0;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilistic ASP (3)
+
+// Error distribution parameters
+static double vErrMean = 0.0;         // velocity error distribution
+static double vErrStdDev = 0.1;
+
+// Action error probabilities
+static double haProbCorrect = 0.9;    // Probability of selecting the correct high-level action
 
 // Global variables
+static const bool genCsv = true;            // generate CSV trace file
+static const bool genJson = true;           // generate JSON trace file
+static const bool velocityError = true;     // apply error to velocity
+static const bool actionError = true;       // apply error to state transitions
 static const double T_STEP = .1;            // time step
 static const double T_TOT = 15;             // total time per simulated scenario
 
-// Error distribution parameters
-static const double vErrMean = 0.0;         // velocity error distribution
-static const double vErrStdDev = 0.1;
-
-// Action error probabilities
-static const double haProbCorrect = 0.9;    // Probability of selecting the correct high-level action
-
 // ---------------------------------------------------------------------------------------------------------------------
-int main() {
+int main(int argc, char** argv) {
+    // Reading parameters
+    if(argc > 1){
+        if(argc < 6){
+            cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate>" << endl;
+            exit(0);
+        }
+
+        robotTestSet = stoi(argv[1]);
+        useModel = stoi(argv[2]);
+        vErrMean = stod(argv[3]);
+        vErrStdDev = stod(argv[4]);
+        haProbCorrect = stod(argv[5]);
+    }
 
     // Initialization
     double _vErrMean = 0.0;
@@ -69,7 +82,12 @@ int main() {
         robots.push_back(Robot(8, -6, 20, 80, vErrDistr, _haProbCorrect, useModel));
         robots.push_back(Robot(4, -5, 100, 80, vErrDistr, _haProbCorrect, useModel));
     } else if(robotTestSet == 3){
-        robots.push_back(Robot(6, -5, 15, 100, vErrDistr, _haProbCorrect, useModel));
+        // Custom, user-defined robot
+        if(argc != 10){
+            cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate> <accMax> <decMax> <maxSpeed> <targetDistance>" << endl;
+            exit(0);
+        }        
+        robots.push_back(Robot(stod(argv[6]), stod(argv[7]), stod(argv[8]), stod(argv[9]), vErrDistr, haProbCorrect, useModel));
     }
     
     // Setup output
