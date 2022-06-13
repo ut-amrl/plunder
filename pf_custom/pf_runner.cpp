@@ -19,7 +19,7 @@ static double resampleThreshold = 0.5;
 static double LAStddev = 10.0;
 
 // Global variables
-static const char* inputFile = "../accSim/data.csv";
+static const char* inputFile = "../accSim/out/data.csv";
 static const char* outputFile = "pf.csv";
 static const int maxTimeSteps = 1000;
 
