@@ -99,22 +99,34 @@ def main():
     # plt.xlabel('time') 
     # plt.ylabel('acceleration')
 
-
+    freq = 1
     for t in range(0, len(trajectories[0])):
-        actions = [0, 0, 0]
-        for i in range(0, len(trajectories)):
-            traj = trajectories[i]
-            a = traj[t]
-            if a == 6:
-                actions[0] += 1
-            elif a == -5:
-                actions[1] += 1
-            elif a == 0:
-                actions[2] += 1
-        plt.bar(t, actions[0], bottom=actions[2], color="green")
-        plt.bar(t, actions[1], color="yellow")
-        plt.bar(t, actions[2], bottom=actions[1], color="red")
-        
+        if t % freq == 0:
+            actions = [0, 0, 0]
+            for i in range(0, len(trajectories)):
+                traj = trajectories[i]
+                a = traj[t]
+                if a == 6:
+                    actions[0] += 1
+                elif a == 0:
+                    actions[1] += 1
+                elif a == -5:
+                    actions[2] += 1
+            if t == 0:
+                plt.bar(t/freq, actions[0], bottom=actions[2] + actions[1], color="green", label="ACC")
+                plt.bar(t/freq, actions[1], bottom=actions[2], color="yellow", label="CON")
+                plt.bar(t/freq, actions[2], color="red", label="DEC")
+            else:
+                plt.bar(t/freq, actions[0], bottom=actions[2] + actions[1], color="green")
+                plt.bar(t/freq, actions[1], bottom=actions[2], color="yellow")
+                plt.bar(t/freq, actions[2], color="red")
+    
+    plt.xlabel('time')
+    plt.ylabel('count')
+    plt.title('acceleration-time')
+
+    plt.legend(loc="upper left")
+
     plt.show()
     plt.savefig(outFile1)
 
@@ -124,12 +136,14 @@ def main():
     for i in range(0, min(printed_particles, len(trajectories))):
         vel = velocities[i]
         plt.plot(vel[:min(len(traj), max_t)], alpha=0.5, linestyle="dashed") 
-    plt.plot(gtVelocity[:min(len(gtTrajectory), max_t)], alpha=1.0)
+    plt.plot(gtVelocity[:min(len(gtTrajectory), max_t)], alpha=1.0, label="ground truth")
         
     plt.xlabel('time') 
     plt.ylabel('velocity') 
     plt.title('velocity-time') 
-        
+    
+    plt.legend(loc="upper left")
+
     plt.show()
     plt.savefig(outFile2)
 
@@ -139,11 +153,13 @@ def main():
     for i in range(0, min(printed_particles, len(trajectories))):
         pos = positions[i]
         plt.plot(pos[:min(len(traj), max_t)], alpha=0.5, linestyle="dashed") 
-    plt.plot(gtPosition[:min(len(gtTrajectory), max_t)], alpha=1.0)
+    plt.plot(gtPosition[:min(len(gtTrajectory), max_t)], alpha=1.0, label="ground truth")
         
     plt.xlabel('time') 
     plt.ylabel('position') 
-    plt.title('position-time') 
+    plt.title('position-time')
+
+    plt.legend(loc="upper left") 
     
     plt.show()
     plt.savefig(outFile3)

@@ -40,16 +40,16 @@ class Robot {
     double target; // Target distance
 
 
-    normal_distribution<double> vErrDistr;        // Velocity error distribution
+    normal_distribution<double> accErrDistr;      // Acceleration error distribution
     double haProbCorrect;                         // Probability of transitioning to the correct high-level action
     int model;                                    // Use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
 
-    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _vErrDistr, double _haProbCorrect, int _model){
+    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _accErrDistr, double _haProbCorrect, int _model){
         accMax = _accMax;
         decMax = _decMax;
         vMax = _vMax;
         target = _target;
-        vErrDistr = _vErrDistr;
+        accErrDistr = _accErrDistr;
         haProbCorrect = _haProbCorrect;
         model = _model;
     }
@@ -205,15 +205,15 @@ class Robot {
         int prevHA = ha;
 
         if(model == 0) {
-        changeHA_Hand();
+            changeHA_Hand();
         } else if(model == 1){
-        changeHA_LDIPS();
+            changeHA_LDIPS();
         } else if(model == 2){
-        changeHA_LDIPS_error();
+            changeHA_LDIPS_error();
         } else if(model == 3){
-        changeHA_Hand_prob();
+            changeHA_Hand_prob();
         } else{
-        exit(1);
+            exit(1);
         }
 
         putErrorIntoHA(prevHA);
@@ -226,20 +226,16 @@ class Robot {
         double vPrev = v;
         double xPrev = x;
 
-        // Induce some error
-        double vErr = vErrDistr(gen);
-
         // Select some action (acceleration)
         a = ha == DEC ? decMax :
                             (ha == ACC ? accMax : 0);
-
+        
+        // Induce some error
+        a += accErrDistr(gen);
+        
         // Update velocity and displacement accordingly
         v = vPrev + a * t_step;
 
-        if(abs(v) >= epsilon){ // v != 0
-            v += vErr;
-        }
-        
         if(v < epsilon){ // Round to 0
             v = 0;
         }

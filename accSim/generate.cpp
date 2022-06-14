@@ -16,8 +16,8 @@ static int robotTestSet = 3;          // which robot test set to use (1-3)
 static int useModel = 2;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilistic ASP (3)
 
 // Error distribution parameters
-static double vErrMean = 0.0;         // velocity error distribution
-static double vErrStdDev = 0.2;
+static double accErrMean = 0.0;         // acceleration error distribution
+static double accErrStdDev = 2.0;
 
 // Action error probabilities
 static double haProbCorrect = 0.8;    // Probability of selecting the correct high-level action
@@ -25,7 +25,7 @@ static double haProbCorrect = 0.8;    // Probability of selecting the correct hi
 // Global variables
 static const bool genCsv = true;            // generate CSV trace file
 static const bool genJson = true;           // generate JSON trace file
-static const bool velocityError = true;     // apply error to velocity
+static const bool accelerationError = true;     // apply error to acceleration
 static const bool actionError = true;       // apply error to state transitions
 static const double T_STEP = .1;            // time step
 static const double T_TOT = 15;             // total time per simulated scenario
@@ -45,19 +45,19 @@ int main(int argc, char** argv) {
 
         robotTestSet = stoi(argv[1]);
         useModel = stoi(argv[2]);
-        vErrMean = stod(argv[3]);
-        vErrStdDev = stod(argv[4]);
+        accErrMean = stod(argv[3]);
+        accErrStdDev = stod(argv[4]);
         haProbCorrect = stod(argv[5]);
     }
 
     // Initialization
-    double _vErrMean = 0.0;
-    double _vErrStdDev = 0.0;
-    if(velocityError){
-        _vErrMean = vErrMean;
-        _vErrStdDev = vErrStdDev;
+    double _accErrMean = 0.0;
+    double _accErrStdDev = 0.0;
+    if(accelerationError){
+        _accErrMean = accErrMean;
+        _accErrStdDev = accErrStdDev;
     }
-    normal_distribution<double> vErrDistr(_vErrMean, _vErrStdDev);
+    normal_distribution<double> accErrDistr(_accErrMean, _accErrStdDev);
 
     double _haProbCorrect = 1.0;
     if(actionError){
@@ -68,33 +68,33 @@ int main(int argc, char** argv) {
     vector<Robot> robots;
 
     if(robotTestSet == 1){
-        robots.push_back(Robot(6, -5, 15, 150, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -3, 30, 100, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(5, -2, 12, 200, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(8, -3, 30, 50, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(1.5, -2, 3, 30, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -2, 4, 20, vErrDistr, _haProbCorrect, useModel)); 
-        robots.push_back(Robot(0.5, -1, 2, 15, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(1.5, -2, 40, 300, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(2, -2, 100, 300, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(5, -1, 25, 200, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(10, -10, 25, 500, vErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(6, -5, 15, 150, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(3, -3, 30, 100, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(5, -2, 12, 200, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(8, -3, 30, 50, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(1.5, -2, 3, 30, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(3, -2, 4, 20, accErrDistr, _haProbCorrect, useModel)); 
+        robots.push_back(Robot(0.5, -1, 2, 15, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(1.5, -2, 40, 300, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(2, -2, 100, 300, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(5, -1, 25, 200, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(10, -10, 25, 500, accErrDistr, _haProbCorrect, useModel));
     } else if(robotTestSet == 2){
-        robots.push_back(Robot(5, -2, 15, 80, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -3, 4, 80, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(1.5, -4, 50, 80, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(8, -6, 20, 80, vErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(4, -5, 100, 80, vErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(5, -2, 15, 80, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(3, -3, 4, 80, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(1.5, -4, 50, 80, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(8, -6, 20, 80, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(4, -5, 100, 80, accErrDistr, _haProbCorrect, useModel));
     } else if(robotTestSet == 3){
         // Custom, user-defined robot
         if(argc == 1){
-            robots.push_back(Robot(6, -5, 15, 150, vErrDistr, _haProbCorrect, useModel));
+            robots.push_back(Robot(6, -5, 15, 150, accErrDistr, _haProbCorrect, useModel));
         } else {
             if(argc != 10){
                 cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate> <accMax> <decMax> <maxSpeed> <targetDistance>" << endl;
                 exit(0);
             }
-            robots.push_back(Robot(stod(argv[6]), stod(argv[7]), stod(argv[8]), stod(argv[9]), vErrDistr, haProbCorrect, useModel));
+            robots.push_back(Robot(stod(argv[6]), stod(argv[7]), stod(argv[8]), stod(argv[9]), accErrDistr, haProbCorrect, useModel));
         }
        
     }

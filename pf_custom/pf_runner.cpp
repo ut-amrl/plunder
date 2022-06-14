@@ -13,10 +13,9 @@ using namespace std;
  * Configuration: Default parameters
  */
 
-static Robot r (6, -5, 15, 100, normal_distribution<double>(0.0, 3.0), 0.9, 0);
+static Robot r (6, -5, 15, 100, normal_distribution<double>(0.0, 2.0), 0.9, 0);
 static int N = 100;
 static double resampleThreshold = 0.5;
-static double LAStddev = 10.0;
 
 // Global variables
 static const char* inputFile = "accSim/out/data.csv";           // CHANGED TO "GLOBAL" PATH
@@ -61,7 +60,7 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
 FLOAT logLikelihoodGivenMotorModel(Robot r, LA la, HA ha, Obs obs){
     double laMean = (ha == ACC) ? r.accMax : (ha == DEC) ? r.decMax : 0;
-    double res = logpdf(la.acc, laMean, LAStddev);
+    double res = logpdf(la.acc, laMean, r.accErrDistr.stddev());
     return res;
 }
 
@@ -158,15 +157,14 @@ int main(int argc, char** argv){
 
     // Reading parameters
     if(argc > 1){
-        if(argc < 12){
-            cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level error>" << endl;
+        if(argc < 11){
+            cout << "Please run in the following manner: ./pf <robot test set> <model> <mean error> <error standard deviation> <high-level error> <model> <numParticles> <resampleThreshold>" << endl;
             exit(0);
         }
 
         r = Robot(stod(argv[1]), stod(argv[2]), stod(argv[3]), stod(argv[4]), normal_distribution<double>(stod(argv[5]), stod(argv[6])), stod(argv[7]), stod(argv[8]));
         N = stoi(argv[9]);
         resampleThreshold = stod(argv[10]);
-        LAStddev = stod(argv[11]);
     }
 
     // Initialization
