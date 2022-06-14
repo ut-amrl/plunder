@@ -43,7 +43,7 @@ lib/
 gen
 generate
 out
-pf_custom/out
+plots
 
 # Clang
 .clangd/
