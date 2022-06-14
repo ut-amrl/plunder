@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define FLOAT float // Set to double (for precision) or float (for speed)
+#define FLOAT double // Set to double (for precision) or float (for speed)
 
 static uint resampCount = 0;
 
@@ -190,7 +190,7 @@ class PF {
                 weights[i] = exp(log_weights[i]);
                 sum += weights[i];
             }
-            assert(abs(sum - 1.0) < epsilon*N);
+            // assert(abs(sum - 1.0) < epsilon*N);
 
             // Update log observation likelihood
             log_obs += log_z_t;
@@ -233,6 +233,8 @@ class PF {
                 }
             }
         }
+
+        cout << "Cumulative observation likelihood: e^" << log_obs << " = " << exp(log_obs) << endl;
     }
 
     // Retrieve high-level action sequences after running particle filter
