@@ -14,7 +14,7 @@ g++ -o accSim/out/gen accSim/generate.cpp -std=c++14
 # ./pf <accMax> <decMax> <maxSpeed> <targetDistance> <mean error> <error std dev> <high-level success rate>
         # <model> <numParticles> <resampleThreshold> <LA std dev>
 g++ -o pf_custom/out/pf pf_custom/pf_runner.cpp -std=c++14
-pf_custom/out/pf 6 -5 15 100 0.0 0.2 1 2 1000 0.1 8.0
+pf_custom/out/pf 6 -5 15 100 0.0 0.2 .333 1 1000 0.5 5.0
 
 # resamplingThreshold range with these settings: 0.002 to 0.01
 # TODO: add images of varying thresholds

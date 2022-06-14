@@ -90,15 +90,30 @@ def main():
     runSimulation()
 
     # Acceleration
-    fig, (ax1, ax2) = plt.subplots(2)
-    fig.suptitle('acceleration-time')
-    for i in range(0, min(printed_particles, len(trajectories))):
-        traj = trajectories[i]
-        ax1.plot(traj[:min(len(traj), max_t)], alpha=0.1, linestyle="none", marker="o", color='b') 
-    ax2.plot(gtTrajectory[:min(len(gtTrajectory), max_t)], alpha=0.5, linestyle="none", marker="o", color='b')
-        
-    plt.xlabel('time') 
-    plt.ylabel('acceleration')
+    # fig, (ax1, ax2) = plt.subplots(2)
+    # fig.suptitle('acceleration-time')
+    # for i in range(0, min(printed_particles, len(trajectories))):
+    #     traj = trajectories[i]
+    #     ax1.plot(traj[:min(len(traj), max_t)], alpha=0.1, linestyle="none", marker="o", color='b') 
+    # ax2.plot(gtTrajectory[:min(len(gtTrajectory), max_t)], alpha=0.5, linestyle="none", marker="o", color='b')
+    # plt.xlabel('time') 
+    # plt.ylabel('acceleration')
+
+
+    for t in range(0, len(trajectories[0])):
+        actions = [0, 0, 0]
+        for i in range(0, len(trajectories)):
+            traj = trajectories[i]
+            a = traj[t]
+            if a == 6:
+                actions[0] += 1
+            elif a == -5:
+                actions[1] += 1
+            elif a == 0:
+                actions[2] += 1
+        plt.bar(t, actions[0], bottom=actions[2], color="green")
+        plt.bar(t, actions[1], color="yellow")
+        plt.bar(t, actions[2], bottom=actions[1], color="red")
         
     plt.show()
     plt.savefig(outFile1)
