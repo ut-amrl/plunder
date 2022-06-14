@@ -163,9 +163,19 @@ class Robot {
         // else if(ha == ACC)
         //     ha = ACC;
 
-        if(v > 15) ha = DEC;
-        if(v < 15) ha = ACC;
+        // if(sampleDiscrete(0.33)){
+        //     ha = ACC;
+        // } else if (sampleDiscrete(0.5)){
+        //     ha = DEC;
+        // } else {
+        //     ha = CON;
+        // }
 
+        if(x < target / 2){
+            ha = ACC;
+        } else {
+            ha = DEC;
+        }
     }
 
     /*
