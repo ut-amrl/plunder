@@ -153,6 +153,13 @@ vector<vector<HA>> runPF(vector<Obs> dataObs, vector<LA> dataLa){
 }
 
 
+
+void run(string inputFile, string outputFile){
+
+}
+
+
+
 int main(int argc, char** argv){
 
     // Reading parameters
