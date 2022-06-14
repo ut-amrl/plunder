@@ -3,8 +3,12 @@ import csv
 import sys
 
 # I/O
-inFile = open("pf.csv", "r")
-gtFile = open("../accSim/out/data.csv", "r")
+inFile = open("pf_custom/out/pf.csv", "r")
+gtFile = open("accSim/out/data.csv", "r")
+outFile1 = "pf_custom/plots/accel.png"
+outFile2 = "pf_custom/plots/velocity.png"
+outFile3 = "pf_custom/plots/position.png"
+
 reader = csv.reader(inFile)
 gtReader = csv.reader(gtFile)
 
@@ -97,7 +101,7 @@ def main():
     plt.ylabel('acceleration')
         
     plt.show()
-    plt.savefig('plots/accel.png')
+    plt.savefig(outFile1)
 
     plt.clf()
 
@@ -112,7 +116,7 @@ def main():
     plt.title('velocity-time') 
         
     plt.show()
-    plt.savefig('plots/velocity.png')
+    plt.savefig(outFile2)
 
     plt.clf()
 
@@ -127,7 +131,7 @@ def main():
     plt.title('position-time') 
     
     plt.show()
-    plt.savefig('plots/position.png')
+    plt.savefig(outFile3)
     return
 
 if __name__ == "__main__":

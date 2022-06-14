@@ -11,12 +11,16 @@ g++ -o accSim/out/gen accSim/generate.cpp -std=c++14
 
 
 # generate high-level actions from observations and low-level actions
-cd pf_custom
 # ./pf <accMax> <decMax> <maxSpeed> <targetDistance> <mean error> <error std dev> <high-level success rate>
         # <model> <numParticles> <resampleThreshold> <LA std dev>
-g++ -o pf pf_runner.cpp -std=c++14
-./pf 6 -5 15 100 0.0 0.2 0.8 2 1000 0.001 10.0
+g++ -o pf_custom/out/pf pf_custom/pf_runner.cpp -std=c++14
+pf_custom/out/pf 6 -5 15 100 0.0 0.2 0.6 2 1000 0.001 0.2
+
+# resamplingThreshold range with these settings: 0.002 to 0.01
+# TODO: add images of varying thresholds
+# TODO: instead of printing "resamp" everywhere, just print out number of times resampled
+# never resamples at 0.001 for some reason, maybe bc .001 * 1000 = 1
 
 
 # python3 plotter.py <max time steps> <particles to plot>
-python3 plotter.py 1000 10
+python3 pf_custom/plotter.py 1000 100

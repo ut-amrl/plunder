@@ -39,6 +39,7 @@ FLOAT effectiveParticles(vector<FLOAT>& weights){
 // This method performs the resampling systematically to reduce variance.
 template <typename HA>
 vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int>& ancestor){
+    cout << "resamp" << endl;
     int n = weights.size();
     vector<FLOAT> cumulativeWeights;
     vector<HA> haResampled;

@@ -101,8 +101,8 @@ class Robot {
      */
     void changeHA_Hand_prob(){
         double xToTarget = target - x;                            // distance to the target
-        bool cond1 = vMax - v < 0;                                // is at max velocity (can no longer accelerate)
-        bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;     // needs to decelerate or else it will pass target
+        // bool cond1 = vMax - v < 0;                                // is at max velocity (can no longer accelerate)
+        // bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;     // needs to decelerate or else it will pass target
 
         bool cond1smooth = sampleDiscrete(logistic(vMax*0.1, -50.0/vMax, vMax-v));
         bool cond2smooth = sampleDiscrete(logistic(target*0.1, -50.0/target, xToTarget - DistTraveled(v, decMax)));

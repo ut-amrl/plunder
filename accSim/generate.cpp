@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 
     // Run simulations and generate json/csv files
     bool first = true;
-    for(int i=0; i<robots.size(); i++){
+    for(uint i=0; i<robots.size(); i++){
         for(double t=0; t<T_TOT/T_STEP; t++){
 
             // Run simulation

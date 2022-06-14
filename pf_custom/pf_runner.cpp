@@ -19,8 +19,8 @@ static double resampleThreshold = 0.5;
 static double LAStddev = 10.0;
 
 // Global variables
-static const char* inputFile = "../accSim/out/data.csv";
-static const char* outputFile = "pf.csv";
+static const char* inputFile = "accSim/out/data.csv";           // CHANGED TO "GLOBAL" PATH
+static const char* outputFile = "pf_custom/out/pf.csv";             // CHANGED TO "GLOBAL" PATH
 static const int maxTimeSteps = 1000;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void writeData(const char* file, vector<vector<HA>> trajectories){
     outFile.open(file);
 
     for(vector<HA> traj : trajectories){
-        for(int i = 0; i < traj.size(); i++){
+        for(uint i = 0; i < traj.size(); i++){
             if(traj[i] == ACC){
                 outFile << r.accMax;
             } else if (traj[i] == DEC){
