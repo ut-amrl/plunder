@@ -3,9 +3,9 @@
 #include <fstream>
 #include <iomanip>
 
-#define PRECISION 6
-#define epsilon 10E-6
-#define SEED 3256+2585 // Random seed
+#define PRECISION 10
+#define epsilon 10E-10
+#define SEED 0 // Random seed
 
 using namespace std;
 

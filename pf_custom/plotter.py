@@ -99,18 +99,18 @@ def main():
     # plt.xlabel('time') 
     # plt.ylabel('acceleration')
 
-    freq = 1
+    freq = 2
     for t in range(0, len(trajectories[0])):
         if t % freq == 0:
             actions = [0, 0, 0]
             for i in range(0, len(trajectories)):
                 traj = trajectories[i]
                 a = traj[t]
-                if a == 6:
+                if a > 0:
                     actions[0] += 1
                 elif a == 0:
                     actions[1] += 1
-                elif a == -5:
+                elif a < 0:
                     actions[2] += 1
             if t == 0:
                 plt.bar(t/freq, actions[0], bottom=actions[2] + actions[1], color="green", label="ACC")
