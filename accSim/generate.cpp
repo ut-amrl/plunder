@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
         cout << "generating csv\n";
         csvFile << fixed << setprecision(PRECISION);
         csvFile.open(pathCsv);
-        csvFile << "time, x, v, LA" << "\n";
+        csvFile << "time, x, v, LA, HA" << "\n";
     }
 
     // Run simulations and generate json/csv files
@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
 
             // Print trace
             if(genCsv) {
-                csvFile << t << ", " << robots[i].x << ", " << robots[i].v << ", " << robots[i].a << "\n";
+                csvFile << t << ", " << robots[i].x << ", " << robots[i].v << ", " << robots[i].a << ", " << curHAStr << "\n";
             }
 
             if(genJson){

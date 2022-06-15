@@ -18,4 +18,4 @@ pf_custom/out/pf 5 -4 12 100 0.0 2.0 0.9 0 5000 0.001
 # TODO: add images of varying thresholds
 
 # python3 plotter.py <max time steps> <particles to plot>
-python3 pf_custom/plotter.py 1000 10
+python3 pf_custom/plotter.py 500 10

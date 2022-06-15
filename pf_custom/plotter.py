@@ -1,4 +1,5 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+import numpy as np 
 import csv
 import sys
 
@@ -40,7 +41,7 @@ def readGroundTruth():
     for info in gtReader:
         gtPosition.append(float(info[1]))
         gtVelocity.append(float(info[2]))
-        gtTrajectory.append(float(info[3]))
+        gtTrajectory.append(info[4].strip())
     return
 
 # Populates velocity and position values based on acceleration data
@@ -86,12 +87,15 @@ def main():
     readTrajectories()
     readGroundTruth()
 
+    max_t = min(max_t, min(len(gtTrajectory), len(trajectories[0])))
+    printed_particles = min(printed_particles, len(trajectories))
+
     # Calculate full state sequences
     runSimulation()
 
     # Acceleration
-    # fig, (ax1, ax2) = plt.subplots(2)
-    # fig.suptitle('acceleration-time')
+    fig, (ax1, ax2) = plt.subplots(2, gridspec_kw={'height_ratios': [5, 1]})
+    fig.suptitle('low-level actions vs. time')
     # for i in range(0, min(printed_particles, len(trajectories))):
     #     traj = trajectories[i]
     #     ax1.plot(traj[:min(len(traj), max_t)], alpha=0.1, linestyle="none", marker="o", color='b') 
@@ -100,32 +104,48 @@ def main():
     # plt.ylabel('acceleration')
 
     freq = 2
-    for t in range(0, len(trajectories[0])):
+    actions = [[0] * max_t, [0] * max_t, [0] * max_t]
+    gt = [[0] * max_t, [0] * max_t, [0] * max_t]
+    times = []
+    for t in range(0, max_t):
+        times.append(t)
         if t % freq == 0:
-            actions = [0, 0, 0]
             for i in range(0, len(trajectories)):
-                traj = trajectories[i]
-                a = traj[t]
+                a = trajectories[i][t]
                 if a > 0:
-                    actions[0] += 1
+                    actions[0][t] += 1
                 elif a == 0:
-                    actions[1] += 1
+                    actions[1][t] += 1
                 elif a < 0:
-                    actions[2] += 1
-            if t == 0:
-                plt.bar(t/freq, actions[0], bottom=actions[2] + actions[1], color="green", label="ACC")
-                plt.bar(t/freq, actions[1], bottom=actions[2], color="yellow", label="CON")
-                plt.bar(t/freq, actions[2], color="red", label="DEC")
-            else:
-                plt.bar(t/freq, actions[0], bottom=actions[2] + actions[1], color="green")
-                plt.bar(t/freq, actions[1], bottom=actions[2], color="yellow")
-                plt.bar(t/freq, actions[2], color="red")
+                    actions[2][t] += 1
+            a = gtTrajectory[t]
+            if a == "ACC":
+                gt[0][t] += 1
+            elif a == "CON":
+                gt[1][t] += 1
+            elif a == "DEC":
+                gt[2][t] += 1
+        else:
+            actions[0][t] = actions[0][t-1]
+            actions[1][t] = actions[1][t-1]
+            actions[2][t] = actions[2][t-1]
+            gt[0][t] = gt[0][t-1]
+            gt[1][t] = gt[1][t-1]
+            gt[2][t] = gt[2][t-1]
+
+    ax1.bar(times, actions[0], width=1, bottom=np.add(actions[2], actions[1]), color="#05a655", label="ACC")
+    ax1.bar(times, actions[1], width=1, bottom=actions[2], color="#f8ff99", label="CON")
+    ax1.bar(times, actions[2], width=1, color="#ff6040", label="DEC")
+    
+    ax2.bar(times, gt[0], color="#05a655", width=1)
+    ax2.bar(times, gt[1], color="#f8ff99", width=1)
+    ax2.bar(times, gt[2], color="#ff6040", width=1)
     
     plt.xlabel('time')
-    plt.ylabel('count')
-    plt.title('acceleration-time')
+    ax1.set_ylabel('low-level action counts')
+    ax2.set_ylabel('ground\ntruth')
 
-    plt.legend(loc="upper left")
+    ax1.legend(loc="upper left")
 
     plt.show()
     plt.savefig(outFile1)
@@ -133,10 +153,10 @@ def main():
     plt.clf()
 
     # Velocity
-    for i in range(0, min(printed_particles, len(trajectories))):
+    for i in range(0, printed_particles):
         vel = velocities[i]
-        plt.plot(vel[:min(len(traj), max_t)], alpha=0.5, linestyle="dashed") 
-    plt.plot(gtVelocity[:min(len(gtTrajectory), max_t)], alpha=1.0, label="ground truth")
+        plt.plot(vel[:max_t], alpha=0.5, linestyle="dashed") 
+    plt.plot(gtVelocity[:max_t], alpha=1.0, label="ground truth")
         
     plt.xlabel('time') 
     plt.ylabel('velocity') 
@@ -150,10 +170,10 @@ def main():
     plt.clf()
 
     # Position
-    for i in range(0, min(printed_particles, len(trajectories))):
+    for i in range(0, printed_particles):
         pos = positions[i]
-        plt.plot(pos[:min(len(traj), max_t)], alpha=0.5, linestyle="dashed") 
-    plt.plot(gtPosition[:min(len(gtTrajectory), max_t)], alpha=1.0, label="ground truth")
+        plt.plot(pos[:max_t], alpha=0.5, linestyle="dashed") 
+    plt.plot(gtPosition[:max_t], alpha=1.0, label="ground truth")
         
     plt.xlabel('time') 
     plt.ylabel('position') 
