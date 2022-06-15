@@ -50,7 +50,7 @@ add_library(nlohmann_json::nlohmann_json INTERFACE IMPORTED)
 
 set_target_properties(nlohmann_json::nlohmann_json PROPERTIES
   INTERFACE_COMPILE_FEATURES "cxx_std_11"
-  INTERFACE_INCLUDE_DIRECTORIES "/home/jjx88/em-synthesis/pips/submodules/json/single_include/"
+  INTERFACE_INCLUDE_DIRECTORIES "/home/linusjz/em-synthesis/pips/submodules/json/single_include/"
 )
 
 # This file does not depend on other imported targets which have

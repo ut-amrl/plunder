@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: /home/jjx88/em-synthesis/pips/submodules/json
-BuildDirectory: /home/jjx88/em-synthesis/pips/submodules/json
+SourceDirectory: /home/linusjz/em-synthesis/pips/submodules/json
+BuildDirectory: /home/linusjz/em-synthesis/pips/submodules/json
 
 # Where to place the cost data store
 CostDataFile: 
@@ -26,7 +26,7 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/bin/cmake" "/home/jjx88/em-synthesis/pips/submodules/json"
+ConfigureCommand: "/usr/bin/cmake" "/home/linusjz/em-synthesis/pips/submodules/json"
 MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 

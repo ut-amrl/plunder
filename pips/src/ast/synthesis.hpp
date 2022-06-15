@@ -28,7 +28,7 @@ namespace AST {
     ast_ptr best_program,
     float* best_score);
 
-  ast_ptr ldipsL3(const std::vector<Example>& demos,
+  std::vector<ast_ptr> ldipsL3(const std::vector<Example>& demos,
       const std::vector<std::pair<std::string, std::string>>& transitions,
       const std::vector<ast_ptr> lib,
       const int sketch_depth,
