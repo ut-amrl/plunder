@@ -25,102 +25,68 @@ static double haProbCorrect = 0.8;    // Probability of selecting the correct hi
 // Global variables
 static const bool genCsv = true;            // generate CSV trace file
 static const bool genJson = true;           // generate JSON trace file
-static const bool accelerationError = true;     // apply error to acceleration
-static const bool actionError = true;       // apply error to state transitions
 static const double T_STEP = .1;            // time step
 static const double T_TOT = 15;             // total time per simulated scenario
 
 // File I/O
-static const string pathJson = "accSim/out/data.json";
-static const string pathCsv = "accSim/out/data.csv";
+static const string path = "accSim/out/data";   // Output file directory and prefix
+                                                // Both the JSON and CSV files will be generated here
 
 // ---------------------------------------------------------------------------------------------------------------------
-int main(int argc, char** argv) {
-    // Reading parameters
-    if(argc > 1){
-        if(argc < 6){
-            cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate>" << endl;
-            exit(0);
-        }
-
-        robotTestSet = stoi(argv[1]);
-        useModel = stoi(argv[2]);
-        accErrMean = stod(argv[3]);
-        accErrStdDev = stod(argv[4]);
-        haProbCorrect = stod(argv[5]);
-    }
-
+void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double haProbCorrect){
+    
     // Initialization
-    double _accErrMean = 0.0;
-    double _accErrStdDev = 0.0;
-    if(accelerationError){
-        _accErrMean = accErrMean;
-        _accErrStdDev = accErrStdDev;
-    }
-    normal_distribution<double> accErrDistr(_accErrMean, _accErrStdDev);
-
-    double _haProbCorrect = 1.0;
-    if(actionError){
-        _haProbCorrect = haProbCorrect;
-    }
-
-    // Create some arbitrary robots
+    normal_distribution<double> accErrDistr(accErrMean, accErrStdDev);
+    
+    // Create some robots
     vector<Robot> robots;
 
     if(robotTestSet == 1){
-        robots.push_back(Robot(6, -5, 15, 150, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -3, 30, 100, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(5, -2, 12, 200, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(8, -3, 30, 50, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(1.5, -2, 3, 30, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -2, 4, 20, accErrDistr, _haProbCorrect, useModel)); 
-        robots.push_back(Robot(0.5, -1, 2, 15, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(1.5, -2, 40, 300, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(2, -2, 100, 300, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(5, -1, 25, 200, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(10, -10, 25, 500, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(6, -5, 15, 150, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(3, -3, 30, 100, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(5, -2, 12, 200, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(8, -3, 30, 50, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(1.5, -2, 3, 30, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(3, -2, 4, 20, accErrDistr, haProbCorrect, useModel)); 
+        robots.push_back(Robot(0.5, -1, 2, 15, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(1.5, -2, 40, 300, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(2, -2, 100, 300, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(5, -1, 25, 200, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(10, -10, 25, 500, accErrDistr, haProbCorrect, useModel));
     } else if(robotTestSet == 2){
-        robots.push_back(Robot(5, -2, 15, 80, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(3, -3, 4, 80, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(1.5, -4, 50, 80, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(8, -6, 20, 80, accErrDistr, _haProbCorrect, useModel));
-        robots.push_back(Robot(4, -5, 100, 80, accErrDistr, _haProbCorrect, useModel));
+        robots.push_back(Robot(5, -2, 15, 80, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(3, -3, 4, 80, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(1.5, -4, 50, 80, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(8, -6, 20, 80, accErrDistr, haProbCorrect, useModel));
+        robots.push_back(Robot(4, -5, 100, 80, accErrDistr, haProbCorrect, useModel));
     } else if(robotTestSet == 3){
-        // Custom, user-defined robot
-        if(argc == 1){
-            robots.push_back(Robot(6, -5, 15, 150, accErrDistr, _haProbCorrect, useModel));
-        } else {
-            if(argc != 10){
-                cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate> <accMax> <decMax> <maxSpeed> <targetDistance>" << endl;
-                exit(0);
-            }
-            robots.push_back(Robot(stod(argv[6]), stod(argv[7]), stod(argv[8]), stod(argv[9]), accErrDistr, haProbCorrect, useModel));
-        }
-       
+        robots.push_back(Robot(5, -4, 12, 100, accErrDistr, haProbCorrect, useModel));
     }
     
-    // Setup output
+    // Setup JSON
     ofstream jsonFile;
-    ofstream csvFile;
     if(genJson){
-        cout << "generating json\n";
+        cout << "Filling JSON with simulation data:\n";
         jsonFile << fixed << setprecision(PRECISION);
-        jsonFile.open(pathJson);
+        jsonFile.open(path + ".json");
         jsonFile << "[";
-    }
-    if(genCsv){
-        cout << "generating csv\n";
-        csvFile << fixed << setprecision(PRECISION);
-        csvFile.open(pathCsv);
-        csvFile << "time, x, v, LA, HA" << "\n";
     }
 
     // Run simulations and generate json/csv files
     bool first = true;
-    for(uint i=0; i<robots.size(); i++){
-        for(double t=0; t<T_TOT/T_STEP; t++){
+    for(uint i = 0; i < robots.size(); i++){
+        
+        // Setup CSV file
+        ofstream csvFile;
+        if(genCsv){
+            csvFile << fixed << setprecision(PRECISION);
+            csvFile.open(path + to_string(i) + ".csv");
+            csvFile << "time, x, v, LA, HA" << "\n";
+        }
 
-            // Run simulation
+        // Run simulation
+        for(double t = 0; t < T_TOT/T_STEP; t++){
+
             string prevHAStr = robots[i].ha_tostring();
 
             robots[i].updatePhysics(T_STEP);
@@ -157,15 +123,41 @@ int main(int argc, char** argv) {
                 break;
             }
         }
+
+        if(genCsv){
+            csvFile.close();
+        }
     }
 
     if(genJson){
         jsonFile << "]";
         jsonFile.close();
     }
-    if(genCsv){
-        csvFile.close();
+}
+
+// runSim() with default parameters
+void runSim() {
+    runSim(robotTestSet, useModel, accErrMean, accErrStdDev, haProbCorrect);
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+int main(int argc, char** argv) {
+    // Reading parameters
+    if(argc > 1){
+        if(argc < 6){
+            cout << "Please run in the following manner: ./gen <robot test set> <model> <mean error> <error standard deviation> <high-level success rate>" << endl;
+            exit(0);
+        }
+
+        robotTestSet = stoi(argv[1]);
+        useModel = stoi(argv[2]);
+        accErrMean = stod(argv[3]);
+        accErrStdDev = stod(argv[4]);
+        haProbCorrect = stod(argv[5]);
     }
+
+    runSim(robotTestSet, useModel, accErrMean, accErrStdDev, haProbCorrect);
 
     return 0;
 }
