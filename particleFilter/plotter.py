@@ -3,9 +3,11 @@ import numpy as np
 import csv
 import sys
 
+# ----- Configuration & I/O ---------------------------------------------
+
 # I/O
 inFile = open("particleFilter/out/pf.csv", "r")
-gtFile = open("accSim/out/data.csv", "r")
+gtFile = open("accSim/out/data0.csv", "r")
 outFile1 = "particleFilter/plots/accel.png"
 outFile2 = "particleFilter/plots/velocity.png"
 outFile3 = "particleFilter/plots/position.png"
@@ -44,6 +46,9 @@ def readGroundTruth():
         gtTrajectory.append(info[4].strip())
     return
 
+
+# ----- Simulation ---------------------------------------------
+
 # Populates velocity and position values based on acceleration data
 def fillVelocity(acc, dt):
     vel = []
@@ -72,7 +77,9 @@ def runSimulation():
     
     return
 
-# --------------------------------------------------------------------------------------------
+
+# ----- Main ---------------------------------------------
+
 def main():
     global max_t, printed_particles
     # Read parameters
@@ -184,6 +191,8 @@ def main():
     plt.show()
     plt.savefig(outFile3)
     return
+
+
 
 if __name__ == "__main__":
     main()
