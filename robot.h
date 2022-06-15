@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <random>
 #include <fstream>
@@ -56,11 +58,9 @@ class Robot {
 
     Robot() {}
 
-    double a = 0; // acceleration
-    double v = 0; // velocity
-    double x = 0; // displacement
-
     HA ha = CON; // Initial high-level action
+    LA la = { .acc = 0 }; // Initial low-level action
+    Obs state = { .pos = 0, .vel = 0 }; // Initial observed state
 
     // Return the distance this robot would travel before stopping if it began decelerating immediately
     double DistTraveled(double v, double dec){
@@ -80,10 +80,10 @@ class Robot {
      * This is a hand-crafted action-selection policy.
      */
     void changeHA_Hand(){
-        double xToTarget = target - x;                                  // distance to the target
+        double xToTarget = target - state.pos;                                  // distance to the target
 
-        bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-        bool cond2 = xToTarget - DistTraveled(v, decMax) < epsilon;     // needs to decelerate or else it will pass target
+        bool cond1 = state.vel - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+        bool cond2 = xToTarget - DistTraveled(state.vel, decMax) < epsilon;     // needs to decelerate or else it will pass target
 
         if(cond2){
             ha = DEC;
@@ -100,12 +100,12 @@ class Robot {
      * This is a probabilistic hand-crafted action-selection policy.
      */
     void changeHA_Hand_prob(){
-        double xToTarget = target - x;                            // distance to the target
-        // bool cond1 = vMax - v < 0;                                // is at max velocity (can no longer accelerate)
-        // bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;     // needs to decelerate or else it will pass target
+        double xToTarget = target - state.pos;                            // distance to the target
+        // bool cond1 = vMax - state.vel < 0;                                // is at max velocity (can no longer accelerate)
+        // bool cond2 = xToTarget - DistTraveled(state.vel, decMax) < 0;     // needs to decelerate or else it will pass target
 
-        bool cond1smooth = sampleDiscrete(logistic(vMax*0.1, -50.0/vMax, vMax-v));
-        bool cond2smooth = sampleDiscrete(logistic(target*0.1, -50.0/target, xToTarget - DistTraveled(v, decMax)));
+        bool cond1smooth = sampleDiscrete(logistic(vMax*0.1, -50.0/vMax, vMax-state.vel));
+        bool cond2smooth = sampleDiscrete(logistic(target*0.1, -50.0/target, xToTarget - DistTraveled(state.vel, decMax)));
 
         if(cond2smooth){
             ha = DEC;
@@ -123,19 +123,19 @@ class Robot {
      */
     void changeHA_LDIPS(){
         // Copy paste below
-        if(ha == ACC && DistTraveled(v, decMax) + x - target >= -2.320007)
+        if(ha == ACC && DistTraveled(state.vel, decMax) + state.pos - target >= -2.320007)
             ha = DEC;
-        else if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= -150.000000 && DistTraveled(vMax, decMax) + x - target >= -0.095000)
+        else if(ha == CON && DistTraveled(state.vel, decMax) - DistTraveled(vMax, decMax) >= -150.000000 && DistTraveled(vMax, decMax) + state.pos - target >= -0.095000)
             ha = DEC;
-        else if(ha == ACC && v - vMax >= -0.025000 && x - target >= -499.975006)
+        else if(ha == ACC && state.vel - vMax >= -0.025000 && state.pos - target >= -499.975006)
             ha = CON;
-        else if(ha == CON && vMax - v >= 0.000000)
+        else if(ha == CON && vMax - state.vel >= 0.000000)
             ha = ACC;
-        else if(ha == DEC && v >= -1.000000)
+        else if(ha == DEC && state.vel >= -1.000000)
             ha = DEC;
-        else if(ha == ACC && x >= -0.997500)
+        else if(ha == ACC && state.pos >= -0.997500)
             ha = ACC;
-        else if(ha == CON && v >= 0.000000 && DistTraveled(vMax, decMax) - x >= -128.399994)
+        else if(ha == CON && state.vel >= 0.000000 && DistTraveled(vMax, decMax) - state.pos >= -128.399994)
             ha = CON;
     }
 
@@ -171,7 +171,7 @@ class Robot {
         //     ha = CON;
         // }
 
-        if(x < target / 2){
+        if(state.pos < target / 2){
             ha = ACC;
         } else {
             ha = DEC;
@@ -219,49 +219,71 @@ class Robot {
         putErrorIntoHA(prevHA);
     }
 
+    // Motor model: known function mapping from high-level to low-level actions
+    LA motorModel(HA ha, Obs state, bool error){
+        double acc = 0;
+        
+        if(ha == ACC){
+            acc = accMax;
+        } else if (ha == DEC) {
+            acc = decMax;
+        }
+
+        // Induce some error
+        if(error){
+            acc += accErrDistr(gen);
+        }
+
+        return LA { .acc = acc };
+    }
+
     /*
      * Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
      */
     void updatePhysics(double t_step){
-        double vPrev = v;
-        double xPrev = x;
+        double vPrev = state.vel;
+        double xPrev = state.pos;
 
         // Select some action (acceleration)
-        a = ha == DEC ? decMax :
-                            (ha == ACC ? accMax : 0);
-        
-        // Induce some error
-        a += accErrDistr(gen);
+        la = motorModel(ha, state, true);
         
         // Update velocity and displacement accordingly
-        v = vPrev + a * t_step;
+        state.vel = vPrev + la.acc * t_step;
 
-        if(v < epsilon){ // Round to 0
-            v = 0;
+        if(state.vel < epsilon){ // Round to 0
+            state.vel = 0;
         }
 
-        if(abs(v - vMax) < epsilon){ // Round to vMax
-            v = vMax;
+        if(abs(state.vel - vMax) < epsilon){ // Round to vMax
+            state.vel = vMax;
         }
 
-        if(abs(x - target) < epsilon){ // Round to target
-            x = target;
+        if(abs(state.pos - target) < epsilon){ // Round to target
+            state.pos = target;
         }
 
-        x = xPrev + (v + vPrev)/2 * t_step;
+        state.pos = xPrev + (state.vel + vPrev)/2 * t_step;
     }
 
     /*
      * Robot has reached target and is at rest. End simulation.
      */
     bool finished(){
-        return v < epsilon && x >= target - epsilon;
+        return state.vel < epsilon && state.pos >= target - epsilon;
     }
 
     void reset(){
-        a = 0;
-        v = 0;
-        x = 0;
         ha = CON;
+        la = LA { .acc = 0 };
+        state = Obs { .pos = 0, .vel = 0 };
+    }
+
+    // Gives the string form of the current high-level action
+    string ha_tostring() {
+        if(ha == ACC)
+            return "ACC";
+        if(ha == DEC)
+            return "DEC";
+        return "CON";
     }
 };

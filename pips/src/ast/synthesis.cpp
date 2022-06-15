@@ -31,9 +31,11 @@ using std::make_shared;
 using nlohmann::json;
 using AST::CheckModelAccuracy;
 
-DECLARE_uint32(sketch_depth);
-DECLARE_double(min_accuracy);
-DECLARE_bool(debug);
+// DECLARE_uint32(sketch_depth);
+// DECLARE_double(min_accuracy);
+// DECLARE_bool(debug);
+
+bool flagsDebug = false;
 
 namespace AST {
 
@@ -350,7 +352,7 @@ ast_ptr PredicateL2(
   unordered_set<Example> no;
   SplitExamples(examples, transition, &yes, &no);
 
-  if (FLAGS_debug) {
+  if (flagsDebug) {
     cout << "Current Sketch: " << sketch << endl;
   }
 
@@ -441,7 +443,7 @@ ast_ptr ldipsL2(ast_ptr candidate,
 }
 
 // TODO(currently writes to file, may want a call that doesn't do this).
-void ldipsL3(const vector<Example>& demos,
+ast_ptr ldipsL3(const vector<Example>& demos,
       const vector<pair<string, string>>& transitions,
       const vector<ast_ptr> lib,
       const int sketch_depth,
@@ -474,7 +476,7 @@ void ldipsL3(const vector<Example>& demos,
       current_solution = ldipsL2(sketch, examples, lib, transition,
           min_accuracy, current_solution, &current_best);
       if (current_best >= min_accuracy) break;
-      if (FLAGS_debug) {
+      if (flagsDebug) {
         cout << "Score: " << current_best << endl;
         cout << "Solution: " << current_solution << endl;
         cout << "- - - - -" << endl;
@@ -493,6 +495,7 @@ void ldipsL3(const vector<Example>& demos,
     examples = FilterExamples(examples, transition);
 
     cout << endl;
+    return current_solution;
   }
 }
 
@@ -542,7 +545,7 @@ void DIPR(const vector<Example>& demos,
     // TODO(jaholtz) iterative over both sketches separately
     for (const auto& sketch : sketches) {
       // Extend the Sketch
-      if (FLAGS_debug) {
+      if (flagsDebug) {
         cout << "Pos: " << pos << " Neg: " << neg << endl;
       }
       ast_ptr candidate = ExtendPred(programs[i], sketch, sketch, pos, neg);

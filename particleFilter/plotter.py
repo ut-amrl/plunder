@@ -4,11 +4,11 @@ import csv
 import sys
 
 # I/O
-inFile = open("pf_custom/out/pf.csv", "r")
+inFile = open("particleFilter/out/pf.csv", "r")
 gtFile = open("accSim/out/data.csv", "r")
-outFile1 = "pf_custom/plots/accel.png"
-outFile2 = "pf_custom/plots/velocity.png"
-outFile3 = "pf_custom/plots/position.png"
+outFile1 = "particleFilter/plots/accel.png"
+outFile2 = "particleFilter/plots/velocity.png"
+outFile3 = "particleFilter/plots/position.png"
 
 reader = csv.reader(inFile)
 gtReader = csv.reader(gtFile)

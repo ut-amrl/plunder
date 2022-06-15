@@ -55,7 +55,7 @@ using namespace std;
 
 
 const string obsDataPath = "accSim/out/data.json";
-const string aspPath = "synthesis/out/asp.json";
+const string aspPath = "synthesis/out/";
 const string hiLvlDataPath = "pf_custom/out/pf.csv";
 const string operationLibPath = "pips/ops/test_library.json";
 
@@ -65,7 +65,9 @@ const int sketch_depth = 2;
 const int min_accuracy = 0.8;
 
 
-
+void collectDemos(){
+    
+}
 
 void expectation(){
 
@@ -91,7 +93,7 @@ void expectation(){
     // Enumerate all features
     vector<ast_ptr> ops = AST::RecEnumerate(roots, inputs, examples, library, feature_depth, &signatures);
 
-    // ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspPath);
+    ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspPath);
 }
 
 

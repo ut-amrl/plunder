@@ -121,27 +121,25 @@ int main(int argc, char** argv) {
         for(double t=0; t<T_TOT/T_STEP; t++){
 
             // Run simulation
-            string prevHAStr = robots[i].ha == 0 ? "ACC" : 
-                                                (robots[i].ha == 1 ? "DEC" : "CON");
+            string prevHAStr = robots[i].ha_tostring();
 
             robots[i].updatePhysics(T_STEP);
             robots[i].changeHA();
 
-            string curHAStr = robots[i].ha == 0 ? "ACC" : 
-                                        (robots[i].ha == 1 ? "DEC" : "CON");
+            string curHAStr = robots[i].ha_tostring();
 
             // Print trace
             if(genCsv) {
-                csvFile << t << ", " << robots[i].x << ", " << robots[i].v << ", " << robots[i].a << ", " << curHAStr << "\n";
+                csvFile << t << ", " << robots[i].state.pos << ", " << robots[i].state.vel << ", " << robots[i].la.acc << ", " << curHAStr << "\n";
             }
 
             if(genJson){
                 if(first) first = false;
                 else jsonFile << ",";
                 jsonFile << R"({"x":{"dim":[1,0,0],"type":"NUM","name":"x","value":)";
-                jsonFile << robots[i].x;
+                jsonFile << robots[i].state.pos;
                 jsonFile << R"(},"v":{"dim":[1,-1,0],"type":"NUM","name":"v","value":)";
-                jsonFile << robots[i].v;
+                jsonFile << robots[i].state.vel;
                 jsonFile << R"(},"target":{"dim":[1,0,0],"type":"NUM","name":"target","value":)";
                 jsonFile << robots[i].target;
                 jsonFile << R"(},"vMax":{"dim":[1,-1,0],"type":"NUM","name":"vMax","value":)";

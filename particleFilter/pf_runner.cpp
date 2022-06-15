@@ -19,7 +19,7 @@ static double resampleThreshold = 0.5;
 
 // Global variables
 static const char* inputFile = "accSim/out/data.csv";           // CHANGED TO "GLOBAL" PATH
-static const char* outputFile = "pf_custom/out/pf.csv";             // CHANGED TO "GLOBAL" PATH
+static const char* outputFile = "particleFilter/out/pf.csv";             // CHANGED TO "GLOBAL" PATH
 static const int maxTimeSteps = 1000;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,8 +43,8 @@ HA sampleInitialHA(){
 
 // Run robot-based action-selection policy
 HA ASP(Robot r, HA prevHA, Obs prevObs){
-    r.x = prevObs.pos;
-    r.v = prevObs.vel;
+    r.state.pos = prevObs.pos;
+    r.state.vel = prevObs.vel;
     r.ha = prevHA;
 
     r.changeHA();
@@ -59,9 +59,9 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
 FLOAT logLikelihoodGivenMotorModel(Robot r, LA la, HA ha, Obs obs){
-    double laMean = (ha == ACC) ? r.accMax : (ha == DEC) ? r.decMax : 0;
-    double res = logpdf(la.acc, laMean, r.accErrDistr.stddev());
-    return res;
+    double mean = r.motorModel(ha, obs, false).acc;
+    double stddev = r.accErrDistr.stddev();
+    return logpdf(la.acc, mean, stddev);
 }
 
 
@@ -81,19 +81,13 @@ void readData(const char* file, vector<Obs>& dataObs, vector<LA>& dataLA){
         if(!getline(infile, res))
             break;
         istringstream iss (res);
-        float time; string comma1;
-        float x; string comma2;
-        float v; string comma3;
-        float a;
-        iss >> time >> comma1 >> x >> comma2 >> v >> comma3 >> a;
+        float time, x, v, a; string comma;
+        iss >> time >> comma >> x >> comma >> v >> comma >> a;
 
-        Obs obs;
-        obs.pos = x;
-        obs.vel = v;
+        Obs obs = { .pos = x, .vel = v };
         dataObs.push_back(obs);
 
-        LA la;
-        la.acc = a;
+        LA la = { .acc = a };
         dataLA.push_back(la);
     }
 }
@@ -105,13 +99,7 @@ void writeData(const char* file, vector<vector<HA>> trajectories){
 
     for(vector<HA> traj : trajectories){
         for(uint i = 0; i < traj.size(); i++){
-            if(traj[i] == ACC){
-                outFile << r.accMax;
-            } else if (traj[i] == DEC){
-                outFile << r.decMax;
-            } else {
-                outFile << 0;
-            }
+            outFile << r.motorModel(traj[i], Obs {}, false).acc;
             if(i != traj.size() - 1){
                 outFile << ",";
             }
