@@ -231,6 +231,11 @@ class RobotASP {
     double haProbCorrect = 0.8;
     bool useTree;
 
+    RobotASP(modelNum, wantErrHA, haProbCorrect, useTree){
+
+    }
+    
+
     /*
      * Transition robot high-level action based on current global state. Runs once per time step
      */

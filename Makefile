@@ -33,7 +33,7 @@ $(TARGET4):
 
 $(TARGET5):
 			mkdir -p synthesis/out && \
-			g++ synthesis/em.cpp -L pips/lib/libc++-pips-core.a -o synthesis/out/em -I pips/src -I pf_custom -I accSim -I pips/submodules/json/single_include/
+			g++ synthesis/em.cpp -L pips/lib -l c++-pips-core -l amrl_shared_lib -o synthesis/out/em -I pips/src -I pf_custom -I accSim -I pips/submodules/json/single_include/
 
 
 
