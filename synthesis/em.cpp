@@ -81,7 +81,9 @@ void expectation(){
     // Turn variables into roots
     vector<ast_ptr> roots;
     for (const Var& variable : variables) {
-        roots.push_back(make_shared<Var>(variable));
+        if (variable.name_ != "goal" && variable.name_ != "free_path" && variable.name_ != "DoorState") {
+            roots.push_back(make_shared<Var>(variable));
+        }
     }
 
     // Get library
@@ -92,6 +94,7 @@ void expectation(){
 
     // Enumerate all features
     vector<ast_ptr> ops = AST::RecEnumerate(roots, inputs, examples, library, feature_depth, &signatures);
+
 
     ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspPath);
 }
