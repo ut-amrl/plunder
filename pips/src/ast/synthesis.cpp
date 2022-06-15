@@ -443,7 +443,7 @@ ast_ptr ldipsL2(ast_ptr candidate,
 }
 
 // TODO(currently writes to file, may want a call that doesn't do this).
-ast_ptr ldipsL3(const vector<Example>& demos,
+vector<ast_ptr> ldipsL3(const vector<Example>& demos,
       const vector<pair<string, string>>& transitions,
       const vector<ast_ptr> lib,
       const int sketch_depth,
@@ -453,6 +453,8 @@ ast_ptr ldipsL3(const vector<Example>& demos,
   vector<Example> examples = demos;
   // Enumerate possible sketches
   const auto sketches = EnumerateSketches(sketch_depth);
+
+  vector<ast_ptr> transition_solutions;
 
   // For each input/output pair
   for (const auto& transition : transitions) {
@@ -495,8 +497,9 @@ ast_ptr ldipsL3(const vector<Example>& demos,
     examples = FilterExamples(examples, transition);
 
     cout << endl;
-    return current_solution;
+    transition_solutions.push_back(current_solution);
   }
+  return transition_solutions;
 }
 
 void DIPR(const vector<Example>& demos,

@@ -46,14 +46,14 @@ add_library(gflags_nothreads_static STATIC IMPORTED)
 
 set_target_properties(gflags_nothreads_static PROPERTIES
   INTERFACE_COMPILE_DEFINITIONS "GFLAGS_IS_A_DLL=0"
-  INTERFACE_INCLUDE_DIRECTORIES "/home/jjx88/em-synthesis/pips/submodules/gflags/include"
+  INTERFACE_INCLUDE_DIRECTORIES "/home/linusjz/em-synthesis/pips/submodules/gflags/include"
 )
 
 # Import target "gflags_nothreads_static" for configuration ""
 set_property(TARGET gflags_nothreads_static APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(gflags_nothreads_static PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "CXX"
-  IMPORTED_LOCATION_NOCONFIG "/home/jjx88/em-synthesis/pips/lib/libgflags_nothreads.a"
+  IMPORTED_LOCATION_NOCONFIG "/home/linusjz/em-synthesis/pips/lib/libgflags_nothreads.a"
   )
 
 # This file does not depend on other imported targets which have
