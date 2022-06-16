@@ -7,12 +7,28 @@
 
 using namespace std;
 
+typedef HA asp_t(HA, Obs, Robot*);
+
+vector<asp_t*> ASPs;
 int model = 0; // Default model
+asp_t curASP = ASP_Hand;
 
 // ----- Helper Methods ---------------------------------------------
+void init(){
+    ASPs.push_back(ASP_Hand);
+    ASPs.push_back(ASP_LDIPS);
+    ASPs.push_back(ASP_LDIPS_error);
+    ASPs.push_back(ASP_Hand_prob);
+    ASPs.push_back(ASP_accDecOnly);
+}
 
-void setModel(int asp){
-    model = asp;
+void setModel(int aspNum){
+    if(aspNum >= ASPs.size()) {
+        cout << "Invalid model provided" << endl;
+        exit(1);
+    }
+    model = aspNum;
+    curASP = ASPs[asp];
 }
 
 double logistic(double midpoint, double steepness, double input){
@@ -108,55 +124,60 @@ HA ASP_LDIPS(HA ha, Obs state, Robot* r){
 */
 HA ASP_LDIPS_error(HA ha, Obs state, Robot* r){
     // Copy paste below
-    // if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= 9.714069)
-    //     ha = CON;
-    // else if(ha == DEC && DistTraveled(v, decMax) - target >= 11.458965)
-    //     ha = CON;
-    // else if(ha == CON && x + x + x - target >= 35.615170)
-    //     ha = DEC;
-    // else if(ha == ACC && DistTraveled(v, decMax) + target >= 535.545532)
-    //     ha = CON;
-    // else if(ha == CON)
-    //     ha = ACC;
-    // else if(ha == ACC && x - target + DistTraveled(v, decMax) >= -0.138184)
-    //     ha = DEC;
-    // else if(ha == DEC && DistTraveled(v, decMax) - x - x >= -49.242615)
-    //     ha = ACC;
-    // else if(ha == DEC)
-    //     ha = DEC;
-    // else if(ha == ACC)
-    //     ha = ACC;
+    if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= 9.714069)
+        ha = CON;
+    else if(ha == DEC && DistTraveled(v, decMax) - target >= 11.458965)
+        ha = CON;
+    else if(ha == CON && x + x + x - target >= 35.615170)
+        ha = DEC;
+    else if(ha == ACC && DistTraveled(v, decMax) + target >= 535.545532)
+        ha = CON;
+    else if(ha == CON)
+        ha = ACC;
+    else if(ha == ACC && x - target + DistTraveled(v, decMax) >= -0.138184)
+        ha = DEC;
+    else if(ha == DEC && DistTraveled(v, decMax) - x - x >= -49.242615)
+        ha = ACC;
+    else if(ha == DEC)
+        ha = DEC;
+    else if(ha == ACC)
+        ha = ACC;
 
-    // if(sampleDiscrete(0.33)){
-    //     ha = ACC;
-    // } else if (sampleDiscrete(0.5)){
-    //     ha = DEC;
-    // } else {
-    //     ha = CON;
-    // }
+    if(sampleDiscrete(0.33)){
+        ha = ACC;
+    } else if (sampleDiscrete(0.5)){
+        ha = DEC;
+    } else {
+        ha = CON;
+    }
 
+}
+
+HA ASP_accDecOnly(){
     if(state.pos < r->target / 2){
         ha = ACC;
     } else {
         ha = DEC;
     }
-
     return ha;
 }
+
 
 /*
 * Transition robot high-level action based on current global state. Runs once per time step
 */
 HA ASP_model(HA ha, Obs state, Robot* r){
-    if(model == 0) {
+    if(model == 0) 
         ha = ASP_Hand(ha, state, r);
-    } else if(model == 1){
+    else if(model == 1)
         ha = ASP_LDIPS(ha, state, r);
-    } else if(model == 2){
+    else if(model == 2)
         ha = ASP_LDIPS_error(ha, state, r);
-    } else if(model == 3){
+    else if(model == 3)
         ha = ASP_Hand_prob(ha, state, r);
-    } else{
+    else if(model == 4)
+        ha = ASP_accDecOnly(ha, state, r);
+    else{
         cout << "Invalid model provided" << endl;
         exit(1);
     }

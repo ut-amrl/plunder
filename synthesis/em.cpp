@@ -17,6 +17,7 @@
 #include "visitors/interp_visitor.hpp"
 #include "visitors/print_visitor.hpp"
 #include "ast/synthesis.hpp"
+#include "../robot.h"
 
 using AST::ast_ptr;
 using AST::BinOp;
@@ -55,7 +56,7 @@ using namespace std;
 
 
 const string obsDataPath = "pips/examples/data.json";
-const string aspPath = "synthesis/out2/";
+const string aspPath = "synthesis/out/";
 const string hiLvlDataPath = "particleFilter/out/pf.csv";
 const string operationLibPath = "pips/ops/test_library.json";
 
@@ -76,7 +77,15 @@ void collectDemos(){
 
 
 Example obsToExample(Obs obs){
-    return nullptr;
+    Example ex;
+    SymEntry xEntry(obs.pos);
+    SymEntry vEntry(obs.vel);
+    string stateStr = 
+    SymEntry curStateEntry()
+    ex.symbol_table_["x"] = xEntry;
+    ex.symbol_table_["y"] = vEntry;
+    ex.symbol_table_["state"] = curStateEntry;
+    return ex;
 }
 
 
@@ -125,20 +134,21 @@ void expectation(){
 
 
 void maximization(){
-    
+    HA state = ACC;     // initial state
+    for(int i=0; i<10; i++){
+        cout << transitionUsingASP(state, obs) << endl;
+    }
 }
 
 
 int main(int argc, char** argv){
 
     for(int i=0; i<10; i++){
+        cout << "loop " << i << " expectation" << endl;
         expectation();
+        cout << "loop " << i << " maximization" << endl;
         maximization();
     }
-
-    // expectation();
-    // Obs robotState {10, 10};
-    // cout << transitionUsingASP(preds, transitions, robotState);
 
     return 0;
 }

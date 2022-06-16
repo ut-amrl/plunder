@@ -40,10 +40,10 @@ class Robot {
     private:
     public:
 
+    // Constant inputs into LDIPS
     double accMax; // Maximum constant acceleration
     double decMax; // Maximum constant deceleration 
     double vMax;   // Maximum velocity
-
     double target; // Target distance
 
 
