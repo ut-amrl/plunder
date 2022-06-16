@@ -91,7 +91,7 @@ def main():
         PRINTED_PARTICLES = int(sys.argv[2])
         NUM_FILES = int(sys.argv[3])
 
-    for robot in range(0, NUM_FILES - 1):
+    for robot in range(0, NUM_FILES):
         # I/O
         trajectories = []
         velocities = []

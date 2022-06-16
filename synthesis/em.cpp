@@ -138,8 +138,9 @@ HA initialASP(HA ha, Obs obs, Robot* r){
 }
 
 vector<Example> expectation(){
-    vector<HA> traj = runFilter(pfN, pfResampleThreshold, &globalRobot, dataObs, dataLA, curASP);
+    vector<vector<HA>> allTraj = runFilter(pfN, pfResampleThreshold, &globalRobot, dataObs, dataLA, curASP);
     vector<Example> examples;
+    for(int n=0; n<)
     for(int i=0; i<dataObs.size()-1; i++){
         Example ex = dataToExample2(dataObs[i], traj[i], traj[i+1]);
         examples.push_back(ex);

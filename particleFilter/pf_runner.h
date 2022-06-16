@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -5,13 +7,14 @@
 #include <string>
 #include <cstring>
 
-#include "pf_runner.h"
+#include "pf.h"
+#include "../accSim/asps.h"
+#include "../accSim/robotSets.h"
 
 using namespace std;
 
 #define PF_SEED time(0)
 
-<<<<<<< HEAD
 // ----- Default Configuration ---------------------------------------------
 
 static vector<Robot> robots = { Robot(5, -4, 12, 100, normal_distribution<double>(0.0, 1.0), 0.8) };
@@ -104,28 +107,7 @@ void writeData(string file, Robot* r, vector<vector<HA>>& trajectories){
 
 // ----- Particle Filter ---------------------------------------------
 
-void runFilter(int N, double resampleThreshold, Robot* r, string inputFile, string outputFile){
-
-    // Read input
-    vector<Obs> dataObs;
-    vector<LA> dataLa;
-    readData(inputFile, dataObs, dataLa);
-
-    // Initialization
-    srand(PF_SEED);
-    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel, r);
-    ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
-        
-    // Run particle filter
-    pf.forwardFilter(N, resampleThreshold);
-    vector<vector<HA>> trajectories = pf.retrieveTrajectories();
-
-    // Write results
-    writeData(outputFile, r, trajectories);
-}
-
-vector<HA> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
-
+vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
 
     // Initialization
     srand(PF_SEED);
@@ -136,13 +118,20 @@ vector<HA> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> data
     pf.forwardFilter(N, resampleThreshold);
     vector<vector<HA>> trajectories = pf.retrieveTrajectories();
 
-    vector<HA> finalTraj;
-    for(vector<HA> particleTraj: trajectories){
-        for(HA ha : particleTraj){
-            finalTraj.push_back(ha);
-        }
-    }
-    return finalTraj;
+    return trajectories;
+}
+
+void runFilter(int N, double resampleThreshold, Robot* r, string inputFile, string outputFile){
+
+    // Read input
+    vector<Obs> dataObs;
+    vector<LA> dataLa;
+    readData(inputFile, dataObs, dataLa);
+
+    vector<vector<HA>> trajectories = runFilter(N, resampleThreshold, r, dataObs, dataLa, &ASP);
+
+    // Write results
+    writeData(outputFile, r, trajectories);
 }
 
 void processPath(int N, double resampleThreshold, vector<Robot>& robots, string inputPath, string outputPath, int numFiles){
@@ -153,23 +142,3 @@ void processPath(int N, double resampleThreshold, vector<Robot>& robots, string 
         runFilter(N, resampleThreshold, &robots[i], in, out);
     }
 }
-
-
-=======
->>>>>>> 55fa93f2ea08686edf0821e5c00ee1b68a8f704d
-// ----- Main ---------------------------------------------
-
-// int main(int argc, char** argv){
-//     // Reading parameters
-//     if(argc > 1){
-//         if(argc < 8){
-//             cout << "Please run in the following manner: ./pf <robot test set> <mean error> <error std dev> <high-level success rate> <model> <numParticles> <resampleThreshold>" << endl;
-//             exit(0);
-//         }
-
-//         vector<Robot> robots = getRobotSet(stoi(argv[1]), normal_distribution<double>(stod(argv[2]), stod(argv[3])), stod(argv[4]));
-//         setModel(stod(argv[5]));
-
-//         processPath(stoi(argv[6]), stod(argv[7]), robots, inputPath, outputPath, robots.size());
-//     }
-// }
