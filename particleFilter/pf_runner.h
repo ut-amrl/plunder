@@ -107,6 +107,20 @@ void writeData(string file, Robot* r, vector<vector<HA>>& trajectories){
 
 // ----- Particle Filter ---------------------------------------------
 
+vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
+
+    // Initialization
+    srand(PF_SEED);
+    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, asp, &logLikelihoodGivenMotorModel, r);
+    ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
+        
+    // Run particle filter
+    pf.forwardFilter(N, resampleThreshold);
+    vector<vector<HA>> trajectories = pf.retrieveTrajectories();
+
+    return trajectories;
+}
+
 void runFilter(int N, double resampleThreshold, Robot* r, string inputFile, string outputFile){
 
     // Read input
@@ -114,14 +128,7 @@ void runFilter(int N, double resampleThreshold, Robot* r, string inputFile, stri
     vector<LA> dataLa;
     readData(inputFile, dataObs, dataLa);
 
-    // Initialization
-    srand(PF_SEED);
-    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel, r);
-    ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
-        
-    // Run particle filter
-    pf.forwardFilter(N, resampleThreshold);
-    vector<vector<HA>> trajectories = pf.retrieveTrajectories();
+    vector<vector<HA>> trajectories = runFilter(N, resampleThreshold, r, dataObs, dataLa, &ASP);
 
     // Write results
     writeData(outputFile, r, trajectories);
