@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <cmath>
@@ -11,9 +13,9 @@ using namespace std;
 
 #define FLOAT double // Set to double (for precision) or float (for speed)
 
-static uint resampCount = 0;
+static uint resampCount = 0; // Debug
 
-// ---------------------------------------------------------------------------------------------------------------------
+// ----- Helper Functions ---------------------------------------------
 
 // Exponentiate some values, take their sum, then take the log of the sum
 FLOAT logsumexp(vector<FLOAT>& vals) {
@@ -67,11 +69,8 @@ vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int
 
 
 
+// ----- Markov System ---------------------------------------------
 
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-// Setup Markov System with parameterized high-level actions, low-level actions, observed states, and robot class
 template<typename HA, typename LA, typename Obs, typename RobotClass>
 class MarkovSystem {
     
@@ -79,23 +78,23 @@ class MarkovSystem {
     public:
 
     HA (*sampleInitialHA)(); // Initial distribution
-    HA (*ASP)(RobotClass r, HA prevHa, Obs prevObs); // Provided action-selection policy
-    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs); // Calculate likelihood of observed LA given the simulated HA sequence
-    RobotClass r;
+    HA (*ASP)(HA prevHa, Obs prevObs, RobotClass* r); // Provided action-selection policy
+    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass* r, LA la, HA ha, Obs obs); // Calculate likelihood of observed LA given the simulated HA sequence
+    RobotClass* r;
 
     // Constructor
     MarkovSystem( HA (*_sampleInitialHA)(), 
-                  HA (*_ASP)(RobotClass r, HA prevHa, Obs prevObs),
-                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs),
-                  RobotClass _r):
+                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass* r),
+                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass* r, LA la, HA ha, Obs obs),
+                  RobotClass* _r):
                         sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
                   {
     }
     
     // Robot-less constructor
     MarkovSystem( HA (*_sampleInitialHA)(), 
-                  HA (*_ASP)(RobotClass r, HA prevHa, Obs prevObs),
-                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass r, LA la, HA ha, Obs obs)):
+                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass* r),
+                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass* r, LA la, HA ha, Obs obs)):
                         sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
                   {
     }
@@ -103,11 +102,10 @@ class MarkovSystem {
 
 
 
-// ---------------------------------------------------------------------------------------------------------------------
+// ----- Particle Filter ---------------------------------------------
 
-// Particle filter based off a MarkovSystem
 template<typename HA, typename LA, typename Obs, typename RobotClass>
-class PF {
+class ParticleFilter {
     
     private:
     public:
@@ -119,7 +117,7 @@ class PF {
     vector<vector<HA>> particles;   // Gives the high-level trajectories of each particle
     vector<vector<int>> ancestors;  // Stores ancestors during resampling
 
-    PF(MarkovSystem<HA, LA, Obs, RobotClass>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
+    ParticleFilter(MarkovSystem<HA, LA, Obs, RobotClass>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
         system = _system;
         dataObs = _dataObs;
         dataLA = _dataLA;
@@ -128,7 +126,7 @@ class PF {
     }
 
     // Run particle filter on numParticles particles (and some resampleThreshold between 0 and 1)
-    void forward_filter(int numParticles, float resampleThreshold){
+    void forwardFilter(int numParticles, float resampleThreshold){
 
         // Initialization
         int N = numParticles;
@@ -229,7 +227,7 @@ class PF {
             // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = system->ASP(system->r, particles[t][i], dataObs[t]);
+                    particles[t+1][i] = system->ASP(particles[t][i], dataObs[t], system->r);
                 }
             }
         }

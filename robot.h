@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <random>
 #include <fstream>
@@ -8,6 +10,8 @@
 #define SEED 0 // Random seed
 
 using namespace std;
+
+// ----- Markov System definitions ---------------------------------------------
 
 enum HA { // High-level actions
     ACC, // Constant acceleration
@@ -28,240 +32,125 @@ struct Obs { // State observations
 random_device rd;
 default_random_engine gen(SEED);
 
+
+// ----- Robot Class ---------------------------------------------
+
 class Robot {
 
     private:
     public:
 
+    // Constant inputs into LDIPS
     double accMax; // Maximum constant acceleration
     double decMax; // Maximum constant deceleration 
     double vMax;   // Maximum velocity
-
     double target; // Target distance
 
 
     normal_distribution<double> accErrDistr;      // Acceleration error distribution
     double haProbCorrect;                         // Probability of transitioning to the correct high-level action
-    int model;                                    // Use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilstic ASP (3)
 
-    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _accErrDistr, double _haProbCorrect, int _model){
+    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _accErrDistr, double _haProbCorrect){
         accMax = _accMax;
         decMax = _decMax;
         vMax = _vMax;
         target = _target;
         accErrDistr = _accErrDistr;
         haProbCorrect = _haProbCorrect;
-        model = _model;
     }
 
     Robot() {}
 
-    double a = 0; // acceleration
-    double v = 0; // velocity
-    double x = 0; // displacement
+    HA ha = CON;                        // Initial high-level action
+    LA la = { .acc = 0 };               // Initial low-level action
+    Obs state = { .pos = 0, .vel = 0 }; // Initial observed state
 
-    HA ha = CON; // Initial high-level action
+    // MOTION MODEL (ACTION-SELECTION POLICY): Transition to new high-level action based on current action and state
+    void runASP(HA (*ASP) (HA, Obs, Robot*)){
+        ha = ASP(ha, state, this);
+    }
+
+    // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
+    LA motorModel(HA ha, Obs state, bool error){
+        double acc = 0;
+        
+        if(ha == ACC){
+            acc = accMax;
+        } else if (ha == DEC) {
+            acc = decMax;
+        }
+
+        // Induce some error
+        if(error){
+            acc += accErrDistr(gen);
+        }
+
+        return LA { .acc = acc };
+    }
+
+    // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
+    void updatePhysics(double t_step){
+        double vPrev = state.vel;
+        double xPrev = state.pos;
+
+        // Select some action (acceleration)
+        la = motorModel(ha, state, true);
+        
+        // Update velocity and displacement accordingly
+        state.vel = vPrev + la.acc * t_step;
+
+        if(state.vel < epsilon){ // Round to 0
+            state.vel = 0;
+        }
+
+        if(abs(state.vel - vMax) < epsilon){ // Round to vMax
+            state.vel = vMax;
+        }
+
+        if(abs(state.pos - target) < epsilon){ // Round to target
+            state.pos = target;
+        }
+
+        state.pos = xPrev + (state.vel + vPrev)/2 * t_step;
+    }
+
+
+    // HELPER METHODS
 
     // Return the distance this robot would travel before stopping if it began decelerating immediately
     double DistTraveled(double v, double dec){
         return - v * v / (2 * dec);
     }
 
-    double logistic(double midpoint, double steepness, double input){
-        return 1.0 / (1.0 + exp(-steepness * (input - midpoint)));
-    }
-
+    // Seeded random generator
     bool sampleDiscrete(double probTrue){
         double rv = ((double) rand())/RAND_MAX;
         return rv <= probTrue;
     }
 
-    /*
-     * This is a hand-crafted action-selection policy.
-     */
-    void changeHA_Hand(){
-        double xToTarget = target - x;                                  // distance to the target
-
-        bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-        bool cond2 = xToTarget - DistTraveled(v, decMax) < epsilon;     // needs to decelerate or else it will pass target
-
-        if(cond2){
-            ha = DEC;
-        }
-        if(cond1 && !cond2){
-            ha = CON;
-        }
-        if(!cond1 && !cond2){
-            ha = ACC;
-        }
-    }
-
-    /*
-     * This is a probabilistic hand-crafted action-selection policy.
-     */
-    void changeHA_Hand_prob(){
-        double xToTarget = target - x;                            // distance to the target
-        // bool cond1 = vMax - v < 0;                                // is at max velocity (can no longer accelerate)
-        // bool cond2 = xToTarget - DistTraveled(v, decMax) < 0;     // needs to decelerate or else it will pass target
-
-        bool cond1smooth = sampleDiscrete(logistic(vMax*0.1, -50.0/vMax, vMax-v));
-        bool cond2smooth = sampleDiscrete(logistic(target*0.1, -50.0/target, xToTarget - DistTraveled(v, decMax)));
-
-        if(cond2smooth){
-            ha = DEC;
-        }
-        if(cond1smooth && !cond2smooth){
-            ha = CON;
-        }
-        if(!cond1smooth && !cond2smooth){
-            ha = ACC;
-        }
-    }
-
-    /*
-     * This is an action-selection policy generated by LDIPS, without error.
-     */
-    void changeHA_LDIPS(){
-        // Copy paste below
-        if(ha == ACC && DistTraveled(v, decMax) + x - target >= -2.320007)
-            ha = DEC;
-        else if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= -150.000000 && DistTraveled(vMax, decMax) + x - target >= -0.095000)
-            ha = DEC;
-        else if(ha == ACC && v - vMax >= -0.025000 && x - target >= -499.975006)
-            ha = CON;
-        else if(ha == CON && vMax - v >= 0.000000)
-            ha = ACC;
-        else if(ha == DEC && v >= -1.000000)
-            ha = DEC;
-        else if(ha == ACC && x >= -0.997500)
-            ha = ACC;
-        else if(ha == CON && v >= 0.000000 && DistTraveled(vMax, decMax) - x >= -128.399994)
-            ha = CON;
-    }
-
-    /*
-     * This is an action-selection policy generated by LDIPS, with error.
-     */
-    void changeHA_LDIPS_error(){
-        // Copy paste below
-        // if(ha == CON && DistTraveled(v, decMax) - DistTraveled(vMax, decMax) >= 9.714069)
-        //     ha = CON;
-        // else if(ha == DEC && DistTraveled(v, decMax) - target >= 11.458965)
-        //     ha = CON;
-        // else if(ha == CON && x + x + x - target >= 35.615170)
-        //     ha = DEC;
-        // else if(ha == ACC && DistTraveled(v, decMax) + target >= 535.545532)
-        //     ha = CON;
-        // else if(ha == CON)
-        //     ha = ACC;
-        // else if(ha == ACC && x - target + DistTraveled(v, decMax) >= -0.138184)
-        //     ha = DEC;
-        // else if(ha == DEC && DistTraveled(v, decMax) - x - x >= -49.242615)
-        //     ha = ACC;
-        // else if(ha == DEC)
-        //     ha = DEC;
-        // else if(ha == ACC)
-        //     ha = ACC;
-
-        // if(sampleDiscrete(0.33)){
-        //     ha = ACC;
-        // } else if (sampleDiscrete(0.5)){
-        //     ha = DEC;
-        // } else {
-        //     ha = CON;
-        // }
-
-        if(x < target / 2){
-            ha = ACC;
-        } else {
-            ha = DEC;
-        }
-    }
-
-    /*
-     * Randomly transitions to an incorrect high-level action with specified probability
-     */
-    void putErrorIntoHA(int prevHA){
-        double r = ((double) rand()) /RAND_MAX;
-        int haDif = r < haProbCorrect ? 0 :
-                                (r < 1-(1-haProbCorrect)/2) ? 1 : 2;
-        ha = static_cast<HA>((ha + haDif)%3);
-    }
-
-    /*
-     * Transition robot high-level action based on current global state. Runs once per time step.
-     * Uses a provided method as the ASP.
-     */
-    void changeHA(void (*ASP) ()){
-        int prevHA = ha;
-        ASP();
-        putErrorIntoHA(prevHA);
-    }
-
-    /*
-     * Transition robot high-level action based on current global state. Runs once per time step
-     */
-    void changeHA(){
-        int prevHA = ha;
-
-        if(model == 0) {
-            changeHA_Hand();
-        } else if(model == 1){
-            changeHA_LDIPS();
-        } else if(model == 2){
-            changeHA_LDIPS_error();
-        } else if(model == 3){
-            changeHA_Hand_prob();
-        } else{
-            exit(1);
-        }
-
-        putErrorIntoHA(prevHA);
-    }
-
-    /*
-     * Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
-     */
-    void updatePhysics(double t_step){
-        double vPrev = v;
-        double xPrev = x;
-
-        // Select some action (acceleration)
-        a = ha == DEC ? decMax :
-                            (ha == ACC ? accMax : 0);
-        
-        // Induce some error
-        a += accErrDistr(gen);
-        
-        // Update velocity and displacement accordingly
-        v = vPrev + a * t_step;
-
-        if(v < epsilon){ // Round to 0
-            v = 0;
-        }
-
-        if(abs(v - vMax) < epsilon){ // Round to vMax
-            v = vMax;
-        }
-
-        if(abs(x - target) < epsilon){ // Round to target
-            x = target;
-        }
-
-        x = xPrev + (v + vPrev)/2 * t_step;
-    }
-
-    /*
-     * Robot has reached target and is at rest. End simulation.
-     */
+    // Robot has reached target and is at rest. End simulation.
     bool finished(){
-        return v < epsilon && x >= target - epsilon;
+        return state.vel < epsilon && state.pos >= target - epsilon;
     }
 
+    // Reset robot
     void reset(){
-        a = 0;
-        v = 0;
-        x = 0;
         ha = CON;
+        la = LA { .acc = 0 };
+        state = Obs { .pos = 0, .vel = 0 };
+    }
+
+    // Gives the string form of a high-level action
+    string ha_tostring(HA ha) {
+        if(ha == ACC)
+            return "ACC";
+        if(ha == DEC)
+            return "DEC";
+        return "CON";
+    }
+
+    // Gives string form of the current robot action
+    string ha_tostring() {
+        return ha_tostring(ha);
     }
 };

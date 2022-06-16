@@ -1,654 +1,632 @@
-.PHONY: pretty clean ChangeLog.md release
-
-##########################################################################
-# configuration
-##########################################################################
-
-# directory to recent compiler binaries
-COMPILER_DIR=/Users/niels/Documents/projects/compilers/local/bin
-
-# find GNU sed to use `-i` parameter
-SED:=$(shell command -v gsed || which sed)
-
-
-##########################################################################
-# source files
-##########################################################################
-
-# the list of sources in the include folder
-SRCS=$(shell find include -type f | sort)
-
-# the single header (amalgamated from the source files)
-AMALGAMATED_FILE=single_include/nlohmann/json.hpp
-
-
-##########################################################################
-# documentation of the Makefile's targets
-##########################################################################
-
-# main target
-all:
-	@echo "amalgamate - amalgamate file single_include/nlohmann/json.hpp from the include/nlohmann sources"
-	@echo "ChangeLog.md - generate ChangeLog file"
-	@echo "check - compile and execute test suite"
-	@echo "check-amalgamation - check whether sources have been amalgamated"
-	@echo "clean - remove built files"
-	@echo "coverage - create coverage information with lcov"
-	@echo "cppcheck - analyze code with cppcheck"
-	@echo "cpplint - analyze code with cpplint"
-	@echo "clang_tidy - analyze code with Clang-Tidy"
-	@echo "clang_analyze - analyze code with Clang-Analyzer"
-	@echo "doctest - compile example files and check their output"
-	@echo "fuzz_testing - prepare fuzz testing of the JSON parser"
-	@echo "fuzz_testing_bson - prepare fuzz testing of the BSON parser"
-	@echo "fuzz_testing_cbor - prepare fuzz testing of the CBOR parser"
-	@echo "fuzz_testing_msgpack - prepare fuzz testing of the MessagePack parser"
-	@echo "fuzz_testing_ubjson - prepare fuzz testing of the UBJSON parser"
-	@echo "json_unit - create single-file test executable"
-	@echo "pedantic_clang - run Clang with maximal warning flags"
-	@echo "pedantic_gcc - run GCC with maximal warning flags"
-	@echo "pretty - beautify code with Artistic Style"
-	@echo "run_benchmarks - build and run benchmarks"
-
-
-##########################################################################
-# unit tests
-##########################################################################
-
-# build unit tests
-json_unit:
-	@$(MAKE) json_unit -C test
-
-# run unit tests
-check:
-	$(MAKE) check -C test
-
-
-##########################################################################
-# coverage
-##########################################################################
-
-coverage:
-	rm -fr build_coverage
-	mkdir build_coverage
-	cd build_coverage ; cmake .. -GNinja -DCMAKE_BUILD_TYPE=Debug -DJSON_Coverage=ON -DJSON_MultipleHeaders=ON
-	cd build_coverage ; ninja
-	cd build_coverage ; ctest -j10
-	cd build_coverage ; ninja lcov_html
-	open build_coverage/test/html/index.html
-
-##########################################################################
-# documentation tests
-##########################################################################
-
-# compile example files and check output
-doctest:
-	$(MAKE) check_output -C doc
-
-
-##########################################################################
-# warning detector
-##########################################################################
-
-# calling Clang with all warnings, except:
-# -Wno-c++2a-compat: u8 literals will behave differently in C++20...
-# -Wno-deprecated-declarations: the library deprecated some functions
-# -Wno-documentation-unknown-command: code uses user-defined commands like @complexity
-# -Wno-exit-time-destructors: warning in json code triggered by NLOHMANN_JSON_SERIALIZE_ENUM
-# -Wno-float-equal: not all comparisons in the tests can be replaced by Approx
-# -Wno-keyword-macro: unit-tests use "#define private public"
-# -Wno-padded: padding is nothing to warn about
-# -Wno-range-loop-analysis: items tests "for(const auto i...)"
-# -Wno-switch-enum -Wno-covered-switch-default: pedantic/contradicting warnings about switches
-# -Wno-weak-vtables: exception class is defined inline, but has virtual method
-pedantic_clang:
-	rm -fr build_pedantic
-	CXXFLAGS=" \
-		-std=c++11 -Wno-c++98-compat -Wno-c++98-compat-pedantic \
-		-Werror \
-		-Weverything \
-		-Wno-c++2a-compat \
-		-Wno-deprecated-declarations \
-		-Wno-documentation-unknown-command \
-		-Wno-exit-time-destructors \
-		-Wno-float-equal \
-		-Wno-keyword-macro \
-		-Wno-padded \
-		-Wno-range-loop-analysis \
-		-Wno-switch-enum -Wno-covered-switch-default \
-		-Wno-weak-vtables" cmake -S . -B build_pedantic -GNinja -DCMAKE_BUILD_TYPE=Debug -DJSON_MultipleHeaders=ON -DJSON_BuildTests=On
-	cmake --build build_pedantic
-
-# calling GCC with most warnings
-pedantic_gcc:
-	rm -fr build_pedantic
-	CXXFLAGS=" \
-		-std=c++11 \
-		-pedantic \
-		-Werror \
-		--all-warnings                                    \
-		--extra-warnings                                  \
-		-W                                                \
-		-Wno-abi-tag                                         \
-		-Waddress                                         \
-		-Waddress-of-packed-member                        \
-		-Wno-aggregate-return                                \
-		-Waggressive-loop-optimizations                   \
-		-Waligned-new=all                                 \
-		-Wall                                             \
-		-Walloc-zero                                      \
-		-Walloca                                          \
-		-Wanalyzer-double-fclose                          \
-		-Wanalyzer-double-free                            \
-		-Wanalyzer-exposure-through-output-file           \
-		-Wanalyzer-file-leak                              \
-		-Wanalyzer-free-of-non-heap                       \
-		-Wanalyzer-malloc-leak                            \
-		-Wanalyzer-null-argument                          \
-		-Wanalyzer-null-dereference                       \
-		-Wanalyzer-possible-null-argument                 \
-		-Wanalyzer-possible-null-dereference              \
-		-Wanalyzer-stale-setjmp-buffer                    \
-		-Wanalyzer-tainted-array-index                    \
-		-Wanalyzer-too-complex                            \
-		-Wanalyzer-unsafe-call-within-signal-handler      \
-		-Wanalyzer-use-after-free                         \
-		-Wanalyzer-use-of-pointer-in-stale-stack-frame    \
-		-Warith-conversion                                \
-		-Warray-bounds                                    \
-		-Warray-bounds=2                                  \
-		-Wattribute-alias=2                               \
-		-Wattribute-warning                               \
-		-Wattributes                                      \
-		-Wbool-compare                                    \
-		-Wbool-operation                                  \
-		-Wbuiltin-declaration-mismatch                    \
-		-Wbuiltin-macro-redefined                         \
-		-Wc++0x-compat                                    \
-		-Wc++11-compat                                    \
-		-Wc++14-compat                                    \
-		-Wc++17-compat                                    \
-		-Wc++1z-compat                                    \
-		-Wc++20-compat                                    \
-		-Wc++2a-compat                                    \
-		-Wcannot-profile                                  \
-		-Wcast-align                                      \
-		-Wcast-align=strict                               \
-		-Wcast-function-type                              \
-		-Wcast-qual                                       \
-		-Wcatch-value=3                                   \
-		-Wchar-subscripts                                 \
-		-Wclass-conversion                                \
-		-Wclass-memaccess                                 \
-		-Wclobbered                                       \
-		-Wcomma-subscript                                 \
-		-Wcomment                                         \
-		-Wcomments                                        \
-		-Wconditionally-supported                         \
-		-Wconversion                                      \
-		-Wconversion-null                                 \
-		-Wcoverage-mismatch                               \
-		-Wcpp                                             \
-		-Wctor-dtor-privacy                               \
-		-Wdangling-else                                   \
-		-Wdate-time                                       \
-		-Wdelete-incomplete                               \
-		-Wdelete-non-virtual-dtor                         \
-		-Wdeprecated                                      \
-		-Wdeprecated-copy                                 \
-		-Wdeprecated-copy-dtor                            \
-		-Wdeprecated-declarations                         \
-		-Wdisabled-optimization                           \
-		-Wdiv-by-zero                                     \
-		-Wdouble-promotion                                \
-		-Wduplicated-branches                             \
-		-Wduplicated-cond                                 \
-		-Weffc++                                          \
-		-Wempty-body                                      \
-		-Wendif-labels                                    \
-		-Wenum-compare                                    \
-		-Wexpansion-to-defined                            \
-		-Wextra                                           \
-		-Wextra-semi                                      \
-		-Wfloat-conversion                                \
-		-Wfloat-equal                                     \
-		-Wformat -Wformat-contains-nul                    \
-		-Wformat -Wformat-extra-args                      \
-		-Wformat -Wformat-nonliteral                      \
-		-Wformat -Wformat-security                        \
-		-Wformat -Wformat-y2k                             \
-		-Wformat -Wformat-zero-length                     \
-		-Wformat-diag                                     \
-		-Wformat-overflow=2                               \
-		-Wformat-signedness                               \
-		-Wformat-truncation=2                             \
-		-Wformat=2                                        \
-		-Wframe-address                                   \
-		-Wfree-nonheap-object                             \
-		-Whsa                                             \
-		-Wif-not-aligned                                  \
-		-Wignored-attributes                              \
-		-Wignored-qualifiers                              \
-		-Wimplicit-fallthrough=5                          \
-		-Winaccessible-base                               \
-		-Winherited-variadic-ctor                         \
-		-Winit-list-lifetime                              \
-		-Winit-self                                       \
-		-Winline                                          \
-		-Wint-in-bool-context                             \
-		-Wint-to-pointer-cast                             \
-		-Winvalid-memory-model                            \
-		-Winvalid-offsetof                                \
-		-Winvalid-pch                                     \
-		-Wliteral-suffix                                  \
-		-Wlogical-not-parentheses                         \
-		-Wlogical-op                                      \
-		-Wno-long-long                                       \
-		-Wlto-type-mismatch                               \
-		-Wmain                                            \
-		-Wmaybe-uninitialized                             \
-		-Wmemset-elt-size                                 \
-		-Wmemset-transposed-args                          \
-		-Wmisleading-indentation                          \
-		-Wmismatched-tags                                 \
-		-Wmissing-attributes                              \
-		-Wmissing-braces                                  \
-		-Wmissing-declarations                            \
-		-Wmissing-field-initializers                      \
-		-Wmissing-include-dirs                            \
-		-Wmissing-profile                                 \
-		-Wmultichar                                       \
-		-Wmultiple-inheritance                            \
-		-Wmultistatement-macros                           \
-		-Wno-namespaces                                      \
-		-Wnarrowing                                       \
-		-Wno-noexcept                                        \
-		-Wnoexcept-type                                   \
-		-Wnon-template-friend                             \
-		-Wnon-virtual-dtor                                \
-		-Wnonnull                                         \
-		-Wnonnull-compare                                 \
-		-Wnonportable-cfstrings                           \
-		-Wnormalized=nfkc                                 \
-		-Wnull-dereference                                \
-		-Wodr                                             \
-		-Wold-style-cast                                  \
-		-Wopenmp-simd                                     \
-		-Woverflow                                        \
-		-Woverlength-strings                              \
-		-Woverloaded-virtual                              \
-		-Wpacked                                          \
-		-Wpacked-bitfield-compat                          \
-		-Wpacked-not-aligned                              \
-		-Wno-padded                                          \
-		-Wparentheses                                     \
-		-Wpedantic                                        \
-		-Wpessimizing-move                                \
-		-Wplacement-new=2                                 \
-		-Wpmf-conversions                                 \
-		-Wpointer-arith                                   \
-		-Wpointer-compare                                 \
-		-Wpragmas                                         \
-		-Wprio-ctor-dtor                                  \
-		-Wpsabi                                           \
-		-Wredundant-decls                                 \
-		-Wredundant-move                                  \
-		-Wredundant-tags                                  \
-		-Wregister                                        \
-		-Wreorder                                         \
-		-Wrestrict                                        \
-		-Wreturn-local-addr                               \
-		-Wreturn-type                                     \
-		-Wscalar-storage-order                            \
-		-Wsequence-point                                  \
-		-Wshadow=compatible-local                         \
-		-Wshadow=global                                   \
-		-Wshadow=local                                    \
-		-Wshift-count-negative                            \
-		-Wshift-count-overflow                            \
-		-Wshift-negative-value                            \
-		-Wshift-overflow=2                                \
-		-Wsign-compare                                    \
-		-Wsign-conversion                                 \
-		-Wsign-promo                                      \
-		-Wsized-deallocation                              \
-		-Wsizeof-array-argument                           \
-		-Wsizeof-pointer-div                              \
-		-Wsizeof-pointer-memaccess                        \
-		-Wstack-protector                                 \
-		-Wstrict-aliasing                                 \
-		-Wstrict-aliasing=3                               \
-		-Wstrict-null-sentinel                            \
-		-Wstrict-overflow                                 \
-		-Wstrict-overflow=5                               \
-		-Wstring-compare                                  \
-		-Wstringop-overflow                               \
-		-Wstringop-overflow=4                             \
-		-Wstringop-truncation                             \
-		-Wsubobject-linkage                               \
-		-Wsuggest-attribute=cold                          \
-		-Wsuggest-attribute=const                         \
-		-Wsuggest-attribute=format                        \
-		-Wsuggest-attribute=malloc                        \
-		-Wsuggest-attribute=noreturn                      \
-		-Wsuggest-attribute=pure                          \
-		-Wsuggest-final-methods                           \
-		-Wsuggest-final-types                             \
-		-Wsuggest-override                                \
-		-Wswitch                                          \
-		-Wswitch-bool                                     \
-		-Wswitch-default                                  \
-		-Wno-switch-enum                                     \
-		-Wswitch-outside-range                            \
-		-Wswitch-unreachable                              \
-		-Wsync-nand                                       \
-		-Wsynth                                           \
-		-Wno-system-headers                                  \
-		-Wtautological-compare                            \
-		-Wno-templates                                       \
-		-Wterminate                                       \
-		-Wtrampolines                                     \
-		-Wtrigraphs                                       \
-		-Wtype-limits                                     \
-		-Wundef                                           \
-		-Wuninitialized                                   \
-		-Wunknown-pragmas                                 \
-		-Wunreachable-code                                \
-		-Wunsafe-loop-optimizations                       \
-		-Wunused                                          \
-		-Wunused-but-set-parameter                        \
-		-Wunused-but-set-variable                         \
-		-Wunused-const-variable=2                         \
-		-Wunused-function                                 \
-		-Wunused-label                                    \
-		-Wno-unused-local-typedefs                           \
-		-Wunused-macros                                   \
-		-Wunused-parameter                                \
-		-Wunused-result                                   \
-		-Wunused-value                                    \
-		-Wunused-variable                                 \
-		-Wuseless-cast                                    \
-		-Wvarargs                                         \
-		-Wvariadic-macros                                 \
-		-Wvector-operation-performance                    \
-		-Wvirtual-inheritance                             \
-		-Wvirtual-move-assign                             \
-		-Wvla                                             \
-		-Wvolatile                                        \
-		-Wvolatile-register-var                           \
-		-Wwrite-strings                                   \
-		-Wzero-as-null-pointer-constant                   \
-		-Wzero-length-bounds                              \
-		" cmake -S . -B build_pedantic -GNinja -DCMAKE_BUILD_TYPE=Debug -DJSON_MultipleHeaders=ON -DJSON_BuildTests=On
-	cmake --build build_pedantic
-
-##########################################################################
-# benchmarks
-##########################################################################
-
-run_benchmarks:
-	rm -fr build_benchmarks
-	mkdir build_benchmarks
-	cd build_benchmarks ; cmake ../benchmarks -GNinja -DCMAKE_BUILD_TYPE=Release -DJSON_BuildTests=On
-	cd build_benchmarks ; ninja
-	cd build_benchmarks ; ./json_benchmarks
-
-##########################################################################
-# fuzzing
-##########################################################################
-
-# the overall fuzz testing target
-fuzz_testing:
-	rm -fr fuzz-testing
-	mkdir -p fuzz-testing fuzz-testing/testcases fuzz-testing/out
-	$(MAKE) parse_afl_fuzzer -C test CXX=afl-clang++
-	mv test/parse_afl_fuzzer fuzz-testing/fuzzer
-	find test/data/json_tests -size -5k -name *json | xargs -I{} cp "{}" fuzz-testing/testcases
-	@echo "Execute: afl-fuzz -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer"
-
-fuzz_testing_bson:
-	rm -fr fuzz-testing
-	mkdir -p fuzz-testing fuzz-testing/testcases fuzz-testing/out
-	$(MAKE) parse_bson_fuzzer -C test CXX=afl-clang++
-	mv test/parse_bson_fuzzer fuzz-testing/fuzzer
-	find test/data -size -5k -name *.bson | xargs -I{} cp "{}" fuzz-testing/testcases
-	@echo "Execute: afl-fuzz -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer"
-
-fuzz_testing_cbor:
-	rm -fr fuzz-testing
-	mkdir -p fuzz-testing fuzz-testing/testcases fuzz-testing/out
-	$(MAKE) parse_cbor_fuzzer -C test CXX=afl-clang++
-	mv test/parse_cbor_fuzzer fuzz-testing/fuzzer
-	find test/data -size -5k -name *.cbor | xargs -I{} cp "{}" fuzz-testing/testcases
-	@echo "Execute: afl-fuzz -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer"
-
-fuzz_testing_msgpack:
-	rm -fr fuzz-testing
-	mkdir -p fuzz-testing fuzz-testing/testcases fuzz-testing/out
-	$(MAKE) parse_msgpack_fuzzer -C test CXX=afl-clang++
-	mv test/parse_msgpack_fuzzer fuzz-testing/fuzzer
-	find test/data -size -5k -name *.msgpack | xargs -I{} cp "{}" fuzz-testing/testcases
-	@echo "Execute: afl-fuzz -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer"
-
-fuzz_testing_ubjson:
-	rm -fr fuzz-testing
-	mkdir -p fuzz-testing fuzz-testing/testcases fuzz-testing/out
-	$(MAKE) parse_ubjson_fuzzer -C test CXX=afl-clang++
-	mv test/parse_ubjson_fuzzer fuzz-testing/fuzzer
-	find test/data -size -5k -name *.ubjson | xargs -I{} cp "{}" fuzz-testing/testcases
-	@echo "Execute: afl-fuzz -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer"
-
-fuzzing-start:
-	afl-fuzz -S fuzzer1 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -S fuzzer2 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -S fuzzer3 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -S fuzzer4 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -S fuzzer5 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -S fuzzer6 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -S fuzzer7 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer > /dev/null &
-	afl-fuzz -M fuzzer0 -i fuzz-testing/testcases -o fuzz-testing/out fuzz-testing/fuzzer
-
-fuzzing-stop:
-	-killall fuzzer
-	-killall afl-fuzz
-
-
-##########################################################################
-# Static analysis
-##########################################################################
-
-# call cppcheck <http://cppcheck.sourceforge.net>
-# Note: this target is called by Travis
-cppcheck:
-	cppcheck --enable=warning --inline-suppr --inconclusive --force --std=c++11 $(AMALGAMATED_FILE) --error-exitcode=1
-
-# call Clang Static Analyzer <https://clang-analyzer.llvm.org>
-clang_analyze:
-	rm -fr clang_analyze_build
-	mkdir clang_analyze_build
-	cd clang_analyze_build ; CCC_CXX=$(COMPILER_DIR)/clang++ CXX=$(COMPILER_DIR)/clang++ $(COMPILER_DIR)/scan-build cmake .. -GNinja -DJSON_BuildTests=On
-	cd clang_analyze_build ; \
-		$(COMPILER_DIR)/scan-build \
-			-enable-checker alpha.core.BoolAssignment,alpha.core.CallAndMessageUnInitRefArg,alpha.core.CastSize,alpha.core.CastToStruct,alpha.core.Conversion,alpha.core.DynamicTypeChecker,alpha.core.FixedAddr,alpha.core.PointerArithm,alpha.core.PointerSub,alpha.core.SizeofPtr,alpha.core.StackAddressAsyncEscape,alpha.core.TestAfterDivZero,alpha.deadcode.UnreachableCode,core.builtin.BuiltinFunctions,core.builtin.NoReturnFunctions,core.CallAndMessage,core.DivideZero,core.DynamicTypePropagation,core.NonnilStringConstants,core.NonNullParamChecker,core.NullDereference,core.StackAddressEscape,core.UndefinedBinaryOperatorResult,core.uninitialized.ArraySubscript,core.uninitialized.Assign,core.uninitialized.Branch,core.uninitialized.CapturedBlockVariable,core.uninitialized.UndefReturn,core.VLASize,cplusplus.InnerPointer,cplusplus.Move,cplusplus.NewDelete,cplusplus.NewDeleteLeaks,cplusplus.SelfAssignment,deadcode.DeadStores,nullability.NullableDereferenced,nullability.NullablePassedToNonnull,nullability.NullableReturnedFromNonnull,nullability.NullPassedToNonnull,nullability.NullReturnedFromNonnull \
-			--use-c++=$(COMPILER_DIR)/clang++ -analyze-headers -o report ninja
-	open clang_analyze_build/report/*/index.html
-
-# call cpplint <https://github.com/cpplint/cpplint>
-# Note: some errors expected due to false positives
-cpplint:
-	third_party/cpplint/cpplint.py \
-		--filter=-whitespace,-legal,-readability/alt_tokens,-runtime/references,-runtime/explicit \
-		--quiet --recursive $(SRCS)
-
-# call Clang-Tidy <https://clang.llvm.org/extra/clang-tidy/>
-clang_tidy:
-	$(COMPILER_DIR)/clang-tidy $(AMALGAMATED_FILE) -- -Iinclude -std=c++11
-
-# call PVS-Studio Analyzer <https://www.viva64.com/en/pvs-studio/>
-pvs_studio:
-	rm -fr pvs_studio_build
-	mkdir pvs_studio_build
-	cd pvs_studio_build ; cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=On
-	cd pvs_studio_build ; pvs-studio-analyzer analyze -j 10
-	cd pvs_studio_build ; plog-converter -a'GA:1,2;64:1;CS' -t fullhtml PVS-Studio.log -o pvs
-	open pvs_studio_build/pvs/index.html
-
-# call Infer <https://fbinfer.com> static analyzer
-infer:
-	rm -fr infer_build
-	mkdir infer_build
-	cd infer_build ; infer compile -- cmake .. ; infer run -- make -j 4
-
-# call OCLint <http://oclint.org> static analyzer
-oclint:
-	oclint $(SRCS) -report-type html -enable-global-analysis -o oclint_report.html -max-priority-1=10000 -max-priority-2=10000 -max-priority-3=10000 -- -std=c++11 -Iinclude
-	open oclint_report.html
-
-# execute the test suite with Clang sanitizers (address and undefined behavior)
-clang_sanitize:
-	rm -fr clang_sanitize_build
-	mkdir clang_sanitize_build
-	cd clang_sanitize_build ; CXX=$(COMPILER_DIR)/clang++ cmake .. -DJSON_Sanitizer=On -DJSON_MultipleHeaders=ON -DJSON_BuildTests=On -GNinja
-	cd clang_sanitize_build ; ninja
-	cd clang_sanitize_build ; ctest -j10
-
-
-##########################################################################
-# Code format and source amalgamation
-##########################################################################
-
-# call the Artistic Style pretty printer on all source files
-pretty:
-	astyle \
-		--style=allman \
-		--indent=spaces=4 \
-		--indent-modifiers \
-	    --indent-switches \
-	    --indent-preproc-block \
-	    --indent-preproc-define \
-	    --indent-col1-comments \
-	    --pad-oper \
-	    --pad-header \
-	    --align-pointer=type \
-	    --align-reference=type \
-	    --add-brackets \
-	    --convert-tabs \
-	    --close-templates \
-	    --lineend=linux \
-	    --preserve-date \
-	    --suffix=none \
-	    --formatted \
-	   $(SRCS) $(AMALGAMATED_FILE) test/src/*.cpp benchmarks/src/benchmarks.cpp doc/examples/*.cpp
-
-# create single header file
-amalgamate: $(AMALGAMATED_FILE)
-
-# call the amalgamation tool and pretty print
-$(AMALGAMATED_FILE): $(SRCS)
-	third_party/amalgamate/amalgamate.py -c third_party/amalgamate/config.json -s . --verbose=yes
-	$(MAKE) pretty
-
-# check if file single_include/nlohmann/json.hpp has been amalgamated from the nlohmann sources
-# Note: this target is called by Travis
-check-amalgamation:
-	@mv $(AMALGAMATED_FILE) $(AMALGAMATED_FILE)~
-	@$(MAKE) amalgamate
-	@diff $(AMALGAMATED_FILE) $(AMALGAMATED_FILE)~ || (echo "===================================================================\n  Amalgamation required! Please read the contribution guidelines\n  in file .github/CONTRIBUTING.md.\n===================================================================" ; mv $(AMALGAMATED_FILE)~ $(AMALGAMATED_FILE) ; false)
-	@mv $(AMALGAMATED_FILE)~ $(AMALGAMATED_FILE)
-
-# check if every header in nlohmann includes sufficient headers to be compiled individually
-check-single-includes:
-	@for x in $(SRCS); do \
-	  echo "Checking self-sufficiency of $$x..." ; \
-	  echo "#include <$$x>\nint main() {}\n" | sed 's|include/||' > single_include_test.cpp; \
-	  $(CXX) $(CXXFLAGS) -Iinclude -std=c++11 single_include_test.cpp -o single_include_test; \
-	  rm -f single_include_test.cpp single_include_test; \
-	done
-
-
-##########################################################################
-# CMake
-##########################################################################
-
-# grep "^option" CMakeLists.txt test/CMakeLists.txt | sed 's/(/ /' | awk '{print $2}' | xargs
-
-# check if all flags of our CMake files work
-check_cmake_flags_do:
-	$(CMAKE_BINARY) --version
-	for flag in '' JSON_BuildTests JSON_Install JSON_MultipleHeaders JSON_Sanitizer JSON_Valgrind JSON_NoExceptions JSON_Coverage; do \
-		rm -fr cmake_build; \
-		mkdir cmake_build; \
-		echo "$(CMAKE_BINARY) .. -D$$flag=On" ; \
-		cd cmake_build ; \
-		CXX=g++-8 $(CMAKE_BINARY) .. -D$$flag=On -DCMAKE_CXX_COMPILE_FEATURES="cxx_std_11;cxx_range_for" -DCMAKE_CXX_FLAGS="-std=gnu++11" ; \
-		test -f Makefile || exit 1 ; \
-		cd .. ; \
-	done;
-
-# call target `check_cmake_flags_do` twice: once for minimal required CMake version 3.1.0 and once for the installed version
-check_cmake_flags:
-	wget https://github.com/Kitware/CMake/releases/download/v3.1.0/cmake-3.1.0-Darwin64.tar.gz
-	tar xfz cmake-3.1.0-Darwin64.tar.gz
-	CMAKE_BINARY=$(abspath cmake-3.1.0-Darwin64/CMake.app/Contents/bin/cmake) $(MAKE) check_cmake_flags_do
-	CMAKE_BINARY=$(shell which cmake) $(MAKE) check_cmake_flags_do
-
-
-##########################################################################
-# ChangeLog
-##########################################################################
-
-# Create a ChangeLog based on the git log using the GitHub Changelog Generator
-# (<https://github.com/github-changelog-generator/github-changelog-generator>).
-
-# variable to control the diffs between the last released version and the current repository state
-NEXT_VERSION ?= "unreleased"
-
-ChangeLog.md:
-	github_changelog_generator -o ChangeLog.md --user nlohmann --project json --simple-list --release-url https://github.com/nlohmann/json/releases/tag/%s --future-release $(NEXT_VERSION)
-	$(SED) -i 's|https://github.com/nlohmann/json/releases/tag/HEAD|https://github.com/nlohmann/json/tree/HEAD|' ChangeLog.md
-	$(SED) -i '2i All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).' ChangeLog.md
-
-
-##########################################################################
-# Release files
-##########################################################################
-
-# Create the files for a release and add signatures and hashes. We use `-X` to make the resulting ZIP file
-# reproducible, see <https://content.pivotal.io/blog/barriers-to-deterministic-reproducible-zip-files>.
-
-release:
-	rm -fr release_files
-	mkdir release_files
-	zip -9 --recurse-paths -X include.zip $(SRCS) $(AMALGAMATED_FILE) meson.build
-	gpg --armor --detach-sig include.zip
-	mv include.zip include.zip.asc release_files
-	gpg --armor --detach-sig $(AMALGAMATED_FILE)
-	cp $(AMALGAMATED_FILE) release_files
-	mv $(AMALGAMATED_FILE).asc release_files
-	cd release_files ; shasum -a 256 json.hpp > hashes.txt
-	cd release_files ; shasum -a 256 include.zip >> hashes.txt
-
-
-##########################################################################
-# Maintenance
-##########################################################################
-
-# clean up
+# CMAKE generated file: DO NOT EDIT!
+# Generated by "Unix Makefiles" Generator, CMake Version 3.16
+
+# Default target executed when no arguments are given to make.
+default_target: all
+
+.PHONY : default_target
+
+# Allow only one "make -f Makefile2" at a time, but pass parallelism.
+.NOTPARALLEL:
+
+
+#=============================================================================
+# Special targets provided by cmake.
+
+# Disable implicit rules so canonical targets will work.
+.SUFFIXES:
+
+
+# Remove some rules from gmake that .SUFFIXES does not remove.
+SUFFIXES =
+
+.SUFFIXES: .hpux_make_needs_suffix_list
+
+
+# Suppress display of executed commands.
+$(VERBOSE).SILENT:
+
+
+# A target that is always out of date.
+cmake_force:
+
+.PHONY : cmake_force
+
+#=============================================================================
+# Set environment variables for the build.
+
+# The shell in which to execute make rules.
+SHELL = /bin/sh
+
+# The CMake executable.
+CMAKE_COMMAND = /usr/bin/cmake
+
+# The command to remove a file.
+RM = /usr/bin/cmake -E remove -f
+
+# Escaping for special characters.
+EQUALS = =
+
+# The top-level source directory on which CMake was run.
+CMAKE_SOURCE_DIR = /home/linusjz/em-synthesis/pips
+
+# The top-level build directory on which CMake was run.
+CMAKE_BINARY_DIR = /home/linusjz/em-synthesis/pips
+
+#=============================================================================
+# Targets provided globally by CMake.
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# The main all target
+all: cmake_check_build_system
+	cd /home/linusjz/em-synthesis/pips && $(CMAKE_COMMAND) -E cmake_progress_start /home/linusjz/em-synthesis/pips/CMakeFiles /home/linusjz/em-synthesis/pips/submodules/json/CMakeFiles/progress.marks
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/linusjz/em-synthesis/pips/CMakeFiles 0
+.PHONY : all
+
+# The main clean target
 clean:
-	rm -fr json_unit json_benchmarks fuzz fuzz-testing *.dSYM test/*.dSYM oclint_report.html
-	rm -fr benchmarks/files/numbers/*.json
-	rm -fr cmake-3.1.0-Darwin64.tar.gz cmake-3.1.0-Darwin64
-	rm -fr build_coverage build_benchmarks fuzz-testing clang_analyze_build pvs_studio_build infer_build clang_sanitize_build cmake_build
-	$(MAKE) clean -Cdoc
-	$(MAKE) clean -Ctest
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/clean
+.PHONY : clean
 
-##########################################################################
-# Thirdparty code
-##########################################################################
+# The main clean target
+clean/fast: clean
 
-update_hedley:
-	rm -f include/nlohmann/thirdparty/hedley/hedley.hpp include/nlohmann/thirdparty/hedley/hedley_undef.hpp
-	curl https://raw.githubusercontent.com/nemequ/hedley/master/hedley.h -o include/nlohmann/thirdparty/hedley/hedley.hpp
-	gsed -i 's/HEDLEY_/JSON_HEDLEY_/g' include/nlohmann/thirdparty/hedley/hedley.hpp
-	grep "[[:blank:]]*#[[:blank:]]*undef" include/nlohmann/thirdparty/hedley/hedley.hpp | grep -v "__" | sort | uniq | gsed 's/ //g' | gsed 's/undef/undef /g' > include/nlohmann/thirdparty/hedley/hedley_undef.hpp
-	$(MAKE) amalgamate
+.PHONY : clean/fast
+
+# Prepare targets for installation.
+preinstall: all
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/preinstall
+.PHONY : preinstall
+
+# Prepare targets for installation.
+preinstall/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/preinstall
+.PHONY : preinstall/fast
+
+# clear depends
+depend:
+	cd /home/linusjz/em-synthesis/pips && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+.PHONY : depend
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyMemCheck.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyMemCheck.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyMemCheck.dir/rule
+
+# Convenience name for target.
+NightlyMemCheck: submodules/json/CMakeFiles/NightlyMemCheck.dir/rule
+
+.PHONY : NightlyMemCheck
+
+# fast build rule for target.
+NightlyMemCheck/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyMemCheck.dir/build.make submodules/json/CMakeFiles/NightlyMemCheck.dir/build
+.PHONY : NightlyMemCheck/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyTest.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyTest.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyTest.dir/rule
+
+# Convenience name for target.
+NightlyTest: submodules/json/CMakeFiles/NightlyTest.dir/rule
+
+.PHONY : NightlyTest
+
+# fast build rule for target.
+NightlyTest/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyTest.dir/build.make submodules/json/CMakeFiles/NightlyTest.dir/build
+.PHONY : NightlyTest/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousConfigure.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousConfigure.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousConfigure.dir/rule
+
+# Convenience name for target.
+ContinuousConfigure: submodules/json/CMakeFiles/ContinuousConfigure.dir/rule
+
+.PHONY : ContinuousConfigure
+
+# fast build rule for target.
+ContinuousConfigure/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousConfigure.dir/build.make submodules/json/CMakeFiles/ContinuousConfigure.dir/build
+.PHONY : ContinuousConfigure/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousBuild.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousBuild.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousBuild.dir/rule
+
+# Convenience name for target.
+ContinuousBuild: submodules/json/CMakeFiles/ContinuousBuild.dir/rule
+
+.PHONY : ContinuousBuild
+
+# fast build rule for target.
+ContinuousBuild/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousBuild.dir/build.make submodules/json/CMakeFiles/ContinuousBuild.dir/build
+.PHONY : ContinuousBuild/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyConfigure.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyConfigure.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyConfigure.dir/rule
+
+# Convenience name for target.
+NightlyConfigure: submodules/json/CMakeFiles/NightlyConfigure.dir/rule
+
+.PHONY : NightlyConfigure
+
+# fast build rule for target.
+NightlyConfigure/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyConfigure.dir/build.make submodules/json/CMakeFiles/NightlyConfigure.dir/build
+.PHONY : NightlyConfigure/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyMemoryCheck.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyMemoryCheck.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyMemoryCheck.dir/rule
+
+# Convenience name for target.
+NightlyMemoryCheck: submodules/json/CMakeFiles/NightlyMemoryCheck.dir/rule
+
+.PHONY : NightlyMemoryCheck
+
+# fast build rule for target.
+NightlyMemoryCheck/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyMemoryCheck.dir/build.make submodules/json/CMakeFiles/NightlyMemoryCheck.dir/build
+.PHONY : NightlyMemoryCheck/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalTest.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalTest.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalTest.dir/rule
+
+# Convenience name for target.
+ExperimentalTest: submodules/json/CMakeFiles/ExperimentalTest.dir/rule
+
+.PHONY : ExperimentalTest
+
+# fast build rule for target.
+ExperimentalTest/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalTest.dir/build.make submodules/json/CMakeFiles/ExperimentalTest.dir/build
+.PHONY : ExperimentalTest/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousUpdate.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousUpdate.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousUpdate.dir/rule
+
+# Convenience name for target.
+ContinuousUpdate: submodules/json/CMakeFiles/ContinuousUpdate.dir/rule
+
+.PHONY : ContinuousUpdate
+
+# fast build rule for target.
+ContinuousUpdate/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousUpdate.dir/build.make submodules/json/CMakeFiles/ContinuousUpdate.dir/build
+.PHONY : ContinuousUpdate/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyUpdate.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyUpdate.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyUpdate.dir/rule
+
+# Convenience name for target.
+NightlyUpdate: submodules/json/CMakeFiles/NightlyUpdate.dir/rule
+
+.PHONY : NightlyUpdate
+
+# fast build rule for target.
+NightlyUpdate/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyUpdate.dir/build.make submodules/json/CMakeFiles/NightlyUpdate.dir/build
+.PHONY : NightlyUpdate/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalMemCheck.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalMemCheck.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalMemCheck.dir/rule
+
+# Convenience name for target.
+ExperimentalMemCheck: submodules/json/CMakeFiles/ExperimentalMemCheck.dir/rule
+
+.PHONY : ExperimentalMemCheck
+
+# fast build rule for target.
+ExperimentalMemCheck/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalMemCheck.dir/build.make submodules/json/CMakeFiles/ExperimentalMemCheck.dir/build
+.PHONY : ExperimentalMemCheck/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalSubmit.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalSubmit.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalSubmit.dir/rule
+
+# Convenience name for target.
+ExperimentalSubmit: submodules/json/CMakeFiles/ExperimentalSubmit.dir/rule
+
+.PHONY : ExperimentalSubmit
+
+# fast build rule for target.
+ExperimentalSubmit/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalSubmit.dir/build.make submodules/json/CMakeFiles/ExperimentalSubmit.dir/build
+.PHONY : ExperimentalSubmit/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/Experimental.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/Experimental.dir/rule
+.PHONY : submodules/json/CMakeFiles/Experimental.dir/rule
+
+# Convenience name for target.
+Experimental: submodules/json/CMakeFiles/Experimental.dir/rule
+
+.PHONY : Experimental
+
+# fast build rule for target.
+Experimental/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/Experimental.dir/build.make submodules/json/CMakeFiles/Experimental.dir/build
+.PHONY : Experimental/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousCoverage.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousCoverage.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousCoverage.dir/rule
+
+# Convenience name for target.
+ContinuousCoverage: submodules/json/CMakeFiles/ContinuousCoverage.dir/rule
+
+.PHONY : ContinuousCoverage
+
+# fast build rule for target.
+ContinuousCoverage/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousCoverage.dir/build.make submodules/json/CMakeFiles/ContinuousCoverage.dir/build
+.PHONY : ContinuousCoverage/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalConfigure.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalConfigure.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalConfigure.dir/rule
+
+# Convenience name for target.
+ExperimentalConfigure: submodules/json/CMakeFiles/ExperimentalConfigure.dir/rule
+
+.PHONY : ExperimentalConfigure
+
+# fast build rule for target.
+ExperimentalConfigure/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalConfigure.dir/build.make submodules/json/CMakeFiles/ExperimentalConfigure.dir/build
+.PHONY : ExperimentalConfigure/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/Continuous.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/Continuous.dir/rule
+.PHONY : submodules/json/CMakeFiles/Continuous.dir/rule
+
+# Convenience name for target.
+Continuous: submodules/json/CMakeFiles/Continuous.dir/rule
+
+.PHONY : Continuous
+
+# fast build rule for target.
+Continuous/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/Continuous.dir/build.make submodules/json/CMakeFiles/Continuous.dir/build
+.PHONY : Continuous/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/Nightly.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/Nightly.dir/rule
+.PHONY : submodules/json/CMakeFiles/Nightly.dir/rule
+
+# Convenience name for target.
+Nightly: submodules/json/CMakeFiles/Nightly.dir/rule
+
+.PHONY : Nightly
+
+# fast build rule for target.
+Nightly/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/Nightly.dir/build.make submodules/json/CMakeFiles/Nightly.dir/build
+.PHONY : Nightly/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlySubmit.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlySubmit.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlySubmit.dir/rule
+
+# Convenience name for target.
+NightlySubmit: submodules/json/CMakeFiles/NightlySubmit.dir/rule
+
+.PHONY : NightlySubmit
+
+# fast build rule for target.
+NightlySubmit/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlySubmit.dir/build.make submodules/json/CMakeFiles/NightlySubmit.dir/build
+.PHONY : NightlySubmit/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyStart.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyStart.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyStart.dir/rule
+
+# Convenience name for target.
+NightlyStart: submodules/json/CMakeFiles/NightlyStart.dir/rule
+
+.PHONY : NightlyStart
+
+# fast build rule for target.
+NightlyStart/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyStart.dir/build.make submodules/json/CMakeFiles/NightlyStart.dir/build
+.PHONY : NightlyStart/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalCoverage.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalCoverage.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalCoverage.dir/rule
+
+# Convenience name for target.
+ExperimentalCoverage: submodules/json/CMakeFiles/ExperimentalCoverage.dir/rule
+
+.PHONY : ExperimentalCoverage
+
+# fast build rule for target.
+ExperimentalCoverage/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalCoverage.dir/build.make submodules/json/CMakeFiles/ExperimentalCoverage.dir/build
+.PHONY : ExperimentalCoverage/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyCoverage.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyCoverage.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyCoverage.dir/rule
+
+# Convenience name for target.
+NightlyCoverage: submodules/json/CMakeFiles/NightlyCoverage.dir/rule
+
+.PHONY : NightlyCoverage
+
+# fast build rule for target.
+NightlyCoverage/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyCoverage.dir/build.make submodules/json/CMakeFiles/NightlyCoverage.dir/build
+.PHONY : NightlyCoverage/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalStart.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalStart.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalStart.dir/rule
+
+# Convenience name for target.
+ExperimentalStart: submodules/json/CMakeFiles/ExperimentalStart.dir/rule
+
+.PHONY : ExperimentalStart
+
+# fast build rule for target.
+ExperimentalStart/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalStart.dir/build.make submodules/json/CMakeFiles/ExperimentalStart.dir/build
+.PHONY : ExperimentalStart/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/NightlyBuild.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/NightlyBuild.dir/rule
+.PHONY : submodules/json/CMakeFiles/NightlyBuild.dir/rule
+
+# Convenience name for target.
+NightlyBuild: submodules/json/CMakeFiles/NightlyBuild.dir/rule
+
+.PHONY : NightlyBuild
+
+# fast build rule for target.
+NightlyBuild/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/NightlyBuild.dir/build.make submodules/json/CMakeFiles/NightlyBuild.dir/build
+.PHONY : NightlyBuild/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalBuild.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalBuild.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalBuild.dir/rule
+
+# Convenience name for target.
+ExperimentalBuild: submodules/json/CMakeFiles/ExperimentalBuild.dir/rule
+
+.PHONY : ExperimentalBuild
+
+# fast build rule for target.
+ExperimentalBuild/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalBuild.dir/build.make submodules/json/CMakeFiles/ExperimentalBuild.dir/build
+.PHONY : ExperimentalBuild/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ExperimentalUpdate.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ExperimentalUpdate.dir/rule
+.PHONY : submodules/json/CMakeFiles/ExperimentalUpdate.dir/rule
+
+# Convenience name for target.
+ExperimentalUpdate: submodules/json/CMakeFiles/ExperimentalUpdate.dir/rule
+
+.PHONY : ExperimentalUpdate
+
+# fast build rule for target.
+ExperimentalUpdate/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ExperimentalUpdate.dir/build.make submodules/json/CMakeFiles/ExperimentalUpdate.dir/build
+.PHONY : ExperimentalUpdate/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousStart.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousStart.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousStart.dir/rule
+
+# Convenience name for target.
+ContinuousStart: submodules/json/CMakeFiles/ContinuousStart.dir/rule
+
+.PHONY : ContinuousStart
+
+# fast build rule for target.
+ContinuousStart/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousStart.dir/build.make submodules/json/CMakeFiles/ContinuousStart.dir/build
+.PHONY : ContinuousStart/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousMemCheck.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousMemCheck.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousMemCheck.dir/rule
+
+# Convenience name for target.
+ContinuousMemCheck: submodules/json/CMakeFiles/ContinuousMemCheck.dir/rule
+
+.PHONY : ContinuousMemCheck
+
+# fast build rule for target.
+ContinuousMemCheck/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousMemCheck.dir/build.make submodules/json/CMakeFiles/ContinuousMemCheck.dir/build
+.PHONY : ContinuousMemCheck/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousTest.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousTest.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousTest.dir/rule
+
+# Convenience name for target.
+ContinuousTest: submodules/json/CMakeFiles/ContinuousTest.dir/rule
+
+.PHONY : ContinuousTest
+
+# fast build rule for target.
+ContinuousTest/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousTest.dir/build.make submodules/json/CMakeFiles/ContinuousTest.dir/build
+.PHONY : ContinuousTest/fast
+
+# Convenience name for target.
+submodules/json/CMakeFiles/ContinuousSubmit.dir/rule:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f CMakeFiles/Makefile2 submodules/json/CMakeFiles/ContinuousSubmit.dir/rule
+.PHONY : submodules/json/CMakeFiles/ContinuousSubmit.dir/rule
+
+# Convenience name for target.
+ContinuousSubmit: submodules/json/CMakeFiles/ContinuousSubmit.dir/rule
+
+.PHONY : ContinuousSubmit
+
+# fast build rule for target.
+ContinuousSubmit/fast:
+	cd /home/linusjz/em-synthesis/pips && $(MAKE) -f submodules/json/CMakeFiles/ContinuousSubmit.dir/build.make submodules/json/CMakeFiles/ContinuousSubmit.dir/build
+.PHONY : ContinuousSubmit/fast
+
+# Help Target
+help:
+	@echo "The following are some of the valid targets for this Makefile:"
+	@echo "... all (the default if no target is provided)"
+	@echo "... clean"
+	@echo "... depend"
+	@echo "... install/strip"
+	@echo "... install/local"
+	@echo "... list_install_components"
+	@echo "... rebuild_cache"
+	@echo "... edit_cache"
+	@echo "... NightlyMemCheck"
+	@echo "... NightlyTest"
+	@echo "... ContinuousConfigure"
+	@echo "... ContinuousBuild"
+	@echo "... NightlyConfigure"
+	@echo "... NightlyMemoryCheck"
+	@echo "... ExperimentalTest"
+	@echo "... ContinuousUpdate"
+	@echo "... NightlyUpdate"
+	@echo "... ExperimentalMemCheck"
+	@echo "... ExperimentalSubmit"
+	@echo "... Experimental"
+	@echo "... ContinuousCoverage"
+	@echo "... ExperimentalConfigure"
+	@echo "... Continuous"
+	@echo "... Nightly"
+	@echo "... NightlySubmit"
+	@echo "... install"
+	@echo "... NightlyStart"
+	@echo "... ExperimentalCoverage"
+	@echo "... NightlyCoverage"
+	@echo "... ExperimentalStart"
+	@echo "... NightlyBuild"
+	@echo "... ExperimentalBuild"
+	@echo "... ExperimentalUpdate"
+	@echo "... ContinuousStart"
+	@echo "... ContinuousMemCheck"
+	@echo "... ContinuousTest"
+	@echo "... ContinuousSubmit"
+.PHONY : help
+
+
+
+#=============================================================================
+# Special targets to cleanup operation of make.
+
+# Special rule to run CMake to check the build system integrity.
+# No rule that depends on this can have commands that come from listfiles
+# because they might be regenerated.
+cmake_check_build_system:
+	cd /home/linusjz/em-synthesis/pips && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+.PHONY : cmake_check_build_system
+
