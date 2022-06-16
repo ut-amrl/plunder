@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "../robot.h"
+#include "../accSim/robotSets.h"
 #include "asp_ex.cpp"
 
 using namespace std;
@@ -28,9 +29,8 @@ static const double T_STEP = .1;            // time step
 static const double T_TOT = 15;             // total time per simulated scenario
 
 // File I/O
-static const string path = "accSim/out/data";   // Output file directory and prefix
+static const string outputPath = "accSim/out/data";   // Output file directory and prefix
                                                 // Both the JSON and CSV files will be generated here
-
 
 // ----- Simulation ---------------------------------------------
 
@@ -39,38 +39,14 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     // Initialization
     normal_distribution<double> accErrDistr(accErrMean, accErrStdDev);
     setModel(useModel);
-    
-    // Create some robots
-    vector<Robot> robots;
-
-    if(robotTestSet == 1){
-        robots.push_back(Robot(6, -5, 15, 150, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(3, -3, 30, 100, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(5, -2, 12, 200, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(8, -3, 30, 50, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(1.5, -2, 3, 30, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(3, -2, 4, 20, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(0.5, -1, 2, 15, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(1.5, -2, 40, 300, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(2, -2, 100, 300, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(5, -1, 25, 200, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(10, -10, 25, 500, accErrDistr, haProbCorrect));
-    } else if(robotTestSet == 2){
-        robots.push_back(Robot(5, -2, 15, 80, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(3, -3, 4, 80, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(1.5, -4, 50, 80, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(8, -6, 20, 80, accErrDistr, haProbCorrect));
-        robots.push_back(Robot(4, -5, 100, 80, accErrDistr, haProbCorrect));
-    } else if(robotTestSet == 3){
-        robots.push_back(Robot(5, -4, 12, 100, accErrDistr, haProbCorrect));
-    }
+    vector<Robot> robots = getRobotSet(robotTestSet, accErrDistr, haProbCorrect);
     
     // Setup JSON
     ofstream jsonFile;
     if(genJson){
         cout << "Filling JSON with simulation data:\n";
         jsonFile << fixed << setprecision(PRECISION);
-        jsonFile.open(path + ".json");
+        jsonFile.open(outputPath + ".json");
         jsonFile << "[";
     }
 
@@ -82,7 +58,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         ofstream csvFile;
         if(genCsv){
             csvFile << fixed << setprecision(PRECISION);
-            csvFile.open(path + to_string(i) + ".csv");
+            csvFile.open(outputPath + to_string(i) + ".csv");
             csvFile << "time, x, v, LA, HA" << "\n";
         }
 
@@ -153,14 +129,8 @@ int main(int argc, char** argv) {
             exit(0);
         }
 
-        robotTestSet = stoi(argv[1]);
-        useModel = stoi(argv[2]);
-        accErrMean = stod(argv[3]);
-        accErrStdDev = stod(argv[4]);
-        haProbCorrect = stod(argv[5]);
+        runSim(stoi(argv[1]), stoi(argv[2]), stod(argv[3]), stod(argv[4]), stod(argv[5]));
     }
-
-    runSim(robotTestSet, useModel, accErrMean, accErrStdDev, haProbCorrect);
 
     return 0;
 }

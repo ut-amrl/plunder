@@ -103,7 +103,7 @@ class MarkovSystem {
 // ----- Particle Filter ---------------------------------------------
 
 template<typename HA, typename LA, typename Obs, typename RobotClass>
-class PF {
+class ParticleFilter {
     
     private:
     public:
@@ -115,7 +115,7 @@ class PF {
     vector<vector<HA>> particles;   // Gives the high-level trajectories of each particle
     vector<vector<int>> ancestors;  // Stores ancestors during resampling
 
-    PF(MarkovSystem<HA, LA, Obs, RobotClass>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
+    ParticleFilter(MarkovSystem<HA, LA, Obs, RobotClass>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
         system = _system;
         dataObs = _dataObs;
         dataLA = _dataLA;
@@ -124,7 +124,7 @@ class PF {
     }
 
     // Run particle filter on numParticles particles (and some resampleThreshold between 0 and 1)
-    void forward_filter(int numParticles, float resampleThreshold){
+    void forwardFilter(int numParticles, float resampleThreshold){
 
         // Initialization
         int N = numParticles;

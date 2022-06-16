@@ -140,12 +140,17 @@ class Robot {
         state = Obs { .pos = 0, .vel = 0 };
     }
 
-    // Gives the string form of the current high-level action
-    string ha_tostring() {
+    // Gives the string form of a high-level action
+    string ha_tostring(HA ha) {
         if(ha == ACC)
             return "ACC";
         if(ha == DEC)
             return "DEC";
         return "CON";
+    }
+
+    // Gives string form of the current robot action
+    string ha_tostring() {
+        return ha_tostring(ha);
     }
 };
