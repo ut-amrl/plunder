@@ -1,4 +1,9 @@
+#pragma once
+
 #include <stdlib.h>
+#include <vector>
+
+#include "../robot.h"
 
 using namespace std;
 
