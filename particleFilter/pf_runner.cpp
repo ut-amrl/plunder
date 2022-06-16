@@ -125,6 +125,27 @@ void runFilter(int N, double resampleThreshold, Robot* r, string inputFile, stri
     writeData(outputFile, r, trajectories);
 }
 
+vector<HA> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
+
+
+    // Initialization
+    srand(PF_SEED);
+    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, asp, &logLikelihoodGivenMotorModel, r);
+    ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
+        
+    // Run particle filter
+    pf.forwardFilter(N, resampleThreshold);
+    vector<vector<HA>> trajectories = pf.retrieveTrajectories();
+
+    vector<HA> finalTraj;
+    for(vector<HA> particleTraj: trajectories){
+        for(HA ha : particleTraj){
+            finalTraj.push_back(ha);
+        }
+    }
+    return finalTraj;
+}
+
 void processPath(int N, double resampleThreshold, vector<Robot>& robots, string inputPath, string outputPath, int numFiles){
     for(int i = 0; i < numFiles; i++){
         string in = inputPath + to_string(i) + ".csv";
@@ -137,17 +158,17 @@ void processPath(int N, double resampleThreshold, vector<Robot>& robots, string 
 
 // ----- Main ---------------------------------------------
 
-int main(int argc, char** argv){
-    // Reading parameters
-    if(argc > 1){
-        if(argc < 8){
-            cout << "Please run in the following manner: ./pf <robot test set> <mean error> <error std dev> <high-level success rate> <model> <numParticles> <resampleThreshold>" << endl;
-            exit(0);
-        }
+// int main(int argc, char** argv){
+//     // Reading parameters
+//     if(argc > 1){
+//         if(argc < 8){
+//             cout << "Please run in the following manner: ./pf <robot test set> <mean error> <error std dev> <high-level success rate> <model> <numParticles> <resampleThreshold>" << endl;
+//             exit(0);
+//         }
 
-        vector<Robot> robots = getRobotSet(stoi(argv[1]), normal_distribution<double>(stod(argv[2]), stod(argv[3])), stod(argv[4]));
-        setModel(stod(argv[5]));
+//         vector<Robot> robots = getRobotSet(stoi(argv[1]), normal_distribution<double>(stod(argv[2]), stod(argv[3])), stod(argv[4]));
+//         setModel(stod(argv[5]));
 
-        processPath(stoi(argv[6]), stod(argv[7]), robots, inputPath, outputPath, robots.size());
-    }
-}
+//         processPath(stoi(argv[6]), stod(argv[7]), robots, inputPath, outputPath, robots.size());
+//     }
+// }
