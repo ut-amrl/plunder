@@ -44,6 +44,7 @@ gen
 generate
 out
 plots
+ts
 
 # Clang
 .clangd/
