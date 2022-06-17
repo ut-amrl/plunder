@@ -1,4 +1,3 @@
-
 #include <dlfcn.h>
 #include <z3++.h>
 
@@ -15,147 +14,130 @@
 #include "ast/library_functions.hpp"
 #include "ast/parsing.hpp"
 #include "visitors/interp_visitor.hpp"
-#include "visitors/print_visitor.hpp"
 #include "ast/synthesis.hpp"
+
 #include "../robot.h"
-#include "../particleFilter/pf_runner.cpp"
+#include "../particleFilter/pf_runner.h"
 
-using AST::ast_ptr;
-using AST::BinOp;
-using AST::BOOL;
-using AST::Dimension;
-using AST::Example;
-using AST::Feature;
-using AST::FunctionEntry;
-using AST::Interpret;
-using AST::Model;
-using AST::Num;
-using AST::NUM;
-using AST::Param;
-using AST::Signature;
-using AST::Sketch;
-using AST::SymEntry;
-using AST::Type;
-using AST::Var;
-using AST::VEC;
-using Eigen::Vector2f;
-using std::cout;
-using std::endl;
-using std::invalid_argument;
-using std::make_shared;
-using std::map;
-using std::ofstream;
-using std::ifstream;
-using std::string;
-using std::unordered_map;
-using std::unordered_set;
-using std::vector;
-using json = nlohmann::json;
-using z3::context;
-using z3::solver;
 using namespace std;
+using namespace AST;
+using namespace z3;
+using Eigen::Vector2f;
+using json = nlohmann::json;
 
+// ----- Default Configuration ---------------------------------------------
 
-typedef HA asp_t(HA, Obs, Robot*);
-
-
-const string obsDataPath = "pips/examples/data.json";
-const string aspPath = "synthesis/out/";
+const string obsDataPath = "accSim/out/data0.csv";
+const string aspPathBase = "synthesis/";
 const string hiLvlDataPath = "particleFilter/out/pf.csv";
 const string operationLibPath = "pips/ops/test_library.json";
+
+// EM Loop parameters
+const int numIterations = 10;
 
 // LDIPS parameters
 const int window_size = 0;
 const int feature_depth = 3;
 const int sketch_depth = 3;
-const int min_accuracy = 0.2;
+const float min_accuracy = 0.95;
 
-// PF parameters
+// Particle filter parameters
 const int pfN = 1000;
-const int pfResampleThreshold = 0.2;
+const float pfResampleThreshold = 0.2;
+
 
 vector<Obs> dataObs;
 vector<LA> dataLA;
 
 unordered_set<Var> variables;
-vector<std::pair<string,string>> transitions;
+vector<pair<string,string>> transitions;
 vector<ast_ptr> preds;
 vector<FunctionEntry> library;
 
 Robot globalRobot;
+asp_t* curASP_em;
 
-
-string haToString(HA ha){
-    if(ha == ACC) return "ACC";
-    if(ha == DEC) return "DEC";
-    if(ha == CON) return "CON";
-    return "CON";
+namespace std {
+    ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
 }
 
-HA stringToHA(string str){
-    if(str == "ACC") return ACC;
-    if(str == "DEC") return DEC;
-    if(str == "CON") return CON;
-    return CON;
-}
-
-Example dataToExample(Obs obs, HA curState){
+Example dataToExample(HA ha, Obs state, Robot* robot){
     Example ex;
-    SymEntry xEntry((float)obs.pos);
-    SymEntry vEntry((float)obs.vel);
-    SymEntry curStateEntry(haToString(curState));
-    SymEntry accMaxEntry((float)globalRobot.accMax);
-    SymEntry vMaxEntry((float)globalRobot.vMax);
-    SymEntry targetEntry((float)globalRobot.target);
+    SymEntry xEntry((float) state.pos);
+    SymEntry vEntry((float) state.vel);
+    SymEntry curHAEntry(HAToString(ha));
+    SymEntry decMaxEntry((float) robot->decMax);
+    SymEntry vMaxEntry((float) robot->vMax);
+    SymEntry targetEntry((float) robot->target);
+    SymEntry zeroVelEntry((float) 0);
     ex.symbol_table_["x"] = xEntry;
     ex.symbol_table_["v"] = vEntry;
-    ex.symbol_table_["start"] = curStateEntry;
-    ex.symbol_table_["accMax"] = accMaxEntry;
+    ex.symbol_table_["decMax"] = decMaxEntry;
     ex.symbol_table_["vMax"] = vMaxEntry;
     ex.symbol_table_["target"] = targetEntry;
+    ex.symbol_table_["zeroVel"] = zeroVelEntry;
+
+    ex.start_ = curHAEntry;
     return ex;
 }
 
-Example dataToExample2(Obs obs, HA curState, HA nextState){
-    Example ex = dataToExample(obs, curState);
-    SymEntry nextStateEntry(haToString(nextState));
-    ex.symbol_table_["output"] = nextStateEntry;
-    return ex;
-}
-
-HA transitionUsingASPTree(HA curState, Obs obs, Robot* r){
-    Example obsObject = dataToExample(obs, curState);
-    for(uint i=0; i<transitions.size(); i++){
-        if(haToString(curState) == transitions[i].first){
-            if(InterpretBool(preds[i], obsObject)) return stringToHA(transitions[i].second);
+HA transitionUsingASPTree(HA ha, Obs state, Robot* robot){
+    Example obsObject = dataToExample(ha, state, robot);
+    for(uint i = 0; i < transitions.size(); i++){
+        if(HAToString(ha) == transitions[i].first){
+            if(InterpretBool(preds[i], obsObject)) {
+                ha = stringToHA(transitions[i].second);
+                return putErrorIntoHA(ha, robot);
+            }
         }
     }
-    return CON;
+    // we only upload transitions that change state, 
+    // so it is assumed that the "else" clause corresponds to staying in the same state
+    return putErrorIntoHA(ha, robot);
 }
 
-HA initialASP(HA ha, Obs obs, Robot* r){
-    return ACC;
+// Initial ASP: random transitions
+HA initialASP(HA ha, Obs state, Robot* r){
+    // return putErrorIntoHA(ASP_Hand(ha, state, r), r);
+    // if(r->sampleDiscrete(0.33)){
+    //     ha = ACC;
+    // } else if (r->sampleDiscrete(0.5)){
+    //     ha = DEC;
+    // } else {
+    //     ha = CON;
+    // }
+    // return ha;
+    return ASP_random(ha, state, r);
 }
 
-vector<Example> expectation(){
-    vector<vector<HA>> allTraj = runFilter(pfN, pfResampleThreshold, &globalRobot, dataObs, dataLA, curASP);
+vector<Example> expectation(Robot* robot, uint iteration){
+    // Run filter
+    vector<vector<HA>> trajectories = runFilter(pfN, pfResampleThreshold, robot, dataObs, dataLA, curASP_em);
+
+    cout << "synthesis/out/examples/pf" + to_string(iteration) + ".csv" << endl;
+    writeData("synthesis/out/examples/pf" + to_string(iteration) + ".csv", robot, trajectories);
+
+    // Convert each particle trajectory point to LDIPS-supported Example
     vector<Example> examples;
-    for(int n=0; n<)
-    for(int i=0; i<dataObs.size()-1; i++){
-        Example ex = dataToExample2(dataObs[i], traj[i], traj[i+1]);
-        examples.push_back(ex);
+    for(int n = 0; n < pfN; n++){
+        vector<HA> traj = trajectories[n];
+        for(int t = 0; t < dataObs.size() - 1; t++){
+            Example ex = dataToExample(traj[t], dataObs[t], robot);
+
+            // Provide next high-level action
+            ex.result_ = SymEntry(HAToString(traj[t+1]));
+            examples.push_back(ex);
+        }
     }
     return examples;
 }
 
-void maximization(vector<Example> examples){
+void maximization(vector<Example> examples, uint iteration){
 
-    // vector<AST::Example> examples = ReadExamples(obsDataPath, variables, &transitions);
 
     // this is where we can optimize and remove the last transition of each if-statement
     // we can also order the transitions however we want
-
-    std::reverse(transitions.begin(), transitions.end());
+    
     examples = WindowExamples(examples, window_size);
     
     // Turn variables into roots
@@ -163,66 +145,90 @@ void maximization(vector<Example> examples){
     for (const Var& variable : variables) {
         roots.push_back(make_shared<Var>(variable));
     }
+    
 
     vector<Signature> signatures;
-    vector<ast_ptr> ops = AST::RecEnumerate(roots, inputs, examples, library, feature_depth, &signatures);
+    vector<ast_ptr> ops = RecEnumerate(roots, inputs, examples, library, feature_depth, &signatures);
+
+
+    // -----------------
+    cout << "----Roots----" << endl;
+    for (auto& node : roots) {
+        cout << node << endl;
+    }
+    cout << endl;
+
+    cout << "----Transitions----" << endl;
+    for (auto& trans : transitions) {
+        cout << trans.first << "->" << trans.second << endl;
+    }
+    cout << endl;
+    cout << "---- Features Synthesized ----" << endl;
+    for (auto& feat : ops) {
+        cout << feat << endl;
+    }
+    cout << endl;
+
+    cout << "---- Number of Features Enumerated ----" << endl;
+    cout << ops.size() << endl << endl;
+    cout << endl;
+    // --------------------
     
-    preds = ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspPath);
+    
+    preds = ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspPathBase+"out"+to_string(iteration)+"/");
 }
 
 void setupLdips(){
     Var x ("x", Dimension(1, 0, 0), NUM);
     Var v ("v", Dimension(1, -1, 0), NUM);
-    Var accMax ("accMax", Dimension(1, -2, 0), NUM);
+    Var decMax ("decMax", Dimension(1, -2, 0), NUM);
     Var vMax ("vMax", Dimension(1, -1, 0), NUM);
+    Var zeroVel ("zeroVel", Dimension(1, -1, 0), NUM);
     Var target ("target", Dimension(1, 0, 0), NUM);
-    Var start ("start", Dimension(1, 1, 0), AST::STATE);
-    Var output ("output", Dimension(1, 1, 0), AST::STATE);
+
     variables.insert(x);
     variables.insert(v);
-    variables.insert(accMax);
+    variables.insert(decMax);
     variables.insert(vMax);
+    variables.insert(zeroVel);
     variables.insert(target);
-    variables.insert(start);
-    variables.insert(output);
-    pair<string, string> t1 ("ACC", "ACC");
-    pair<string, string> t2 ("ACC", "DEC");
-    pair<string, string> t3 ("ACC", "CON");
-    pair<string, string> t4 ("DEC", "ACC");
-    pair<string, string> t5 ("DEC", "DEC");
-    pair<string, string> t6 ("DEC", "CON");
-    pair<string, string> t7 ("CON", "ACC");
-    pair<string, string> t8 ("CON", "DEC");
-    pair<string, string> t9 ("CON", "CON");
-    transitions.push_back(t1);
-    transitions.push_back(t2);
-    transitions.push_back(t3);
-    transitions.push_back(t4);
-    transitions.push_back(t5);
-    transitions.push_back(t6);
-    transitions.push_back(t7);
-    transitions.push_back(t8);
-    transitions.push_back(t9);
+
+    // transitions.push_back(pair<string, string> ("ACC", "ACC"));
+    transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    transitions.push_back(pair<string, string> ("ACC", "CON"));
+    transitions.push_back(pair<string, string> ("DEC", "ACC"));
+    // transitions.push_back(pair<string, string> ("DEC", "DEC"));
+    transitions.push_back(pair<string, string> ("DEC", "CON"));
+    transitions.push_back(pair<string, string> ("CON", "ACC"));
+    transitions.push_back(pair<string, string> ("CON", "DEC"));
+    // transitions.push_back(pair<string, string> ("CON", "CON"));
 }
 
 
 int main(int argc, char** argv){
 
+    // Read known sequences from demonstration
     readData(obsDataPath, dataObs, dataLA);
-    library = ReadLibrary(operationLibPath);
     setupLdips();
-    asp_t* curASP = initialASP;
 
-    for(int i=0; i<10; i++){
-        cout << "loop " << i << " expectation" << endl;
-        vector<Example> examples = expectation();      // uses preds
+    // Initialization
+    library = ReadLibrary(operationLibPath);
+    curASP_em = initialASP;
 
-        cout << "loop " << i << " maximization" << endl;
-        maximization(examples);     // updates preds, which is used by transitionUsingASPTree
+    // TO-DO: support passing in multiple different robots
+    Robot jimmy_bot = Robot(5, -4, 12, 100, normal_distribution<double>(0, 1), 0.9);
 
-        curASP = transitionUsingASPTree;
+    for(int i = 0; i < numIterations; i++){
+        // Expectation
+        cout << "Loop " << i << " expectation:" << endl;
+        vector<Example> examples = expectation(&jimmy_bot, i);      // uses preds
+
+        // Maximization
+        cout << "Loop " << i << " maximization:" << endl;
+        maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
+
+        curASP_em = transitionUsingASPTree;
     }
 
     return 0;
 }
-

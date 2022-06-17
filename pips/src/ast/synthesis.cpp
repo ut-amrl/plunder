@@ -35,7 +35,7 @@ using AST::CheckModelAccuracy;
 // DECLARE_double(min_accuracy);
 // DECLARE_bool(debug);
 
-bool flagsDebug = false;
+bool flagsDebug = true;
 
 namespace AST {
 
@@ -453,6 +453,7 @@ vector<ast_ptr> ldipsL3(const vector<Example>& demos,
   vector<Example> examples = demos;
   // Enumerate possible sketches
   const auto sketches = EnumerateSketches(sketch_depth);
+  cout << "Number of sketches: " << sketches.size() << endl;
 
   vector<ast_ptr> transition_solutions;
 
@@ -473,7 +474,6 @@ vector<ast_ptr> ldipsL3(const vector<Example>& demos,
     float current_best = 0.0;
     ast_ptr current_solution = nullptr;
     for (const auto& sketch : sketches) {
-
       // Attempt L2 Synthesis with current sketch.
       current_solution = ldipsL2(sketch, examples, lib, transition,
           min_accuracy, current_solution, &current_best);

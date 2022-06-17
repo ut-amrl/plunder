@@ -11,6 +11,16 @@ using namespace std;
 
 #define PF_SEED time(0)
 
+// ----- Default Configuration ---------------------------------------------
+
+static vector<Robot> robots = { Robot(5, -4, 12, 100, normal_distribution<double>(0.0, 1.0), 0.8) };
+static int N = 1000;
+static double resampleThreshold = 0.1;
+
+// File paths
+static string inputPath = "accSim/out/data";
+static string outputPath = "particleFilter/out/pf";
+
 // ----- Main ---------------------------------------------
 
 int main(int argc, char** argv){

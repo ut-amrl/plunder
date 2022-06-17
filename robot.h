@@ -32,6 +32,21 @@ struct Obs { // State observations
 random_device rd;
 default_random_engine gen(SEED);
 
+// Helper functions
+string HAToString(HA ha){
+    if(ha == ACC) return "ACC";
+    if(ha == DEC) return "DEC";
+    if(ha == CON) return "CON";
+    return "CON";
+}
+
+HA stringToHA(string str){
+    if(str == "ACC") return ACC;
+    if(str == "DEC") return DEC;
+    if(str == "CON") return CON;
+    return CON;
+}
+
 
 // ----- Robot Class ---------------------------------------------
 
@@ -138,19 +153,5 @@ class Robot {
         ha = CON;
         la = LA { .acc = 0 };
         state = Obs { .pos = 0, .vel = 0 };
-    }
-
-    // Gives the string form of a high-level action
-    string ha_tostring(HA ha) {
-        if(ha == ACC)
-            return "ACC";
-        if(ha == DEC)
-            return "DEC";
-        return "CON";
-    }
-
-    // Gives string form of the current robot action
-    string ha_tostring() {
-        return ha_tostring(ha);
     }
 };

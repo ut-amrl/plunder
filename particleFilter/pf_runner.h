@@ -15,15 +15,6 @@ using namespace std;
 
 #define PF_SEED time(0)
 
-// ----- Default Configuration ---------------------------------------------
-
-static vector<Robot> robots = { Robot(5, -4, 12, 100, normal_distribution<double>(0.0, 1.0), 0.8) };
-static int N = 1000;
-static double resampleThreshold = 0.1;
-
-// File paths
-static string inputPath = "accSim/out/data";
-static string outputPath = "particleFilter/out/pf";
 
 // ----- Markov System Parameters ---------------------------------------------
 
@@ -108,12 +99,21 @@ void writeData(string file, Robot* r, vector<vector<HA>>& trajectories){
 // ----- Particle Filter ---------------------------------------------
 
 vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
+    cout << N << " " << resampleThreshold << " " << r->accErrDistr.mean() << " " << r->accErrDistr.stddev() << endl;
+    for(Obs each: dataObs){
+        cout << each.pos << ", " << each.vel << ";   ";
+    }
+    cout << endl;
+    for(LA each: dataLa){
+        cout << each.acc << " ";
+    }
+    cout << endl;
 
     // Initialization
     srand(PF_SEED);
     MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, asp, &logLikelihoodGivenMotorModel, r);
     ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
-        
+    
     // Run particle filter
     pf.forwardFilter(N, resampleThreshold);
     vector<vector<HA>> trajectories = pf.retrieveTrajectories();
@@ -139,6 +139,10 @@ void processPath(int N, double resampleThreshold, vector<Robot>& robots, string 
         string in = inputPath + to_string(i) + ".csv";
         string out = outputPath + to_string(i) + ".csv";
 
+        cout << outputPath << endl;
+
         runFilter(N, resampleThreshold, &robots[i], in, out);
     }
 }
+
+

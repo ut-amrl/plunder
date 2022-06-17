@@ -66,12 +66,12 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         // Run simulation
         for(double t = 0; t < T_TOT/T_STEP; t++){
 
-            string prevHAStr = robots[i].ha_tostring();
+            string prevHAStr = HAToString(robots[i].ha);
 
             robots[i].updatePhysics(T_STEP);
             robots[i].runASP(ASP_model);
 
-            string curHAStr = robots[i].ha_tostring();
+            string curHAStr = HAToString(robots[i].ha);
 
             // Print trace
             if(genCsv) {
@@ -91,7 +91,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
                 jsonFile << robots[i].vMax;
                 jsonFile << R"(},"decMax":{"dim":[1,-2,0],"type":"NUM","name":"decMax","value":)";
                 jsonFile << robots[i].decMax;
-                jsonFile << R"(},"start":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
+                jsonFile << R"(},"start":{"dim":[0,0,0],"type":"STATE","name":"start","value":")";
                 jsonFile << prevHAStr;
                 jsonFile << R"("},"output":{"dim":[0,0,0],"type":"STATE","name":"output","value":")";
                 jsonFile << curHAStr;

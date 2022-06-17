@@ -7,6 +7,7 @@ import sys
 
 # I/O
 inPath = "particleFilter/out/pf"
+inPath = "synthesis/out/examples/pf"
 gtPath = "accSim/out/data"
 outPathA = "particleFilter/plots/accel"
 outPathV = "particleFilter/plots/velocity"
@@ -101,7 +102,8 @@ def main():
         gtVelocity = []
         gtPosition = []
         readTrajectories(inPath + str(robot) + ".csv")
-        readGroundTruth(gtPath + str(robot) + ".csv")
+        # readGroundTruth(gtPath + str(robot) + ".csv")
+        readGroundTruth("accSim/out/data0.csv")
 
         max_t = min(MAX_T, min(len(gtTrajectory), len(trajectories[0])))
         printed_particles = min(PRINTED_PARTICLES, len(trajectories))
