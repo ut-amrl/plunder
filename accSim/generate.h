@@ -6,36 +6,21 @@
 #include <iomanip>
 #include <stdlib.h>
 
+#include "../settings.h"
 #include "robotSets.h"
 #include "asps.h"
 
 using namespace std;
 
-// ----- Configuration: Default Parameters ---------------------------------------------
-
-static int robotTestSet = 3;          // which robot test set to use (1-3)
-static int useModel = 2;              // use hand-written ASP (0), LDIPS-generated ASP without error (1), LDIPS-generated ASP with error (2), probabilistic ASP (3)
-
-// Error distribution parameters
-static double accErrMean = 0.0;         // acceleration error distribution
-static double accErrStdDev = 2.0;
-
-// Action error probabilities
-static double haProbCorrect = 0.8;    // Probability of selecting the correct high-level action
+// ----- Configuration ---------------------------------------------
 
 // Global variables
 static const bool genCsv = true;            // generate CSV trace file
 static const bool genJson = true;           // generate JSON trace file
-static const double T_STEP = .1;            // time step
-static const double T_TOT = 15;             // total time per simulated scenario
-
-// File I/O
-static const string outputPath = "accSim/out/data";   // Output file directory and prefix
-                                                // Both the JSON and CSV files will be generated here
 
 // ----- Simulation ---------------------------------------------
 
-void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double haProbCorrect){
+void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double haProbCorrect, string outputPath){
     
     // Initialization
     normal_distribution<double> accErrDistr(accErrMean, accErrStdDev);
@@ -44,7 +29,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     // Setup JSON
     ofstream jsonFile;
     if(genJson){
-        cout << "Filling JSON with simulation data:\n";
+        cout << "Filling JSON with simulation data\n";
         jsonFile << fixed << setprecision(PRECISION);
         jsonFile.open(outputPath + ".json");
         jsonFile << "[";
@@ -111,9 +96,4 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         jsonFile << "]";
         jsonFile.close();
     }
-}
-
-// runSim() with default parameters
-void runSim() {
-    runSim(robotTestSet, useModel, accErrMean, accErrStdDev, haProbCorrect);
 }

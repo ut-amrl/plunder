@@ -81,23 +81,23 @@ class MarkovSystem {
     public:
 
     HA (*sampleInitialHA)(); // Initial distribution
-    HA (*ASP)(HA prevHa, Obs prevObs, RobotClass* r); // Provided action-selection policy
-    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass* r, LA la, HA ha, Obs obs); // Calculate likelihood of observed LA given the simulated HA sequence
-    RobotClass* r;
+    HA (*ASP)(HA prevHa, Obs prevObs, RobotClass& r); // Provided action-selection policy
+    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs); // Calculate likelihood of observed LA given the simulated HA sequence
+    RobotClass r;
 
     // Constructor
     MarkovSystem( HA (*_sampleInitialHA)(), 
-                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass* r),
-                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass* r, LA la, HA ha, Obs obs),
-                  RobotClass* _r):
+                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
+                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs),
+                  RobotClass& _r):
                         sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
                   {
     }
     
     // Robot-less constructor
     MarkovSystem( HA (*_sampleInitialHA)(), 
-                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass* r),
-                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass* r, LA la, HA ha, Obs obs)):
+                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
+                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs)):
                         sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
                   {
     }

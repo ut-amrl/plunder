@@ -37,9 +37,9 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 }
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-FLOAT logLikelihoodGivenMotorModel(Robot* r, LA la, HA ha, Obs obs){
-    double mean = r->motorModel(ha, obs, false).acc;
-    double stddev = r->accErrDistr.stddev();
+FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs){
+    double mean = r.motorModel(ha, obs, false).acc;
+    double stddev = r.accErrDistr.stddev();
     return logpdf(la.acc, mean, stddev);
 }
 
@@ -70,13 +70,13 @@ void readData(string file, vector<Obs>& dataObs, vector<LA>& dataLA){
 }
 
 // Write high-level action sequences (trajectories) to file
-void writeData(string file, Robot* r, vector<vector<HA>>& trajectories){
+void writeData(string file, Robot& r, vector<vector<HA>>& trajectories){
     ofstream outFile;
     outFile.open(file);
 
     for(vector<HA> traj : trajectories){
         for(uint i = 0; i < traj.size(); i++){
-            outFile << r->motorModel(traj[i], Obs {}, false).acc;
+            outFile << r.motorModel(traj[i], Obs {}, false).acc;
             if(i != traj.size() - 1){
                 outFile << ",";
             }
@@ -91,7 +91,7 @@ void writeData(string file, Robot* r, vector<vector<HA>>& trajectories){
 // ----- Particle Filter ---------------------------------------------
 
 // Full trajectory generation with particle filter
-vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
+vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
 
     // Initialization
     srand(PF_SEED);
@@ -109,26 +109,18 @@ vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot* r, vector<O
     return trajectories;
 }
 
-void filterFromFile(int N, double resampleThreshold, Robot* r, string inputFile, string outputFile, asp_t* asp){
-
+// Read input, run filter, write output
+vector<vector<HA>> filterFromFile(int N, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
     // Read input
-    vector<Obs> dataObs;
-    vector<LA> dataLa;
-    readData(inputFile, dataObs, dataLa);
+    if(dataObs.size() == 0 || dataLa.size() == 0){
+        dataObs.clear(); dataLa.clear();
+        readData(inputFile, dataObs, dataLa);
+    }
 
     vector<vector<HA>> trajectories = runFilter(N, resampleThreshold, r, dataObs, dataLa, asp);
 
     // Write results
     writeData(outputFile, r, trajectories);
+
+    return trajectories;
 }
-
-void processPath(int N, double resampleThreshold, vector<Robot>& robots, string inputPath, string outputPath, int numFiles, asp_t* asp){
-    for(int i = 0; i < numFiles; i++){
-        string in = inputPath + to_string(i) + ".csv";
-        string out = outputPath + to_string(i) + ".csv";
-
-        filterFromFile(N, resampleThreshold, &robots[i], in, out, asp);
-    }
-}
-
-

@@ -81,8 +81,8 @@ class Robot {
     Obs state = { .pos = 0, .vel = 0 }; // Initial observed state
 
     // MOTION MODEL (ACTION-SELECTION POLICY): Transition to new high-level action based on current action and state
-    void runASP(HA (*ASP) (HA, Obs, Robot*)){
-        ha = ASP(ha, state, this);
+    void runASP(HA (*ASP) (HA, Obs, Robot&)){
+        ha = ASP(ha, state, *this);
     }
 
     // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
