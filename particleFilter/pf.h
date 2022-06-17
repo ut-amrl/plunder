@@ -8,10 +8,13 @@
 #include <numeric>
 
 #include "../robot.h"
+#include "../accSim/asps.h"
 
 using namespace std;
 
 #define FLOAT double // Set to double (for precision) or float (for speed)
+
+#define PF_SEED time(0)
 
 static uint resampCount = 0; // Debug
 
@@ -229,6 +232,10 @@ class ParticleFilter {
                 for(int i = 0; i < N; i++){
                     particles[t+1][i] = system->ASP(particles[t][i], dataObs[t], system->r);
                 }
+            } else {
+                // resample at last step to eliminate deviating particles
+                particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
+                resampCount++;
             }
         }
 
@@ -265,8 +272,7 @@ class ParticleFilter {
                 }
             }
         }
-        cout << "resample count: " << resampCount << endl;
+
         return trajectories;
     }
-
 };

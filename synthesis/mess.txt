@@ -1,7 +1,0 @@
-things in pips i messed with:
-- enumeration.cpp:
-        bool dimChecking = true;
-        bool sigPruning = true;
-- synthesis.cpp:
-        bool flagsDebug = false;
-        ldipsL3() -> ast_ptr;

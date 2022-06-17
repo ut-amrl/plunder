@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <filesystem>
 #include <memory>
 #include <algorithm>
 #include <unordered_map>
@@ -28,7 +29,7 @@ using json = nlohmann::json;
 // ----- Default Configuration ---------------------------------------------
 
 const string obsDataPath = "accSim/out/data0.csv";
-const string aspPathBase = "synthesis/";
+const string aspPathBase = "synthesis/out/asp";
 const string hiLvlDataPath = "particleFilter/out/pf.csv";
 const string operationLibPath = "pips/ops/test_library.json";
 
@@ -39,7 +40,7 @@ const int numIterations = 10;
 const int window_size = 0;
 const int feature_depth = 3;
 const int sketch_depth = 3;
-const float min_accuracy = 0.95;
+const float min_accuracy = 0.8;
 
 // Particle filter parameters
 const int pfN = 1000;
@@ -172,10 +173,13 @@ void maximization(vector<Example> examples, uint iteration){
     cout << "---- Number of Features Enumerated ----" << endl;
     cout << ops.size() << endl << endl;
     cout << endl;
+
+    cout << "Number of examples: " << examples.size() << endl;
     // --------------------
     
-    
-    preds = ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspPathBase+"out"+to_string(iteration)+"/");
+    string aspFilePath = aspPathBase + to_string(iteration) + "/";
+    filesystem::create_directory(aspFilePath);
+    preds = ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath);
 }
 
 void setupLdips(){
@@ -219,6 +223,7 @@ int main(int argc, char** argv){
     Robot jimmy_bot = Robot(5, -4, 12, 100, normal_distribution<double>(0, 1), 0.9);
 
     for(int i = 0; i < numIterations; i++){
+        
         // Expectation
         cout << "Loop " << i << " expectation:" << endl;
         vector<Example> examples = expectation(&jimmy_bot, i);      // uses preds

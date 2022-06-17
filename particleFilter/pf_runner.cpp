@@ -32,8 +32,6 @@ int main(int argc, char** argv){
         }
 
         vector<Robot> robots = getRobotSet(stoi(argv[1]), normal_distribution<double>(stod(argv[2]), stod(argv[3])), stod(argv[4]));
-        setModel(stod(argv[5]));
-
-        processPath(stoi(argv[6]), stod(argv[7]), robots, inputPath, outputPath, robots.size());
+        processPath(stoi(argv[6]), stod(argv[7]), robots, inputPath, outputPath, robots.size(), ASP_model(stoi(argv[5])));
     }
 }

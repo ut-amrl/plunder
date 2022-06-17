@@ -39,7 +39,6 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     
     // Initialization
     normal_distribution<double> accErrDistr(accErrMean, accErrStdDev);
-    setModel(useModel);
     vector<Robot> robots = getRobotSet(robotTestSet, accErrDistr, haProbCorrect);
     
     // Setup JSON
@@ -69,7 +68,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
             string prevHAStr = HAToString(robots[i].ha);
 
             robots[i].updatePhysics(T_STEP);
-            robots[i].runASP(ASP_model);
+            robots[i].runASP(ASP_model(useModel));
 
             string curHAStr = HAToString(robots[i].ha);
 

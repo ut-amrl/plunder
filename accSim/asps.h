@@ -29,7 +29,6 @@ HA putErrorIntoHA(int ha, Robot* r){
     return static_cast<HA>((ha + haDif)%3);
 }
 
-
 // ----- Curated Selection of ASPs ---------------------------------------------
 
 /*
@@ -143,7 +142,7 @@ HA ASP_accDecOnly(HA ha, Obs state, Robot* r){
 /*
  * This is a uniformly random ASP.
  */
- HA ASP_random(HA ha, Obs state, Robot* r){
+HA ASP_random(HA ha, Obs state, Robot* r){
     if(r->sampleDiscrete(0.33)){
         ha = ACC;
     } else if (r->sampleDiscrete(0.5)){
@@ -152,41 +151,11 @@ HA ASP_accDecOnly(HA ha, Obs state, Robot* r){
         ha = CON;
     }
     return ha;
- }
-
-
-// ----- Main Functionality ---------------------------------------------
-
-vector<asp_t*> ASPs;
-int model = 0; // Default model
-asp_t* curASP = ASP_Hand;
-
-void init(){
-    ASPs.push_back(ASP_Hand);
-    ASPs.push_back(ASP_LDIPS);
-    ASPs.push_back(ASP_LDIPS_error);
-    ASPs.push_back(ASP_Hand_prob);
-    ASPs.push_back(ASP_accDecOnly);
-    ASPs.push_back(ASP_random);
 }
 
-void setModel(int aspNum){
-    if(ASPs.size() == 0){
-        init();
-    }
-    
-    if(aspNum >= ASPs.size()) {
-        cout << "Invalid model provided" << endl;
-        exit(1);
-    }
-    model = aspNum;
-    curASP = ASPs[aspNum];
-}
+// Select an ASP to use
+vector<asp_t*> ASPs = { &ASP_Hand, &ASP_LDIPS, &ASP_LDIPS_error, &ASP_Hand_prob, &ASP_accDecOnly, &ASP_random };
 
-/*
- * Selects one ASP to transition robot high-level action based on current global state. Runs once per time step
- */
-HA ASP_model(HA ha, Obs state, Robot* r){
-    ha = curASP(ha, state, r);
-    return putErrorIntoHA(ha, r);
+asp_t* ASP_model(int model){
+    return ASPs[model];
 }

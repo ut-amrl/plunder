@@ -31,7 +31,7 @@ $(TARGET3):
 
 $(TARGET4):
 			mkdir -p particleFilter/plots && \
-			$(PY) particleFilter/plotter.py 1000 1000 3
+			$(PY) particleFilter/plotter.py 1000 1000 10
 
 $(TARGET5):
 			cd pips && make && cd ..

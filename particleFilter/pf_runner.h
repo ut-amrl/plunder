@@ -13,9 +13,6 @@
 
 using namespace std;
 
-#define PF_SEED time(0)
-
-
 // ----- Markov System Parameters ---------------------------------------------
 
 // Initial distribution
@@ -32,11 +29,6 @@ HA sampleInitialHA(){
     } else {
         return CON;
     }
-}
-
-// Run robot-based action-selection policy
-HA ASP(HA ha, Obs obs, Robot* r){
-    return ASP_model(ha, obs, r);
 }
 
 // Calculate pdf of N(mu, sigma) at x, then take the natural log
@@ -98,50 +90,44 @@ void writeData(string file, Robot* r, vector<vector<HA>>& trajectories){
 
 // ----- Particle Filter ---------------------------------------------
 
+// Full trajectory generation with particle filter
 vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot* r, vector<Obs> dataObs, vector<LA> dataLa, asp_t* asp){
-    cout << N << " " << resampleThreshold << " " << r->accErrDistr.mean() << " " << r->accErrDistr.stddev() << endl;
-    for(Obs each: dataObs){
-        cout << each.pos << ", " << each.vel << ";   ";
-    }
-    cout << endl;
-    for(LA each: dataLa){
-        cout << each.acc << " ";
-    }
-    cout << endl;
 
     // Initialization
     srand(PF_SEED);
     MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, asp, &logLikelihoodGivenMotorModel, r);
     ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
+    resampCount = 0;
     
     // Run particle filter
     pf.forwardFilter(N, resampleThreshold);
     vector<vector<HA>> trajectories = pf.retrieveTrajectories();
 
+    // DEBUG
+    cout << "resample count: " << resampCount << endl;
+
     return trajectories;
 }
 
-void runFilter(int N, double resampleThreshold, Robot* r, string inputFile, string outputFile){
+void filterFromFile(int N, double resampleThreshold, Robot* r, string inputFile, string outputFile, asp_t* asp){
 
     // Read input
     vector<Obs> dataObs;
     vector<LA> dataLa;
     readData(inputFile, dataObs, dataLa);
 
-    vector<vector<HA>> trajectories = runFilter(N, resampleThreshold, r, dataObs, dataLa, &ASP);
+    vector<vector<HA>> trajectories = runFilter(N, resampleThreshold, r, dataObs, dataLa, asp);
 
     // Write results
     writeData(outputFile, r, trajectories);
 }
 
-void processPath(int N, double resampleThreshold, vector<Robot>& robots, string inputPath, string outputPath, int numFiles){
+void processPath(int N, double resampleThreshold, vector<Robot>& robots, string inputPath, string outputPath, int numFiles, asp_t* asp){
     for(int i = 0; i < numFiles; i++){
         string in = inputPath + to_string(i) + ".csv";
         string out = outputPath + to_string(i) + ".csv";
 
-        cout << outputPath << endl;
-
-        runFilter(N, resampleThreshold, &robots[i], in, out);
+        filterFromFile(N, resampleThreshold, &robots[i], in, out, asp);
     }
 }
 
