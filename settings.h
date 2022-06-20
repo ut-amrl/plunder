@@ -20,11 +20,12 @@ const string operationLibPath = "pips/ops/test_library.json";   // Operation lib
 const string plotGenPath = "synthesis/plots/";
 
 // Simulation parameters
-const double T_STEP = .1;            // time step
-const double T_TOT = 15;             // total time per simulated scenario
+const double T_STEP = .1;               // time step (s)
+const double T_TOT = 15;                // total time (s) per simulated scenario
 
 // EM Loop parameters
-const int numIterations = 10;       // number of iterations in the expectation-maximization loop
+const int numIterations = 10;           // number of iterations in the expectation-maximization loop
+const int sampleSize = 20;              // number of trajectories to pass into LDIPS
 
 // LDIPS parameters
 const int window_size = 0;
@@ -33,8 +34,9 @@ const int sketch_depth = 3;
 const float min_accuracy = 0.5;
 
 // Particle filter parameters
-const int numParticles = 1000;
-const float resampleThreshold = 0.2;
+const int numParticles = 1000;          // number of particle trajectories created to represent the distribution
+const int numTrajectories = 10;         // number of particle trajectories sampled to be fed into the maximization step
+const float resampleThreshold = 0.2;    // higher = more resampling
 
 // Plot parameters
 const int numParticlesPlot = 1000;

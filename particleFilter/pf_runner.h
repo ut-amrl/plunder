@@ -91,7 +91,7 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories){
 // ----- Particle Filter ---------------------------------------------
 
 // Full trajectory generation with particle filter
-vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
+vector<vector<HA>> runFilter(int N, int M, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
 
     // Initialization
     srand(PF_SEED);
@@ -101,7 +101,8 @@ vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot& r, vector<O
     
     // Run particle filter
     pf.forwardFilter(N, resampleThreshold);
-    vector<vector<HA>> trajectories = pf.retrieveTrajectories();
+
+    vector<vector<HA>> trajectories = pf.retrieveTrajectories(M);
 
     // DEBUG
     cout << "resample count: " << resampCount << endl;
@@ -110,14 +111,14 @@ vector<vector<HA>> runFilter(int N, double resampleThreshold, Robot& r, vector<O
 }
 
 // Read input, run filter, write output
-vector<vector<HA>> filterFromFile(int N, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
+vector<vector<HA>> filterFromFile(int N, int M, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
     // Read input
     if(dataObs.size() == 0 || dataLa.size() == 0){
         dataObs.clear(); dataLa.clear();
         readData(inputFile, dataObs, dataLa);
     }
 
-    vector<vector<HA>> trajectories = runFilter(N, resampleThreshold, r, dataObs, dataLa, asp);
+    vector<vector<HA>> trajectories = runFilter(N, M, resampleThreshold, r, dataObs, dataLa, asp);
 
     // Write results
     writeData(outputFile, r, trajectories);

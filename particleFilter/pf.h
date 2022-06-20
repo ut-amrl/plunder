@@ -243,7 +243,7 @@ class ParticleFilter {
     }
 
     // Retrieve high-level action sequences after running particle filter
-    vector<vector<HA>> retrieveTrajectories(){
+    vector<vector<HA>> retrieveTrajectories(int numTrajectories){        
         if(particles.size() == 0){
             cout << "Run the particle filter first!" << endl;
             return vector<vector<HA>>();
@@ -251,23 +251,24 @@ class ParticleFilter {
         assert(particles.size() == ancestors.size());
 
         int T = particles.size(); int N = particles[0].size();
+        numTrajectories = min(numTrajectories, (int) particles[0].size());
 
         vector<vector<HA>> trajectories;
-        for(int i = 0; i < N; i++){
+        for(int i = 0; i < numTrajectories; i++){
             trajectories.push_back(vector<HA>(T));
         }
 
-        vector<int> activeParticles(N);
-        for(int i = 0; i < N; i++){
-            activeParticles[i] = i;
+        vector<uint> activeParticles;
+        for(uint i = 0; (int) activeParticles.size() < numTrajectories; i += (N / numTrajectories)){
+            activeParticles.push_back(i);
         }
 
         for(int t = T - 1; t >= 0; t--){
-            for(int i = 0; i < N; i++){
+            for(int i = 0; i < numTrajectories; i++){
                 trajectories[i][t] = particles[t][activeParticles[i]];
             }
             if(t != 0){
-                for(int i = 0; i < N; i++){
+                for(int i = 0; i < numTrajectories; i++){
                     activeParticles[i] = ancestors[t][activeParticles[i]];
                 }
             }

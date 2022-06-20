@@ -23,7 +23,7 @@ int main(int argc, char** argv){
 
         vector<Obs> dataObs;
         vector<LA> dataLa;
-        filterFromFile(numParticles, resampleThreshold, robots[i], in, out, dataObs, dataLa, ASP_model(model));
+        filterFromFile(numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs, dataLa, ASP_model(model));
     }
     
     return 0;

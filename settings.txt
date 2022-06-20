@@ -17,6 +17,7 @@ feature_depth 3
 sketch_depth 3
 min_accuracy 0.5
 numParticles 1000
+numTrajectories 10
 resampleThreshold 0.2
 numParticlesPlot 1000
 timeStepsPlot 1000

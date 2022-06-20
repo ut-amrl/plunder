@@ -41,10 +41,11 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
 
     ex.symbol_table_["x"] = SymEntry((float) state.pos);
     ex.symbol_table_["v"] = SymEntry((float) state.vel);
-    ex.symbol_table_["decMax"] = ((float) robot.decMax);
-    ex.symbol_table_["vMax"] = ((float) robot.vMax);
-    ex.symbol_table_["target"] = ((float) robot.target);
-    ex.symbol_table_["zeroVel"] = ((float) 0);
+    ex.symbol_table_["decMax"] = SymEntry((float) robot.decMax);
+    ex.symbol_table_["vMax"] = SymEntry((float) robot.vMax);
+    ex.symbol_table_["target"] = SymEntry((float) robot.target);
+    ex.symbol_table_["zeroVel"] = SymEntry((float) 0);
+
     ex.start_ = SymEntry(HAToString(ha));
 
     return ex;
@@ -79,10 +80,10 @@ vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector
         string out = trajGenPath + to_string(iteration) + "-" + to_string(i) + ".csv";
         
         // Run filter
-        vector<vector<HA>> trajectories = filterFromFile(numParticles, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
+        vector<vector<HA>> trajectories = filterFromFile(numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
         
         // Convert each particle trajectory point to LDIPS-supported Example
-        for(uint n = 0; n < numParticles; n++){
+        for(uint n = 0; n < sampleSize; n++){
             vector<HA> traj = trajectories[n];
             for(uint t = 0; t < dataObs[i].size() - 1; t++){
                 Example ex = dataToExample(traj[t], dataObs[i][t], robots[i]);

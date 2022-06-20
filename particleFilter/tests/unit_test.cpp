@@ -3,95 +3,18 @@
 #include <sstream>
 #include <math.h>
 
-#include "../pf.cpp"
+#include "../pf_runner.h"
+#include "../../settings.h"
+#include "../../accSim/robotSets.h"
+#include "../../accSim/asps.h"
 
 using namespace std;
 
 #define PF_SEED time(0)
 
-// ---------------------------------------------------------------------------------------------------------------------
+// // ---------------------------------------------------------------------------------------------------------------------
 
-// Initial distribution
-HA sampleInitialHA(){
-    // Distribution 1: Point distribution
-    // return ACC;
-
-    // Distribution 2: Uniformly Randomly Distributed
-    double rv = ((double) rand()) / RAND_MAX;
-    if(rv <= 0.33){
-        return ACC;
-    } else if (rv <= 0.67){
-        return DEC;
-    } else {
-        return CON;
-    }
-}
-
-// Run robot-based action-selection policy
-HA ASP(Robot r, HA prevHA, Obs prevObs){
-    r.x = prevObs.pos;
-    r.v = prevObs.vel;
-    r.ha = prevHA;
-
-    r.changeHA();
-    
-    return r.ha;
-}
-
-// Calculate pdf of N(mu, sigma) at x, then take the natural log
-FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
-    return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
-}
-
-// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-FLOAT logLikelihoodGivenMotorModel(Robot r, LA la, HA ha, Obs obs){
-    double la_mean = (ha == ACC) ? r.accMax : (ha == DEC) ? r.decMax : 0;
-    double res = logpdf(la.acc, la_mean, 5.0);
-    return res;
-}
-
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-// Read low-level action sequence and observed state sequence from file
-void readData(vector<Obs>& dataObs, vector<LA>& dataLA){
-
-    ifstream infile;
-    infile.open("../accSim/data.csv");
-    string res;
-    // header line
-    getline(infile, res);
-    // data lines
-    for(int i = 0; i < 20; i++){
-        if(!getline(infile, res))
-            break;
-        istringstream iss (res);
-        float time; string comma1;
-        float x; string comma2;
-        float v; string comma3;
-        float a;
-        iss >> time >> comma1 >> x >> comma2 >> v >> comma3 >> a;
-
-        Obs obs;
-        obs.pos = x;
-        obs.vel = v;
-        dataObs.push_back(obs);
-
-        LA la;
-        la.acc = a;
-        dataLA.push_back(la);
-    }
-}
-
-
-
-
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-// Unit tests
+// // Unit tests
 
 void test_logsumexp(){
     vector<FLOAT> vec;
@@ -142,21 +65,32 @@ void testLogPdf(){
 }
 
 void testLikelihood(){
-    Robot r (6, -5, 15, 150, normal_distribution<double>(0.0, 0.1), 0.9, 0);
-    // assert(abs(logLikelihoodGivenMotorModel(r, LA { .acc = 5.5 }, ACC, Obs { .pos = 3, .vel = 3 }) + 2.03143971076) < epsilon);
-    // assert(abs(logLikelihoodGivenMotorModel(r, LA { .acc = 0 }, DEC, Obs { .pos = 3, .vel = 3 }) + 3.40643971076) < epsilon);
-    // assert(abs(logLikelihoodGivenMotorModel(r, LA { .acc = 0 }, ACC, Obs { .pos = 3, .vel = 3 }) + 4.01755082187) < epsilon);
+    Robot r (6, -5, 15, 150, normal_distribution<double>(0.0, 2.0), 0.9);
+    assert(abs(logLikelihoodGivenMotorModel(r, LA { .acc = 5.5 }, ACC, Obs { .pos = 3, .vel = 3 }) + 1.6433567) < 0.01);
+    assert(abs(logLikelihoodGivenMotorModel(r, LA { .acc = 0 }, DEC, Obs { .pos = 3, .vel = 3 }) + 4.7375594) < 0.01);
+    assert(abs(logLikelihoodGivenMotorModel(r, LA { .acc = 0 }, ACC, Obs { .pos = 3, .vel = 3 }) + 6.110248) < 0.01);
 }
 
 void testTrajectoryRetrieval(){
-    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel);
+
+    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), haProbCorrect);
+
+    int i = 0;
+    string in = stateGenPath + to_string(i) + ".csv";
+
     vector<Obs> dataObs;
     vector<LA> dataLa;
-    readData(dataObs, dataLa);
-    PF<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
     
+    if(dataObs.size() == 0 || dataLa.size() == 0){
+        dataObs.clear(); dataLa.clear();
+        readData(in, dataObs, dataLa);
+    }
+
     int T = 4;
     int N = 5;
+
+    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, ASP_model(model), &logLikelihoodGivenMotorModel, robots[i]);
+    ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
 
     pf.particles = {
         { ACC, CON, ACC, DEC, CON },
@@ -171,7 +105,31 @@ void testTrajectoryRetrieval(){
         { 0, 0, 0, 2, 3 }
     };
 
-    vector<vector<HA>> traj = pf.retrieveTrajectories();
+    vector<vector<HA>> traj = pf.retrieveTrajectories(N);
+
+    cout << "Trajectory test - trajectories: " << endl;
+    for(vector<HA> each: traj){
+        for(HA ha: each){
+            cout << ha << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    traj.clear();
+    traj = pf.retrieveTrajectories(3);
+
+    cout << "Trajectory test - trajectories: " << endl;
+    for(vector<HA> each: traj){
+        for(HA ha: each){
+            cout << ha << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    traj.clear();
+    traj = pf.retrieveTrajectories(2);
 
     cout << "Trajectory test - trajectories: " << endl;
     for(vector<HA> each: traj){
@@ -185,18 +143,24 @@ void testTrajectoryRetrieval(){
 
 void testPF(){
     int N = 5;
+    int M = 5;
     double resample_threshold = 0.5;
 
-    Robot r (6, -5, 15, 150, normal_distribution<double>(0.0, 0.1), 1, 0);
-    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, &ASP, &logLikelihoodGivenMotorModel, r);
+    int i = 0;
+
+    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), haProbCorrect);
+    string in = "../../" + stateGenPath + to_string(i) + ".csv";
+
     vector<Obs> dataObs;
     vector<LA> dataLa;
-    readData(dataObs, dataLa);
-
-    PF<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
-    pf.forward_filter(N, resample_threshold);
     
-    vector<vector<HA>> traj = pf.retrieveTrajectories();
+    if(dataObs.size() == 0 || dataLa.size() == 0){
+        dataObs.clear(); dataLa.clear();
+        readData(in, dataObs, dataLa);
+    }
+
+    vector<vector<HA>> traj = runFilter(N, M, resampleThreshold, robots[i], dataObs, dataLa, ASP_model(model));
+
     cout << "PF test - trajectories: " << endl;
     for(vector<HA> each: traj){
         for(HA ha: each){
