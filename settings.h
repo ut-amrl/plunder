@@ -10,7 +10,6 @@ const int numRobots = 5;            // number of robots (depends on robot test s
 const int model = 0;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 2.0;     // low-level action error standard deviation
-const double haProbCorrect = 0.8;   // probability of a correct high-level transition
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -22,6 +21,7 @@ const string plotGenPath = "synthesis/plots/";
 // Simulation parameters
 const double T_STEP = .1;               // time step (s)
 const double T_TOT = 15;                // total time (s) per simulated scenario
+const double gen_haProbCorrect = 0.95;   // probability of a correct high-level transition
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
@@ -30,15 +30,16 @@ const int sampleSize = 20;              // number of trajectories to pass into L
 // LDIPS parameters
 const int window_size = 0;
 const int feature_depth = 3;
-const int sketch_depth = 3;
+const int sketch_depth = 2;
 const float min_accuracy = 0.5;
 
 // Particle filter parameters
 const int numParticles = 1000;          // number of particle trajectories created to represent the distribution
-const int numTrajectories = 20;         // number of particle trajectories sampled to be fed into the maximization step
+const int numTrajectories = 10;         // number of particle trajectories sampled to be fed into the maximization step
 const float resampleThreshold = 0.1;    // higher = more resampling
 const double pf_stddevError = 8.0;
+const double haProbCorrect = 0.8;   // probability of a correct high-level transition
 
 // Plot parameters
-const int numParticlesPlot = 20;
+const int particlesPlotted = 10;
 const int timeStepsPlot = 1000;

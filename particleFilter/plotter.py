@@ -106,8 +106,8 @@ def main():
             readTrajectories(inFile)
             readGroundTruth(gtFile)
 
-            max_t = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
-            printed_particles = min(int(settings["numParticlesPlot"]), len(trajectories))
+            maxTime = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
+            particlesPlotted = min(int(settings["particlesPlotted"]), len(trajectories))
 
             # Calculate full state sequences
             runSimulation()
@@ -115,18 +115,18 @@ def main():
             # Acceleration
             fig, (ax1, ax2) = plt.subplots(2, gridspec_kw={'height_ratios': [5, 1]})
             fig.suptitle('low-level actions vs. time')
-            # for i in range(0, min(printed_particles, len(trajectories))):
+            # for i in range(0, min(particlesPlotted, len(trajectories))):
             #     traj = trajectories[i]
-            #     ax1.plot(traj[:min(len(traj), max_t)], alpha=0.1, linestyle="none", marker="o", color='b') 
-            # ax2.plot(gtTrajectory[:min(len(gtTrajectory), max_t)], alpha=0.5, linestyle="none", marker="o", color='b')
+            #     ax1.plot(traj[:min(len(traj), maxTime)], alpha=0.1, linestyle="none", marker="o", color='b') 
+            # ax2.plot(gtTrajectory[:min(len(gtTrajectory), maxTime)], alpha=0.5, linestyle="none", marker="o", color='b')
             # plt.xlabel('time') 
             # plt.ylabel('acceleration')
 
             freq = 2
-            actions = [[0] * max_t, [0] * max_t, [0] * max_t]
-            gt = [[0] * max_t, [0] * max_t, [0] * max_t]
+            actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
+            gt = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
             times = []
-            for t in range(0, max_t):
+            for t in range(0, maxTime):
                 times.append(t)
                 if t % freq == 0:
                     for i in range(0, len(trajectories)):
@@ -172,10 +172,10 @@ def main():
             plt.clf()
 
             # Velocity
-            for i in range(0, printed_particles):
+            for i in range(0, particlesPlotted):
                 vel = velocities[i]
-                plt.plot(vel[:max_t], alpha=0.5, linestyle="dashed") 
-            plt.plot(gtVelocity[:max_t], alpha=1.0, label="ground truth")
+                plt.plot(vel[:maxTime], alpha=0.5, linestyle="dashed") 
+            plt.plot(gtVelocity[:maxTime], alpha=1.0, label="ground truth")
                 
             plt.xlabel('time') 
             plt.ylabel('velocity') 
@@ -189,10 +189,10 @@ def main():
             plt.clf()
 
             # Position
-            for i in range(0, printed_particles):
+            for i in range(0, particlesPlotted):
                 pos = positions[i]
-                plt.plot(pos[:max_t], alpha=0.5, linestyle="dashed") 
-            plt.plot(gtPosition[:max_t], alpha=1.0, label="ground truth")
+                plt.plot(pos[:maxTime], alpha=0.5, linestyle="dashed") 
+            plt.plot(gtPosition[:maxTime], alpha=1.0, label="ground truth")
                 
             plt.xlabel('time') 
             plt.ylabel('position') 
