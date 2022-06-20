@@ -18,8 +18,9 @@ settings = {}
 # ----- I/O ---------------------------------------------=
 
 # Reads in csv files
-def readTrajectories(inFile):
-    reader = csv.reader(open(inFile, "r"))
+def readTrajectories(inPath):
+    inFile = open(inPath, "r")
+    reader = csv.reader(inFile)
     for x in inFile:
         traj = []
         for elem in next(reader):
@@ -27,8 +28,8 @@ def readTrajectories(inFile):
         trajectories.append(traj)
     return
 
-def readGroundTruth(gtFile):
-    gtReader = csv.reader(open(gtFile, "r"))
+def readGroundTruth(gtPath):
+    gtReader = csv.reader(open(gtPath, "r"))
     next(gtReader)
 
     for info in gtReader:
@@ -37,8 +38,8 @@ def readGroundTruth(gtFile):
         gtTrajectory.append(info[4].strip())
     return
 
-def readSettings(sgFile):
-    with open(sgFile) as f:
+def readSettings(sgPath):
+    with open(sgPath) as f:
         lines = f.readlines()
         for line in lines:
             line = line.strip()
@@ -106,7 +107,7 @@ def main():
             readGroundTruth(gtFile)
 
             max_t = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
-            printed_particles = min(int(settings["numParticles"]), len(trajectories))
+            printed_particles = min(int(settings["numParticlesPlot"]), len(trajectories))
 
             # Calculate full state sequences
             runSimulation()

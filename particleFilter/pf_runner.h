@@ -10,6 +10,7 @@
 #include "pf.h"
 #include "../accSim/asps.h"
 #include "../accSim/robotSets.h"
+#include "../settings.h"
 
 using namespace std;
 
@@ -39,7 +40,7 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
 FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs){
     double mean = r.motorModel(ha, obs, false).acc;
-    double stddev = r.accErrDistr.stddev();
+    double stddev = pf_stddevError;
     return logpdf(la.acc, mean, stddev);
 }
 

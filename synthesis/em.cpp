@@ -44,7 +44,6 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     ex.symbol_table_["decMax"] = SymEntry((float) robot.decMax);
     ex.symbol_table_["vMax"] = SymEntry((float) robot.vMax);
     ex.symbol_table_["target"] = SymEntry((float) robot.target);
-    ex.symbol_table_["zeroVel"] = SymEntry((float) 0);
 
     ex.start_ = SymEntry(HAToString(ha));
 
@@ -58,7 +57,7 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
         if(HAToString(ha) == transitions[i].first){
             if(InterpretBool(preds[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
-                return putErrorIntoHA(ha, robot);
+                return putErrorIntoHA(ha, robot); // Simplistic method to make ASP probabilistic
             }
         }
     }
@@ -148,14 +147,12 @@ void setupLdips(){
     Var v ("v", Dimension(1, -1, 0), NUM);
     Var decMax ("decMax", Dimension(1, -2, 0), NUM);
     Var vMax ("vMax", Dimension(1, -1, 0), NUM);
-    Var zeroVel ("zeroVel", Dimension(1, -1, 0), NUM);
     Var target ("target", Dimension(1, 0, 0), NUM);
 
     variables.insert(x);
     variables.insert(v);
     variables.insert(decMax);
     variables.insert(vMax);
-    variables.insert(zeroVel);
     variables.insert(target);
 
     transitions.push_back(pair<string, string> ("ACC", "DEC"));
