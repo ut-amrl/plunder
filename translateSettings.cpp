@@ -2,13 +2,24 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <assert.h>
+
+#include "settings.h"
 
 using namespace std;
+
+// ----- Asserts -------------------------------
+
+void assertConstraints() {
+    assert(robotTestSet >= 0 && robotTestSet <= 2 && "Robot test set must be between 0 and 2");
+    // assert()
+}
 
 // ----- Main -------------------------------
 
 // Reads in settings.h and prints it to settings.txt in standardized format
 int main(int argc, char** argv){
+    assertConstraints();
 
     if(argc < 2) {
         cout << "please input which settings file to process" << endl;

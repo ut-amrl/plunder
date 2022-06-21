@@ -17,10 +17,10 @@ window_size 0
 feature_depth 3
 sketch_depth 2
 min_accuracy 0.5
-numParticles 200000
-numTrajectories 2000
-resampleThreshold 0.1
-pf_stddevError 8.0
-haProbCorrect 0.8
-particlesPlotted 2000
+particlesPlotted 10
 timeStepsPlot 1000
+numParticles 1000
+numTrajectories max(sampleSize
+resampleThreshold 0.1
+pf_stddevError 4.0
+haProbCorrect 0.8

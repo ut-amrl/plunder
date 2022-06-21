@@ -21,7 +21,7 @@ const string plotGenPath = "synthesis/plots/";
 // Simulation parameters
 const double T_STEP = .1;               // time step (s)
 const double T_TOT = 15;                // total time (s) per simulated scenario
-const double gen_haProbCorrect = 0.95;   // probability of a correct high-level transition
+const double gen_haProbCorrect = 0.95;  // probability of a correct high-level transition
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
@@ -33,13 +33,14 @@ const int feature_depth = 3;
 const int sketch_depth = 2;
 const float min_accuracy = 0.5;
 
-// Particle filter parameters
-const int numParticles = 1000;          // number of particle trajectories created to represent the distribution
-const int numTrajectories = 10;         // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.1;    // higher = more resampling
-const double pf_stddevError = 8.0;
-const double haProbCorrect = 0.8;   // probability of a correct high-level transition
-
 // Plot parameters
 const int particlesPlotted = 10;
 const int timeStepsPlot = 1000;
+
+
+// Particle filter parameters
+const int numParticles = 1000;                                  // number of particle trajectories created to represent the distribution
+const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
+const float resampleThreshold = 0.1;                            // higher = more resampling
+const double pf_stddevError = 4.0;
+const double haProbCorrect = 0.8;                               // probability of a correct high-level transition

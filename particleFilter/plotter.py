@@ -115,12 +115,6 @@ def main():
             # Acceleration
             fig, (ax1, ax2) = plt.subplots(2, gridspec_kw={'height_ratios': [5, 1]})
             fig.suptitle('low-level actions vs. time')
-            # for i in range(0, min(particlesPlotted, len(trajectories))):
-            #     traj = trajectories[i]
-            #     ax1.plot(traj[:min(len(traj), maxTime)], alpha=0.1, linestyle="none", marker="o", color='b') 
-            # ax2.plot(gtTrajectory[:min(len(gtTrajectory), maxTime)], alpha=0.5, linestyle="none", marker="o", color='b')
-            # plt.xlabel('time') 
-            # plt.ylabel('acceleration')
 
             freq = 2
             actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
