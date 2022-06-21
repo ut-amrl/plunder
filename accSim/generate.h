@@ -18,7 +18,7 @@ using namespace std;
 static const bool genCsv = true;            // generate CSV trace file
 static const bool genJson = true;           // generate JSON trace file
 
-// ----- Simulation ---------------------------------------------
+// ----- Simulation ------------------------------------------------
 
 void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double haProbCorrect, string outputPath){
     

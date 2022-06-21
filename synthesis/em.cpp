@@ -155,12 +155,18 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    transitions.push_back(pair<string, string> ("ACC", "CON"));
-    transitions.push_back(pair<string, string> ("DEC", "ACC"));
-    transitions.push_back(pair<string, string> ("DEC", "CON"));
-    transitions.push_back(pair<string, string> ("CON", "ACC"));
-    transitions.push_back(pair<string, string> ("CON", "DEC"));
+    for(uint i=0; i<numHA; i++){
+        for(uint j=0; j<numHA; j++){
+            if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+        }
+    }
+
+    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    // transitions.push_back(pair<string, string> ("ACC", "CON"));
+    // transitions.push_back(pair<string, string> ("DEC", "ACC"));
+    // transitions.push_back(pair<string, string> ("DEC", "CON"));
+    // transitions.push_back(pair<string, string> ("CON", "ACC"));
+    // transitions.push_back(pair<string, string> ("CON", "DEC"));
     // else statements
     // transitions.push_back(pair<string, string> ("ACC", "ACC"));
     // transitions.push_back(pair<string, string> ("DEC", "DEC"));

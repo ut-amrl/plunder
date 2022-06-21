@@ -19,6 +19,8 @@ enum HA { // High-level actions
     CON  // No acceleration
 };
 
+const uint numHA = 3;
+
 struct LA { // Low-level actions
     double acc; // target acceleration
 };
