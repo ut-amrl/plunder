@@ -191,7 +191,7 @@ class ParticleFilter {
                 weights[i] = exp(log_weights[i]);
                 sum += weights[i];
             }
-            // assert(abs(sum - 1.0) < epsilon*N);
+            assert(abs(sum - 1.0) < epsilon*N);
 
             // Update log observation likelihood
             log_obs += log_z_t;

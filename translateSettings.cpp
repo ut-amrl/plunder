@@ -5,6 +5,9 @@
 #include <assert.h>
 
 #include "settings.h"
+#include "robot.h"
+#include "accSim/robotSets.h"
+#include "accSim/asps.h"
 
 using namespace std;
 
@@ -12,7 +15,20 @@ using namespace std;
 
 void assertConstraints() {
     assert(robotTestSet >= 0 && robotTestSet <= 2 && "Robot test set must be between 0 and 2");
-    // assert()
+    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(0, 0), 0);
+    assert(robots.size() == numRobots && "numRobots does not match size of test set");
+    assert(model >= 0 && model < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
+
+    assert(stddevError >= 0 && "Standard deviation must be positive");
+    assert(pf_stddevError >= 0 && "Standard deviation must be positive");
+
+    assert(haProbCorrect >= 0 && haProbCorrect <= 1 && "HA probability must be between 0 and 1");
+    assert(gen_haProbCorrect >= 0 && gen_haProbCorrect <= 1 && "HA probability must be between 0 and 1");
+    assert(min_accuracy >= 0 && min_accuracy <= 1 && "min_accuracy must be between 0 and 1");
+    assert(resampleThreshold >= 0 && resampleThreshold <= 1 && "Resample threshold must be between 0 and 1");
+
+    assert(sampleSize <= numParticles && "Sample size must be less than the number of particles");
+    assert(particlesPlotted <= numParticles && "Particles plotted must be less than the number of particles");
 }
 
 // ----- Main -------------------------------

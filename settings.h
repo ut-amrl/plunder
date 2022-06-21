@@ -37,9 +37,8 @@ const float min_accuracy = 0.5;
 const int particlesPlotted = 10;
 const int timeStepsPlot = 1000;
 
-
 // Particle filter parameters
-const int numParticles = 1000;                                  // number of particle trajectories created to represent the distribution
+const int numParticles = 2000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
 const float resampleThreshold = 0.1;                            // higher = more resampling
 const double pf_stddevError = 4.0;
