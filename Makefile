@@ -8,6 +8,10 @@ PF = pf
 PLT = plt
 EM = em
 
+INCLUDES = -L pips/lib \
+			-l c++-pips-core -l amrl_shared_lib -l z3 \
+			-I pips/src -I pf_custom -I accSim -I pips/submodules/json/single_include/
+
 
 .SILENT: $(SETTINGS) $(GEN) $(PF) $(PLT) $(EM) clean
 
@@ -18,7 +22,7 @@ $(SETTINGS):
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p accSim/out && \
-			$(CC) $(CFLAGS) -o accSim/out/gen accSim/generate.cpp && \
+			$(CC) $(CFLAGS) -o accSim/out/gen accSim/generate.cpp accSim/generate.h $(INCLUDES) && \
 			accSim/out/gen && \
 			cp accSim/out/data.json pips/examples/data.json
 $(PF):
@@ -36,10 +40,7 @@ $(EM):
 			$(MAKE) $(GEN) && \
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
-			$(CC) $(CFLAGS) synthesis/em.cpp -L pips/lib \
-			-l c++-pips-core -l amrl_shared_lib -l z3 \
-			-o synthesis/out/em \
-			-I pips/src -I pf_custom -I accSim -I pips/submodules/json/single_include/ && \
+			$(CC) $(CFLAGS) synthesis/em.cpp $(INCLUDES) -o synthesis/out/em && \
 			synthesis/out/em
 
 clean: 

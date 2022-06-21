@@ -43,7 +43,7 @@ def readSettings(sgPath):
         lines = f.readlines()
         for line in lines:
             line = line.strip()
-            vals = line.split(" ")
+            vals = line.split()
             settings[vals[0]] = vals[1]
     return
 

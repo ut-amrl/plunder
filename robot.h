@@ -6,7 +6,7 @@
 #include <iomanip>
 
 #define PRECISION 10
-#define epsilon 10E-10
+#define robotEpsilon 10E-10
 #define SEED 0 // Random seed
 
 using namespace std;
@@ -51,6 +51,8 @@ HA stringToHA(string str){
 
 
 // ----- Robot Class ---------------------------------------------
+
+// class 
 
 class Robot {
 
@@ -116,15 +118,15 @@ class Robot {
         // Update velocity and displacement accordingly
         state.vel = vPrev + la.acc * t_step;
 
-        if(state.vel < epsilon){ // Round to 0
+        if(state.vel < robotEpsilon){ // Round to 0
             state.vel = 0;
         }
 
-        if(abs(state.vel - vMax) < epsilon){ // Round to vMax
+        if(abs(state.vel - vMax) < robotEpsilon){ // Round to vMax
             state.vel = vMax;
         }
 
-        if(abs(state.pos - target) < epsilon){ // Round to target
+        if(abs(state.pos - target) < robotEpsilon){ // Round to target
             state.pos = target;
         }
 
@@ -147,7 +149,7 @@ class Robot {
 
     // Robot has reached target and is at rest. End simulation.
     bool finished(){
-        return state.vel < epsilon && state.pos >= target - epsilon;
+        return state.vel < robotEpsilon && state.pos >= target - robotEpsilon;
     }
 
     // Reset robot

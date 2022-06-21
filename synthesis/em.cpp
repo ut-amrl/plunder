@@ -67,7 +67,7 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    return ASP_random(ha, state, r);
+    return putErrorIntoHA(ha, r);
 }
 
 // Expectation step

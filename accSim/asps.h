@@ -38,7 +38,7 @@ HA ASP_Hand(HA ha, Obs state, Robot& r){
     double xToTarget = r.target - state.pos;                                  // distance to the target
 
     bool cond1 = state.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < epsilon;  // needs to decelerate or else it will pass target
+    bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
 
     if(cond2){
         ha = DEC;

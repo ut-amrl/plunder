@@ -11,6 +11,8 @@
 
 using namespace std;
 
+uint numSpaces = 20;
+
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
@@ -62,7 +64,8 @@ int main(int argc, char** argv){
             valStr = valStr.substr(0, valStr.end()-valStr.begin()-1);
             // Remove quotation marks
             if(typeStr == "string") valStr = valStr.substr(1, valStr.end()-valStr.begin()-2);
-            outFile << varName << " " << valStr << endl;
+            string spaces ((numSpaces - (varName.end()-varName.begin())), ' ');
+            outFile << varName << spaces << valStr << endl;
         }
     }
 
