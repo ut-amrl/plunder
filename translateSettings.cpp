@@ -56,7 +56,7 @@ int main(int argc, char** argv){
     string res;
     while(getline(inFile, res)){
         istringstream iss (res);
-        string constStr, typeStr, varName, equalsStr, valStr, semicolon;
+        string constStr, typeStr, varName, equalsStr, valStr;
         iss >> constStr;
         if(constStr == "const"){
             iss >> typeStr >> varName >> equalsStr >> valStr;
