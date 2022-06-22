@@ -5,6 +5,9 @@
 
 #include "ast/ast.hpp"
 
+
+void setBoundaryStddev(double err);
+
 namespace AST {
 
 ast_ptr Interpret(const ast_ptr& program);

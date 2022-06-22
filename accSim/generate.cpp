@@ -12,7 +12,7 @@ using namespace std;
 // ----- Main ---------------------------------------------
 
 int main(int argc, char** argv) {
-    runSim(robotTestSet, model, meanError, stddevError, gen_haProbCorrect, stateGenPath);
+    runSim(robotTestSet, model, meanError, stddevError, genAccuracy, stateGenPath);
     
     return 0;
 }

@@ -28,6 +28,7 @@ using json = nlohmann::json;
 
 unordered_set<Var> variables;
 vector<pair<string,string>> transitions;
+vector<double> accuracies;
 vector<ast_ptr> preds;
 vector<FunctionEntry> library;
 
@@ -57,21 +58,22 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
         if(HAToString(ha) == transitions[i].first){
             if(InterpretBool(preds[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
-                return putErrorIntoHA(ha, robot); // Simplistic method to make ASP probabilistic
+                break;
             }
         }
     }
 
-    return putErrorIntoHA(ha, robot);
+    return pointError(ha, robot); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    return putErrorIntoHA(ha, r);
+    return pointError(pointError(pointError(pointError(ha, r), r), r), r);
 }
 
 // Expectation step
 vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
+
     vector<Example> examples;
 
     for(uint i = 0; i < robots.size(); i++){
@@ -138,7 +140,20 @@ void maximization(vector<Example>& examples, uint iteration){
     // Write ASPs to directory    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
-    preds = emdips(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath).ast_vec;
+    EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath);
+    preds = eo.ast_vec;
+    accuracies = eo.transition_accuracies;
+
+    // Write ASP info to file
+    ofstream aspStrFile;
+    string aspStrFilePath = aspPathBase + to_string(iteration) + "/asp.txt";
+    aspStrFile.open(aspStrFilePath);
+    for(int i=0; i<transitions.size(); i++){
+        aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
+        aspStrFile << "Accuracy: " + accuracies[i] << endl;
+        aspStrFile << preds[i] << endl;
+    }
+    aspStrFile.close();
 }
 
 // Settings
@@ -160,17 +175,6 @@ void setupLdips(){
             if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
         }
     }
-
-    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    // transitions.push_back(pair<string, string> ("ACC", "CON"));
-    // transitions.push_back(pair<string, string> ("DEC", "ACC"));
-    // transitions.push_back(pair<string, string> ("DEC", "CON"));
-    // transitions.push_back(pair<string, string> ("CON", "ACC"));
-    // transitions.push_back(pair<string, string> ("CON", "DEC"));
-    // else statements
-    // transitions.push_back(pair<string, string> ("ACC", "ACC"));
-    // transitions.push_back(pair<string, string> ("DEC", "DEC"));
-    // transitions.push_back(pair<string, string> ("CON", "CON"));
 }
 
 
@@ -187,10 +191,12 @@ void emLoop(vector<Robot>& robots){
         
         // Expectation
         cout << "Loop " << i << " expectation:" << endl;
+        if(useBoundaryError) setBoundaryStddev(boundaryDeviation); // use probabilistic ASP
         vector<Example> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
 
         // Maximization
         cout << "Loop " << i << " maximization:" << endl;
+        setBoundaryStddev(0); // reset boundaries during LDIPS
         maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
 
         curASP = ldipsASP;
@@ -198,7 +204,7 @@ void emLoop(vector<Robot>& robots){
 }
 
 int main() {
-    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), haProbCorrect);
+    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
     emLoop(robots);
 
     return 0;

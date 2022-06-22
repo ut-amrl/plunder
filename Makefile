@@ -22,7 +22,7 @@ $(SETTINGS):
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p accSim/out && \
-			$(CC) $(CFLAGS) -o accSim/out/gen accSim/generate.cpp accSim/generate.h $(INCLUDES) && \
+			$(CC) $(CFLAGS) -o accSim/out/gen accSim/generate.cpp $(INCLUDES) && \
 			accSim/out/gen && \
 			cp accSim/out/data.json pips/examples/data.json
 $(PF):
@@ -34,7 +34,7 @@ $(PF):
 $(PLT):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p synthesis/plots && \
-			$(PY) particleFilter/plotter.py 10000 10000
+			$(PY) particleFilter/plotter.py
 
 $(EM):
 			$(MAKE) $(GEN) && \

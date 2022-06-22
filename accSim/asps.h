@@ -6,6 +6,7 @@
 #include <iomanip>
 
 #include "../robot.h"
+#include "../settings.h"
 
 using namespace std;
 
@@ -13,20 +14,23 @@ typedef HA asp_t(HA, Obs, Robot&);
 
 // ----- Helper Methods ---------------------------------------------
 
-double logistic(double midpoint, double steepness, double input){
-    return 1.0 / (1.0 + exp(-steepness * (input - midpoint)));
-}
-
 /*
  * Randomly transitions to an incorrect high-level action with specified probability
  */
-HA putErrorIntoHA(HA ha, Robot& r){
-    int haDif = 0;
-    if(!r.sampleDiscrete(r.haProbCorrect)){
-        if(r.sampleDiscrete(0.5)) haDif = 1;
-        else haDif = 2;
+HA pointError(HA ha, Robot& r){
+    if(usePointError){
+        int haDif = 0;
+        if(!r.sampleDiscrete(r.haProbCorrect)){
+            if(r.sampleDiscrete(0.5)) haDif = 1;
+            else haDif = 2;
+        }
+        return static_cast<HA>((ha + haDif)%3);
     }
-    return static_cast<HA>((ha + haDif)%3);
+    return ha;
+}
+
+double logistic(double midpoint, double steepness, double input){
+    return 1.0 / (1.0 + exp(-steepness * (input - midpoint)));
 }
 
 // ----- Curated Selection of ASPs ---------------------------------------------

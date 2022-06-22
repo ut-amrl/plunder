@@ -657,11 +657,21 @@ EmdipsOutput emdips(const vector<Example>& demos,
     if (ExistsFile(output_name)) {
       continue;
     }
-    // if (transition.first != "GoAlone" || transition.second != "Pass") {
-      // continue;
-    // }
+
     cout << "----- " << transition.first << "->";
     cout << transition.second << " -----" << endl;
+
+
+    unordered_set<Example> yes;
+    unordered_set<Example> no;
+    SplitExamples(examples, transition, &yes, &no);
+    cout << "Num transitions: " << yes.size() << endl;
+    if(yes.size() == 0) {
+      transition_solutions.push_back(make_shared<Bool>(Bool(true)));
+      accuracies.push_back(1.0);
+      continue;
+    }
+
     float current_best = 0.0;
     ast_ptr current_solution = nullptr;
     for (const auto& sketch : sketches) {

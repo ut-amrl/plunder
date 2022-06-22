@@ -5,15 +5,22 @@
 #include <memory>             // make_shared
 #include <stdexcept>          // invalid_argument
 #include <string>             // string
+#include <random>             // random
 
 #include "ast/library_functions.hpp"
 
+#define SEED 3256+2585
+
 using Eigen::Vector2f;
-using std::cout;
-using std::endl;
-using std::invalid_argument;
-using std::make_shared;
-using std::string;
+using namespace std;
+
+// Set probabilistic boundaries
+normal_distribution<double> boundaryDistr (0, 0);
+default_random_engine emdipsGen(SEED);
+
+void setBoundaryStddev(double err){
+  boundaryDistr = normal_distribution<double>(0, err);
+}
 
 namespace AST {
 
@@ -114,6 +121,9 @@ ast_ptr Interp::Visit(Param* node) {
     return make_shared<Param>(*node);
   } else {
     ast_ptr result = node->current_value_->Accept(this);
+    float boundaryValue = ((Num*) (result.get()))->value_;
+    boundaryValue += boundaryDistr(emdipsGen); // Add normally-distributed noise
+    ((Num*) (result.get()))->value_ = boundaryValue;
     return result;
   }
 }
