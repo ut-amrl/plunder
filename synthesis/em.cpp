@@ -138,7 +138,7 @@ void maximization(vector<Example>& examples, uint iteration){
     // Write ASPs to directory    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
-    preds = ldipsL3(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath);
+    preds = emdips(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath).ast_vec;
 }
 
 // Settings

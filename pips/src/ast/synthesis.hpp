@@ -12,7 +12,14 @@
 
 #include "ast.hpp"
 
+
+
 namespace AST {
+
+    struct EmdipsOutput {
+        std::vector<ast_ptr> ast_vec;
+        std::vector<float> transition_accuracies;
+    };
 
   ast_ptr  PredicateL2(const std::vector<Example>& examples,
       const std::vector<ast_ptr>& ops,
@@ -42,6 +49,13 @@ namespace AST {
 
   void DIPR(const std::vector<Example>& demos,
       const std::vector<ast_ptr>& programs,
+      const std::vector<std::pair<std::string, std::string>>& transitions,
+      const std::vector<ast_ptr> lib,
+      const int sketch_depth,
+      const float min_accuracy,
+      const std::string& output_path);
+    
+    EmdipsOutput emdips(const std::vector<Example>& demos,
       const std::vector<std::pair<std::string, std::string>>& transitions,
       const std::vector<ast_ptr> lib,
       const int sketch_depth,
