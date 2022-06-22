@@ -629,4 +629,73 @@ void SRTR(const vector<Example>& demos,
   }
 }
 
+
+
+// TODO(currently writes to file, may want a call that doesn't do this).
+EmdipsOutput emdips(const vector<Example>& demos,
+      const vector<pair<string, string>>& transitions,
+      const vector<ast_ptr> lib,
+      const int sketch_depth,
+      const float min_accuracy,
+      const string& output_path) {
+
+  vector<Example> examples = demos;
+  // Enumerate possible sketches
+  const auto sketches = EnumerateSketches(sketch_depth);
+  cout << "Number of sketches: " << sketches.size() << endl;
+
+  vector<ast_ptr> transition_solutions;
+
+  vector<float> accuracies;
+
+  // For each input/output pair
+  for (const auto& transition : transitions) {
+    // Skipping already synthesized conditions, allows for very basic
+    // checkpointing.
+    const string output_name =
+      output_path + transition.first + "_" + transition.second + ".json";
+    if (ExistsFile(output_name)) {
+      continue;
+    }
+    // if (transition.first != "GoAlone" || transition.second != "Pass") {
+      // continue;
+    // }
+    cout << "----- " << transition.first << "->";
+    cout << transition.second << " -----" << endl;
+    float current_best = 0.0;
+    ast_ptr current_solution = nullptr;
+    for (const auto& sketch : sketches) {
+      // Attempt L2 Synthesis with current sketch.
+      current_solution = ldipsL2(sketch, examples, lib, transition,
+          min_accuracy, current_solution, &current_best);
+      if (current_best >= min_accuracy) break;
+      if (flagsDebug) {
+        cout << "Score: " << current_best << endl;
+        cout << "Solution: " << current_solution << endl;
+        cout << "- - - - -" << endl;
+      }
+    }
+    // Write the solution out to a file.
+    cout << "Score: " << current_best << endl;
+    cout << "Final Solution: " << current_solution << endl;
+    ofstream output_file;
+    output_file.open(output_name);
+    const json output = current_solution->ToJson();
+    output_file << std::setw(4) << output << std::endl;
+    output_file.close();
+
+    // Filter out Examples used by this transition
+    examples = FilterExamples(examples, transition);
+
+    cout << endl;
+    transition_solutions.push_back(current_solution);
+    accuracies.push_back(current_best);
+  }
+  EmdipsOutput res;
+  res.ast_vec = transition_solutions;
+  res.transition_accuracies = accuracies;
+  return res;
+}
+
 }  // namespace AST
+
