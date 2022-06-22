@@ -28,7 +28,7 @@ vector<Robot> getRobotSet(int setNum, normal_distribution<double> accErrDistr, d
         return {
             Robot(5, -2, 15, 80, accErrDistr, haProbCorrect),
             Robot(3, -3, 4, 80, accErrDistr, haProbCorrect),
-            Robot(1.5, -4, 50, 80, accErrDistr, haProbCorrect),
+            Robot(2, -4, 50, 80, accErrDistr, haProbCorrect),
             Robot(8, -6, 20, 80, accErrDistr, haProbCorrect),
             Robot(4, -5, 100, 80, accErrDistr, haProbCorrect)
         };

@@ -54,6 +54,7 @@ def readSettings(sgPath):
 def fillVelocity(acc, dt):
     vel = []
     curVel = 0
+    vel.append(curVel)
     for val in acc:
         curVel += val * dt
         vel.append(curVel)
@@ -63,6 +64,7 @@ def fillPosition(vel, dt):
     pos = []
     curPos = 0
     lastVel = 0
+    pos.append(curPos)
     for v in vel:
         curPos += 0.5*(lastVel + v)*dt
         lastVel = v

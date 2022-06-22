@@ -56,10 +56,12 @@ int main(int argc, char** argv){
     string res;
     while(getline(inFile, res)){
         istringstream iss (res);
-        string constStr, typeStr, varName, equalsStr, valStr;
+        string constStr, typeStr, varName, equalsStr, valStr, semicolon;
         iss >> constStr;
         if(constStr == "const"){
             iss >> typeStr >> varName >> equalsStr >> valStr;
+            // shortcut, ignore if there are spaces on the RHS
+            if(valStr.back() != ';') continue;
             // Remove semicolon
             valStr = valStr.substr(0, valStr.end()-valStr.begin()-1);
             // Remove quotation marks
