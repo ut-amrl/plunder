@@ -111,9 +111,6 @@ class Robot {
     void updatePhysics(double t_step){
         double vPrev = state.vel;
         double xPrev = state.pos;
-
-        // Select some action (acceleration)
-        la = motorModel(ha, state, true);
         
         // Update velocity and displacement accordingly
         state.vel = vPrev + la.acc * t_step;
@@ -131,6 +128,11 @@ class Robot {
         }
 
         state.pos = xPrev + (state.vel + vPrev)/2 * t_step;
+    }
+
+    void updateLA(){
+        // Select some action (acceleration)
+        la = motorModel(ha, state, true);
     }
 
 

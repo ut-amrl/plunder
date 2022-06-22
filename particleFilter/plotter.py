@@ -114,7 +114,7 @@ def main():
 
             # Acceleration
             fig, (ax1, ax2) = plt.subplots(2, gridspec_kw={'height_ratios': [5, 1]})
-            fig.suptitle('low-level actions vs. time')
+            fig.suptitle('hi-level actions vs. time')
 
             freq = 2
             actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
@@ -155,7 +155,7 @@ def main():
             ax2.bar(times, gt[2], color="#ff6040", width=1)
             
             plt.xlabel('time')
-            ax1.set_ylabel('low-level action counts')
+            ax1.set_ylabel('hi-level action counts')
             ax2.set_ylabel('ground\ntruth')
 
             ax1.legend(loc="upper left")

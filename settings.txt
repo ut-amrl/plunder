@@ -2,7 +2,7 @@ robotTestSet        1
 numRobots           5
 model               0
 meanError           0.0
-stddevError         2.0
+stddevError         0.3
 stateGenPath        accSim/out/data
 aspPathBase         synthesis/out/asp
 trajGenPath         synthesis/out/examples/pf
@@ -10,7 +10,7 @@ operationLibPath    pips/ops/test_library.json
 plotGenPath         synthesis/plots/
 T_STEP              .1
 T_TOT               15
-gen_haProbCorrect   0.95
+gen_haProbCorrect   0.99
 numIterations       10
 sampleSize          20
 window_size         0
@@ -21,6 +21,6 @@ particlesPlotted    10
 timeStepsPlot       1000
 numParticles        2000
 numTrajectories     max(sampleSize
-resampleThreshold   0.1
-pf_stddevError      4.0
+resampleThreshold   0.4
+pf_stddevError      1.0
 haProbCorrect       0.8

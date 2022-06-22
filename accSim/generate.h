@@ -118,6 +118,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
             robots[i].updatePhysics(T_STEP);
             robots[i].runASP(ASP_model(useModel));
             robots[i].ha = putErrorIntoHA(robots[i].ha, robots[i]);
+            robots[i].updateLA();
 
 
             // Print trace
