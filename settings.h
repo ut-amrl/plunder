@@ -35,11 +35,7 @@ const double boundaryDeviation = 10.0;  // conditional deviation
 const int window_size = 4;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-<<<<<<< HEAD
 const float min_accuracy = 1;
-=======
-const float min_accuracy = 0.99;
->>>>>>> 9c61ffa2d36d54804bc7e0dda87ca4f72eba2b2f
 
 // Plot parameters
 const int particlesPlotted = 2000;
