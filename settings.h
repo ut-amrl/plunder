@@ -28,14 +28,14 @@ const int numIterations = 10;           // number of iterations in the expectati
 const int sampleSize = 20;              // number of trajectories to pass into EMDIPS
 const bool usePointError = true;        // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.8;       // probability of a correct (ASP-consistent) high-level transition
-const bool useBoundaryError = false;     // boundary error: threshold-dependent error in EMDIPS-generated ASP
+const bool useBoundaryError = false;    // boundary error: threshold-dependent error in EMDIPS-generated ASP
 const double boundaryDeviation = 10.0;  // conditional deviation
 
 // EMDIPS parameters
 const int window_size = 4;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float min_accuracy = 1;
+const float min_accuracy = 1;               // Only when running EMDIPS and not the full EM loop
 
 // Plot parameters
 const int particlesPlotted = 2000;
