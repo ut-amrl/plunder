@@ -20,6 +20,9 @@
 #include "../particleFilter/pf_runner.h"
 #include "../settings.h"
 
+// ignores the last 20 particles of the particle filter because they are weird and introduce wrong transitions??
+#define END_PF_ERR 20
+
 using namespace std;
 using namespace AST;
 using namespace z3;
@@ -28,7 +31,7 @@ using json = nlohmann::json;
 
 unordered_set<Var> variables;
 vector<pair<string,string>> transitions;
-vector<double> accuracies;
+vector<float> accuracies;
 vector<ast_ptr> preds;
 vector<FunctionEntry> library;
 
@@ -86,7 +89,7 @@ vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector
         // Convert each particle trajectory point to LDIPS-supported Example
         for(uint n = 0; n < sampleSize; n++){
             vector<HA> traj = trajectories[n];
-            for(uint t = 0; t < dataObs[i].size() - 1; t++){
+            for(uint t = 0; t < dataObs[i].size() - 1 - END_PF_ERR; t++){
                 Example ex = dataToExample(traj[t], dataObs[i][t], robots[i]);
 
                 // Provide next high-level action
@@ -150,7 +153,7 @@ void maximization(vector<Example>& examples, uint iteration){
     aspStrFile.open(aspStrFilePath);
     for(int i=0; i<transitions.size(); i++){
         aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
-        aspStrFile << "Accuracy: " + accuracies[i] << endl;
+        aspStrFile << "Accuracy: " + to_string(accuracies[i]) << endl;
         aspStrFile << preds[i] << endl;
     }
     aspStrFile.close();

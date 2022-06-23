@@ -10,6 +10,7 @@ velocities = []
 positions = []
 
 gtTrajectory = []
+gtLA = []
 gtVelocity = []
 gtPosition = []
 
@@ -35,6 +36,7 @@ def readGroundTruth(gtPath):
     for info in gtReader:
         gtPosition.append(float(info[1]))
         gtVelocity.append(float(info[2]))
+        gtLA.append(float(info[3]))
         gtTrajectory.append(info[4].strip())
     return
 
@@ -84,7 +86,7 @@ def runSimulation():
 # ----- Main ---------------------------------------------
 
 def main():
-    global trajectories, velocities, positions, gtTrajectory, gtVelocity, gtPosition
+    global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
 
     # Read settings
     readSettings("settings.txt")
@@ -97,6 +99,7 @@ def main():
             positions = []
 
             gtTrajectory = []
+            gtLA = []
             gtVelocity = []
             gtPosition = []
 
@@ -115,7 +118,7 @@ def main():
             runSimulation()
 
             # Acceleration
-            fig, (ax1, ax2) = plt.subplots(2, gridspec_kw={'height_ratios': [5, 1]})
+            fig, (ax1, ax2, ax3) = plt.subplots(3, gridspec_kw={'height_ratios': [5, 1, 1]})
             fig.suptitle('hi-level actions vs. time')
 
             freq = 2
@@ -155,6 +158,8 @@ def main():
             ax2.bar(times, gt[0], color="#05a655", width=1)
             ax2.bar(times, gt[1], color="#f8ff99", width=1)
             ax2.bar(times, gt[2], color="#ff6040", width=1)
+
+            ax3.bar(times, gtLA, color="red", width=1)
             
             plt.xlabel('time')
             ax1.set_ylabel('hi-level action counts')

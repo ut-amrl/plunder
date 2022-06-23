@@ -41,7 +41,7 @@ class RobotIO {
     json target_j;
     json start_j;
     json output_j;
-    string prevHAStr;
+    string prevHAStr = "ACC";
 
     public:
     RobotIO(Robot &_r): r(_r) {
