@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <unordered_set>
 #include <queue>
+#include <chrono>
 
 #include "enumeration.hpp"
 #include "gflags/gflags_declare.h"
@@ -390,7 +391,7 @@ ast_ptr PredicateL2(
             keep_searching = false;
             solution_cond = filled;
             current_best = sat_ratio;
-          } else if (sat_ratio >= current_best) {
+          } else if (sat_ratio >= current_best) {      // use > or >= ??
             solution_cond = filled;
             current_best = sat_ratio;
           }
@@ -441,6 +442,24 @@ ast_ptr ldipsL2(ast_ptr candidate,
   Z3_reset_memory();
   return best_program;
 }
+
+
+pair<ast_ptr, float> emdipsL2(ast_ptr candidate,
+    const vector<Example>& examples,
+    const vector<ast_ptr>& ops,
+    const pair<string, string>& transition,
+    const float min_accuracy) {
+
+  // Find best performing completion of current sketch
+  float solved = 0.0;
+  ast_ptr solution =
+    PredicateL2(examples,
+        ops, candidate, transition, min_accuracy, &solved);
+
+  Z3_reset_memory();
+  return pair<ast_ptr, float>(solution, solved);
+}
+
 
 // TODO(currently writes to file, may want a call that doesn't do this).
 vector<ast_ptr> ldipsL3(const vector<Example>& demos,
@@ -665,7 +684,8 @@ EmdipsOutput emdips(const vector<Example>& demos,
     unordered_set<Example> yes;
     unordered_set<Example> no;
     SplitExamples(examples, transition, &yes, &no);
-    cout << "Num transitions: " << yes.size() << endl;
+    cout << "Num transitions (pos): " << yes.size() << endl;
+    cout << "Num transitions (neg): " << no.size() << endl;
     if(yes.size() == 0) {
       transition_solutions.push_back(make_shared<Bool>(Bool(true)));
       accuracies.push_back(1.0);
@@ -675,15 +695,24 @@ EmdipsOutput emdips(const vector<Example>& demos,
     float current_best = 0.0;
     ast_ptr current_solution = nullptr;
     for (const auto& sketch : sketches) {
+      std::chrono::steady_clock::time_point timerBegin = std::chrono::steady_clock::now();
+
       // Attempt L2 Synthesis with current sketch.
-      current_solution = ldipsL2(sketch, examples, lib, transition,
-          min_accuracy, current_solution, &current_best);
-      if (current_best >= min_accuracy) break;
+      pair<ast_ptr, float> new_solution = emdipsL2(sketch, examples, lib, transition, min_accuracy);
+      
+      if (new_solution.second > current_best) {
+        current_best = new_solution.second;
+        current_solution = new_solution.first;
+      }
       if (flagsDebug) {
-        cout << "Score: " << current_best << endl;
-        cout << "Solution: " << current_solution << endl;
+        cout << "Score: " << new_solution.second << endl;
+        cout << "Solution: " << new_solution.first << endl;
+        std::chrono::steady_clock::time_point timerEnd = std::chrono::steady_clock::now();
+        cout << "Time Elapsed: " << ((float)(std::chrono::duration_cast<std::chrono::milliseconds>(timerEnd - timerBegin).count()))/1000.0 << endl;
         cout << "- - - - -" << endl;
       }
+      if (current_best >= min_accuracy) break;
+
     }
     // Write the solution out to a file.
     cout << "Score: " << current_best << endl;
