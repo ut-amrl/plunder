@@ -28,7 +28,7 @@ using json = nlohmann::json;
 
 unordered_set<Var> variables;
 vector<pair<string,string>> transitions;
-vector<double> accuracies;
+vector<float> accuracies;
 vector<ast_ptr> preds;
 vector<FunctionEntry> library;
 
@@ -68,7 +68,8 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    return pointError(pointError(pointError(pointError(ha, r), r), r), r);
+    // return pointError(pointError(pointError(pointError(ha, r), r), r), r);
+    return pointError(ha, r);
 }
 
 // Expectation step
@@ -137,7 +138,7 @@ void maximization(vector<Example>& examples, uint iteration){
 
     cout << "Number of examples: " << examples.size() << endl;
 
-    // Write ASPs to directory    
+    // Retrieve ASPs and accuracies    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
     EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath);
@@ -148,9 +149,9 @@ void maximization(vector<Example>& examples, uint iteration){
     ofstream aspStrFile;
     string aspStrFilePath = aspPathBase + to_string(iteration) + "/asp.txt";
     aspStrFile.open(aspStrFilePath);
-    for(int i=0; i<transitions.size(); i++){
+    for(uint i = 0; i < transitions.size(); i++){
         aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
-        aspStrFile << "Accuracy: " + accuracies[i] << endl;
+        aspStrFile << "Accuracy: " << accuracies[i] << endl;
         aspStrFile << preds[i] << endl;
     }
     aspStrFile.close();

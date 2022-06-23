@@ -2,7 +2,7 @@ robotTestSet        1
 numRobots           5
 model               0
 meanError           0.0
-stddevError         1.0
+stddevError         10.0
 stateGenPath        accSim/out/data
 aspPathBase         synthesis/out/asp
 trajGenPath         synthesis/out/examples/pf
@@ -20,7 +20,7 @@ boundaryDeviation   10.0
 window_size         0
 feature_depth       3
 sketch_depth        2
-min_accuracy        0.2
+min_accuracy        1
 particlesPlotted    20
 timeStepsPlot       1000
 numParticles        2000
