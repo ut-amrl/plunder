@@ -90,7 +90,7 @@ vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector
         for(uint n = 0; n < sampleSize; n++){
             vector<HA> traj = trajectories[n];
             for(uint t = 0; t < dataObs[i].size() - 1 - END_PF_ERR; t++){
-                Example ex = dataToExample(traj[t], dataObs[i][t], robots[i]);
+                Example ex = dataToExample(traj[t], dataObs[i][t+1], robots[i]);
 
                 // Provide next high-level action
                 ex.result_ = SymEntry(HAToString(traj[t+1]));
@@ -205,6 +205,29 @@ void emLoop(vector<Robot>& robots){
         curASP = ldipsASP;
     }
 }
+
+// void testExampleOnASP(vector<Example> examples){
+//     for(Example e : examples){
+//         float x = e.symbol_table_["x"].GetFloat();
+//         float v = e.symbol_table_["v"].GetFloat();
+//         float decMax = e.symbol_table_["decMax"].GetFloat();
+//         float vMax = e.symbol_table_["vMax"].GetFloat();
+//         float target = e.symbol_table_["target"].GetFloat();
+//         string start = e.start_.GetString();
+//         string res = e.result_.GetString();
+//         // if(start == "ACC" && x < 1){
+//         if(start == "ACC" && res == "CON") {
+//             double xToTarget = target - x;                                  // distance to the target
+
+//             bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+//             bool cond2 = xToTarget - robots[i].DistTraveled(v, decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
+
+//             if(cond2) cout << "DEC" << endl;
+//             if(cond1 && !cond2) cout << "CON" << endl;
+//             if(!cond1 && !cond2) cout << "ACC" << endl;
+//         }
+//     }
+// }
 
 int main() {
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);

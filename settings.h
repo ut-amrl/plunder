@@ -32,7 +32,7 @@ const bool useBoundaryError = false;     // boundary error: threshold-dependent 
 const double boundaryDeviation = 10.0;  // conditional deviation
 
 // EMDIPS parameters
-const int window_size = 4;
+const int window_size = 2;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float min_accuracy = 0.99;
