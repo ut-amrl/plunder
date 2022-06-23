@@ -18,11 +18,12 @@ uint numSpaces = 20;
 void assertConstraints() {
     assert(robotTestSet >= 0 && robotTestSet <= 2 && "Robot test set must be between 0 and 2");
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(0, 0), 0);
-    assert(robots.size() == numRobots && "numRobots does not match size of test set");
+    assert(numRobots <= robots.size() && "numRobots does not match size of test set");
     assert(model >= 0 && model < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
 
     assert(stddevError >= 0 && "Standard deviation must be positive");
     assert(pf_stddevError >= 0 && "Standard deviation must be positive");
+    assert(pf_stddevError >= stddevError && "PF stddev must be greater than actual stddev");
 
     assert(pointAccuracy >= 0 && pointAccuracy <= 1 && "HA probability must be between 0 and 1");
     assert(genAccuracy >= 0 && genAccuracy <= 1 && "HA probability must be between 0 and 1");

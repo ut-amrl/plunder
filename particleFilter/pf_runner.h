@@ -75,7 +75,7 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories){
     ofstream outFile;
     outFile.open(file);
 
-    for(vector<HA> traj : trajectories){
+    for(vector<HA>& traj : trajectories){
         for(uint i = 0; i < traj.size(); i++){
             outFile << r.motorModel(traj[i], Obs {}, false).acc;
             if(i != traj.size() - 1){

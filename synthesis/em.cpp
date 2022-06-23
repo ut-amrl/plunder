@@ -20,7 +20,7 @@
 #include "../particleFilter/pf_runner.h"
 #include "../settings.h"
 
-// ignores the last 20 particles of the particle filter because they are weird and introduce wrong transitions??
+// ignores the last 20 time steps of the particle filter because they are weird and introduce wrong transitions??
 #define END_PF_ERR 20
 
 using namespace std;
@@ -71,19 +71,19 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    // return pointError(pointError(pointError(pointError(ha, r), r), r), r);
     return pointError(ha, r);
 }
 
 // Expectation step
-vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
+vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
 
-    vector<Example> examples;
+    vector<vector<Example>> examples;
 
     for(uint i = 0; i < robots.size(); i++){
         string in = stateGenPath + to_string(i) + ".csv";
         string out = trajGenPath + to_string(iteration) + "-" + to_string(i) + ".csv";
-        
+        examples.push_back(vector<Example>());
+
         // Run filter
         vector<vector<HA>> trajectories = filterFromFile(numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
         
@@ -95,7 +95,7 @@ vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector
 
                 // Provide next high-level action
                 ex.result_ = SymEntry(HAToString(traj[t+1]));
-                examples.push_back(ex);
+                examples[i].push_back(ex);
             }
         }
     }
@@ -104,8 +104,12 @@ vector<Example> expectation(uint iteration, vector<Robot>& robots, vector<vector
 }
 
 // Maximization step
-void maximization(vector<Example>& examples, uint iteration){
-    
+void maximization(vector<vector<Example>>& allExamples, uint iteration){
+    vector<Example> examples;
+    for(vector<Example>& each : allExamples){
+        examples.insert(end(examples), begin(each), end(each));
+    }
+
     examples = WindowExamples(examples, window_size);
     
     // Turn variables into roots
@@ -141,10 +145,15 @@ void maximization(vector<Example>& examples, uint iteration){
 
     cout << "Number of examples: " << examples.size() << endl;
 
+    // Calculate new minimum accuracy
+    std::sort(accuracies.begin(), accuracies.end());
+    float min_acc = (iteration == 0) ? 0 : accuracies[accuracies.size() / 2];
+    min_acc = min(min_acc, min_accuracy); // Cap the minimum accuracy to prevent searching the whole space
+
     // Retrieve ASPs and accuracies    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
-    EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, min_accuracy, aspFilePath);
+    EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, min_acc, aspFilePath);
     preds = eo.ast_vec;
     accuracies = eo.transition_accuracies;
 
@@ -174,8 +183,8 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    for(uint i=0; i<numHA; i++){
-        for(uint j=0; j<numHA; j++){
+    for(uint i = 0; i < numHA; i++){
+        for(uint j = 0; j < numHA; j++){
             if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
         }
     }
@@ -196,7 +205,7 @@ void emLoop(vector<Robot>& robots){
         // Expectation
         cout << "Loop " << i << " expectation:" << endl;
         if(useBoundaryError) setBoundaryStddev(boundaryDeviation); // use probabilistic ASP
-        vector<Example> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
+        vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
 
         // Maximization
         cout << "Loop " << i << " maximization:" << endl;
@@ -204,31 +213,29 @@ void emLoop(vector<Robot>& robots){
         maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
 
         curASP = ldipsASP;
+
+        // Update point accuracy
+        double satisfied = 0;
+        double total = 0;
+        for(uint r = 0; r < robots.size(); r++){
+            robots[r].haProbCorrect = 1; // make ASP deterministic
+            for(Example& ex: examples[r]){
+                total++;
+                Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
+                if(ldipsASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
+                    satisfied++;
+                }
+            }
+        }
+        
+        // Update point accuracy
+        double newPointAcc = satisfied / total;
+        cout << "New point accuracy: " << satisfied << " / " << total << " = " << newPointAcc << endl;
+        for(Robot& r : robots){
+            r.haProbCorrect = newPointAcc;
+        }
     }
 }
-
-// void testExampleOnASP(vector<Example> examples){
-//     for(Example e : examples){
-//         float x = e.symbol_table_["x"].GetFloat();
-//         float v = e.symbol_table_["v"].GetFloat();
-//         float decMax = e.symbol_table_["decMax"].GetFloat();
-//         float vMax = e.symbol_table_["vMax"].GetFloat();
-//         float target = e.symbol_table_["target"].GetFloat();
-//         string start = e.start_.GetString();
-//         string res = e.result_.GetString();
-//         // if(start == "ACC" && x < 1){
-//         if(start == "ACC" && res == "CON") {
-//             double xToTarget = target - x;                                  // distance to the target
-
-//             bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-//             bool cond2 = xToTarget - robots[i].DistTraveled(v, decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
-
-//             if(cond2) cout << "DEC" << endl;
-//             if(cond1 && !cond2) cout << "CON" << endl;
-//             if(!cond1 && !cond2) cout << "ACC" << endl;
-//         }
-//     }
-// }
 
 int main() {
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
