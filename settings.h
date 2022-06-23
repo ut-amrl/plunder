@@ -9,7 +9,7 @@ const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 11;            // number of robots (depends on robot test set)
 const int model = 0;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = 0.1;     // low-level action error standard deviation
+const double stddevError = 10.0;     // low-level action error standard deviation
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -35,7 +35,7 @@ const double boundaryDeviation = 10.0;  // conditional deviation
 const int window_size = 2;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float min_accuracy = 0.99;
+const float min_accuracy = 1;
 
 // Plot parameters
 const int particlesPlotted = 2000;
