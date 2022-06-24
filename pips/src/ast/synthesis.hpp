@@ -12,8 +12,6 @@
 
 #include "ast.hpp"
 
-
-
 namespace AST {
 
     struct EmdipsOutput {
@@ -59,7 +57,7 @@ namespace AST {
       const std::vector<std::pair<std::string, std::string>>& transitions,
       const std::vector<ast_ptr> lib,
       const int sketch_depth,
-      const float min_accuracy,
+      const std::vector<float> min_accuracy,
       const std::string& output_path);
 
 }  // namespace AST

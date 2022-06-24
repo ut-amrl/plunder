@@ -146,14 +146,18 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     cout << "Number of examples: " << examples.size() << endl;
 
     // Calculate new minimum accuracy
-    std::sort(accuracies.begin(), accuracies.end());
-    float min_acc = (iteration == 0) ? 0 : accuracies[accuracies.size() / 2];
-    min_acc = min(min_acc, min_accuracy); // Cap the minimum accuracy to prevent searching the whole space
+    // Cap each minimum accuracy to prevent iterating over the entire search space
+    for(uint i = 0; i < transitions.size(); i++){
+        if(accuracies.size() < transitions.size())
+            accuracies.push_back(0);
+        else
+            accuracies[i] = min(accuracies[i], min_accuracy);
+    }
 
     // Retrieve ASPs and accuracies    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
-    EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, min_acc, aspFilePath);
+    EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, accuracies, aspFilePath);
     preds = eo.ast_vec;
     accuracies = eo.transition_accuracies;
 

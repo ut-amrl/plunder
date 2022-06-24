@@ -8,6 +8,8 @@
 #include <unordered_set>
 #include <queue>
 #include <chrono>
+#include <algorithm>
+#include <unordered_map>
 
 #include "enumeration.hpp"
 #include "gflags/gflags_declare.h"
@@ -648,14 +650,11 @@ void SRTR(const vector<Example>& demos,
   }
 }
 
-
-
-// TODO(currently writes to file, may want a call that doesn't do this).
 EmdipsOutput emdips(const vector<Example>& demos,
       const vector<pair<string, string>>& transitions,
       const vector<ast_ptr> lib,
       const int sketch_depth,
-      const float min_accuracy,
+      const vector<float> min_accuracy,
       const string& output_path) {
 
   vector<Example> examples = demos;
@@ -668,7 +667,8 @@ EmdipsOutput emdips(const vector<Example>& demos,
   vector<float> accuracies;
 
   // For each input/output pair
-  for (const auto& transition : transitions) {
+  for(int t = 0; t < transitions.size(); t++){
+    const auto& transition = transitions[t];
     // Skipping already synthesized conditions, allows for very basic
     // checkpointing.
     const string output_name =
@@ -679,7 +679,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
 
     cout << "----- " << transition.first << "->";
     cout << transition.second << " -----" << endl;
-
+    cout << "Target accuracy: " << min_accuracy[t] << endl;
 
     unordered_set<Example> yes;
     unordered_set<Example> no;
@@ -698,7 +698,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
       std::chrono::steady_clock::time_point timerBegin = std::chrono::steady_clock::now();
 
       // Attempt L2 Synthesis with current sketch.
-      pair<ast_ptr, float> new_solution = emdipsL2(sketch, examples, lib, transition, min_accuracy);
+      pair<ast_ptr, float> new_solution = emdipsL2(sketch, examples, lib, transition, min_accuracy[t]);
       
       if (new_solution.second > current_best) {
         current_best = new_solution.second;
@@ -711,7 +711,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
         cout << "Time Elapsed: " << ((float)(std::chrono::duration_cast<std::chrono::milliseconds>(timerEnd - timerBegin).count()))/1000.0 << endl;
         cout << "- - - - -" << endl;
       }
-      if (current_best >= min_accuracy) break;
+      if (current_best >= min_accuracy[t]) break;
 
     }
     // Write the solution out to a file.
