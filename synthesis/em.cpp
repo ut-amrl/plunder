@@ -195,7 +195,8 @@ void setupLdips(){
 }
 
 void testExampleOnASP(vector<Example> examples, Robot r){
-    for(Example e : examples){
+    for(uint i=0; i<examples.size(); i++){
+        Example e = examples[i];
         float x = e.symbol_table_["x"].GetFloat();
         float v = e.symbol_table_["v"].GetFloat();
         float decMax = e.symbol_table_["decMax"].GetFloat();
@@ -204,12 +205,13 @@ void testExampleOnASP(vector<Example> examples, Robot r){
         string start = e.start_.GetString();
         string res = e.result_.GetString();
         // if(start == "ACC" && x < 1){
-        if(start == "CON" && res == "DEC") {
+        if(start == "CON" && res == "DEC" || (i>0 && examples[i-1].result_.GetString() != "CON" && examples[i].result_.GetString() == "CON")) {
             double xToTarget = target - x;                                  // distance to the target
 
             bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
             bool cond2 = xToTarget - r.DistTraveled(v, decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
 
+            cout << x << " " << v << endl;
             if(cond2) cout << "DEC" << endl;
             if(cond1 && !cond2) cout << "CON" << endl;
             if(!cond1 && !cond2) cout << "ACC" << endl;
@@ -245,7 +247,7 @@ void emLoop(vector<Robot>& robots){
         double satisfied = 0;
         double total = 0;
         for(uint r = 0; r < robots.size(); r++){
-            testExampleOnASP(examples[r], robots[r]);
+            // testExampleOnASP(examples[r], robots[r]);
             robots[r].haProbCorrect = 1; // make ASP deterministic
             for(Example& ex: examples[r]){
                 total++;
