@@ -204,6 +204,8 @@ def main():
             plt.show()
             plt.savefig(outPath + "pos.png")
 
+            plt.close('all')
+
     return
 
 

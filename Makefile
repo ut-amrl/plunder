@@ -7,13 +7,14 @@ GEN = gen
 PF = pf
 PLT = plt
 EM = em
+EMNG = emng
 
 INCLUDES = -L pips/lib \
 			-l c++-pips-core -l amrl_shared_lib -l z3 \
 			-I pips/src -I pf_custom -I accSim -I pips/submodules/json/single_include/
 
 
-.SILENT: $(SETTINGS) $(GEN) $(PF) $(PLT) $(EM) clean
+.SILENT: $(SETTINGS) $(GEN) $(PF) $(PLT) $(EMNG) $(EM) clean
 
 $(SETTINGS):
 			$(CC) $(CFLAGS) -o ts translateSettings.cpp
@@ -36,12 +37,15 @@ $(PLT):
 			mkdir -p synthesis/plots && \
 			$(PY) particleFilter/plotter.py
 
-$(EM):
-			$(MAKE) $(GEN) && \
+$(EMNG):
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
 			$(CC) $(CFLAGS) synthesis/em.cpp $(INCLUDES) -o synthesis/out/em && \
 			synthesis/out/em
+
+$(EM):
+			$(MAKE) $(GEN) && \
+			$(MAKE) $(EMNG)
 
 clean: 
 			rm -rf accSim/out \

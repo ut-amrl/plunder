@@ -194,6 +194,28 @@ void setupLdips(){
     }
 }
 
+void testExampleOnASP(vector<Example> examples, Robot r){
+    for(Example e : examples){
+        float x = e.symbol_table_["x"].GetFloat();
+        float v = e.symbol_table_["v"].GetFloat();
+        float decMax = e.symbol_table_["decMax"].GetFloat();
+        float vMax = e.symbol_table_["vMax"].GetFloat();
+        float target = e.symbol_table_["target"].GetFloat();
+        string start = e.start_.GetString();
+        string res = e.result_.GetString();
+        // if(start == "ACC" && x < 1){
+        if(start == "CON" && res == "DEC") {
+            double xToTarget = target - x;                                  // distance to the target
+
+            bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+            bool cond2 = xToTarget - r.DistTraveled(v, decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
+
+            if(cond2) cout << "DEC" << endl;
+            if(cond1 && !cond2) cout << "CON" << endl;
+            if(!cond1 && !cond2) cout << "ACC" << endl;
+        }
+    }
+}
 
 void emLoop(vector<Robot>& robots){
 
@@ -218,23 +240,25 @@ void emLoop(vector<Robot>& robots){
 
         curASP = ldipsASP;
 
+
         // Update point accuracy
         double satisfied = 0;
         double total = 0;
         for(uint r = 0; r < robots.size(); r++){
+            testExampleOnASP(examples[r], robots[r]);
             robots[r].haProbCorrect = 1; // make ASP deterministic
             for(Example& ex: examples[r]){
                 total++;
                 Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-                if(ldipsASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
+                if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
                     satisfied++;
                 }
             }
         }
         
         // Update point accuracy
-        double newPointAcc = satisfied / total;
-        cout << "New point accuracy: " << satisfied << " / " << total << " = " << newPointAcc << endl;
+        double newPointAcc = min(satisfied / total, 0.95);
+        cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
         for(Robot& r : robots){
             r.haProbCorrect = newPointAcc;
         }

@@ -687,7 +687,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
     cout << "Num transitions (pos): " << yes.size() << endl;
     cout << "Num transitions (neg): " << no.size() << endl;
     if(yes.size() == 0) {
-      transition_solutions.push_back(make_shared<Bool>(Bool(true)));
+      transition_solutions.push_back(make_shared<Bool>(Bool(false)));
       accuracies.push_back(1.0);
       continue;
     }
@@ -711,7 +711,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
         cout << "Time Elapsed: " << ((float)(std::chrono::duration_cast<std::chrono::milliseconds>(timerEnd - timerBegin).count()))/1000.0 << endl;
         cout << "- - - - -" << endl;
       }
-      if (current_best >= min_accuracy[t]) break;
+      if (current_best > min_accuracy[t]) break;
 
     }
     // Write the solution out to a file.
