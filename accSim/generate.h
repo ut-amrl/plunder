@@ -56,7 +56,7 @@ class RobotIO {
     string getCsvTitles(){
         return "time, x, v, LA, HA";
     }
-    string getCsvRow(int t){
+    string getCsvRow(double t){
         return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
                 + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
     }
@@ -113,7 +113,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         }
 
         // Run simulation
-        for(double t = 0; t < T_TOT/T_STEP; t++){
+        for(double t = 0; t < T_TOT; t += T_STEP){
 
             robots[i].updatePhysics(T_STEP);
             robots[i].runASP(ASP_model(useModel));
@@ -131,7 +131,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
                 else jsonFile << ",";
                 jsonFile << rio.getJsonRow() << endl;
             }
-
+            
             if(robots[i].finished()){
                 break;
             }

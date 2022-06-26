@@ -12,21 +12,21 @@ using namespace std;
 vector<Robot> getRobotSet(int setNum, normal_distribution<double> accErrDistr, double haProbCorrect){
     if(setNum == 0){
         return {
-            Robot(6, -5, 15, 150, accErrDistr, haProbCorrect),
-            Robot(3, -3, 30, 100, accErrDistr, haProbCorrect),
-            Robot(5, -2, 12, 200, accErrDistr, haProbCorrect),
-            Robot(8, -3, 30, 50, accErrDistr, haProbCorrect),
-            Robot(1.5, -2, 3, 30, accErrDistr, haProbCorrect),
-            Robot(3, -2, 4, 20, accErrDistr, haProbCorrect),
+            Robot(6, -5, 10, 150, accErrDistr, haProbCorrect),
+            Robot(3, -3, 20, 100, accErrDistr, haProbCorrect),
+            Robot(5, -2, 8, 200, accErrDistr, haProbCorrect),
+            Robot(8, -3, 20, 50, accErrDistr, haProbCorrect),
+            Robot(1.5, -2, 2, 30, accErrDistr, haProbCorrect),
+            Robot(3, -2, 3, 20, accErrDistr, haProbCorrect),
             Robot(9, -2, 2, 15, accErrDistr, haProbCorrect),
-            Robot(1.5, -2, 40, 300, accErrDistr, haProbCorrect),
-            Robot(2, -2, 100, 300, accErrDistr, haProbCorrect),
-            Robot(5, -2, 25, 200, accErrDistr, haProbCorrect),
-            Robot(10, -10, 25, 500, accErrDistr, haProbCorrect),
-            Robot(25, -1, 20, 400, accErrDistr, haProbCorrect),
-            Robot(300, -300, 1000, 20000, accErrDistr, haProbCorrect),
-            Robot(1000, -500, 5000, 50000, accErrDistr, haProbCorrect),
-            Robot(8000, -6000, 40000, 400000, accErrDistr, haProbCorrect)
+            Robot(1.5, -2, 30, 300, accErrDistr, haProbCorrect),
+            Robot(2, -2, 80, 300, accErrDistr, haProbCorrect),
+            Robot(5, -2, 15, 200, accErrDistr, haProbCorrect),
+            Robot(10, -10, 20, 500, accErrDistr, haProbCorrect),
+            Robot(25, -1, 15, 400, accErrDistr, haProbCorrect),
+            Robot(300, -300, 500, 20000, accErrDistr, haProbCorrect),
+            Robot(1000, -500, 3000, 50000, accErrDistr, haProbCorrect),
+            Robot(8000, -6000, 30000, 400000, accErrDistr, haProbCorrect)
         };
     } else if(setNum == 1){
         return {

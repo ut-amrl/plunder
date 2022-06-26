@@ -75,10 +75,10 @@ def fillPosition(vel, dt):
 
 def runSimulation():
     for traj in trajectories:
-        velocities.append(fillVelocity(traj, 0.1))
+        velocities.append(fillVelocity(traj, float(settings["T_STEP"])))
     
     for vel in velocities:
-        positions.append(fillPosition(vel, 0.1))
+        positions.append(fillPosition(vel, float(settings["T_STEP"])))
     
     return
 

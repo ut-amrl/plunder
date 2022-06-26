@@ -71,13 +71,13 @@ void readData(string file, vector<Obs>& dataObs, vector<LA>& dataLA){
 }
 
 // Write high-level action sequences (trajectories) to file
-void writeData(string file, Robot& r, vector<vector<HA>>& trajectories){
+void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<Obs>& dataObs){
     ofstream outFile;
     outFile.open(file);
 
     for(vector<HA>& traj : trajectories){
         for(uint i = 0; i < traj.size(); i++){
-            outFile << r.motorModel(traj[i], Obs {}, false).acc;
+            outFile << r.motorModel(traj[i], dataObs[i], false).acc;
             if(i != traj.size() - 1){
                 outFile << ",";
             }
@@ -122,7 +122,7 @@ vector<vector<HA>> filterFromFile(int N, int M, double resampleThreshold, Robot&
     vector<vector<HA>> trajectories = runFilter(N, M, resampleThreshold, r, dataObs, dataLa, asp);
 
     // Write results
-    writeData(outputFile, r, trajectories);
+    writeData(outputFile, r, trajectories, dataObs);
 
     return trajectories;
 }

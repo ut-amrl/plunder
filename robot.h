@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include "settings.h"
+
 #define PRECISION 10
 #define robotEpsilon 10E-10
 #define SEED 0 // Random seed
@@ -94,14 +96,10 @@ class Robot {
         double acc = 0;
         
         if(ha == ACC){
-            acc = max((vMax - state.vel) / vMax, 0.15) * accMax;
-            // if(state.vel / vMax >= 0.8){
-            //     acc = accMax / 2;
-            // } else {
-            //     acc = accMax;
-            // }
+            acc = (vMax - state.vel) / vMax * accMax + activationMinAcc;
         } else if (ha == DEC) {
             acc = decMax;
+            // acc = (vMax - state.vel) / vMax * decMax - activationMinAcc;
         }
 
         // Induce some error
@@ -146,6 +144,9 @@ class Robot {
     // Return the distance this robot would travel before stopping if it began decelerating immediately
     double DistTraveled(double v, double dec){
         return - v * v / (2 * dec);
+        // double ln = log(((decMax - activationMinAcc) * vMax) / ((decMax - activationMinAcc) * vMax - decMax * state.vel));
+        // double num = vMax * ((decMax - activationMinAcc) * vMax * ln - decMax * state.vel);
+        // return - num / (decMax * decMax);
     }
 
     // Seeded random generator

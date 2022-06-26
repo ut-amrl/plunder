@@ -15,7 +15,7 @@ using namespace std;
 // ----- Main ---------------------------------------------
 
 int main(int argc, char** argv){
-    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), haProbCorrect);
+    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
 
     for(int i = 0; i < robots.size(); i++){
         string in = stateGenPath + to_string(i) + ".csv";
