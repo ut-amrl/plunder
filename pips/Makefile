@@ -222,6 +222,266 @@ amrl_shared_lib/fast:
 .PHONY : amrl_shared_lib/fast
 
 #=============================================================================
+# Target rules for targets named NightlyMemCheck
+
+# Build rule for target.
+NightlyMemCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyMemCheck
+.PHONY : NightlyMemCheck
+
+# fast build rule for target.
+NightlyMemCheck/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyMemCheck.dir/build.make submodules/gflags/CMakeFiles/NightlyMemCheck.dir/build
+.PHONY : NightlyMemCheck/fast
+
+#=============================================================================
+# Target rules for targets named NightlyTest
+
+# Build rule for target.
+NightlyTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyTest
+.PHONY : NightlyTest
+
+# fast build rule for target.
+NightlyTest/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyTest.dir/build.make submodules/gflags/CMakeFiles/NightlyTest.dir/build
+.PHONY : NightlyTest/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousConfigure
+
+# Build rule for target.
+ContinuousConfigure: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousConfigure
+.PHONY : ContinuousConfigure
+
+# fast build rule for target.
+ContinuousConfigure/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousConfigure.dir/build.make submodules/gflags/CMakeFiles/ContinuousConfigure.dir/build
+.PHONY : ContinuousConfigure/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousBuild
+
+# Build rule for target.
+ContinuousBuild: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousBuild
+.PHONY : ContinuousBuild
+
+# fast build rule for target.
+ContinuousBuild/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousBuild.dir/build.make submodules/gflags/CMakeFiles/ContinuousBuild.dir/build
+.PHONY : ContinuousBuild/fast
+
+#=============================================================================
+# Target rules for targets named NightlyConfigure
+
+# Build rule for target.
+NightlyConfigure: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyConfigure
+.PHONY : NightlyConfigure
+
+# fast build rule for target.
+NightlyConfigure/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyConfigure.dir/build.make submodules/gflags/CMakeFiles/NightlyConfigure.dir/build
+.PHONY : NightlyConfigure/fast
+
+#=============================================================================
+# Target rules for targets named NightlyMemoryCheck
+
+# Build rule for target.
+NightlyMemoryCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyMemoryCheck
+.PHONY : NightlyMemoryCheck
+
+# fast build rule for target.
+NightlyMemoryCheck/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyMemoryCheck.dir/build.make submodules/gflags/CMakeFiles/NightlyMemoryCheck.dir/build
+.PHONY : NightlyMemoryCheck/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousUpdate
+
+# Build rule for target.
+ContinuousUpdate: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousUpdate
+.PHONY : ContinuousUpdate
+
+# fast build rule for target.
+ContinuousUpdate/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousUpdate.dir/build.make submodules/gflags/CMakeFiles/ContinuousUpdate.dir/build
+.PHONY : ContinuousUpdate/fast
+
+#=============================================================================
+# Target rules for targets named NightlyUpdate
+
+# Build rule for target.
+NightlyUpdate: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyUpdate
+.PHONY : NightlyUpdate
+
+# fast build rule for target.
+NightlyUpdate/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyUpdate.dir/build.make submodules/gflags/CMakeFiles/NightlyUpdate.dir/build
+.PHONY : NightlyUpdate/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalMemCheck
+
+# Build rule for target.
+ExperimentalMemCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalMemCheck
+.PHONY : ExperimentalMemCheck
+
+# fast build rule for target.
+ExperimentalMemCheck/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalMemCheck.dir/build.make submodules/gflags/CMakeFiles/ExperimentalMemCheck.dir/build
+.PHONY : ExperimentalMemCheck/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalSubmit
+
+# Build rule for target.
+ExperimentalSubmit: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalSubmit
+.PHONY : ExperimentalSubmit
+
+# fast build rule for target.
+ExperimentalSubmit/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalSubmit.dir/build.make submodules/gflags/CMakeFiles/ExperimentalSubmit.dir/build
+.PHONY : ExperimentalSubmit/fast
+
+#=============================================================================
+# Target rules for targets named Experimental
+
+# Build rule for target.
+Experimental: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Experimental
+.PHONY : Experimental
+
+# fast build rule for target.
+Experimental/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/Experimental.dir/build.make submodules/gflags/CMakeFiles/Experimental.dir/build
+.PHONY : Experimental/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousCoverage
+
+# Build rule for target.
+ContinuousCoverage: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousCoverage
+.PHONY : ContinuousCoverage
+
+# fast build rule for target.
+ContinuousCoverage/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousCoverage.dir/build.make submodules/gflags/CMakeFiles/ContinuousCoverage.dir/build
+.PHONY : ContinuousCoverage/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalConfigure
+
+# Build rule for target.
+ExperimentalConfigure: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalConfigure
+.PHONY : ExperimentalConfigure
+
+# fast build rule for target.
+ExperimentalConfigure/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalConfigure.dir/build.make submodules/gflags/CMakeFiles/ExperimentalConfigure.dir/build
+.PHONY : ExperimentalConfigure/fast
+
+#=============================================================================
+# Target rules for targets named Continuous
+
+# Build rule for target.
+Continuous: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Continuous
+.PHONY : Continuous
+
+# fast build rule for target.
+Continuous/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/Continuous.dir/build.make submodules/gflags/CMakeFiles/Continuous.dir/build
+.PHONY : Continuous/fast
+
+#=============================================================================
+# Target rules for targets named Nightly
+
+# Build rule for target.
+Nightly: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Nightly
+.PHONY : Nightly
+
+# fast build rule for target.
+Nightly/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/Nightly.dir/build.make submodules/gflags/CMakeFiles/Nightly.dir/build
+.PHONY : Nightly/fast
+
+#=============================================================================
+# Target rules for targets named NightlySubmit
+
+# Build rule for target.
+NightlySubmit: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlySubmit
+.PHONY : NightlySubmit
+
+# fast build rule for target.
+NightlySubmit/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlySubmit.dir/build.make submodules/gflags/CMakeFiles/NightlySubmit.dir/build
+.PHONY : NightlySubmit/fast
+
+#=============================================================================
+# Target rules for targets named NightlyStart
+
+# Build rule for target.
+NightlyStart: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyStart
+.PHONY : NightlyStart
+
+# fast build rule for target.
+NightlyStart/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyStart.dir/build.make submodules/gflags/CMakeFiles/NightlyStart.dir/build
+.PHONY : NightlyStart/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalCoverage
+
+# Build rule for target.
+ExperimentalCoverage: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalCoverage
+.PHONY : ExperimentalCoverage
+
+# fast build rule for target.
+ExperimentalCoverage/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalCoverage.dir/build.make submodules/gflags/CMakeFiles/ExperimentalCoverage.dir/build
+.PHONY : ExperimentalCoverage/fast
+
+#=============================================================================
+# Target rules for targets named NightlyCoverage
+
+# Build rule for target.
+NightlyCoverage: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyCoverage
+.PHONY : NightlyCoverage
+
+# fast build rule for target.
+NightlyCoverage/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyCoverage.dir/build.make submodules/gflags/CMakeFiles/NightlyCoverage.dir/build
+.PHONY : NightlyCoverage/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalTest
+
+# Build rule for target.
+ExperimentalTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalTest
+.PHONY : ExperimentalTest
+
+# fast build rule for target.
+ExperimentalTest/fast:
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalTest.dir/build.make submodules/gflags/CMakeFiles/ExperimentalTest.dir/build
+.PHONY : ExperimentalTest/fast
+
+#=============================================================================
 # Target rules for targets named gflags_nothreads_static
 
 # Build rule for target.
@@ -235,266 +495,6 @@ gflags_nothreads_static/fast:
 .PHONY : gflags_nothreads_static/fast
 
 #=============================================================================
-# Target rules for targets named NightlyMemCheck
-
-# Build rule for target.
-NightlyMemCheck: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyMemCheck
-.PHONY : NightlyMemCheck
-
-# fast build rule for target.
-NightlyMemCheck/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyMemCheck.dir/build.make submodules/json/CMakeFiles/NightlyMemCheck.dir/build
-.PHONY : NightlyMemCheck/fast
-
-#=============================================================================
-# Target rules for targets named NightlyTest
-
-# Build rule for target.
-NightlyTest: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyTest
-.PHONY : NightlyTest
-
-# fast build rule for target.
-NightlyTest/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyTest.dir/build.make submodules/json/CMakeFiles/NightlyTest.dir/build
-.PHONY : NightlyTest/fast
-
-#=============================================================================
-# Target rules for targets named ContinuousConfigure
-
-# Build rule for target.
-ContinuousConfigure: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ContinuousConfigure
-.PHONY : ContinuousConfigure
-
-# fast build rule for target.
-ContinuousConfigure/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousConfigure.dir/build.make submodules/json/CMakeFiles/ContinuousConfigure.dir/build
-.PHONY : ContinuousConfigure/fast
-
-#=============================================================================
-# Target rules for targets named ContinuousBuild
-
-# Build rule for target.
-ContinuousBuild: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ContinuousBuild
-.PHONY : ContinuousBuild
-
-# fast build rule for target.
-ContinuousBuild/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousBuild.dir/build.make submodules/json/CMakeFiles/ContinuousBuild.dir/build
-.PHONY : ContinuousBuild/fast
-
-#=============================================================================
-# Target rules for targets named NightlyConfigure
-
-# Build rule for target.
-NightlyConfigure: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyConfigure
-.PHONY : NightlyConfigure
-
-# fast build rule for target.
-NightlyConfigure/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyConfigure.dir/build.make submodules/json/CMakeFiles/NightlyConfigure.dir/build
-.PHONY : NightlyConfigure/fast
-
-#=============================================================================
-# Target rules for targets named NightlyMemoryCheck
-
-# Build rule for target.
-NightlyMemoryCheck: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyMemoryCheck
-.PHONY : NightlyMemoryCheck
-
-# fast build rule for target.
-NightlyMemoryCheck/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyMemoryCheck.dir/build.make submodules/json/CMakeFiles/NightlyMemoryCheck.dir/build
-.PHONY : NightlyMemoryCheck/fast
-
-#=============================================================================
-# Target rules for targets named ExperimentalTest
-
-# Build rule for target.
-ExperimentalTest: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalTest
-.PHONY : ExperimentalTest
-
-# fast build rule for target.
-ExperimentalTest/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalTest.dir/build.make submodules/json/CMakeFiles/ExperimentalTest.dir/build
-.PHONY : ExperimentalTest/fast
-
-#=============================================================================
-# Target rules for targets named ContinuousUpdate
-
-# Build rule for target.
-ContinuousUpdate: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ContinuousUpdate
-.PHONY : ContinuousUpdate
-
-# fast build rule for target.
-ContinuousUpdate/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousUpdate.dir/build.make submodules/json/CMakeFiles/ContinuousUpdate.dir/build
-.PHONY : ContinuousUpdate/fast
-
-#=============================================================================
-# Target rules for targets named NightlyUpdate
-
-# Build rule for target.
-NightlyUpdate: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyUpdate
-.PHONY : NightlyUpdate
-
-# fast build rule for target.
-NightlyUpdate/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyUpdate.dir/build.make submodules/json/CMakeFiles/NightlyUpdate.dir/build
-.PHONY : NightlyUpdate/fast
-
-#=============================================================================
-# Target rules for targets named ExperimentalMemCheck
-
-# Build rule for target.
-ExperimentalMemCheck: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalMemCheck
-.PHONY : ExperimentalMemCheck
-
-# fast build rule for target.
-ExperimentalMemCheck/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalMemCheck.dir/build.make submodules/json/CMakeFiles/ExperimentalMemCheck.dir/build
-.PHONY : ExperimentalMemCheck/fast
-
-#=============================================================================
-# Target rules for targets named ExperimentalSubmit
-
-# Build rule for target.
-ExperimentalSubmit: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalSubmit
-.PHONY : ExperimentalSubmit
-
-# fast build rule for target.
-ExperimentalSubmit/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalSubmit.dir/build.make submodules/json/CMakeFiles/ExperimentalSubmit.dir/build
-.PHONY : ExperimentalSubmit/fast
-
-#=============================================================================
-# Target rules for targets named Experimental
-
-# Build rule for target.
-Experimental: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Experimental
-.PHONY : Experimental
-
-# fast build rule for target.
-Experimental/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/Experimental.dir/build.make submodules/json/CMakeFiles/Experimental.dir/build
-.PHONY : Experimental/fast
-
-#=============================================================================
-# Target rules for targets named ContinuousCoverage
-
-# Build rule for target.
-ContinuousCoverage: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ContinuousCoverage
-.PHONY : ContinuousCoverage
-
-# fast build rule for target.
-ContinuousCoverage/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousCoverage.dir/build.make submodules/json/CMakeFiles/ContinuousCoverage.dir/build
-.PHONY : ContinuousCoverage/fast
-
-#=============================================================================
-# Target rules for targets named ExperimentalConfigure
-
-# Build rule for target.
-ExperimentalConfigure: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalConfigure
-.PHONY : ExperimentalConfigure
-
-# fast build rule for target.
-ExperimentalConfigure/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalConfigure.dir/build.make submodules/json/CMakeFiles/ExperimentalConfigure.dir/build
-.PHONY : ExperimentalConfigure/fast
-
-#=============================================================================
-# Target rules for targets named Continuous
-
-# Build rule for target.
-Continuous: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Continuous
-.PHONY : Continuous
-
-# fast build rule for target.
-Continuous/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/Continuous.dir/build.make submodules/json/CMakeFiles/Continuous.dir/build
-.PHONY : Continuous/fast
-
-#=============================================================================
-# Target rules for targets named Nightly
-
-# Build rule for target.
-Nightly: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Nightly
-.PHONY : Nightly
-
-# fast build rule for target.
-Nightly/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/Nightly.dir/build.make submodules/json/CMakeFiles/Nightly.dir/build
-.PHONY : Nightly/fast
-
-#=============================================================================
-# Target rules for targets named NightlySubmit
-
-# Build rule for target.
-NightlySubmit: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlySubmit
-.PHONY : NightlySubmit
-
-# fast build rule for target.
-NightlySubmit/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlySubmit.dir/build.make submodules/json/CMakeFiles/NightlySubmit.dir/build
-.PHONY : NightlySubmit/fast
-
-#=============================================================================
-# Target rules for targets named NightlyStart
-
-# Build rule for target.
-NightlyStart: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyStart
-.PHONY : NightlyStart
-
-# fast build rule for target.
-NightlyStart/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyStart.dir/build.make submodules/json/CMakeFiles/NightlyStart.dir/build
-.PHONY : NightlyStart/fast
-
-#=============================================================================
-# Target rules for targets named ExperimentalCoverage
-
-# Build rule for target.
-ExperimentalCoverage: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalCoverage
-.PHONY : ExperimentalCoverage
-
-# fast build rule for target.
-ExperimentalCoverage/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalCoverage.dir/build.make submodules/json/CMakeFiles/ExperimentalCoverage.dir/build
-.PHONY : ExperimentalCoverage/fast
-
-#=============================================================================
-# Target rules for targets named NightlyCoverage
-
-# Build rule for target.
-NightlyCoverage: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 NightlyCoverage
-.PHONY : NightlyCoverage
-
-# fast build rule for target.
-NightlyCoverage/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyCoverage.dir/build.make submodules/json/CMakeFiles/NightlyCoverage.dir/build
-.PHONY : NightlyCoverage/fast
-
-#=============================================================================
 # Target rules for targets named ExperimentalStart
 
 # Build rule for target.
@@ -504,7 +504,7 @@ ExperimentalStart: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalStart/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalStart.dir/build.make submodules/json/CMakeFiles/ExperimentalStart.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalStart.dir/build.make submodules/gflags/CMakeFiles/ExperimentalStart.dir/build
 .PHONY : ExperimentalStart/fast
 
 #=============================================================================
@@ -517,7 +517,7 @@ NightlyBuild: cmake_check_build_system
 
 # fast build rule for target.
 NightlyBuild/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/NightlyBuild.dir/build.make submodules/json/CMakeFiles/NightlyBuild.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/NightlyBuild.dir/build.make submodules/gflags/CMakeFiles/NightlyBuild.dir/build
 .PHONY : NightlyBuild/fast
 
 #=============================================================================
@@ -530,7 +530,7 @@ ExperimentalBuild: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalBuild/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalBuild.dir/build.make submodules/json/CMakeFiles/ExperimentalBuild.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalBuild.dir/build.make submodules/gflags/CMakeFiles/ExperimentalBuild.dir/build
 .PHONY : ExperimentalBuild/fast
 
 #=============================================================================
@@ -543,7 +543,7 @@ ExperimentalUpdate: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalUpdate/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ExperimentalUpdate.dir/build.make submodules/json/CMakeFiles/ExperimentalUpdate.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ExperimentalUpdate.dir/build.make submodules/gflags/CMakeFiles/ExperimentalUpdate.dir/build
 .PHONY : ExperimentalUpdate/fast
 
 #=============================================================================
@@ -556,7 +556,7 @@ ContinuousStart: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousStart/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousStart.dir/build.make submodules/json/CMakeFiles/ContinuousStart.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousStart.dir/build.make submodules/gflags/CMakeFiles/ContinuousStart.dir/build
 .PHONY : ContinuousStart/fast
 
 #=============================================================================
@@ -569,7 +569,7 @@ ContinuousMemCheck: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousMemCheck/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousMemCheck.dir/build.make submodules/json/CMakeFiles/ContinuousMemCheck.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousMemCheck.dir/build.make submodules/gflags/CMakeFiles/ContinuousMemCheck.dir/build
 .PHONY : ContinuousMemCheck/fast
 
 #=============================================================================
@@ -582,7 +582,7 @@ ContinuousTest: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousTest/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousTest.dir/build.make submodules/json/CMakeFiles/ContinuousTest.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousTest.dir/build.make submodules/gflags/CMakeFiles/ContinuousTest.dir/build
 .PHONY : ContinuousTest/fast
 
 #=============================================================================
@@ -595,8 +595,73 @@ ContinuousSubmit: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousSubmit/fast:
-	$(MAKE) -f submodules/json/CMakeFiles/ContinuousSubmit.dir/build.make submodules/json/CMakeFiles/ContinuousSubmit.dir/build
+	$(MAKE) -f submodules/gflags/CMakeFiles/ContinuousSubmit.dir/build.make submodules/gflags/CMakeFiles/ContinuousSubmit.dir/build
 .PHONY : ContinuousSubmit/fast
+
+#=============================================================================
+# Target rules for targets named gflags_declare_test
+
+# Build rule for target.
+gflags_declare_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gflags_declare_test
+.PHONY : gflags_declare_test
+
+# fast build rule for target.
+gflags_declare_test/fast:
+	$(MAKE) -f submodules/gflags/test/CMakeFiles/gflags_declare_test.dir/build.make submodules/gflags/test/CMakeFiles/gflags_declare_test.dir/build
+.PHONY : gflags_declare_test/fast
+
+#=============================================================================
+# Target rules for targets named gflags_unittest_main
+
+# Build rule for target.
+gflags_unittest_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gflags_unittest_main
+.PHONY : gflags_unittest_main
+
+# fast build rule for target.
+gflags_unittest_main/fast:
+	$(MAKE) -f submodules/gflags/test/CMakeFiles/gflags_unittest_main.dir/build.make submodules/gflags/test/CMakeFiles/gflags_unittest_main.dir/build
+.PHONY : gflags_unittest_main/fast
+
+#=============================================================================
+# Target rules for targets named gflags_unittest-main
+
+# Build rule for target.
+gflags_unittest-main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gflags_unittest-main
+.PHONY : gflags_unittest-main
+
+# fast build rule for target.
+gflags_unittest-main/fast:
+	$(MAKE) -f submodules/gflags/test/CMakeFiles/gflags_unittest-main.dir/build.make submodules/gflags/test/CMakeFiles/gflags_unittest-main.dir/build
+.PHONY : gflags_unittest-main/fast
+
+#=============================================================================
+# Target rules for targets named gflags_unittest
+
+# Build rule for target.
+gflags_unittest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gflags_unittest
+.PHONY : gflags_unittest
+
+# fast build rule for target.
+gflags_unittest/fast:
+	$(MAKE) -f submodules/gflags/test/CMakeFiles/gflags_unittest.dir/build.make submodules/gflags/test/CMakeFiles/gflags_unittest.dir/build
+.PHONY : gflags_unittest/fast
+
+#=============================================================================
+# Target rules for targets named gflags_strip_flags_test
+
+# Build rule for target.
+gflags_strip_flags_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gflags_strip_flags_test
+.PHONY : gflags_strip_flags_test
+
+# fast build rule for target.
+gflags_strip_flags_test/fast:
+	$(MAKE) -f submodules/gflags/test/CMakeFiles/gflags_strip_flags_test.dir/build.make submodules/gflags/test/CMakeFiles/gflags_strip_flags_test.dir/build
+.PHONY : gflags_strip_flags_test/fast
 
 src/ast/ast.o: src/ast/ast.cpp.o
 
@@ -976,6 +1041,33 @@ src/visitors/tosmtlib_visitor.cpp.s:
 	$(MAKE) -f CMakeFiles/c++-pips-core.dir/build.make CMakeFiles/c++-pips-core.dir/src/visitors/tosmtlib_visitor.cpp.s
 .PHONY : src/visitors/tosmtlib_visitor.cpp.s
 
+src/visitors/tosmtopt_visitor.o: src/visitors/tosmtopt_visitor.cpp.o
+
+.PHONY : src/visitors/tosmtopt_visitor.o
+
+# target to build an object file
+src/visitors/tosmtopt_visitor.cpp.o:
+	$(MAKE) -f CMakeFiles/c++-pips-core.dir/build.make CMakeFiles/c++-pips-core.dir/src/visitors/tosmtopt_visitor.cpp.o
+.PHONY : src/visitors/tosmtopt_visitor.cpp.o
+
+src/visitors/tosmtopt_visitor.i: src/visitors/tosmtopt_visitor.cpp.i
+
+.PHONY : src/visitors/tosmtopt_visitor.i
+
+# target to preprocess a source file
+src/visitors/tosmtopt_visitor.cpp.i:
+	$(MAKE) -f CMakeFiles/c++-pips-core.dir/build.make CMakeFiles/c++-pips-core.dir/src/visitors/tosmtopt_visitor.cpp.i
+.PHONY : src/visitors/tosmtopt_visitor.cpp.i
+
+src/visitors/tosmtopt_visitor.s: src/visitors/tosmtopt_visitor.cpp.s
+
+.PHONY : src/visitors/tosmtopt_visitor.s
+
+# target to generate assembly for a file
+src/visitors/tosmtopt_visitor.cpp.s:
+	$(MAKE) -f CMakeFiles/c++-pips-core.dir/build.make CMakeFiles/c++-pips-core.dir/src/visitors/tosmtopt_visitor.cpp.s
+.PHONY : src/visitors/tosmtopt_visitor.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -993,14 +1085,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... c++-pips-core"
 	@echo "... amrl_shared_lib"
-	@echo "... gflags_nothreads_static"
 	@echo "... NightlyMemCheck"
 	@echo "... NightlyTest"
 	@echo "... ContinuousConfigure"
 	@echo "... ContinuousBuild"
 	@echo "... NightlyConfigure"
 	@echo "... NightlyMemoryCheck"
-	@echo "... ExperimentalTest"
 	@echo "... ContinuousUpdate"
 	@echo "... NightlyUpdate"
 	@echo "... ExperimentalMemCheck"
@@ -1014,6 +1104,8 @@ help:
 	@echo "... NightlyStart"
 	@echo "... ExperimentalCoverage"
 	@echo "... NightlyCoverage"
+	@echo "... ExperimentalTest"
+	@echo "... gflags_nothreads_static"
 	@echo "... ExperimentalStart"
 	@echo "... NightlyBuild"
 	@echo "... ExperimentalBuild"
@@ -1022,6 +1114,11 @@ help:
 	@echo "... ContinuousMemCheck"
 	@echo "... ContinuousTest"
 	@echo "... ContinuousSubmit"
+	@echo "... gflags_declare_test"
+	@echo "... gflags_unittest_main"
+	@echo "... gflags_unittest-main"
+	@echo "... gflags_unittest"
+	@echo "... gflags_strip_flags_test"
 	@echo "... src/ast/ast.o"
 	@echo "... src/ast/ast.i"
 	@echo "... src/ast/ast.s"
@@ -1064,6 +1161,9 @@ help:
 	@echo "... src/visitors/tosmtlib_visitor.o"
 	@echo "... src/visitors/tosmtlib_visitor.i"
 	@echo "... src/visitors/tosmtlib_visitor.s"
+	@echo "... src/visitors/tosmtopt_visitor.o"
+	@echo "... src/visitors/tosmtopt_visitor.i"
+	@echo "... src/visitors/tosmtopt_visitor.s"
 .PHONY : help
 
 

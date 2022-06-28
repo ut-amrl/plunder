@@ -71,6 +71,8 @@ set(CXX_PIPS_SRCS
     src/visitors/print_visitor.hpp
     src/visitors/tosmtlib_visitor.cpp
     src/visitors/tosmtlib_visitor.hpp
+    src/visitors/tosmtopt_visitor.cpp
+    src/visitors/tosmtopt_visitor.hpp
     src/ast/ast.cpp
     src/ast/ast.hpp
     src/ast/enumeration.cpp
