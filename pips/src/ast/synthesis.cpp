@@ -19,6 +19,7 @@
 #include "visitors/interp_visitor.hpp"
 #include "visitors/print_visitor.hpp"
 #include "visitors/tosmtlib_visitor.hpp"
+#include "visitors/tosmtopt_visitor.hpp"
 #include "../submodules/amrl_shared_lib/util/timer.h"
 #include "utils/nd_bool_array.hpp"
 
@@ -39,6 +40,8 @@ using AST::CheckModelAccuracy;
 // DECLARE_bool(debug);
 
 bool flagsDebug = true;
+
+const bool usingOpt = true;
 
 namespace AST {
 
@@ -149,10 +152,13 @@ Model SolveSMTLIBProblem(const string& problem) {
   z3::optimize solver(context);
   solver.from_string(problem.c_str());
   z3::check_result result = solver.check();
+  if(usingOpt) return Z3ModelToMap(solver.get_model());
   if (result == z3::sat) {
+    cout << "SAT" << endl;
     z3::model m = solver.get_model();
     return Z3ModelToMap(m);
   } else {
+    cout << "UNSAT" << endl;
     throw std::invalid_argument("UNSAT");
   }
 }
@@ -174,23 +180,54 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
   unordered_set<Example> all_examples(yes);
   all_examples.insert(no.cbegin(), no.cend());
   // For every example, ...
+
   for (const Example& example : all_examples) {
+
     // Partially evaluate the program with the examples as much as possible.
     ast_ptr partial = Interpret(program, example);
     // Create an SMT-LIB expression from the program and that example.
-    ToSMTLIB converter = AstToSMTLIB(partial, example);
-    const string smtlib = converter.Get();
-    // Add full assertions using that expression to our assertion list. It's
-    // important to check whether the example is in both sets because we could
-    // have contradictory examples.
-    if (yes.find(example) != yes.cend())
-      assertions.insert("(assert-soft " + smtlib + ")");
-    if (no.find(example) != no.cend())
-      assertions.insert("(assert-soft (not " + smtlib + "))");
 
-    // If there are any parameter holes, make note of them too.
-    const unordered_set<string> example_params = converter.GetParams();
-    params.insert(example_params.cbegin(), example_params.cend());
+
+    if(usingOpt){
+
+      if(yes.find(example) != yes.cend()){
+        ToSMTOPT converter = AstToSMTOPT(partial, example, true);
+        const string smtlib = converter.Get();
+        assertions.insert("(minimize " + smtlib + ")");
+        // If there are any parameter holes, make note of them too.
+        const unordered_set<string> example_params = converter.GetParams();
+        params.insert(example_params.cbegin(), example_params.cend());
+        // cout << "RES " << "(minimize " + smtlib + ")" << endl;
+      }
+      if(no.find(example) != no.cend()){
+        ToSMTOPT converter = AstToSMTOPT(partial, example, false);
+        const string smtlib = converter.Get();
+        assertions.insert("(minimize " + smtlib + ")");
+        // If there are any parameter holes, make note of them too.
+        const unordered_set<string> example_params = converter.GetParams();
+        params.insert(example_params.cbegin(), example_params.cend());
+        // cout << "RES " << "(minimize " + smtlib + ")" << endl;
+      }
+
+
+
+    } else {
+
+      ToSMTLIB converter = AstToSMTLIB(partial, example);
+      const string smtlib = converter.Get();
+
+      // Add full assertions using that expression to our assertion list. It's
+      // important to check whether the example is in both sets because we could
+      // have contradictory examples.
+      if (yes.find(example) != yes.cend())
+        assertions.insert("(assert-soft " + smtlib + ")");
+      if (no.find(example) != no.cend())
+        assertions.insert("(assert-soft (not " + smtlib + "))");
+
+      // If there are any parameter holes, make note of them too.
+      const unordered_set<string> example_params = converter.GetParams();
+      params.insert(example_params.cbegin(), example_params.cend());
+    }
   }
 
   // Create a string where our full SMT-LIB problem will be created.
@@ -229,6 +266,20 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
   )";
 
   problem = "";
+  
+  problem = R"(
+    (define-fun fmin ((x!1 Real) (x!2 Real)) Real
+      (ite (< x!1 x!2) x!1 x!2))
+
+    (define-fun fmax ((x!1 Real) (x!2 Real)) Real
+      (ite (> x!1 x!2) x!1 x!2))
+
+    (define-fun lt-err ((x!1 Real) (x!2 Real)) Real
+      (^ (fmin 0 (- x!1 x!2)) 2))
+
+    (define-fun gt-err ((x!1 Real) (x!2 Real)) Real
+      (^ (fmax 0 (- x!1 x!2)) 2))
+  )";
 
   // For every parameter hole discovered, add a real constant to the problem.
   for (const string& param : params) {
@@ -698,7 +749,9 @@ EmdipsOutput emdips(const vector<Example>& demos,
       std::chrono::steady_clock::time_point timerBegin = std::chrono::steady_clock::now();
 
       // Attempt L2 Synthesis with current sketch.
+      // cout << "BEFORE EMDIPS" << endl;
       pair<ast_ptr, float> new_solution = emdipsL2(sketch, examples, lib, transition, min_accuracy[t]);
+      // cout << "AFTER EMDIPS" << endl;
       
       if (new_solution.second > current_best) {
         current_best = new_solution.second;
