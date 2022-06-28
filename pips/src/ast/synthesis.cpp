@@ -41,7 +41,7 @@ using AST::CheckModelAccuracy;
 
 bool flagsDebug = true;
 
-const bool usingOpt = true;
+const bool usingOpt = false;
 
 namespace AST {
 

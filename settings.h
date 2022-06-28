@@ -22,7 +22,7 @@ const string plotGenPath = "synthesis/plots/";
 const double T_STEP = .1;               // time step (s)
 const double T_TOT = 30;                // total time (s) per simulated scenario
 const double genAccuracy = 1;         // probability of a correct high-level transition
-const double activationMinAcc = 0.05;    // Minimum acceleration (acceleration will not go below this value, excluding 0)
+const double activationMinAcc = 0.2;    // Minimum acceleration (acceleration will not go below this value, excluding 0)
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
