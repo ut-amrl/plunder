@@ -2,6 +2,8 @@ CC = g++
 CFLAGS = -g -std=c++17 -march=native -ggdb -O2 -fPIC -fopenmp -Wall
 PY = python3
 
+export OMP_NUM_THREADS := 16
+
 SETTINGS = settings
 GEN = gen
 PF = pf
@@ -40,6 +42,7 @@ $(PLT):
 $(EMNG):
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
+			echo Threads used: $$OMP_NUM_THREADS && \
 			$(CC) $(CFLAGS) synthesis/em.cpp $(INCLUDES) -o synthesis/out/em && \
 			synthesis/out/em
 
