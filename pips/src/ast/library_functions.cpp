@@ -357,7 +357,7 @@ ast_ptr Lt(ast_ptr x, ast_ptr y) {
 
   num_ptr x_cast = dynamic_pointer_cast<Num>(x);
   num_ptr y_cast = dynamic_pointer_cast<Num>(y);
-  Bool result(x_cast->value_ - y_cast->value_ < 0.0);
+  Bool result(x_cast->value_ - y_cast->value_ < 0);
   return make_shared<Bool>(result);
 }
 

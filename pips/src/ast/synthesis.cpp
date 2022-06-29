@@ -154,11 +154,9 @@ Model SolveSMTLIBProblem(const string& problem) {
   z3::check_result result = solver.check();
   if(usingOpt) return Z3ModelToMap(solver.get_model());
   if (result == z3::sat) {
-    cout << "SAT" << endl;
     z3::model m = solver.get_model();
     return Z3ModelToMap(m);
   } else {
-    cout << "UNSAT" << endl;
     throw std::invalid_argument("UNSAT");
   }
 }
