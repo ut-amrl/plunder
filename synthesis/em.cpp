@@ -133,11 +133,6 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         cout << trans.first << "->" << trans.second << endl;
     }
     cout << endl;
-    cout << "---- Features Synthesized ----" << endl;
-    for (auto& feat : ops) {
-        cout << feat << endl;
-    }
-    cout << endl;
 
     cout << "---- Number of Features Enumerated ----" << endl;
     cout << ops.size() << endl << endl;
@@ -204,17 +199,11 @@ void testExampleOnASP(vector<Example> examples, Robot r){
         float target = e.symbol_table_["target"].GetFloat();
         string start = e.start_.GetString();
         string res = e.result_.GetString();
-        // if(start == "ACC" && x < 1){
-        if(start == "CON" && res == "DEC" || (i>0 && examples[i-1].result_.GetString() != "CON" && examples[i].result_.GetString() == "CON")) {
-            double xToTarget = target - x;                                  // distance to the target
-
-            bool cond1 = v - vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-            bool cond2 = xToTarget - r.DistTraveled(v, decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
-
-            cout << x << " " << v << endl;
-            if(cond2) cout << "DEC" << endl;
-            if(cond1 && !cond2) cout << "CON" << endl;
-            if(!cond1 && !cond2) cout << "ACC" << endl;
+        if(start == "ACC") {
+            string ASP_gen = ((r.DistTraveled(v, decMax) - r.DistTraveled(vMax, decMax) > -0.01) ? "CON" : "ACC");
+            if(ASP_gen != res){
+                cout << v << " " << vMax << " -> " << ASP_gen << " vs " << res << " : " << r.accMax << " " << r.decMax << endl;
+            }
         }
     }
 }
