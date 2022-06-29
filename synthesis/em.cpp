@@ -237,7 +237,7 @@ void emLoop(vector<Robot>& robots){
         double total = 0;
         for(uint r = 0; r < robots.size(); r++){
             // testExampleOnASP(examples[r], robots[r]);
-            robots[r].haProbCorrect = 1; // make ASP deterministic
+            robots[r].pointAccuracy = 1; // make ASP deterministic
             for(Example& ex: examples[r]){
                 total++;
                 Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
@@ -251,7 +251,7 @@ void emLoop(vector<Robot>& robots){
         double newPointAcc = min(satisfied / total, 0.95);
         cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
         for(Robot& r : robots){
-            r.haProbCorrect = newPointAcc;
+            r.pointAccuracy = newPointAcc;
         }
     }
 }

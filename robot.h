@@ -69,15 +69,15 @@ class Robot {
 
 
     normal_distribution<double> accErrDistr;      // Acceleration error distribution
-    double haProbCorrect;                         // Probability of transitioning to the correct high-level action
+    double pointAccuracy;                         // Probability of transitioning to the correct high-level action
 
-    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _accErrDistr, double _haProbCorrect){
+    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _accErrDistr, double _pointAccuracy){
         accMax = _accMax;
         decMax = _decMax;
         vMax = _vMax;
         target = _target;
         accErrDistr = _accErrDistr;
-        haProbCorrect = _haProbCorrect;
+        pointAccuracy = _pointAccuracy;
     }
 
     Robot() {}

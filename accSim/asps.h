@@ -20,7 +20,7 @@ typedef HA asp_t(HA, Obs, Robot&);
 HA pointError(HA ha, Robot& r){
     if(usePointError){
         int haDif = 0;
-        if(!r.sampleDiscrete(r.haProbCorrect)){
+        if(!r.sampleDiscrete(r.pointAccuracy)){
             if(r.sampleDiscrete(0.5)) haDif = 1;
             else haDif = 2;
         }
