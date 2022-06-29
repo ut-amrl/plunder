@@ -764,7 +764,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
         cout << "Time Elapsed: " << ((float)(std::chrono::duration_cast<std::chrono::milliseconds>(timerEnd - timerBegin).count()))/1000.0 << endl;
         cout << "- - - - -" << endl;
       }
-      if (current_best > min_accuracy[t]) break;
+      if (current_best > min_accuracy[t] || current_best == 1) break;
 
     }
     // Write the solution out to a file.
