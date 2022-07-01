@@ -84,6 +84,7 @@ class AST {
   virtual std::shared_ptr<AST> FromJson(const nlohmann::json&) = 0;
   virtual ~AST() = 0;
   const Dimension dims_;
+  int priority = -1;
   const Type type_;
   bool symbolic_;
 

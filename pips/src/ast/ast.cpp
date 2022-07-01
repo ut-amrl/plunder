@@ -138,11 +138,11 @@ std::ostream& operator<<(std::ostream& stream, const Example& example) {
 
 // Constructors
 AST::AST(const Dimension& dims, const Type& type) :
-  dims_(dims), type_(type), symbolic_(false) {
+  dims_(dims), type_(type), priority(-1), symbolic_(false) {
 }
 
 AST::AST(const Dimension& dims, const Type& type, const bool& symbolic) :
-  dims_(dims), type_(type), symbolic_(symbolic) {
+  dims_(dims), type_(type), priority(-1), symbolic_(symbolic) {
 }
 
 AST::~AST(){};

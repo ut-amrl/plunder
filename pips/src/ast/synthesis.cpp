@@ -389,8 +389,7 @@ ast_ptr PredicateL2(
   // Get a list of the names of all the feature holes in the conditional,
   // then store them in a vector because being able to access them in a
   // consistent order and by index is important for something we do later.
-  const unordered_map<string, pair<Type, Dimension>> feature_hole_map =
-      MapFeatureHoles(sketch);
+  const unordered_map<string, pair<Type, Dimension>> feature_hole_map = MapFeatureHoles(sketch);
   vector<string> feature_holes;
   for (const auto& p : feature_hole_map) {
     feature_holes.push_back(p.first);
@@ -413,10 +412,12 @@ ast_ptr PredicateL2(
   ast_ptr solution_cond = sketch;
   float current_best =  0.0;
   if (feature_hole_count > 0) {
+
     index_iterator c(ops.size(), feature_hole_count);
     solution_cond = nullptr;
     bool keep_searching = true;
     int count = 0.0;
+
     #pragma omp parallel
     while (keep_searching) {
       // Use the indices given to us by the iterator to select ops for filling
