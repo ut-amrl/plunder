@@ -15,7 +15,7 @@ namespace AST {
 std::unordered_map<std::string, std::pair<Type, Dimension>> MapFeatureHoles(
     const ast_ptr& ast);
 void ResetParams(ast_ptr ast);
-void FillHoles(ast_ptr& ast, const Model& model);
+int FillHoles(ast_ptr& ast, const Model& model);
 ast_ptr Srtrize(ast_ptr& ast);
 bool IsRelative(ast_ptr& ast);
 ast_ptr FillHoles(const ast_ptr& ast, const Model& model);

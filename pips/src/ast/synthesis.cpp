@@ -372,7 +372,7 @@ ast_ptr FillFeatureHoles(ast_ptr sketch, const vector<size_t>& indicies,
   // values from it and use them to fill the holes in a copy of the
   // condition.
   ast_ptr filled = DeepCopyAST(sketch);
-  FillHoles(filled, m);
+  filled->priority = FillHoles(filled, m);
   return filled;
 }
 
@@ -443,7 +443,7 @@ ast_ptr PredicateL2(
             keep_searching = false;
             solution_cond = filled;
             current_best = sat_ratio;
-          } else if (sat_ratio >= current_best) {      // use > or >= ??
+          } else if (sat_ratio > current_best || sat_ratio == current_best && filled->priority > solution_cond->priority) {
             solution_cond = filled;
             current_best = sat_ratio;
           }

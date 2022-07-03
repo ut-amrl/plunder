@@ -52,10 +52,10 @@ void ResetParams(ast_ptr ast) {
   ast->Accept(&mapper);
 }
 
-void FillHoles(ast_ptr& ast, const Model& model) {
+int FillHoles(ast_ptr& ast, const Model& model) {
   // If there are no holes that still need filling, work is done so exit.
   if (model.empty()) {
-    return;
+    return 0;
   }
 
   // Otherwise, just take the first (arbitrary) hole/value pair.
@@ -72,7 +72,7 @@ void FillHoles(ast_ptr& ast, const Model& model) {
   new_model.erase(hole_name);
 
   // Recursive call to fill another hole (if needed).
-  FillHoles(ast, new_model);
+  return hole_value->priority + FillHoles(ast, new_model);
 }
 
 ast_ptr FillHoles(const ast_ptr& ast, const Model& model) {
