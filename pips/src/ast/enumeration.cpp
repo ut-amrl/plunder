@@ -244,12 +244,6 @@ vector<ast_ptr> RecEnumerateHelper(const vector<ast_ptr>& roots,
                                    int depth, vector<Signature>* signatures) {
   vector<ast_ptr> result = Enumerate(roots, inputs, library);
 
-  for(ast_ptr each: result){
-    if(each->priority == -1){
-        each->priority = depth;
-    }
-  }
-
   if (sigPruning) {
     const vector<Signature> new_sigs = CalcSigs(result, examples);
     PruneFunctions(new_sigs, &result, signatures);
@@ -271,6 +265,9 @@ vector<ast_ptr> RecEnumerate(const vector<ast_ptr>& roots,
                              const vector<FunctionEntry>& library, int depth,
                              vector<Signature>* signatures) {
   CumulativeFunctionTimer::Invocation invoke(&rec_enumerate);
+  for(ast_ptr each: roots){
+    each->priority = 1;
+  }
   return RecEnumerateHelper(roots, inputs, examples, library, depth,
                             signatures);
 }
@@ -305,6 +302,7 @@ vector<ast_ptr> GetLegalOps(ast_ptr node, vector<ast_ptr> inputs,
         // output dimensions and types. Should be able to use the operations
         // themselves to infer these without needing to enumerate them all.
         UnOp result = UnOp(node, func.op_, func.output_type_, func.output_dim_);
+        result.priority = node->priority + 1;
         operations.push_back(make_shared<UnOp>(result));
       } else {
         // Binary Op, have to find some other argument.
@@ -318,12 +316,12 @@ vector<ast_ptr> GetLegalOps(ast_ptr node, vector<ast_ptr> inputs,
               (in_dim == dimensions[in_index] || !dimChecking)) {
             // Use the correct order of inputs
             if (in_index == 0) {
-              BinOp result = BinOp(input, node, func.op_, func.output_type_,
-                                   func.output_dim_);
+              BinOp result = BinOp(input, node, func.op_, func.output_type_, func.output_dim_);
+              result.priority = 1 + input->priority + node->priority;
               operations.push_back(make_shared<BinOp>(result));
             } else {
-              BinOp result = BinOp(node, input, func.op_, func.output_type_,
-                                   func.output_dim_);
+              BinOp result = BinOp(node, input, func.op_, func.output_type_, func.output_dim_);
+              result.priority = 1 + input->priority + node->priority;
               operations.push_back(make_shared<BinOp>(result));
             }
           }

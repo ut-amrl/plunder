@@ -443,7 +443,7 @@ ast_ptr PredicateL2(
             keep_searching = false;
             solution_cond = filled;
             current_best = sat_ratio;
-          } else if (sat_ratio > current_best || sat_ratio == current_best && filled->priority > solution_cond->priority) {
+          } else if (sat_ratio > current_best || sat_ratio == current_best && filled->priority < solution_cond->priority) {
             solution_cond = filled;
             current_best = sat_ratio;
           }
