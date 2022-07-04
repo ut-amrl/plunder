@@ -7,7 +7,7 @@ using namespace std;
 // Robot parameters
 const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 15;           // number of robots (depends on robot test set)
-const int model = 0;                // which ASP to use
+const int model = 6;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.2;     // low-level action error standard deviation
 
@@ -23,6 +23,10 @@ const double T_STEP = .1;               // time step (s)
 const double T_TOT = 30;                // total time (s) per simulated scenario
 const double genAccuracy = 1;         // probability of a correct high-level transition
 const double activationMinAcc = 0.2;    // Minimum acceleration (acceleration will not go below this value, excluding 0)
+const double distErrorMean = 0.0;       // Perception error for distance
+const double distErrorDev = 0.03;
+const double velErrorMean = 0.0;        // Perception error for velocity
+const double velErrorDev = 0.03;
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
@@ -45,5 +49,5 @@ const int timeStepsPlot = 1000;
 // Particle filter parameters
 const int numParticles = 2000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.1;                            // higher = more resampling
+const float resampleThreshold = 0.02;                            // higher = more resampling
 const double pf_stddevError = 0.2;

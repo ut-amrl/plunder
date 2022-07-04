@@ -139,7 +139,6 @@ class Robot {
         la = motorModel(ha, state, true);
     }
 
-
     // HELPER METHODS
 
     // Return the distance this robot would travel before stopping if it began decelerating immediately
