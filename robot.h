@@ -82,7 +82,7 @@ class Robot {
 
     Robot() {}
 
-    HA ha = CON;                        // Initial high-level action
+    HA ha = ACC;                        // Initial high-level action
     LA la = { .acc = 0 };               // Initial low-level action
     Obs state = { .pos = 0, .vel = 0 }; // Initial observed state
 
@@ -162,7 +162,7 @@ class Robot {
 
     // Reset robot
     void reset(){
-        ha = CON;
+        ha = ACC;
         la = LA { .acc = 0 };
         state = Obs { .pos = 0, .vel = 0 };
     }

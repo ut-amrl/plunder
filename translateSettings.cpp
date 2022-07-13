@@ -28,7 +28,7 @@ void assertConstraints() {
     assert(pointAccuracy >= 0 && pointAccuracy <= 1 && "HA probability must be between 0 and 1");
     assert(genAccuracy >= 0 && genAccuracy <= 1 && "HA probability must be between 0 and 1");
     assert(min_accuracy >= 0 && min_accuracy <= 1 && "min_accuracy must be between 0 and 1");
-    assert(resampleThreshold >= 0 && resampleThreshold <= 1 && "Resample threshold must be between 0 and 1");
+    // assert(resampleThreshold >= 0 && resampleThreshold <= 1 && "Resample threshold must be between 0 and 1");
 
     assert(sampleSize <= numParticles && "Sample size must be less than the number of particles");
     assert(particlesPlotted <= numParticles && "Particles plotted must be less than the number of particles");

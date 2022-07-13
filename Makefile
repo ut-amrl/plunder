@@ -47,6 +47,7 @@ $(EMNG):
 			synthesis/out/em
 
 $(EM):
+			$(MAKE) clean && \
 			$(MAKE) $(GEN) && \
 			$(MAKE) $(EMNG)
 

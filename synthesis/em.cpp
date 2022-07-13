@@ -56,6 +56,7 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
 
 // Runs LDIPS-generated ASP
 HA ldipsASP(HA ha, Obs state, Robot& robot){
+    HA prevHA = ha;
     Example obsObject = dataToExample(ha, state, robot);
     for(uint i = 0; i < transitions.size(); i++){
         if(HAToString(ha) == transitions[i].first){
@@ -66,12 +67,12 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
         }
     }
 
-    return pointError(ha, robot); // Introduce point errors - random transitions allow model to escape local minima
+    return pointError(prevHA, ha, robot, true); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    return pointError(ha, r);
+    return pointError(ha, ha, r, true);
 }
 
 // Expectation step
@@ -182,11 +183,19 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
+    // vector<string> haNames;
+    // haNames.push_back("DEC");
+    // haNames.push_back("CON");
+    // haNames.push_back("ACC");
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
-            if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            // if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            // if(i != j) transitions.push_back(pair<string, string> (haNames[i], haNames[j]));
         }
     }
+    transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    transitions.push_back(pair<string, string> ("ACC", "CON"));
+    transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
 
 void testExampleOnASP(vector<Example> examples, Robot r){
@@ -248,7 +257,7 @@ void emLoop(vector<Robot>& robots){
         }
         
         // Update point accuracy
-        double newPointAcc = min(satisfied / total, 0.95);
+        double newPointAcc = min(satisfied / total, 0.9);
         cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
         for(Robot& r : robots){
             r.pointAccuracy = newPointAcc;

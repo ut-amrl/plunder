@@ -19,17 +19,17 @@ using namespace std;
 // Initial distribution
 HA sampleInitialHA(){
     // Distribution 1: Point distribution
-    // return ACC;
+    return ACC;
 
     // Distribution 2: Uniformly Randomly Distributed
-    double rv = ((double) rand()) / RAND_MAX;
-    if(rv <= 0.33){
-        return ACC;
-    } else if (rv <= 0.67){
-        return DEC;
-    } else {
-        return CON;
-    }
+    // double rv = ((double) rand()) / RAND_MAX;
+    // if(rv <= 0.33){
+    //     return ACC;
+    // } else if (rv <= 0.67){
+    //     return DEC;
+    // } else {
+    //     return CON;
+    // }
 }
 
 // Calculate pdf of N(mu, sigma) at x, then take the natural log

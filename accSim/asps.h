@@ -12,22 +12,46 @@ using namespace std;
 
 typedef HA asp_t(HA, Obs, Robot&);
 
+
 // ----- Helper Methods ---------------------------------------------
+
+
+
+// HA safePointError(HA prevHA, HA ha, Robot& r){
+//     bool changeState = !r.sampleDiscrete(r.pointAccuracy);
+//     int haDif = 0;
+//     if(r.sampleDiscrete(0.5)) haDif = 1;
+//     else haDif = 2;
+
+//     if(changeState){
+//         if(prevHA == ACC) ha = static_cast<HA>((ha + haDif)%3);
+//         else if(prevHA == CON && ha == CON) ha = DEC;
+//         else if(prevHA == CON && ha == DEC) ha = CON;
+//     }
+//     cout << prevHA << " " << ha << "|  ";
+//     return ha;
+// }
+
 
 /*
  * Randomly transitions to an incorrect high-level action with specified probability
  */
-HA pointError(HA ha, Robot& r){
+HA pointError(HA prevHA, HA ha, Robot& r, int useSafePointError){
     if(usePointError){
         int haDif = 0;
         if(!r.sampleDiscrete(r.pointAccuracy)){
             if(r.sampleDiscrete(0.5)) haDif = 1;
             else haDif = 2;
         }
-        return static_cast<HA>((ha + haDif)%3);
+        ha = static_cast<HA>((ha + haDif)%3);
+    }
+    if(useSafePointError){
+        if(prevHA == CON && ha == ACC) ha = CON;
+        if(prevHA == DEC) ha = DEC;
     }
     return ha;
 }
+
 
 double logistic(double midpoint, double steepness, double input){
     return 1.0 / (1.0 + exp(-steepness * (input - midpoint)));
@@ -52,6 +76,25 @@ HA ASP_Hand(HA ha, Obs state, Robot& r){
     }
     if(!cond1 && !cond2){
         ha = ACC;
+    }
+
+    return ha;
+}
+
+/*
+ * Clean version of ASP_Hand, ie only containing realistic transition changes
+ */
+HA ASP_Hand_clean(HA ha, Obs state, Robot& r){
+    double xToTarget = r.target - state.pos;                                  // distance to the target
+
+    bool cond1 = state.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
+
+    if(cond2){
+        ha = DEC;
+    }
+    else if(ha == ACC && cond1){
+        ha = CON;
     }
 
     return ha;
@@ -186,7 +229,15 @@ HA ASP_random(HA ha, Obs state, Robot& r){
 }
 
 // Select an ASP to use
-vector<asp_t*> ASPs = { &ASP_Hand, &ASP_LDIPS, &ASP_LDIPS_error, &ASP_Hand_prob, &ASP_accDecOnly, &ASP_random, &ASP_Sim };
+vector<asp_t*> ASPs = { &ASP_Hand,              // 0
+                        &ASP_LDIPS,             // 1
+                        &ASP_LDIPS_error,       // 2
+                        &ASP_Hand_prob,         // 3
+                        &ASP_accDecOnly,        // 4
+                        &ASP_random,            // 5
+                        &ASP_Sim,               // 6
+                        &ASP_Hand_clean         // 7
+                        };
 
 asp_t* ASP_model(int model){
     return ASPs[model];
