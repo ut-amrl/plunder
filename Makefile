@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -g -std=c++17 -march=native -ggdb -O2 -fPIC -fopenmp -Wall
 PY = python3
 
-export OMP_NUM_THREADS := 16
+export OMP_NUM_THREADS := 8
 
 SETTINGS = settings
 GEN = gen

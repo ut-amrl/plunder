@@ -67,7 +67,7 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
         }
     }
 
-    return pointError(prevHA, ha, robot, true); // Introduce point errors - random transitions allow model to escape local minima
+    return pointError(prevHA, ha, robot, false); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
