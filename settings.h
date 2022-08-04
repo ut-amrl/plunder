@@ -34,7 +34,7 @@ const int sampleSize = 20;              // number of trajectories to pass into E
 const bool usePointError = true;        // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.9;       // probability of a correct (ASP-consistent) high-level transition
 const bool useBoundaryError = true;    // boundary error: threshold-dependent error in EMDIPS-generated ASP
-const double boundaryDeviation = 5.0;   // conditional deviation
+const double boundaryDeviation = 1.0;   // conditional deviation
 
 // EMDIPS parameters
 const int window_size = 2;

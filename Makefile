@@ -10,6 +10,7 @@ PF = pf
 PLT = plt
 EM = em
 EMNG = emng
+EMTEST = emtest
 
 INCLUDES = -L pips/lib \
 			-l c++-pips-core -l amrl_shared_lib -l z3 \
@@ -50,6 +51,13 @@ $(EM):
 			$(MAKE) clean && \
 			$(MAKE) $(GEN) && \
 			$(MAKE) $(EMNG)
+
+$(EMTEST):
+			rm -rf synthesis/out && \
+			mkdir -p synthesis/out/examples && \
+			echo Threads used: $$OMP_NUM_THREADS && \
+			$(CC) $(CFLAGS) synthesis/tests/unit_tests.cpp $(INCLUDES) -o synthesis/out/emtest && \
+			synthesis/out/emtest
 
 clean: 
 			rm -rf accSim/out \
