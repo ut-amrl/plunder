@@ -147,6 +147,8 @@ vector<ast_ptr> EnumerateSketchesHelper(int depth) {
     return sketches;
   }
 
+  // Express as CNF
+
   for (auto skt : rec_sketches) {
     if (skt->type_ != BOOL) {
       std::shared_ptr<BinOp> andg = make_shared<BinOp>(great, skt, "And");
@@ -167,8 +169,6 @@ vector<ast_ptr> EnumerateSketches(int depth) {
   int counter = 0;
   while (counter <= depth) {
     const vector<ast_ptr> current = EnumerateSketchesHelper(counter);
-    for (auto astptr : current) {
-    }
     sketches.insert(sketches.end(), current.begin(), current.end());
     counter++;
   }

@@ -711,6 +711,10 @@ EmdipsOutput emdips(const vector<Example>& demos,
   // Enumerate possible sketches
   const auto sketches = EnumerateSketches(sketch_depth);
   cout << "Number of sketches: " << sketches.size() << endl;
+  for(ast_ptr each: sketches){
+    cout << each << endl;
+  }
+  cout << endl << endl;
 
   vector<ast_ptr> transition_solutions;
 

@@ -15,28 +15,10 @@ typedef HA asp_t(HA, Obs, Robot&);
 
 // ----- Helper Methods ---------------------------------------------
 
-
-
-// HA safePointError(HA prevHA, HA ha, Robot& r){
-//     bool changeState = !r.sampleDiscrete(r.pointAccuracy);
-//     int haDif = 0;
-//     if(r.sampleDiscrete(0.5)) haDif = 1;
-//     else haDif = 2;
-
-//     if(changeState){
-//         if(prevHA == ACC) ha = static_cast<HA>((ha + haDif)%3);
-//         else if(prevHA == CON && ha == CON) ha = DEC;
-//         else if(prevHA == CON && ha == DEC) ha = CON;
-//     }
-//     cout << prevHA << " " << ha << "|  ";
-//     return ha;
-// }
-
-
 /*
  * Randomly transitions to an incorrect high-level action with specified probability
  */
-HA pointError(HA prevHA, HA ha, Robot& r, int useSafePointError){
+HA pointError(HA prevHA, HA ha, Robot& r, bool useSafePointError){
     if(usePointError){
         int haDif = 0;
         if(!r.sampleDiscrete(r.pointAccuracy)){
