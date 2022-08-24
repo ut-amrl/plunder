@@ -111,7 +111,7 @@ def run_optimizer():
 
 # -------- Tests, Problems, and Data -----------------------------
 
-### Goal: synthesize x < 30
+### Goal: synthesize x < 30 ----------> SUCCESS
 # https://www.desmos.com/calculator/rymyh1m1gv
 
 clauses = []
@@ -129,7 +129,7 @@ assert abs(log_loss([4, 35]) - 24) < 0.001
 
 
 
-### Goal: synthesize (x > 10 && x < 20)
+### Goal: synthesize (x > 10 && x < 20) ----------> SUCCESS
 
 clauses = [ '&' ] # (p_1 & p_2)
 y_j = [False, False, False, True, True, True, True, False, False, False, False] # whether or not each example satisfied the transition
@@ -143,7 +143,7 @@ res = run_optimizer()
 
 
 
-### Goal: synthesize (x > 10 && x < 20) || x > 50
+### Goal: synthesize (x > 10 && x < 20) || x > 50 ----------> FAIL
 # https://www.desmos.com/calculator/1m79wd5h0e 
 
 clauses = [ '&' , '|' ] # (p_1 & p_2) | p_3
