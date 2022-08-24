@@ -5,6 +5,15 @@ import math
 
 from scipy import optimize
 
+
+# todo
+# set threshold bounds to be the min/max of all samples (hardcoded rn)
+# set spread bounds to force it to be the correct sign (hardcoded rn)
+# init threshold bounds to be the mean of all samples (0 rn)
+# init spread bounds to 1's and -1's (hardcoded rn)
+# emergency option: only solve for threshold, not for spread
+
+
 # ------- Parameters -----------------------------
 max_spread = 10
 max_threshold = 1000
@@ -41,6 +50,7 @@ def log_loss(x):
 def run_optimizer():
     # -------- Initialization -------------------
     init = np.zeros(2 * len(E_k)) # Set initial center and "spread" to 0
+    init = [1, -1, 1, 0, 0, 0] # <----------------------------------------------------------------- HARDCODED
 
     # -------- Bounds ---------------------------
     # Set center bounds
@@ -63,6 +73,7 @@ def run_optimizer():
 
     bounds_obj = Bounds()
     bounds_arr = optimize.Bounds(bounds_lower, bounds_upper)
+    bounds_arr = optimize.Bounds([0, -10, 0, -10, -10, -10], [10, 0, 10, 80, 80, 80])# <------------------------- HARDCODED
     
     # --------- Stepping -------------------------
     class TakeStep:
@@ -74,6 +85,7 @@ def run_optimizer():
             s = self.stepsize
             x[:mid] += self.rng.uniform(-s, s, x[:mid].shape)
             x[mid:] += self.rng.uniform(-100*s, 100*s, x[mid:].shape)
+            # x += (np.random.randint(2, size=x.shape)-0.5)*2
             return x
 
     step_obj = TakeStep()
@@ -93,7 +105,7 @@ def run_optimizer():
     # res = optimize.minimize(log_loss, init, method='BFGS', options={'disp': True})
 
     # global optimization: basin hopping
-    # res = optimize.basinhopping(log_loss, init, niter=100, T=50.0, minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, take_step=step_obj, callback=print_fun, seed=rng)
+    # res = optimize.basinhopping(log_loss, init, niter=1000, T=1000.0, minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, take_step=step_obj, callback=print_fun, seed=rng)
 
     # global optimization: dual annealing
     res = optimize.dual_annealing(log_loss, bounds_arr, x0=init, maxiter=2000, initial_temp=40000, visit=3.0, accept=-5, minimizer_kwargs=minimizer_kwargs)
@@ -139,12 +151,13 @@ E_k = [
 ] # value of E_k(s) for each example, for each predicate
 
 ### Tests
-res = run_optimizer()
+# res = run_optimizer()
 
 
 
-### Goal: synthesize (x > 10 && x < 20) || x > 50 ----------> FAIL
+### Goal: synthesize (x > 10 && x < 20) || x > 50 ----------> SUCCESS (after tweaking)
 # https://www.desmos.com/calculator/1m79wd5h0e 
+# https://www.desmos.com/calculator/fd4codpi8i
 
 clauses = [ '&' , '|' ] # (p_1 & p_2) | p_3
 y_j = [False, False, False, True, True, True, True, False, False, False, False, True, True, True] # whether or not each example satisfied the transition
@@ -157,5 +170,11 @@ E_k = [
 ### Tests
 assert abs(log_loss([2, -2, 1, 12, 18, 50]) - 4.9155) < 0.001
 assert abs(log_loss([-1, -5, -1, 3, 18, 4]) - 176.66) < 0.001
+assert abs(log_loss([-0.09, 0.3, 0.3, 30, 3, 53]) - 6.7191) < 0.001
+assert abs(log_loss([3, -3, 8, 10, 20, 50]) - .195) < 0.001
+assert abs(log_loss([ 9.17704836, -9.96464641,  9.30102843, 10.07471293, 20.03487693, 49.95211582]) - 0) < 0.001
 
-# res = run_optimizer()
+# print(log_loss([]))
+
+res = run_optimizer()
+
