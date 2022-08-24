@@ -124,8 +124,22 @@ E_k = [
 assert abs(log_loss([2, 25]) - 12) < 0.001
 assert abs(log_loss([4, 35]) - 24) < 0.001
 
-res = run_optimizer()
+# res = run_optimizer()
 # assert abs(res.x[1] - 30) < 0.05
+
+
+
+### Goal: synthesize (x > 10 && x < 20)
+
+clauses = [ '&' ] # (p_1 & p_2)
+y_j = [False, False, False, True, True, True, True, False, False, False, False] # whether or not each example satisfied the transition
+E_k = [ 
+    [-5, 0, 9, 11, 14, 15, 19, 21, 30, 40, 49],
+    [-5, 0, 9, 11, 14, 15, 19, 21, 30, 40, 49],
+] # value of E_k(s) for each example, for each predicate
+
+### Tests
+res = run_optimizer()
 
 
 
@@ -144,4 +158,4 @@ E_k = [
 assert abs(log_loss([2, -2, 1, 12, 18, 50]) - 4.9155) < 0.001
 assert abs(log_loss([-1, -5, -1, 3, 18, 4]) - 176.66) < 0.001
 
-res = run_optimizer()
+# res = run_optimizer()
