@@ -17,9 +17,9 @@ import time
 # ------- Parameters -----------------------------
 max_spread = 50
 bounds_extension = 0.1
-opt_method = 1
+opt_method = 3
 print_warnings = False
-padding = 30
+print_padding = 30
 
 # optimization method
 # 0: local
@@ -64,7 +64,7 @@ def lr(l):
     return max(l)-min(l)
 
 def print_with_padding(label, value):
-    print((label+" ").ljust(padding, "-")+" "+str(value))
+    print((label+" ").ljust(print_padding, "-")+" "+str(value))
 
 
 
@@ -199,8 +199,8 @@ E_k = [
 
 
 ### Goal: synthesize (x > 10 && x < 20) || x > 50 ----------> SUCCESS (after tweaking)
-# https://www.desmos.com/calculator/1m79wd5h0e 
-# https://www.desmos.com/calculator/fd4codpi8i
+# https://www.desmos.com/calculator/1m79wd5h0e
+# https://www.desmos.com/calculator/ttucfvkvlp
 
 
 # ---------- Define examples -------------------------------------
