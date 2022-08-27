@@ -7,6 +7,8 @@
 
 
 void setBoundaryStddev(double err);
+void setInterpOpt(int mode);
+void setExampleState(bool yes);
 
 namespace AST {
 

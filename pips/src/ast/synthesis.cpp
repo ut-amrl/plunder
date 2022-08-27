@@ -23,6 +23,8 @@
 #include "../submodules/amrl_shared_lib/util/timer.h"
 #include "utils/nd_bool_array.hpp"
 
+#include "../../sklearn/logistic_regression.h"
+
 using std::vector;
 using std::pair;
 using std::string;
@@ -41,7 +43,12 @@ using AST::CheckModelAccuracy;
 
 bool flagsDebug = true;
 
-const bool usingOpt = false;
+bool usingOpt = false;
+
+void setUseOpt(bool yes){
+  usingOpt = yes;
+}
+
 
 namespace AST {
 
@@ -152,11 +159,14 @@ Model SolveSMTLIBProblem(const string& problem) {
   z3::optimize solver(context);
   solver.from_string(problem.c_str());
   z3::check_result result = solver.check();
+  // cout << "model" << endl;
+  // cout << solver.get_model() << endl;
   if(usingOpt) return Z3ModelToMap(solver.get_model());
   if (result == z3::sat) {
     z3::model m = solver.get_model();
     return Z3ModelToMap(m);
   } else {
+    cout << "unsat" << endl;
     throw std::invalid_argument("UNSAT");
   }
 }
@@ -179,6 +189,10 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
   all_examples.insert(no.cbegin(), no.cend());
   // For every example, ...
 
+
+  float noOverYes = ((float)no.size()) / ((float)yes.size());
+
+
   for (const Example& example : all_examples) {
 
     // Partially evaluate the program with the examples as much as possible.
@@ -188,23 +202,24 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
 
     if(usingOpt){
 
+
       if(yes.find(example) != yes.cend()){
         ToSMTOPT converter = AstToSMTOPT(partial, example, true);
         const string smtlib = converter.Get();
-        assertions.insert("(minimize " + smtlib + ")");
+        // assertions.insert("(minimize (* " + std::to_string(noOverYes) + " " + smtlib + "))");
+        assertions.insert("(* " + std::to_string(noOverYes) + " " + smtlib + ")");
         // If there are any parameter holes, make note of them too.
         const unordered_set<string> example_params = converter.GetParams();
         params.insert(example_params.cbegin(), example_params.cend());
-        // cout << "RES " << "(minimize " + smtlib + ")" << endl;
       }
       if(no.find(example) != no.cend()){
         ToSMTOPT converter = AstToSMTOPT(partial, example, false);
         const string smtlib = converter.Get();
-        assertions.insert("(minimize " + smtlib + ")");
+        // assertions.insert("(minimize " + smtlib + ")");
+        assertions.insert(smtlib);
         // If there are any parameter holes, make note of them too.
         const unordered_set<string> example_params = converter.GetParams();
         params.insert(example_params.cbegin(), example_params.cend());
-        // cout << "RES " << "(minimize " + smtlib + ")" << endl;
       }
 
 
@@ -273,10 +288,10 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
       (ite (> x!1 x!2) x!1 x!2))
 
     (define-fun lt-err ((x!1 Real) (x!2 Real)) Real
-      (^ (fmin 0 (- x!1 x!2)) 2))
+      (^ (fmax 0 (- x!1 x!2)) 2))
 
     (define-fun gt-err ((x!1 Real) (x!2 Real)) Real
-      (^ (fmax 0 (- x!1 x!2)) 2))
+      (^ (fmin 0 (- x!1 x!2)) 2))
   )";
 
   // For every parameter hole discovered, add a real constant to the problem.
@@ -285,9 +300,20 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
   }
 
   // Add every assertion created previously to the problem.
+  // for (const string& assertion : assertions) {
+  //   problem += assertion + "\n";
+  // }
+
+  problem += "(minimize ";
   for (const string& assertion : assertions) {
-    problem += assertion + "\n";
+    problem += "(+ "+assertion+" ";
   }
+  problem += "0";
+  for (const string& assertion : assertions) {
+    problem += ")";
+  }
+  problem += ")\n";
+
 
   if (srtr) {
   for (const string& param : params) {
@@ -307,24 +333,54 @@ string MakeSMTLIBProblem(const unordered_set<Example>& yes,
   return problem;
 }
 
+
+double PredicateLR(ast_ptr sketch, const unordered_set<Example>& pos,
+    const unordered_set<Example>& neg){
+
+      for(Example& example : pos){
+          ast_ptr partial = Interpret(program, example);
+          num_ptr left_cast = dynamic_pointer_cast<Num>(left);
+          
+      }
+
+      logistic_regression lg({ { 6, 180, 12 },{ 5.92, 190, 11 },{ 5.58, 170, 12 },
+        { 5.92, 165, 10 },{ 5, 100, 6 },{ 5.5, 150, 8 },{ 5.42, 130, 7 },{ 5.75, 150, 9 } },
+        { 0, 0, 0, 0, 1, 1, 1, 1 }, NODEBUG);
+      lg.fit();
+    std::map<unsigned long int, double> probabilities = lg.predict({ 6, 130, 8 });
+    return probabilities[0];
+}
+
+
+
 // Attempts to solve for a satisfactory assignment of real values to
 // parameter holes that satisfies a subset of examples. Returns the
 // percentage of examples satisfied.
 double PredicateL1(ast_ptr sketch, const unordered_set<Example>& pos,
     const unordered_set<Example>& neg, const bool srtr) {
   const string problem = MakeSMTLIBProblem(pos, neg, sketch, srtr);
+  
+  cout << PredicateLR(sketch, pos, neg) << endl;
+
   try {
     const Model solution = SolveSMTLIBProblem(problem);
     if (solution.empty()) {
+      cout << "empty" << endl;
       throw std::invalid_argument("UNSAT");
     }
     FillHoles(sketch, solution);
+    // const double output = usingOpt ? GetModelLoss(sketch, pos, neg) : CheckModelAccuracy(sketch, pos, neg);
     const double output = CheckModelAccuracy(sketch, pos, neg);
+    cout << "model " << sketch << endl;
+    cout << " loss " << output << endl;
     return output;
   } catch (const std::invalid_argument) {
-    return 0.0;
+    return -std::numeric_limits<float>::infinity();
   }
 }
+
+
+
 
 ast_ptr FillFeatureHoles(ast_ptr sketch, const vector<size_t>& indicies,
     const vector<ast_ptr>& ops) {
@@ -403,14 +459,14 @@ ast_ptr PredicateL2(
   unordered_set<Example> no;
   SplitExamples(examples, transition, &yes, &no);
 
-  if (flagsDebug) {
+  // if (flagsDebug) {
     cout << "Current Sketch: " << sketch << endl;
-  }
+  // }
 
   // Start iterating through possible models. index_iterator is explained
   // seperately.
   ast_ptr solution_cond = sketch;
-  float current_best =  0.0;
+  float current_best =  -std::numeric_limits<float>::infinity();
   if (feature_hole_count > 0) {
 
     index_iterator c(ops.size(), feature_hole_count);
@@ -436,16 +492,27 @@ ast_ptr PredicateL2(
 
       ast_ptr filled = FillFeatureHoles(sketch, op_indicies, ops);
       if (filled != nullptr) {
-        const double sat_ratio = PredicateL1(filled, yes, no, false);
-        #pragma omp critical
-        {
-          if (keep_searching && sat_ratio >= min_accuracy) {
-            keep_searching = false;
-            solution_cond = filled;
-            current_best = sat_ratio;
-          } else if (sat_ratio > current_best || sat_ratio == current_best && filled->priority < solution_cond->priority) {
-            solution_cond = filled;
-            current_best = sat_ratio;
+        if(usingOpt){
+          const double loss = PredicateL1(filled, yes, no, false);
+          #pragma omp critical
+          {
+            if(loss >= current_best){
+              current_best = loss;
+              solution_cond = filled;
+            }
+          }
+        } else {
+          const double sat_ratio = PredicateL1(filled, yes, no, false);
+          #pragma omp critical
+          {
+            if (keep_searching && sat_ratio >= min_accuracy) {
+              keep_searching = false;
+              solution_cond = filled;
+              current_best = sat_ratio;
+            } else if (sat_ratio > current_best || sat_ratio == current_best && filled->priority < solution_cond->priority) {
+              solution_cond = filled;
+              current_best = sat_ratio;
+            }
           }
         }
       }
@@ -740,21 +807,27 @@ EmdipsOutput emdips(const vector<Example>& demos,
     SplitExamples(examples, transition, &yes, &no);
     cout << "Num transitions (pos): " << yes.size() << endl;
     cout << "Num transitions (neg): " << no.size() << endl;
+
+    for(const Example& example : yes) {
+      cout << example.symbol_table_.find("x")->second.GetFloat() << endl;
+    }
+    for(const Example& example : no) {
+      cout << example.symbol_table_.find("x")->second.GetFloat() << endl;
+    }
+
     if(yes.size() == 0) {
       transition_solutions.push_back(make_shared<Bool>(Bool(false)));
       accuracies.push_back(1.0);
       continue;
     }
 
-    float current_best = 0.0;
+    float current_best = -std::numeric_limits<float>::infinity();
     ast_ptr current_solution = nullptr;
     for (const auto& sketch : sketches) {
       std::chrono::steady_clock::time_point timerBegin = std::chrono::steady_clock::now();
 
       // Attempt L2 Synthesis with current sketch.
-      // cout << "BEFORE EMDIPS" << endl;
       pair<ast_ptr, float> new_solution = emdipsL2(sketch, examples, lib, transition, min_accuracy[t]);
-      // cout << "AFTER EMDIPS" << endl;
       
       if (new_solution.second > current_best) {
         current_best = new_solution.second;
@@ -767,7 +840,7 @@ EmdipsOutput emdips(const vector<Example>& demos,
         cout << "Time Elapsed: " << ((float)(std::chrono::duration_cast<std::chrono::milliseconds>(timerEnd - timerBegin).count()))/1000.0 << endl;
         cout << "- - - - -" << endl;
       }
-      if (current_best > min_accuracy[t] || current_best == 1) break;
+      // if (current_best > min_accuracy[t] || current_best == 1) break;
 
     }
     // Write the solution out to a file.

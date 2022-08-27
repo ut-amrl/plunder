@@ -4,19 +4,30 @@ import matplotlib.pyplot as plt
 import math
 
 from scipy import optimize
+import warnings
+import time
 
-
-# todo
-# set threshold bounds to be the min/max of all samples (hardcoded rn)
-# set spread bounds to force it to be the correct sign (hardcoded rn)
-# init threshold bounds to be the mean of all samples (0 rn)
-# init spread bounds to 1's and -1's (hardcoded rn)
-# emergency option: only solve for threshold, not for spread
+# --------------- TODO ------------------------
+# other option: only solve for threshold, not for spread
+# define clauses as a tree instead a list of all & and | being left associative
+# run more benchmarks
+# interface with C++
 
 
 # ------- Parameters -----------------------------
-max_spread = 10
-max_threshold = 1000
+max_spread = 50
+bounds_extension = 0.1
+opt_method = 1
+print_warnings = False
+padding = 30
+
+# optimization method
+# 0: local
+# 1: basin hopping
+# 2: dual annealing
+# 3: DIRECT
+
+
 
 # -------- objective function --------------------
 def log_loss(x):
@@ -46,20 +57,35 @@ def log_loss(x):
     return log_loss
 
 
-# --------- optimizer -----------------------------
-def run_optimizer():
-    # -------- Initialization -------------------
-    init = np.zeros(2 * len(E_k)) # Set initial center and "spread" to 0
-    init = [1, -1, 1, 0, 0, 0] # <----------------------------------------------------------------- HARDCODED
 
-    # -------- Bounds ---------------------------
-    # Set center bounds
-    bounds_lower = np.full(len(init), -1 * max_threshold)
-    bounds_upper = np.full(len(init), max_threshold)
-    for i in range(len(E_k)):
-        # Set bounds on the spread -- keep some error
-        bounds_lower[i] = -1 * max_spread
-        bounds_upper[i] = max_spread
+# ------- helper functions ----------------------
+# list range
+def lr(l):
+    return max(l)-min(l)
+
+def print_with_padding(label, value):
+    print((label+" ").ljust(padding, "-")+" "+str(value))
+
+
+
+# --------- optimizer -----------------------------
+def run_optimizer(E_k, y_j, clauses, signs):
+    
+    # ---------- Initialization ------------
+    x_0_init = signs
+    e_init = [sum(expression)/len(expression) for expression in E_k]
+    init = np.concatenate((x_0_init, e_init))
+    print_with_padding("Initial values", "|")
+    print(init)
+
+    # ---------- Bounds --------------------
+    x_0_bounds = [(max_spread/2*(n-1), max_spread/2*(n+1)) for n in x_0_init]
+    e_bounds = [(min(expression)-lr(expression)*bounds_extension, max(expression)+lr(expression)*bounds_extension) for expression in E_k]
+    bounds = np.concatenate((x_0_bounds, e_bounds))
+    bounds_lower = [b[0] for b in bounds]
+    bounds_upper = [b[1] for b in bounds]
+    print_with_padding("Bounds", "|")
+    print(bounds)
 
     class Bounds:
         def __init__(self, xmax=bounds_upper, xmin=bounds_lower):
@@ -73,9 +99,8 @@ def run_optimizer():
 
     bounds_obj = Bounds()
     bounds_arr = optimize.Bounds(bounds_lower, bounds_upper)
-    bounds_arr = optimize.Bounds([0, -10, 0, -10, -10, -10], [10, 0, 10, 80, 80, 80])# <------------------------- HARDCODED
     
-    # --------- Stepping -------------------------
+    # --------- Stepping (basin hopping) -------------------------
     class TakeStep:
         def __init__(self, stepsize=0.5):
             self.stepsize = stepsize
@@ -101,27 +126,40 @@ def run_optimizer():
     minimizer_kwargs = {"method": "BFGS"}
     rng = np.random.default_rng()
 
-    # local optimization
-    # res = optimize.minimize(log_loss, init, method='BFGS', options={'disp': True})
+    # local optimization - fastest but local so may not always work
+    # global optimization: basin hopping - slowest
+    # global optimization: dual annealing - good balance
+    # global optimization: DIRECT algorithm - fast but bad lol
 
-    # global optimization: basin hopping
-    # res = optimize.basinhopping(log_loss, init, niter=1000, T=1000.0, minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, take_step=step_obj, callback=print_fun, seed=rng)
+    if(opt_method == 0):
+         res = optimize.minimize(log_loss, init, 
+                                method='BFGS', options={'disp': True})
+    elif(opt_method == 1):
+         res = optimize.basinhopping(log_loss, init,
+                                niter=1000, T=1000.0,
+                                minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, 
+                                take_step=step_obj, callback=print_fun, seed=rng)
+    elif(opt_method == 2):
+         res = optimize.dual_annealing(log_loss, bounds, x0=init, 
+                                        maxiter=1000, initial_temp=40000, 
+                                        visit=3.0, accept=-5, 
+                                        minimizer_kwargs=minimizer_kwargs)
+    elif(opt_method == 3):
+         res = optimize.direct(log_loss, bounds_arr, 
+                                maxiter=10000)
+    else:
+        sys.exit("Please use a valid optimization method")
 
-    # global optimization: dual annealing
-    res = optimize.dual_annealing(log_loss, bounds_arr, x0=init, maxiter=2000, initial_temp=40000, visit=3.0, accept=-5, minimizer_kwargs=minimizer_kwargs)
-
-    # global optimization: DIRECT algorithm - doesn't really work
-    # res = optimize.direct(log_loss, bounds_arr, maxiter=1000)
-
-    print("Optimal parameters: ")
+    print_with_padding("Optimal parameters", "|")
     print(res.x)
-    print("Minimum value: ")
-    print(res.fun)
-    print("Num iterations: ")
-    print(res.nfev)
+    # print_with_padding("Num iterations", res.nfev)
+    print_with_padding("Minimum value", res.fun)
     return res
 
 # -------- Tests, Problems, and Data -----------------------------
+
+if(not print_warnings):
+    warnings.filterwarnings('ignore')
 
 ### Goal: synthesize x < 30 ----------> SUCCESS
 # https://www.desmos.com/calculator/rymyh1m1gv
@@ -155,11 +193,17 @@ E_k = [
 
 
 
+
+
+
+
+
 ### Goal: synthesize (x > 10 && x < 20) || x > 50 ----------> SUCCESS (after tweaking)
 # https://www.desmos.com/calculator/1m79wd5h0e 
 # https://www.desmos.com/calculator/fd4codpi8i
 
-clauses = [ '&' , '|' ] # (p_1 & p_2) | p_3
+
+# ---------- Define examples -------------------------------------
 y_j = [False, False, False, True, True, True, True, False, False, False, False, True, True, True] # whether or not each example satisfied the transition
 E_k = [ 
     [-5, 0, 9, 11, 14, 15, 19, 21, 30, 40, 49, 51, 55, 70],
@@ -167,14 +211,31 @@ E_k = [
     [-5, 0, 9, 11, 14, 15, 19, 21, 30, 40, 49, 51, 55, 70],
 ] # value of E_k(s) for each example, for each predicate
 
-### Tests
-assert abs(log_loss([2, -2, 1, 12, 18, 50]) - 4.9155) < 0.001
-assert abs(log_loss([-1, -5, -1, 3, 18, 4]) - 176.66) < 0.001
-assert abs(log_loss([-0.09, 0.3, 0.3, 30, 3, 53]) - 6.7191) < 0.001
-assert abs(log_loss([3, -3, 8, 10, 20, 50]) - .195) < 0.001
-assert abs(log_loss([ 9.17704836, -9.96464641,  9.30102843, 10.07471293, 20.03487693, 49.95211582]) - 0) < 0.001
+# now introduce some error
+# it works
+E_k = [ 
+    [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
+    [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
+    [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
+] # value of E_k(s) for each example, for each predicate
 
-# print(log_loss([]))
+# ---------- Define equation ------------------------------------
+# clauses have left associativity?
+clauses = [ '&' , '|' ]     # (p_1 & p_2) | p_3
+signs = [1, -1, 1]          # p_1 = e_1 > n_1
+                            # p_2 = e_2 < n_2
+                            # p_3 = e_3 > n_3
 
-res = run_optimizer()
+### ----------------- Tests ---------------------------------------
+# assert abs(log_loss([2, -2, 1, 12, 18, 50]) - 4.9155) < 0.001
+# assert abs(log_loss([-1, -5, -1, 3, 18, 4]) - 176.66) < 0.001
+# assert abs(log_loss([-0.09, 0.3, 0.3, 30, 3, 53]) - 6.7191) < 0.001
+# assert abs(log_loss([3, -3, 8, 10, 20, 50]) - .195) < 0.001
+# assert abs(log_loss([ 9.17704836, -9.96464641,  9.30102843, 10.07471293, 20.03487693, 49.95211582]) - 0) < 0.001
+
+start = time.perf_counter()
+res = run_optimizer(E_k, y_j, clauses, signs)
+end = time.perf_counter()
+
+print_with_padding("Time Elapsed", end-start)
 

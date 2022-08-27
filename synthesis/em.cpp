@@ -183,14 +183,14 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    for(uint i = 0; i < numHA; i++){
-        for(uint j = 0; j < numHA; j++){
-            if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-        }
-    }
-    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    // transitions.push_back(pair<string, string> ("ACC", "CON"));
-    // transitions.push_back(pair<string, string> ("CON", "DEC"));
+    // for(uint i = 0; i < numHA; i++){
+    //     for(uint j = 0; j < numHA; j++){
+    //         if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+    //     }
+    // }
+    transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    transitions.push_back(pair<string, string> ("ACC", "CON"));
+    transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
 
 void testExampleOnASP(vector<Example> examples, Robot r){
@@ -262,6 +262,7 @@ void emLoop(vector<Robot>& robots){
 
 int main() {
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
+    setUseOpt(useOptimizer);
     emLoop(robots);
 
     return 0;

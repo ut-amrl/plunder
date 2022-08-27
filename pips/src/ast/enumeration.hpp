@@ -78,6 +78,9 @@ bool IndexInVector(const std::vector<T>& vec, const T& element, int* index) {
   *index = -1;
   return false;
 }
+double GetModelLoss(const ast_ptr& cond,
+                          const std::unordered_set<Example>& yes,
+                          const std::unordered_set<Example>& no);
 
 double CheckModelAccuracy(const ast_ptr& cond,
                           const std::unordered_set<Example>& yes,

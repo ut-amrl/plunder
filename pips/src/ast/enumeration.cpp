@@ -378,31 +378,140 @@ double CheckModelAccuracy(const ast_ptr& cond,
                           const unordered_set<Example>& yes,
                           const unordered_set<Example>& no) {
   CumulativeFunctionTimer::Invocation invoke(&check_accuracy);
-  // Create a variable for keeping track of the number of examples where we get
-  // the expected result.
-  size_t satisfied = 0;
-  // Count for how many "yes" examples the interpretation of the condition is
-  // true.
+
+
+
+
+
+
+  size_t yesNum = 0;
+  size_t noNum = 0;
+  size_t falsePositive = 0;
+  size_t falseNegative = 0;
+
+// get rid of tautologies
   for (const Example& example : yes) {
     const ast_ptr result = Interpret(cond, example);
     bool_ptr result_cast = dynamic_pointer_cast<Bool>(result);
-    if (result_cast->value_) satisfied += 1;
+    if (result_cast->value_) {
+      yesNum += 1;
+    } else {
+      noNum += 1;
+      falseNegative += 1;
+    }
   }
 
-  // Count for how many "no" examples the interpretation of the condition is
-  // false.
   for (const Example& example : no) {
     const ast_ptr result = Interpret(cond, example);
     bool_ptr result_cast = dynamic_pointer_cast<Bool>(result);
     if (!result_cast->value_) {
-      satisfied += 1;
+      noNum += 1;
+    } else {
+      yesNum += 1;
+      falsePositive += 1;
     }
   }
+  // cout << yesNum << " " << noNum << endl;
+  // cout << falsePositive << " " << falseNegative << endl;
+  if(yesNum == 0 || noNum == 0) return -std::numeric_limits<float>::infinity();
 
-  // Compute the final percentage of satisfied examples to all examples.
-  const double sat_ratio = (double)satisfied / (yes.size() + no.size());
-  return sat_ratio;
+
+
+
+
+
+  // Create a variable for keeping track of the number of examples where we get
+  // the expected result.
+  double lossP = 0;
+  double sumP = 0;
+  double lossN = 0;
+  double sumN = 0;
+  // Count for how many "yes" examples the interpretation of the condition is true.
+  setInterpOpt(1);
+  setExampleState(true);
+  for (const Example& example : yes) {
+    const ast_ptr result = Interpret(cond, example);
+    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
+    // cout << result_cast->value_ << endl;
+    lossP += result_cast->value_;
+  }
+
+  // Count for how many "no" examples the interpretation of the condition is false.
+  setExampleState(false);
+  for (const Example& example : no) {
+    const ast_ptr result = Interpret(cond, example);
+    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
+    // cout << result_cast->value_ << endl;
+    lossN += result_cast->value_;
+  }
+
+  setInterpOpt(2);
+  setExampleState(true);
+  for (const Example& example : yes) {
+    const ast_ptr result = Interpret(cond, example);
+    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
+    // cout << result_cast->value_ << endl;
+    sumP += result_cast->value_;
+  }
+
+  // Count for how many "no" examples the interpretation of the condition is false.
+  setExampleState(false);
+  for (const Example& example : no) {
+    const ast_ptr result = Interpret(cond, example);
+    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
+    // cout << result_cast->value_ << endl;
+    sumN += result_cast->value_;
+  }
+
+
+  setInterpOpt(0);
+
+  // cout << "ss exp p " << lossP << endl;
+  // cout << "ss tot p " << sumP << endl;
+  // cout << "   res p " << 1-lossP/sumP << endl;
+  // cout << "ss exp n " << lossN << endl;
+  // cout << "ss tot n " << sumN << endl;
+  // cout << "   res n " << 1-lossN/sumN << endl;
+
+  return (1-lossP/sumP)*0.5 + (1-lossN/sumN)*0.5;
 }
+
+
+
+double GetModelLoss(const ast_ptr& cond,
+                          const unordered_set<Example>& yes,
+                          const unordered_set<Example>& no) {
+
+                            cout << "get model loss" << endl;
+
+  CumulativeFunctionTimer::Invocation invoke(&check_accuracy);
+
+  double loss = 0;
+  // setInterpOpt(true);
+
+  cout << "cond" << endl;
+  cout << cond << endl;
+  cout << "ex" << endl;
+  setExampleState(true);
+  for(const Example& ex : yes){
+    cout << ex << endl;
+    const ast_ptr res = Interpret(cond, ex);
+    bool_ptr res_cast = dynamic_pointer_cast<Bool>(res);
+    // loss += *res_cast;
+  }
+
+  setExampleState(false);
+  for(const Example& ex : no){
+    // const ast_ptr res = Interpret(cond, ex);
+    // std::shared_ptr<float> res_cast = dynamic_pointer_cast<float>(res);
+    // loss += *res_cast;
+  }
+  
+  return loss;
+}
+
+
+
 
 void SplitExamples(const vector<Example>& examples,
     pair<string, string> transition,

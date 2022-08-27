@@ -12,6 +12,8 @@
 
 #include "ast.hpp"
 
+void setUseOpt(bool yes);
+
 namespace AST {
 
     struct EmdipsOutput {
