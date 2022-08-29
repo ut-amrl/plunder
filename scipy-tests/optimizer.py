@@ -8,19 +8,17 @@ import warnings
 import time
 
 # --------------- TODO ------------------------
-# other option: only solve for threshold, not for spread
-# define clauses as a tree instead a list of all & and | being left associative
 # run more benchmarks
 # interface with C++
 
 
 # ------- Parameters -----------------------------
-max_spread = 5
+max_spread = 10
 bounds_extension = 0.1
 opt_method = 0
+enumerateSigns = True
 print_warnings = False
 print_padding = 30
-enumerateSigns = True
 
 # optimization method
 # 0: local
@@ -60,8 +58,7 @@ def log_loss(x):
 
 
 # ------- helper functions ----------------------
-# list range
-def lr(l):
+def lr(l): # list range
     return max(l)-min(l)
 
 def print_with_padding(label, value):
@@ -117,12 +114,15 @@ def run_optimizer(E_k, y_j, clauses):
         return
 
     bestRes = -1
-    for signs in range(pow(2, len(E_k))):
+    for signs in range(pow(2, len(E_k))): # iterate over possible signs (corresponds to < and >)
         
         # ---------- Initialization ------------
         x_0_init = []
         for i in range(len(E_k)):
             x_0_init.append(1 if (signs & (1 << i)) else -1)
+
+        if not enumerateSigns:
+            x_0_init = np.zeros(len(E_k))
         
         e_init = [sum(expression)/len(expression) for expression in E_k]
         init = np.concatenate((x_0_init, e_init))
@@ -131,17 +131,12 @@ def run_optimizer(E_k, y_j, clauses):
 
         # -------- Optimization ----------------------
 
-        # local optimization - fastest but local so may not always work
-        # global optimization: basin hopping - slowest
-        # global optimization: dual annealing - good balance
-        # global optimization: DIRECT algorithm - fast but ok
-
         if(opt_method == 0):
             res = optimize.minimize(log_loss, init, 
                                     method='BFGS', options={'disp': True})
         elif(opt_method == 1):
             res = optimize.basinhopping(log_loss, init,
-                                    niter=1000, T=1000.0,
+                                    niter=200, T=40000.0,
                                     minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, 
                                     take_step=step_obj, callback=print_fun, seed=rng)
         elif(opt_method == 2):
@@ -160,7 +155,7 @@ def run_optimizer(E_k, y_j, clauses):
         # print_with_padding("Num iterations", res.nfev)
         print_with_padding("Minimum value", res.fun)
         print()
-        
+
         if bestRes == -1 or res.fun < bestRes.fun:
             bestRes = res
         
@@ -169,6 +164,7 @@ def run_optimizer(E_k, y_j, clauses):
     
     print_with_padding("Final parameters", "|")
     print(bestRes.x)
+    print_with_padding("Minimum value", bestRes.fun)
     return bestRes
 
 
@@ -230,7 +226,6 @@ E_k = [
 ] # value of E_k(s) for each example, for each predicate
 
 # now introduce some error
-# it works
 E_k = [ 
     [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
     [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
