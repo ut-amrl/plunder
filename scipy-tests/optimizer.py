@@ -15,11 +15,12 @@ import time
 
 
 # ------- Parameters -----------------------------
-max_spread = 50
+max_spread = 5
 bounds_extension = 0.1
-opt_method = 3
+opt_method = 0
 print_warnings = False
 print_padding = 30
+enumerateSigns = True
 
 # optimization method
 # 0: local
@@ -66,20 +67,13 @@ def lr(l):
 def print_with_padding(label, value):
     print((label+" ").ljust(print_padding, "-")+" "+str(value))
 
-
-
 # --------- optimizer -----------------------------
-def run_optimizer(E_k, y_j, clauses, signs):
-    
-    # ---------- Initialization ------------
-    x_0_init = signs
-    e_init = [sum(expression)/len(expression) for expression in E_k]
-    init = np.concatenate((x_0_init, e_init))
-    print_with_padding("Initial values", "|")
-    print(init)
+def run_optimizer(E_k, y_j, clauses):
+    minimizer_kwargs = {"method": "BFGS"}
+    rng = np.random.default_rng()
 
     # ---------- Bounds --------------------
-    x_0_bounds = [(max_spread/2*(n-1), max_spread/2*(n+1)) for n in x_0_init]
+    x_0_bounds = [(-max_spread, max_spread) for expression in E_k]
     e_bounds = [(min(expression)-lr(expression)*bounds_extension, max(expression)+lr(expression)*bounds_extension) for expression in E_k]
     bounds = np.concatenate((x_0_bounds, e_bounds))
     bounds_lower = [b[0] for b in bounds]
@@ -122,39 +116,63 @@ def run_optimizer(E_k, y_j, clauses, signs):
         # print(x)
         return
 
-    # -------- Optimization ----------------------
-    minimizer_kwargs = {"method": "BFGS"}
-    rng = np.random.default_rng()
+    bestRes = -1
+    for signs in range(pow(2, len(E_k))):
+        
+        # ---------- Initialization ------------
+        x_0_init = []
+        for i in range(len(E_k)):
+            x_0_init.append(1 if (signs & (1 << i)) else -1)
+        
+        e_init = [sum(expression)/len(expression) for expression in E_k]
+        init = np.concatenate((x_0_init, e_init))
+        print_with_padding("Initial values", "|")
+        print(init)
 
-    # local optimization - fastest but local so may not always work
-    # global optimization: basin hopping - slowest
-    # global optimization: dual annealing - good balance
-    # global optimization: DIRECT algorithm - fast but bad lol
+        # -------- Optimization ----------------------
 
-    if(opt_method == 0):
-         res = optimize.minimize(log_loss, init, 
-                                method='BFGS', options={'disp': True})
-    elif(opt_method == 1):
-         res = optimize.basinhopping(log_loss, init,
-                                niter=1000, T=1000.0,
-                                minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, 
-                                take_step=step_obj, callback=print_fun, seed=rng)
-    elif(opt_method == 2):
-         res = optimize.dual_annealing(log_loss, bounds, x0=init, 
-                                        maxiter=1000, initial_temp=40000, 
-                                        visit=3.0, accept=-5, 
-                                        minimizer_kwargs=minimizer_kwargs)
-    elif(opt_method == 3):
-         res = optimize.direct(log_loss, bounds_arr, 
-                                maxiter=10000)
-    else:
-        sys.exit("Please use a valid optimization method")
+        # local optimization - fastest but local so may not always work
+        # global optimization: basin hopping - slowest
+        # global optimization: dual annealing - good balance
+        # global optimization: DIRECT algorithm - fast but ok
 
-    print_with_padding("Optimal parameters", "|")
-    print(res.x)
-    # print_with_padding("Num iterations", res.nfev)
-    print_with_padding("Minimum value", res.fun)
-    return res
+        if(opt_method == 0):
+            res = optimize.minimize(log_loss, init, 
+                                    method='BFGS', options={'disp': True})
+        elif(opt_method == 1):
+            res = optimize.basinhopping(log_loss, init,
+                                    niter=1000, T=1000.0,
+                                    minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, 
+                                    take_step=step_obj, callback=print_fun, seed=rng)
+        elif(opt_method == 2):
+            res = optimize.dual_annealing(log_loss, bounds, x0=init, 
+                                            maxiter=1000, initial_temp=40000, 
+                                            visit=3.0, accept=-5, 
+                                            minimizer_kwargs=minimizer_kwargs)
+        elif(opt_method == 3):
+            res = optimize.direct(log_loss, bounds_arr, 
+                                    maxiter=10000)
+        else:
+            sys.exit("Please use a valid optimization method")
+
+        print_with_padding("Optimal parameters", "|")
+        print(res.x)
+        # print_with_padding("Num iterations", res.nfev)
+        print_with_padding("Minimum value", res.fun)
+        print()
+        
+        if bestRes == -1 or res.fun < bestRes.fun:
+            bestRes = res
+        
+        if not enumerateSigns:
+            break
+    
+    print_with_padding("Final parameters", "|")
+    print(bestRes.x)
+    return bestRes
+
+
+
 
 # -------- Tests, Problems, and Data -----------------------------
 
@@ -222,9 +240,6 @@ E_k = [
 # ---------- Define equation ------------------------------------
 # clauses have left associativity?
 clauses = [ '&' , '|' ]     # (p_1 & p_2) | p_3
-signs = [1, -1, 1]          # p_1 = e_1 > n_1
-                            # p_2 = e_2 < n_2
-                            # p_3 = e_3 > n_3
 
 ### ----------------- Tests ---------------------------------------
 # assert abs(log_loss([2, -2, 1, 12, 18, 50]) - 4.9155) < 0.001
@@ -234,7 +249,7 @@ signs = [1, -1, 1]          # p_1 = e_1 > n_1
 # assert abs(log_loss([ 9.17704836, -9.96464641,  9.30102843, 10.07471293, 20.03487693, 49.95211582]) - 0) < 0.001
 
 start = time.perf_counter()
-res = run_optimizer(E_k, y_j, clauses, signs)
+res = run_optimizer(E_k, y_j, clauses)
 end = time.perf_counter()
 
 print_with_padding("Time Elapsed", end-start)
