@@ -29,7 +29,7 @@ E_k = [
 # assert abs(optimizer.log_loss([2, 25]) - 12) < 0.001
 # assert abs(optimizer.log_loss([4, 35]) - 24) < 0.001
 
-res = optimizer.run_optimizer(E_k, y_j, clauses)
+# res = optimizer.run_optimizer(E_k, y_j, clauses)
 # assert abs(res.x[1] - 30) < 0.05
 
 
@@ -44,7 +44,7 @@ E_k = [
 ] # value of E_k(s) for each example, for each predicate
 
 ### Tests
-res = optimizer.run_optimizer(E_k, y_j, clauses)
+# res = optimizer.run_optimizer(E_k, y_j, clauses)
 
 
 
@@ -67,11 +67,11 @@ E_k = [
 ] # value of E_k(s) for each example, for each predicate
 
 # now introduce some error
-E_k = [
-    [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
-    [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
-    [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
-] # value of E_k(s) for each example, for each predicate
+# E_k = [
+#     [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
+#     [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
+#     [-5, 0, 9, 11, 14, 35, 19, 21, 30, 40, 49, 51, 55, 70],
+# ] # value of E_k(s) for each example, for each predicate
 
 # ---------- Define equation ------------------------------------
 clauses = [ 0 , 1 ]     # (p_1 & p_2) | p_3

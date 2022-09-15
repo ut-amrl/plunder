@@ -23,15 +23,15 @@ import json
 # maybe just expand window idk
 
 # ------- Parameters -----------------------------
-opt_method = 0
-enumerateSigns = True
-print_debug = True
+opt_method = 0          # See below
+enumerateSigns = False   # Equivalent to enumerating over > and <
+print_debug = True      # Extra debugging info
 
-initial_values = 0 # 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
-max_spread = 10.0
-bounds_extension = 0.1
-print_warnings = False
-print_padding = 30
+initial_values = 10     # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
+max_spread = 5.0        # Maximum absolute value of alpha (slope)
+bounds_extension = 0.1  # Amount to search above and below extrema
+print_warnings = False  # Debugging info
+print_padding = 30      # Print customization
 
 # optimization method
 # 0: local
@@ -41,8 +41,8 @@ print_padding = 30
 
 # -------- objective function --------------------
 def log_loss(x):
-    alpha = x[: len(x)//2] # values of alpha (slope) for each conditional structure
-    x_0 = x[len(x)//2 :] # center of logistic function for each conditional structure
+    alpha = x[: len(x)//2]  # values of alpha (slope) for each conditional structure
+    x_0 = x[len(x)//2 :]    # center of logistic function for each conditional structure
 
     log_loss = 0
     for i in range(len(y_j)):
@@ -112,20 +112,20 @@ class TakeStep:
 
 # Runs the optimizer, given some initial parameters
 def run_optimizer_from_initial(init):
-    if(opt_method == 0):
+    if(opt_method == 0):        # Gradient descent - local optimization
         res = optimize.minimize(log_loss, init,
                                 method='BFGS', options={'disp': print_debug, 'maxiter': 100})
-    elif(opt_method == 1):
+    elif(opt_method == 1):      # Basin hopping - global optimization
         res = optimize.basinhopping(log_loss, init,
                                 niter=100, T=100.0,
                                 minimizer_kwargs=minimizer_kwargs, accept_test=bounds_obj, 
                                 take_step=step_obj, callback=print_fun)
-    elif(opt_method == 2):
+    elif(opt_method == 2):      # Dual annealing - global optimization
         res = optimize.dual_annealing(log_loss, bounds, x0=init, 
                                         maxiter=50, initial_temp=50000, 
                                         visit=3.0, accept=-5, 
                                         minimizer_kwargs=minimizer_kwargs)
-    elif(opt_method == 3):
+    elif(opt_method == 3):      # DIRECT - global optimization
         res = optimize.direct(log_loss, bounds_arr, maxiter=10000)
     else:
         sys.exit("Please use a valid optimization method")
@@ -140,7 +140,7 @@ def run_optimizer_from_initial(init):
 
 # Handles initialization and enumeration, then calls the optimizer
 def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
-    global E_k, y_j, clauses, minimizer_kwargs, step_obj, bounds, bounsd_arr, bounds_obj
+    global E_k, y_j, clauses, minimizer_kwargs, step_obj, bounds, bounds_arr, bounds_obj
     E_k = E_k_loc
     y_j = y_j_loc
     clauses = clauses_loc
@@ -149,12 +149,18 @@ def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
         warnings.filterwarnings('ignore')
 
     minimizer_kwargs = {"method": "BFGS"}
+
     step_obj = TakeStep()
 
     # ---------- Bounds --------------------
+
+    # Bounds on alpha : defined by max_spread
     alpha_bounds = [(-max_spread, max_spread) for expression in E_k]
 
-    x_0_bounds = [(min(expression)-lr(expression)*bounds_extension, max(expression)+0.000001+lr(expression)*bounds_extension) for expression in E_k]
+    # Bounds on x_0 : calculated from minimum/maximum and provided bounds extension
+    x_0_bounds = [(min(expression)-lr(expression)*bounds_extension, max(expression)+lr(expression)*bounds_extension) for expression in E_k]
+
+    # Setup bounds
     bounds = np.concatenate((alpha_bounds, x_0_bounds))
     bounds_lower = [b[0] for b in bounds]
     bounds_upper = [b[1] for b in bounds]
@@ -166,22 +172,23 @@ def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
     # ---------- Optimizer ------------------------
     bestRes = -1
 
-    for rand in range(max(1, initial_values)):
+    for _ in range(max(1, initial_values)):
 
-        x_0_init = np.zeros(len(E_k))
-        if initial_values == 1:
+        # Initialization of x_0
+        x_0_init = np.zeros(len(E_k)) # Initialize to 0s
+        if initial_values == 1:       # Initialize to the average
             x_0_init = [sum(expression)/len(expression) for expression in E_k]
-        if initial_values > 1:
-            print("D") # TO-DO
+        elif initial_values > 1:      # Initialize randomly 
+            x_0_init = [np.random.uniform(bound[0], bound[1]) for bound in x_0_bounds]
 
-        for signs in range(pow(2, len(E_k))): # iterate over possible signs (corresponds to < and >)
+        for signs in range(pow(2, len(E_k))): # iterate over possible signs for alpha
             
-            # Initialization
+            # Initialization of alpha
             alpha_init = []
             for i in range(len(E_k)):
                 alpha_init.append(1 if (signs & (1 << i)) else -1)
 
-            if not enumerateSigns: # initialize to 0s if not iterating over signs
+            if not enumerateSigns: # Initialize to 0 (don't iterate over signs)
                 alpha_init = np.zeros(len(E_k))
             
             init = np.concatenate((alpha_init, x_0_init))
