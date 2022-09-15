@@ -24,10 +24,10 @@ import json
 
 # ------- Parameters -----------------------------
 opt_method = 0          # See below
-enumerateSigns = False   # Equivalent to enumerating over > and <
+enumerateSigns = False  # Equivalent to enumerating over > and <
 print_debug = True      # Extra debugging info
 
-initial_values = 10     # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
+initial_values = 5      # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
 max_spread = 5.0        # Maximum absolute value of alpha (slope)
 bounds_extension = 0.1  # Amount to search above and below extrema
 print_warnings = False  # Debugging info
@@ -67,8 +67,8 @@ def log_loss(x):
 
 
 # ------- helper functions ----------------------
-def lr(l): # list range
-    return max(l)-min(l)
+def extension(l, r): # list range
+    return (max(l, r) - min(l, r)) * bounds_extension
 
 def debug(str):
     if print_debug:
@@ -94,6 +94,23 @@ class Bounds:
         tmax = bool(np.all(x <= self.xmax))
         tmin = bool(np.all(x >= self.xmin))
         return tmax and tmin
+
+def find_min_max(expression):
+    
+    lo = min(expression)
+    lo_ind = np.argmin(expression)
+    hi = max(expression)
+    hi_ind = np.argmax(expression)
+
+    lo_diff = hi
+    hi_diff = lo
+    for i in range(len(expression)):
+        if not (y_j[i] == y_j[lo_ind]):
+            lo_diff = min(lo_diff, expression[i])
+        if not (y_j[i] == y_j[hi_ind]):
+            hi_diff = max(hi_diff, expression[i])
+    
+    return (lo_diff - extension(lo_diff, hi_diff), hi_diff + extension(lo_diff, hi_diff))
 
 # --------- Stepping (basin hopping) -------------------------
 class TakeStep:
@@ -158,7 +175,7 @@ def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
     alpha_bounds = [(-max_spread, max_spread) for expression in E_k]
 
     # Bounds on x_0 : calculated from minimum/maximum and provided bounds extension
-    x_0_bounds = [(min(expression)-lr(expression)*bounds_extension, max(expression)+lr(expression)*bounds_extension) for expression in E_k]
+    x_0_bounds = [find_min_max(expression) for expression in E_k]
 
     # Setup bounds
     bounds = np.concatenate((alpha_bounds, x_0_bounds))
