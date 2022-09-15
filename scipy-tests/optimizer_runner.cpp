@@ -1,6 +1,3 @@
-// OUTDATED: See pips for the latest version
-
-
 #include <Python.h>
 
 #include <iomanip>
@@ -15,8 +12,8 @@ using namespace std;
 int main(int argc, char *argv[])
 {   
     // Test Data
-    vector<char> clauses = { '&' };
-    vector<bool> y_j = { false, false, false, true, true, true, true, false, false, false, false };
+    vector<int> clauses = { 0 };
+    vector<int> y_j = { 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 };
     vector<vector<float>> E_k = {
         {-5, 0, 9, 11, 14, 15, 19, 21, 30, 40, 49},
         {-5, 0, 9, 11, 14, 15, 19, 21, 30, 40, 49}
@@ -36,11 +33,11 @@ int main(int argc, char *argv[])
     // Arguments
     pClauses = PyList_New(clauses.size());
     for(int i = 0; i < clauses.size(); i++){
-        PyList_SetItem(pClauses, i, PyUnicode_FromString(&clauses[i]));
+        PyList_SetItem(pClauses, i, PyLong_FromLong(clauses[i]));
     }
     pY_j = PyList_New(y_j.size());
     for(int i = 0; i < y_j.size(); i++){
-        PyList_SetItem(pY_j, i, (y_j[i] ? Py_True : Py_False));
+        PyList_SetItem(pY_j, i, PyLong_FromLong(y_j[i]));
     }
 
     pE_k = PyList_New(E_k.size());
