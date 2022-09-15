@@ -3,6 +3,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy import special as sp
+from multiprocessing import Pool
 
 import math
 import warnings
@@ -24,10 +25,10 @@ import json
 
 # ------- Parameters -----------------------------
 opt_method = 0          # See below
-enumerateSigns = False  # Equivalent to enumerating over > and <
+enumerateSigns = True   # Equivalent to enumerating over > and <
 print_debug = True      # Extra debugging info
-
-initial_values = 5      # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
+initial_values = 4      # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
+num_cores = 16           # Number of processes to run in parallel
 max_spread = 5.0        # Maximum absolute value of alpha (slope)
 bounds_extension = 0.1  # Amount to search above and below extrema
 print_warnings = False  # Debugging info
@@ -187,7 +188,7 @@ def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
     bounds_arr = optimize.Bounds(bounds_lower, bounds_upper)
 
     # ---------- Optimizer ------------------------
-    bestRes = -1
+    input = []
 
     for _ in range(max(1, initial_values)):
 
@@ -209,22 +210,25 @@ def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
                 alpha_init = np.zeros(len(E_k))
             
             init = np.concatenate((alpha_init, x_0_init))
-            print_with_padding("Initial values", "|")
-            debug(init)
 
             # Calling the optimizer
-            res = run_optimizer_from_initial(init)
-
-            # Store results
-            if bestRes == -1 or res.fun < bestRes.fun:
-                bestRes = res
+            input.append(init)
             
             if not enumerateSigns:
                 break
         
         if initial_values <= 1:
             break
-        
+    
+    print_with_padding("Initial values", "|")
+    debug(input)
+    
+    # Run optimizer in parallel
+    with Pool(num_cores) as p:
+        output = p.map(run_optimizer_from_initial, input)
+    
+    bestRes = min(output, key=lambda i: i.fun)
+    
     print_with_padding("Final parameters", "|")
     debug(bestRes.x)
     print_with_padding("Minimum value", bestRes.fun)
