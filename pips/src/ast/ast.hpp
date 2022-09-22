@@ -92,6 +92,24 @@ class AST {
 };
 typedef std::shared_ptr<AST> ast_ptr;
 
+class TernOp : public AST {
+ public:
+  TernOp(ast_ptr x, ast_ptr a, ast_ptr b, const std::string& op);
+  TernOp(ast_ptr x, ast_ptr a, ast_ptr b, const std::string& op, const Type& type,
+        const Dimension& dim);
+  ast_ptr Accept(class Visitor* v);
+  nlohmann::json ToJson();
+  ast_ptr FromJson(const nlohmann::json&);
+  ast_ptr x_;
+  ast_ptr a_;
+  ast_ptr b_;
+  const std::string op_;
+  Type type_ = OP;
+
+ private:
+};
+typedef std::shared_ptr<TernOp> tern_ptr;
+
 class BinOp : public AST {
  public:
   BinOp(ast_ptr left, ast_ptr right, const std::string& op);
@@ -108,6 +126,22 @@ class BinOp : public AST {
  private:
 };
 typedef std::shared_ptr<BinOp> bin_ptr;
+
+class UnOp : public AST {
+ public:
+  UnOp(ast_ptr input, const std::string& op);
+  UnOp(ast_ptr input, const std::string& op, const Type& type,
+       const Dimension& dim);
+  ast_ptr Accept(class Visitor* v);
+  nlohmann::json ToJson();
+  ast_ptr FromJson(const nlohmann::json&);
+  ast_ptr input_;
+  const std::string op_;
+  Type type_ = OP;
+
+ private:
+};
+typedef std::shared_ptr<UnOp> un_ptr;
 
 class Bool : public AST {
  public:
@@ -159,22 +193,6 @@ class Param : public AST {
 };
 typedef std::shared_ptr<Param> param_ptr;
 
-class UnOp : public AST {
- public:
-  UnOp(ast_ptr input, const std::string& op);
-  UnOp(ast_ptr input, const std::string& op, const Type& type,
-       const Dimension& dim);
-  ast_ptr Accept(class Visitor* v);
-  nlohmann::json ToJson();
-  ast_ptr FromJson(const nlohmann::json&);
-  ast_ptr input_;
-  const std::string op_;
-  Type type_ = OP;
-
- private:
-};
-typedef std::shared_ptr<UnOp> un_ptr;
-
 class Var : public AST {
  public:
   Var(const std::string& name, const Dimension& dims, const Type& type);
@@ -204,12 +222,13 @@ typedef std::shared_ptr<Vec> vec_ptr;
 class Visitor {
  public:
   virtual ast_ptr Visit(AST* node) = 0;
+  virtual ast_ptr Visit(TernOp* node) = 0;
   virtual ast_ptr Visit(BinOp* node) = 0;
+  virtual ast_ptr Visit(UnOp* node) = 0;
   virtual ast_ptr Visit(Bool* node) = 0;
   virtual ast_ptr Visit(Feature* node) = 0;
   virtual ast_ptr Visit(Num* node) = 0;
   virtual ast_ptr Visit(Param* node) = 0;
-  virtual ast_ptr Visit(UnOp* node) = 0;
   virtual ast_ptr Visit(Var* node) = 0;
   virtual ast_ptr Visit(Vec* node) = 0;
 };

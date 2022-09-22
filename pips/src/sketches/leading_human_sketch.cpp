@@ -3,15 +3,8 @@
 #include "../ast.hpp"
 #include "../enumeration.hpp"
 
-using AST::BinOp;
-using AST::Feature;
-using AST::NUM;
-using AST::Param;
-using AST::Sketch;
-using AST::SymEntry;
-using AST::UnOp;
-using std::make_shared;
-using std::shared_ptr;
+using namespace AST;
+using namespace std;
 
 extern "C" void* get_sketch() {
   Param human_thresh("human_thresh", {2, 0, 0}, NUM);

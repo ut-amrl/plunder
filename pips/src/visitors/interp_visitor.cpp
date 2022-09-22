@@ -17,19 +17,9 @@ using namespace std;
 // Set probabilistic boundaries
 normal_distribution<double> boundaryDistr (0, 0);
 default_random_engine emdipsGen(SEED);
-int useOpt = 0;
-bool exampleState = false;
 
 void setBoundaryStddev(double err){
   boundaryDistr = normal_distribution<double>(0, err);
-}
-
-void setInterpOpt(int mode){
-  useOpt = mode;
-}
-
-void setExampleState(bool yes){
-  exampleState = yes;
 }
 
 namespace AST {
@@ -62,69 +52,26 @@ Interp::Interp(const Example& world) : world_(world) {}
 
 ast_ptr Interp::Visit(AST* node) { return ast_ptr(node); }
 
-ast_ptr handleOptAnd(ast_ptr left, ast_ptr right){
-  num_ptr left_cast = dynamic_pointer_cast<Num>(left);
-  num_ptr right_cast = dynamic_pointer_cast<Num>(right);
-  float res = exampleState ? left_cast->value_ + right_cast->value_ : fmin(left_cast->value_, right_cast->value_);
-  Num rez(res, left->dims_);
-  return make_shared<Num>(rez);
+ast_ptr Interp::Visit(TernOp* node){
+    ast_ptr x = node->x_->Accept(this);
+    ast_ptr a = node->a_->Accept(this);
+    ast_ptr b = node->b_->Accept(this);
+    const string op = node->op_;
+    TernOp partial(x, a, b, node->op_, node->type_, node->dims_);
+    ast_ptr result = make_shared<TernOp>(partial);
+    // Don't try to evaluate if one of the arguments is symbolic
+    if (x->symbolic_ || a->symbolic_ || b->symbolic_) {
+        result->symbolic_ = true;
+    } else {
+        // One if clause per ternary operation
+        if (op == "Logistic") {
+            result = Logistic(x, a, b);
+        } else {
+            throw invalid_argument("unknown ternary operation `" + op + "'");
+        }
+    }
+    return result;
 }
-
-ast_ptr handleOptOr(ast_ptr left, ast_ptr right){
-  num_ptr left_cast = dynamic_pointer_cast<Num>(left);
-  num_ptr right_cast = dynamic_pointer_cast<Num>(right);
-  float res = !exampleState ? left_cast->value_ + right_cast->value_ : fmin(left_cast->value_, right_cast->value_);
-  Num rez(res, left->dims_);
-  return make_shared<Num>(rez);
-}
-
-float optGtErr(float a, float b){
-  // cout << a << " " << b << endl;
-  // cout << pow(fmin(a-b, 0), 2) << endl;
-  return pow(fmin(a-b, 0), 2);
-}
-
-float optLtErr(float a, float b){
-  // cout << a << " " << b << endl;
-  // cout << pow(fmax(a-b, 0), 2) << endl;
-  return pow(fmax(a-b, 0), 2);
-}
-
-ast_ptr handleOptGt(ast_ptr left, ast_ptr right){
-  num_ptr left_cast = dynamic_pointer_cast<Num>(left);
-  num_ptr right_cast = dynamic_pointer_cast<Num>(right);
-  float res = exampleState ? optGtErr(left_cast->value_, right_cast->value_) : optLtErr(left_cast->value_, right_cast->value_);
-  Num rez(res, left->dims_);
-  // cout << left_cast->value_ << " " << right_cast->value_ << endl;
-  return make_shared<Num>(rez);
-}
-
-ast_ptr handleOptLt(ast_ptr left, ast_ptr right){
-  num_ptr left_cast = dynamic_pointer_cast<Num>(left);
-  num_ptr right_cast = dynamic_pointer_cast<Num>(right);
-  float res = !exampleState ? optGtErr(left_cast->value_, right_cast->value_) : optLtErr(left_cast->value_, right_cast->value_);
-  Num rez(res, left->dims_);
-  // cout << left_cast->value_ << " " << right_cast->value_ << endl;
-  return make_shared<Num>(rez);
-}
-
-ast_ptr handleOptSquareDiff(ast_ptr left, ast_ptr right){
-  num_ptr left_cast = dynamic_pointer_cast<Num>(left);
-  num_ptr right_cast = dynamic_pointer_cast<Num>(right);
-  float res = pow(left_cast->value_ - right_cast->value_, 2);
-  Num rez(res, left->dims_);
-  return make_shared<Num>(rez);
-}
-
-ast_ptr handleOptSum(ast_ptr left, ast_ptr right){
-  num_ptr left_cast = dynamic_pointer_cast<Num>(left);
-  num_ptr right_cast = dynamic_pointer_cast<Num>(right);
-  float res = left_cast->value_ + right_cast->value_;
-  Num rez(res, left->dims_);
-  return make_shared<Num>(rez);
-}
-
-
 
 ast_ptr Interp::Visit(BinOp* node) {
   ast_ptr left = node->left_->Accept(this);
@@ -138,10 +85,8 @@ ast_ptr Interp::Visit(BinOp* node) {
   } else {
     // One if clause per binary operation
     if (op == "Plus") {
-      // cout << "plus" << endl;
       result = Plus(left, right);
     } else if (op == "Minus") {
-      // cout << "minus" << endl;
       result = Minus(left, right);
     } else if (op == "Times") {
       result = Times(left, right);
@@ -158,62 +103,28 @@ ast_ptr Interp::Visit(BinOp* node) {
     } else if (op == "DistTraveled") {
       result = DistTraveled(left, right);
     } else if (op == "And") {
-      result =  useOpt == 1 ? handleOptAnd(left, right) : 
-                useOpt == 2 ? handleOptSum(left, right) : 
-                And(left, right);
+      result = And(left, right);
     } else if (op == "Or") {
-      result =  useOpt == 1 ? handleOptOr(left, right) : 
-                useOpt == 2 ? handleOptSum(left, right) :
-                Or(left, right);
+      result = Or(left, right);
     } else if (op == "Eq") {
       result = Eq(left, right);
     } else if (op == "Gt") {
-      result =  useOpt == 1 ? handleOptGt(left, right) : 
-                useOpt == 2 ? handleOptSquareDiff(left, right) :
-                Gt(left, right);
+      result = Gt(left, right);
     } else if (op == "Lt") {
-      result =  useOpt == 1 ? handleOptLt(left, right) : 
-                useOpt == 2 ? handleOptSquareDiff(left, right) :
-                Lt(left, right);
+      result = Lt(left, right);
     } else if (op == "Gte") {
       result = Gte(left, right);
     } else if (op == "Lte") {
       result = Lte(left, right);
+    } else if (op == "Flip") {
+      result = Flip(left, right);
     } else {
       throw invalid_argument("unknown binary operation `" + op + "'");
     }
   }
-  
   return result;
 }
 
-ast_ptr Interp::Visit(Bool* node) { return make_shared<Bool>(*node); }
-
-ast_ptr Interp::Visit(Feature* node) {
-  if (node->current_value_ == nullptr) {
-    throw invalid_argument("AST has unfilled feature holes");
-  } else {
-    ast_ptr result = node->current_value_->Accept(this);
-    return result;
-  }
-}
-
-ast_ptr Interp::Visit(Num* node) { return make_shared<Num>(*node); }
-
-ast_ptr Interp::Visit(Param* node) {
-  if (node->current_value_ == nullptr) {
-    // throw invalid_argument("AST has unfilled parameter holes");
-    return make_shared<Param>(*node);
-  } else {
-    ast_ptr result = node->current_value_->Accept(this);
-    float boundaryValue = ((Num*) (result.get()))->value_;
-    boundaryValue += boundaryDistr(emdipsGen); // Add normally-distributed noise
-    ((Num*) (result.get()))->value_ = boundaryValue;
-    return result;
-  }
-}
-
-// TODO(jaholtz) Throw errors instead of printing
 ast_ptr Interp::Visit(UnOp* node) {
   ast_ptr input = node->input_->Accept(this);
   const string op = node->op_;
@@ -255,6 +166,32 @@ ast_ptr Interp::Visit(UnOp* node) {
     }
   }
   return result;
+}
+
+ast_ptr Interp::Visit(Bool* node) { return make_shared<Bool>(*node); }
+
+ast_ptr Interp::Visit(Feature* node) {
+  if (node->current_value_ == nullptr) {
+    throw invalid_argument("AST has unfilled feature holes");
+  } else {
+    ast_ptr result = node->current_value_->Accept(this);
+    return result;
+  }
+}
+
+ast_ptr Interp::Visit(Num* node) { return make_shared<Num>(*node); }
+
+ast_ptr Interp::Visit(Param* node) {
+  if (node->current_value_ == nullptr) {
+    // throw invalid_argument("AST has unfilled parameter holes");
+    return make_shared<Param>(*node);
+  } else {
+    ast_ptr result = node->current_value_->Accept(this);
+    float boundaryValue = ((Num*) (result.get()))->value_;
+    boundaryValue += boundaryDistr(emdipsGen); // Add normally-distributed noise
+    ((Num*) (result.get()))->value_ = boundaryValue;
+    return result;
+  }
 }
 
 ast_ptr Interp::Visit(Var* node) {

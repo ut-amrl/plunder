@@ -60,6 +60,7 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
     Example obsObject = dataToExample(ha, state, robot);
     for(uint i = 0; i < transitions.size(); i++){
         if(HAToString(ha) == transitions[i].first){
+            cout << preds[i] << endl;
             if(InterpretBool(preds[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
                 break;
@@ -120,8 +121,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     }
 
     vector<Signature> signatures;
-    vector<ast_ptr> ops = RecEnumerate(roots, inputs, examples, library, feature_depth, &signatures);
-
+    vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, examples, library,
+                                          feature_depth, &signatures);
     // Debug
     cout << "----Roots----" << endl;
     for (auto& node : roots) {
@@ -141,21 +142,18 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     cout << "Number of examples: " << examples.size() << endl;
 
-    // Calculate new minimum accuracy
-    // Cap each minimum accuracy to prevent iterating over the entire search space
+    // Calculate new error tolerance
+    // Cap each maximum error to speed up search
     for(uint i = 0; i < transitions.size(); i++){
-        if(accuracies.size() < transitions.size())
-            accuracies.push_back(0);
-        else
-            accuracies[i] = min(accuracies[i], min_accuracy);
+        accuracies[i] = max(accuracies[i], max_error);
     }
 
     // Retrieve ASPs and accuracies    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
-    EmdipsOutput eo = emdips(examples, transitions, ops, sketch_depth, accuracies, aspFilePath);
+    EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, accuracies, aspFilePath, batch_size);
     preds = eo.ast_vec;
-    accuracies = eo.transition_accuracies;
+    accuracies = eo.log_likelihoods;
 
     // Write ASP info to file
     ofstream aspStrFile;
@@ -183,14 +181,23 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    // for(uint i = 0; i < numHA; i++){
-    //     for(uint j = 0; j < numHA; j++){
-    //         if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-    //     }
-    // }
-    transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    transitions.push_back(pair<string, string> ("ACC", "CON"));
-    transitions.push_back(pair<string, string> ("CON", "DEC"));
+    for(uint i = 0; i < numHA; i++){
+        for(uint j = 0; j < numHA; j++){
+            if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+        }
+    }
+    
+    std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
+        if(a.first == b.first){
+            if(a.first == a.second) return 1;
+            if(b.first == b.second) return -1;
+            return a.second < b.second;
+        }
+        return a.first < b.first;
+    });
+    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    // transitions.push_back(pair<string, string> ("ACC", "CON"));
+    // transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
 
 void testExampleOnASP(vector<Example> examples, Robot r){
@@ -203,12 +210,6 @@ void testExampleOnASP(vector<Example> examples, Robot r){
         float target = e.symbol_table_["target"].GetFloat();
         string start = e.start_.GetString();
         string res = e.result_.GetString();
-        if(start == "ACC") {
-            string ASP_gen = ((r.DistTraveled(v, decMax) - r.DistTraveled(vMax, decMax) > -0.01) ? "CON" : "ACC");
-            if(ASP_gen != res){
-                cout << v << " " << vMax << " -> " << ASP_gen << " vs " << res << " : " << r.accMax << " " << r.decMax << endl;
-            }
-        }
     }
 }
 
@@ -262,7 +263,6 @@ void emLoop(vector<Robot>& robots){
 
 int main() {
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
-    setUseOpt(useOptimizer);
     emLoop(robots);
 
     return 0;

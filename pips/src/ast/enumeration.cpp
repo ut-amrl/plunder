@@ -27,26 +27,12 @@
 #include "visitors/tosmtlib_visitor.hpp"
 
 using Eigen::Vector3i;
-using std::cerr;
-using std::cout;
-using std::dynamic_pointer_cast;
-using std::endl;
-using std::invalid_argument;
-using std::make_shared;
-using std::ostream;
-using std::pair;
-using std::queue;
-using std::string;
-using std::to_string;
-using std::unordered_map;
-using std::unordered_set;
-using std::vector;
+using namespace std;
 using terminal_colors::ColorTerminal;
 using terminal_colors::ResetTerminal;
 
 // DECLARE_bool(dim_checking);
 // DECLARE_bool(sig_pruning);
-
 bool dimChecking = true;
 bool sigPruning = true;
 
@@ -129,34 +115,22 @@ vector<ast_ptr> EnumerateSketchesHelper(int depth) {
 
   // TODO(jaholtz) make sure we can fill in any dimension of feature here.
   const string depth_string = std::to_string(depth);
-  Param p("pX" + depth_string, {0,0,0}, NUM);
   Feature f("fX" + depth_string, {0,0,0}, NUM);
-  Param p1("pY" + depth_string, {0,0,0}, NUM);
-  Feature f1("fY" + depth_string, {0,0,0}, NUM);
-  std::shared_ptr<BinOp> great = make_shared<BinOp>(make_shared<Feature>(f),
-                                 make_shared<Param>(p), "Gt");
-  std::shared_ptr<BinOp> less = make_shared<BinOp>(make_shared<Feature>(f),
-                                make_shared<Param>(p), "Lt");
 
   // Depth > 0
   vector<ast_ptr> rec_sketches = EnumerateSketchesHelper(depth - 1);
 
   if (depth == 1) {
-    sketches.push_back(great);
-    sketches.push_back(less);
+    sketches.push_back(make_shared<Feature>(f));
     return sketches;
   }
 
   for (auto skt : rec_sketches) {
     if (skt->type_ != BOOL) {
-      std::shared_ptr<BinOp> andg = make_shared<BinOp>(great, skt, "And");
-      std::shared_ptr<BinOp> org = make_shared<BinOp>(great, skt, "Or");
-      std::shared_ptr<BinOp> andl = make_shared<BinOp>(less, skt, "And");
-      std::shared_ptr<BinOp> orl = make_shared<BinOp>(less, skt, "Or");
-      sketches.push_back(andg);
-      sketches.push_back(org);
-      sketches.push_back(andl);
-      sketches.push_back(orl);
+      std::shared_ptr<BinOp> andf = make_shared<BinOp>(make_shared<Feature>(f), skt, "And");
+      std::shared_ptr<BinOp> orf = make_shared<BinOp>(make_shared<Feature>(f), skt, "Or");
+      sketches.push_back(andf);
+      sketches.push_back(orf);
     }
   }
   return sketches;
@@ -256,6 +230,26 @@ vector<ast_ptr> RecEnumerateHelper(const vector<ast_ptr>& roots,
   return result;
 }
 
+CumulativeFunctionTimer rec_enumerate_logistic("RecEnumerateLogistic");
+vector<ast_ptr> RecEnumerateLogistic(const vector<ast_ptr>& roots,
+                             const vector<ast_ptr>& inputs,
+                             const vector<Example>& examples,
+                             const vector<FunctionEntry>& library, int depth,
+                             vector<Signature>* signatures) {
+  CumulativeFunctionTimer::Invocation invoke(&rec_enumerate_logistic);
+  for(ast_ptr each: roots){
+    each->priority = 1;
+  }
+  vector<ast_ptr> feat = RecEnumerateHelper(roots, inputs, examples, library, depth, signatures);
+  for(auto i = 0; i < feat.size(); i++){
+    TernOp logistic(feat[i], make_shared<Num>(Num(0, {0, 0, 0})), make_shared<Num>(Num(0, {0, 0, 0})), "Logistic");
+    BinOp flip(make_shared<TernOp>(logistic), make_shared<Bool>(true), "Flip");
+
+    feat[i] = make_shared<BinOp>(flip);
+  }
+  return feat;
+}
+
 CumulativeFunctionTimer rec_enumerate("RecEnumerate");
 vector<ast_ptr> RecEnumerate(const vector<ast_ptr>& roots,
                              const vector<ast_ptr>& inputs,
@@ -266,8 +260,7 @@ vector<ast_ptr> RecEnumerate(const vector<ast_ptr>& roots,
   for(ast_ptr each: roots){
     each->priority = 1;
   }
-  return RecEnumerateHelper(roots, inputs, examples, library, depth,
-                            signatures);
+  return RecEnumerateHelper(roots, inputs, examples, library, depth, signatures);
 }
 
 CumulativeFunctionTimer get_legal("GetLegalOperations");
@@ -378,140 +371,31 @@ double CheckModelAccuracy(const ast_ptr& cond,
                           const unordered_set<Example>& yes,
                           const unordered_set<Example>& no) {
   CumulativeFunctionTimer::Invocation invoke(&check_accuracy);
-
-
-
-
-
-
-  size_t yesNum = 0;
-  size_t noNum = 0;
-  size_t falsePositive = 0;
-  size_t falseNegative = 0;
-
-// get rid of tautologies
+  // Create a variable for keeping track of the number of examples where we get
+  // the expected result.
+  size_t satisfied = 0;
+  // Count for how many "yes" examples the interpretation of the condition is
+  // true.
   for (const Example& example : yes) {
     const ast_ptr result = Interpret(cond, example);
     bool_ptr result_cast = dynamic_pointer_cast<Bool>(result);
-    if (result_cast->value_) {
-      yesNum += 1;
-    } else {
-      noNum += 1;
-      falseNegative += 1;
-    }
+    if (result_cast->value_) satisfied += 1;
   }
 
+  // Count for how many "no" examples the interpretation of the condition is
+  // false.
   for (const Example& example : no) {
     const ast_ptr result = Interpret(cond, example);
     bool_ptr result_cast = dynamic_pointer_cast<Bool>(result);
     if (!result_cast->value_) {
-      noNum += 1;
-    } else {
-      yesNum += 1;
-      falsePositive += 1;
+      satisfied += 1;
     }
   }
-  // cout << yesNum << " " << noNum << endl;
-  // cout << falsePositive << " " << falseNegative << endl;
-  if(yesNum == 0 || noNum == 0) return -std::numeric_limits<float>::infinity();
 
-
-
-
-
-
-  // Create a variable for keeping track of the number of examples where we get
-  // the expected result.
-  double lossP = 0;
-  double sumP = 0;
-  double lossN = 0;
-  double sumN = 0;
-  // Count for how many "yes" examples the interpretation of the condition is true.
-  setInterpOpt(1);
-  setExampleState(true);
-  for (const Example& example : yes) {
-    const ast_ptr result = Interpret(cond, example);
-    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
-    // cout << result_cast->value_ << endl;
-    lossP += result_cast->value_;
-  }
-
-  // Count for how many "no" examples the interpretation of the condition is false.
-  setExampleState(false);
-  for (const Example& example : no) {
-    const ast_ptr result = Interpret(cond, example);
-    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
-    // cout << result_cast->value_ << endl;
-    lossN += result_cast->value_;
-  }
-
-  setInterpOpt(2);
-  setExampleState(true);
-  for (const Example& example : yes) {
-    const ast_ptr result = Interpret(cond, example);
-    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
-    // cout << result_cast->value_ << endl;
-    sumP += result_cast->value_;
-  }
-
-  // Count for how many "no" examples the interpretation of the condition is false.
-  setExampleState(false);
-  for (const Example& example : no) {
-    const ast_ptr result = Interpret(cond, example);
-    num_ptr result_cast = dynamic_pointer_cast<Num>(result);
-    // cout << result_cast->value_ << endl;
-    sumN += result_cast->value_;
-  }
-
-
-  setInterpOpt(0);
-
-  // cout << "ss exp p " << lossP << endl;
-  // cout << "ss tot p " << sumP << endl;
-  // cout << "   res p " << 1-lossP/sumP << endl;
-  // cout << "ss exp n " << lossN << endl;
-  // cout << "ss tot n " << sumN << endl;
-  // cout << "   res n " << 1-lossN/sumN << endl;
-
-  return (1-lossP/sumP)*0.5 + (1-lossN/sumN)*0.5;
+  // Compute the final percentage of satisfied examples to all examples.
+  const double sat_ratio = (double)satisfied / (yes.size() + no.size());
+  return sat_ratio;
 }
-
-
-
-double GetModelLoss(const ast_ptr& cond,
-                          const unordered_set<Example>& yes,
-                          const unordered_set<Example>& no) {
-
-                            cout << "get model loss" << endl;
-
-  CumulativeFunctionTimer::Invocation invoke(&check_accuracy);
-
-  double loss = 0;
-  // setInterpOpt(true);
-
-  cout << "cond" << endl;
-  cout << cond << endl;
-  cout << "ex" << endl;
-  setExampleState(true);
-  for(const Example& ex : yes){
-    cout << ex << endl;
-    const ast_ptr res = Interpret(cond, ex);
-    bool_ptr res_cast = dynamic_pointer_cast<Bool>(res);
-    // loss += *res_cast;
-  }
-
-  setExampleState(false);
-  for(const Example& ex : no){
-    // const ast_ptr res = Interpret(cond, ex);
-    // std::shared_ptr<float> res_cast = dynamic_pointer_cast<float>(res);
-    // loss += *res_cast;
-  }
-  
-  return loss;
-}
-
-
-
 
 void SplitExamples(const vector<Example>& examples,
     pair<string, string> transition,
@@ -532,15 +416,10 @@ void SplitExamples(const vector<Example>& examples,
 
 vector<Example> FilterExamples(const vector<Example>& examples,
     pair<string, string> transition) {
-  unordered_set<Example> yes;
-  unordered_set<Example> no;
-  SplitExamples(examples, transition, &yes, &no);
-  vector<Example> copy = examples;
-  for (const Example& example : yes) {
-    vector<Example>::iterator pos =
-      std::find(copy.begin(), copy.end(), example);
-    if (pos != copy.end()) {
-      copy.erase(pos);
+  vector<Example> copy;
+  for (const Example& example : examples) {
+    if(!(example.start_ == transition.first && example.result_ == transition.second)){
+        copy.push_back(example);
     }
   }
   return copy;

@@ -9,20 +9,25 @@
 
 #include "ast/ast.hpp"
 
-using std::cout;
-using std::endl;
-using std::invalid_argument;
-using std::make_shared;
-using std::string;
-using std::to_string;
-using std::unordered_set;
-using std::vector;
+using namespace std;
 
 namespace AST {
 
 ToSMTLIB::ToSMTLIB(const Example& example) : example_(example) {}
 
 ast_ptr ToSMTLIB::Visit(AST* node) { return ast_ptr(node); }
+
+ast_ptr ToSMTLIB::Visit(TernOp* node){
+    const string op = node->op_;
+    string ternop_smtlib;
+    if(op == "Logistic"){
+        ternop_smtlib += "Sorry, logistic not yet supported :(";
+    } else {
+        throw invalid_argument("unknown ternary operation `" + op + "'");
+  }
+
+  return make_shared<TernOp>(*node);
+}
 
 ast_ptr ToSMTLIB::Visit(BinOp* node) {
   const string op = node->op_;
@@ -79,6 +84,36 @@ ast_ptr ToSMTLIB::Visit(BinOp* node) {
   return make_shared<BinOp>(*node);
 }
 
+ast_ptr ToSMTLIB::Visit(UnOp* node) {
+  const string op = node->op_;
+  string unop_smtlib;
+  if (op == "Abs") {
+    unop_smtlib += "(abs ";
+  } else if (op == "Sq") {
+    unop_smtlib += "(sq ";
+  } else if (op == "Cos") {
+    unop_smtlib += "(cos ";
+  } else if (op == "Sin") {
+    unop_smtlib += "(sin ";
+  } else if (op == "NormSq") {
+    unop_smtlib += "(norm-sq ";
+  } else if (op == "VecX") {
+    unop_smtlib += "(vec-x ";
+  } else if (op == "VecY") {
+    unop_smtlib += "(vec-y ";
+  } else if (op == "Not") {
+    unop_smtlib += "(not ";
+  } else {
+    throw invalid_argument("unknown unary operation `" + op + "'");
+  }
+  output_ += unop_smtlib;
+  output_ += " ";
+  node->input_->Accept(this);
+  output_ += ")";
+
+  return make_shared<UnOp>(*node);
+}
+
 ast_ptr ToSMTLIB::Visit(Bool* node) {
   const string bool_string = (node->value_) ? "true" : "false";
   output_ += bool_string;
@@ -116,36 +151,6 @@ ast_ptr ToSMTLIB::Visit(Param* node) {
     parameters_.insert(param_name);
   }
   return make_shared<Param>(*node);
-}
-
-ast_ptr ToSMTLIB::Visit(UnOp* node) {
-  const string op = node->op_;
-  string unop_smtlib;
-  if (op == "Abs") {
-    unop_smtlib += "(abs ";
-  } else if (op == "Sq") {
-    unop_smtlib += "(sq ";
-  } else if (op == "Cos") {
-    unop_smtlib += "(cos ";
-  } else if (op == "Sin") {
-    unop_smtlib += "(sin ";
-  } else if (op == "NormSq") {
-    unop_smtlib += "(norm-sq ";
-  } else if (op == "VecX") {
-    unop_smtlib += "(vec-x ";
-  } else if (op == "VecY") {
-    unop_smtlib += "(vec-y ";
-  } else if (op == "Not") {
-    unop_smtlib += "(not ";
-  } else {
-    throw invalid_argument("unknown unary operation `" + op + "'");
-  }
-  output_ += unop_smtlib;
-  output_ += " ";
-  node->input_->Accept(this);
-  output_ += ")";
-
-  return make_shared<UnOp>(*node);
 }
 
 ast_ptr ToSMTLIB::Visit(Var* node) {

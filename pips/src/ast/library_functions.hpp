@@ -54,6 +54,8 @@ AST::ast_ptr Lt(AST::ast_ptr x, AST::ast_ptr y);
 AST::ast_ptr Gt(AST::ast_ptr x, AST::ast_ptr y);
 AST::ast_ptr Lte(AST::ast_ptr x, AST::ast_ptr y);
 AST::ast_ptr Gte(AST::ast_ptr x, AST::ast_ptr y);
+AST::ast_ptr Logistic(AST::ast_ptr x, AST::ast_ptr x_0, AST::ast_ptr k);
+AST::ast_ptr Flip(AST::ast_ptr p, AST::ast_ptr probabilistic);
 
 // Tentative idea, function that loads presets from the examples
 AST::ast_ptr StraightFreePathLength(

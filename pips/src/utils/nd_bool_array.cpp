@@ -4,10 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-using std::invalid_argument;
-using std::out_of_range;
-using std::pow;
-using std::vector;
+using namespace std;
 
 nd_bool_array::nd_bool_array(const vector<size_t>& dims) : dims_(dims) {
   if (dims_.empty()) {

@@ -27,19 +27,26 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 endif()
 
+# ros setup stuff
+# INCLUDE($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+# ROSBUILD_INIT()
+# SET(ROS_BUILD_STATIC_LIBS true)
+# SET(ROS_BUILD_SHARED_LIBS false)
+
 # Load required third-party libraries from system
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(GTest REQUIRED)
 # find_package(GFlags REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Z3 REQUIRED)
+find_package(PythonLibs REQUIRED)
 
 # Set final locations for binaries
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # Libraries
-# SET(libs boost_system pthread)
+# SET(libs roslib roscpp rosbag boost_system pthread)
 SET(libs glog amrl_shared_lib boost_system gflags
     pthread)
 
@@ -48,6 +55,7 @@ include_directories(src/)
 add_subdirectory(submodules/amrl_shared_lib/)
 include_directories(submodules/amrl_shared_lib/)
 include_directories(submodules/)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 # Load Gflags from submodule
 add_subdirectory(submodules/gflags)
@@ -71,8 +79,6 @@ set(CXX_PIPS_SRCS
     src/visitors/print_visitor.hpp
     src/visitors/tosmtlib_visitor.cpp
     src/visitors/tosmtlib_visitor.hpp
-    src/visitors/tosmtopt_visitor.cpp
-    src/visitors/tosmtopt_visitor.hpp
     src/ast/ast.cpp
     src/ast/ast.hpp
     src/ast/enumeration.cpp
@@ -89,13 +95,18 @@ target_link_libraries(c++-pips-core Eigen3::Eigen)
 target_link_libraries(c++-pips-core nlohmann_json::nlohmann_json)
 target_link_libraries(c++-pips-core ${Z3_LIBRARIES})
 target_link_libraries(c++-pips-core ${libs})
+target_link_libraries(c++-pips-core ${PYTHON_LIBRARIES})
 
 # Add an executable for ldips-l3
 add_executable(ldips-l3 src/ldips-l3.cpp)
 target_link_libraries(ldips-l3 c++-pips-core)
+
+add_executable(emdips-l3 src/emdips-l3.cpp)
+target_link_libraries(emdips-l3 c++-pips-core)
 
 add_executable(srtr src/srtr.cpp)
 target_link_libraries(srtr c++-pips-core)
 
 add_executable(dipr src/dipr.cpp)
 target_link_libraries(dipr c++-pips-core)
+

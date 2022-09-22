@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -std=c++17 -march=native -ggdb -O2 -fPIC -fopenmp -Wall
+CFLAGS = -g -std=c++17 -march=native -ggdb -O2 -fPIC -fopenmp -Wall -I/usr/include/python3.8 -I/usr/include/python3.8  -Wno-unused-result -Wsign-compare -fdebug-prefix-map=/build/python3.8-uvizni/python3.8-3.8.10=. -specs=/usr/share/dpkg/no-pie-compile.specs -fstack-protector -Wformat -Werror=format-security -DNDEBUG -fwrapv
 PY = python3
 
 export OMP_NUM_THREADS := 1
@@ -43,7 +43,6 @@ $(PLT):
 $(EMNG):
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
-			echo Threads used: $$OMP_NUM_THREADS && \
 			$(CC) $(CFLAGS) synthesis/em.cpp $(INCLUDES) -o synthesis/out/em && \
 			synthesis/out/em
 

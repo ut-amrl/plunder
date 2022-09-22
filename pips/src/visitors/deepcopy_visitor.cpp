@@ -5,8 +5,7 @@
 
 // #include "../ast.hpp"
 
-using std::logic_error;
-using std::make_shared;
+using namespace std;
 
 namespace AST {
 
@@ -23,6 +22,18 @@ DeepCopy::DeepCopy() : copy_(nullptr) {}
 
 ast_ptr DeepCopy::Visit(AST* node) { return ast_ptr(node); }
 
+ast_ptr DeepCopy::Visit(TernOp* node) {
+  node->x_->Accept(this);
+  ast_ptr x = copy_;
+  node->a_->Accept(this);
+  ast_ptr a = copy_;
+  node->b_->Accept(this);
+  ast_ptr b = copy_;
+  TernOp copy(x, a, b, node->op_, node->type_, node->dims_);
+  copy_ = make_shared<TernOp>(copy);
+  return copy_;
+}
+
 ast_ptr DeepCopy::Visit(BinOp* node) {
   node->left_->Accept(this);
   ast_ptr lhs = copy_;
@@ -30,6 +41,13 @@ ast_ptr DeepCopy::Visit(BinOp* node) {
   ast_ptr rhs = copy_;
   BinOp copy(lhs, rhs, node->op_, node->type_, node->dims_);
   copy_ = make_shared<BinOp>(copy);
+  return copy_;
+}
+
+ast_ptr DeepCopy::Visit(UnOp* node) {
+  node->input_->Accept(this);
+  UnOp copy(copy_, node->op_);
+  copy_ = make_shared<UnOp>(copy);
   return copy_;
 }
 
@@ -56,13 +74,6 @@ ast_ptr DeepCopy::Visit(Param* node) {
   Param copy(node->name_, node->dims_, node->type_);
   copy.current_value_ = DeepCopyAST(node->current_value_);
   copy_ = make_shared<Param>(copy);
-  return copy_;
-}
-
-ast_ptr DeepCopy::Visit(UnOp* node) {
-  node->input_->Accept(this);
-  UnOp copy(copy_, node->op_);
-  copy_ = make_shared<UnOp>(copy);
   return copy_;
 }
 

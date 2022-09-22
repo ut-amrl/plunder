@@ -15,12 +15,13 @@ class ToSMTLIB : public Visitor {
  public:
   ToSMTLIB(const Example& example);
   ast_ptr Visit(AST* node);
+  ast_ptr Visit(TernOp* node);
   ast_ptr Visit(BinOp* node);
+  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Bool* node);
   ast_ptr Visit(Feature* node);
   ast_ptr Visit(Num* node);
   ast_ptr Visit(Param* node);
-  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Var* node);
   ast_ptr Visit(Vec* node);
   std::string Get() const;

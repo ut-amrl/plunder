@@ -25,28 +25,10 @@ private:
 #include "visitors/print_visitor.hpp"
 #include "ast.hpp"
 
-using AST::ast_ptr;
-using AST::BOOL;
-using AST::Dimension;
-using AST::Example;
-using AST::FunctionEntry;
-using AST::NUM;
-using AST::SymEntry;
-using AST::Type;
-using AST::Var;
-using AST::VEC;
-using AST::STATE;
+using namespace AST;
+using namespace std;
 using Eigen::Vector2f;
 using nlohmann::json;
-using std::invalid_argument;
-using std::ifstream;
-using std::map;
-using std::string;
-using std::unordered_set;
-using std::vector;
-using std::pair;
-using std::cout;
-using std::endl;
 
 Type StringToType(const string& type_string) {
   if (type_string == "NODE") {

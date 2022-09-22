@@ -5,14 +5,8 @@
 #include "../ast.hpp"
 #include "deepcopy_visitor.hpp"
 
-using AST::ast_ptr;
-using AST::bin_ptr;
-using AST::BinOp;
-using AST::DeepCopyAST;
-using AST::Num;
-using AST::num_ptr;
-using std::dynamic_pointer_cast;
-using std::make_shared;
+using namespace AST;
+using namespace std;
 
 TEST(DeepCopyVisitor, basically_works) {
   Num lhs(4.0, {1, 2, 3});

@@ -24,12 +24,13 @@ class MapHoles : public Visitor {
  public:
   MapHoles();
   ast_ptr Visit(AST* node);
+  ast_ptr Visit(TernOp* node);
   ast_ptr Visit(BinOp* node);
+  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Bool* node);
   ast_ptr Visit(Feature* node);
   ast_ptr Visit(Num* node);
   ast_ptr Visit(Param* node);
-  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Var* node);
   ast_ptr Visit(Vec* node);
   std::unordered_map<std::string, std::pair<Type, Dimension>> GetFeatureHoles()
@@ -51,12 +52,13 @@ class FillHole : public Visitor {
  public:
   FillHole(const std::string& target_name, const ast_ptr& new_value);
   ast_ptr Visit(AST* node);
+  ast_ptr Visit(TernOp* node);
   ast_ptr Visit(BinOp* node);
+  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Bool* node);
   ast_ptr Visit(Feature* node);
   ast_ptr Visit(Num* node);
   ast_ptr Visit(Param* node);
-  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Var* node);
   ast_ptr Visit(Vec* node);
 

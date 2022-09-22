@@ -41,7 +41,8 @@ const bool useOptimizer = true;
 const int window_size = 2;
 const int feature_depth = 3;
 const int sketch_depth = 1;
-const float min_accuracy = 0.95;               // Target min accuracy
+const float max_error = 10;               // Target min accuracy
+const int batch_size = 8;
 
 // Plot parameters
 const int particlesPlotted = 20;

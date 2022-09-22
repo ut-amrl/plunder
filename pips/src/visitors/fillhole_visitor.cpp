@@ -14,16 +14,7 @@
 #include "visitors/print_visitor.hpp"
 
 using AST::Dimension;
-using std::cout;
-using std::endl;
-using std::make_pair;
-using std::make_shared;
-using std::pair;
-using std::string;
-using std::to_string;
-using std::unordered_map;
-using std::unordered_set;
-using std::ostream;
+using namespace std;
 
 namespace AST {
 
@@ -93,6 +84,20 @@ string PrintAst(ast_ptr ast) {
 
 ast_ptr MapHoles::Visit(AST* node) { return ast_ptr(node); }
 
+ast_ptr MapHoles::Visit(TernOp* node) {
+  depth_ += 1;
+  ast_ptr x = node->x_->Accept(this);
+  ast_ptr a = node->a_->Accept(this);
+  ast_ptr b = node->b_->Accept(this);  
+  if (srtrize_) {
+    TernOp srtrd(x, a, b, node->op_);
+    node = &srtrd;
+    return make_shared<TernOp>(srtrd);
+  }
+  is_relative_ = true;
+  return make_shared<TernOp>(*node);
+}
+
 ast_ptr MapHoles::Visit(BinOp* node) {
   depth_ += 1;
   ast_ptr left = node->left_->Accept(this);
@@ -104,6 +109,17 @@ ast_ptr MapHoles::Visit(BinOp* node) {
   }
   is_relative_ = true;
   return make_shared<BinOp>(*node);
+}
+
+ast_ptr MapHoles::Visit(UnOp* node) {
+  depth_ += 1;
+  ast_ptr input = node->input_->Accept(this);
+  if (srtrize_) {
+    UnOp srtrd(input, node->op_);
+    node = &srtrd;
+    return make_shared<UnOp>(srtrd);
+  }
+  return make_shared<UnOp>(*node);
 }
 
 ast_ptr MapHoles::Visit(Bool* node) { return make_shared<Bool>(*node); }
@@ -134,17 +150,6 @@ ast_ptr MapHoles::Visit(Param* node) {
   return make_shared<Param>(*node);
 }
 
-ast_ptr MapHoles::Visit(UnOp* node) {
-  ast_ptr input = node->input_->Accept(this);
-  depth_ += 1;
-  if (srtrize_) {
-    UnOp srtrd(input, node->op_);
-    node = &srtrd;
-    return make_shared<UnOp>(srtrd);
-  }
-  return make_shared<UnOp>(*node);
-}
-
 ast_ptr MapHoles::Visit(Var* node) { return make_shared<Var>(*node); }
 
 ast_ptr MapHoles::Visit(Vec* node) { return make_shared<Vec>(*node); }
@@ -171,10 +176,22 @@ FillHole::FillHole(const string& target_name, const ast_ptr& new_value)
 
 ast_ptr FillHole::Visit(AST* node) { return ast_ptr(node); }
 
+ast_ptr FillHole::Visit(TernOp* node){
+    node->x_->Accept(this);
+    node->a_->Accept(this);
+    node->b_->Accept(this);
+    return make_shared<TernOp>(*node);
+}
+
 ast_ptr FillHole::Visit(BinOp* node) {
   node->left_->Accept(this);
   node->right_->Accept(this);
   return make_shared<BinOp>(*node);
+}
+
+ast_ptr FillHole::Visit(UnOp* node) {
+  node->input_->Accept(this);
+  return make_shared<UnOp>(*node);
 }
 
 ast_ptr FillHole::Visit(Bool* node) { return make_shared<Bool>(*node); }
@@ -201,11 +218,6 @@ ast_ptr FillHole::Visit(Param* node) {
     node->current_value_->Accept(this);
   }
   return make_shared<Param>(*node);
-}
-
-ast_ptr FillHole::Visit(UnOp* node) {
-  node->input_->Accept(this);
-  return make_shared<UnOp>(*node);
 }
 
 ast_ptr FillHole::Visit(Var* node) { return make_shared<Var>(*node); }

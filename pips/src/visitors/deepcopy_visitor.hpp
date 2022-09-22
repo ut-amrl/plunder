@@ -11,12 +11,13 @@ class DeepCopy : public Visitor {
  public:
   DeepCopy();
   ast_ptr Visit(AST* node);
+  ast_ptr Visit(TernOp* node);
   ast_ptr Visit(BinOp* node);
+  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Bool* node);
   ast_ptr Visit(Feature* node);
   ast_ptr Visit(Num* node);
   ast_ptr Visit(Param* node);
-  ast_ptr Visit(UnOp* node);
   ast_ptr Visit(Var* node);
   ast_ptr Visit(Vec* node);
   ast_ptr GetCopy() const;

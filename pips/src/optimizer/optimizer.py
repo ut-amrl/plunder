@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy import special as sp
 from multiprocessing import Pool
+from itertools import repeat
 
 import math
 import warnings
@@ -24,11 +25,11 @@ import json
 # maybe just expand window idk
 
 # ------- Parameters -----------------------------
-opt_method = 0          # See below
+opt_method = 1          # See below
 enumerateSigns = True   # Equivalent to enumerating over > and <
-print_debug = True      # Extra debugging info
-initial_values = 4      # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
-num_cores = 8           # Number of processes to run in parallel
+print_debug = False      # Extra debugging info
+initial_values = 1      # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
+num_cores = 4           # Number of processes to run in parallel
 max_spread = 5.0        # Maximum absolute value of alpha (slope)
 bounds_extension = 0.1  # Amount to search above and below extrema
 print_warnings = False  # Debugging info
@@ -41,7 +42,8 @@ print_padding = 30      # Print customization
 # 3: DIRECT
 
 # -------- objective function --------------------
-def log_loss(x):
+# not working for some reason, TODO fix
+def log_loss2(x):
     alpha = x[: len(x)//2]  # values of alpha (slope) for each conditional structure
     x_0 = x[len(x)//2 :]    # center of logistic function for each conditional structure
 
@@ -67,6 +69,40 @@ def log_loss(x):
     return log_loss
 
 
+
+def log_loss(x):
+    alpha = x[: len(x)//2] # values of alpha (slope) for each conditional structure
+    x_0 = x[len(x)//2 :] # center of logistic function for each conditional structure
+
+    log_loss = 0
+    for i in range(len(y_j)):
+        likelihood = 0
+        if(-alpha[0] * (E_k[0][i] - x_0[0]) > 100):     # deal with overflow - do this better
+            likelihood = 1e-16
+        else:
+            likelihood = 1.0 / (1.0 + pow(math.e, - alpha[0] * (E_k[0][i] - x_0[0])))
+        for j in range(len(clauses)):
+            likelihood_j = 0
+            if(- alpha[j+1] * (E_k[j+1][i] - x_0[j+1]) > 100):
+                likelihood_j = 1e-16
+            else:
+                likelihood_j = 1.0 / (1.0 + pow(math.e, - alpha[j+1] * (E_k[j+1][i] - x_0[j+1])))
+            if(clauses[j] == 0): # AND
+                likelihood = likelihood * likelihood_j
+            if(clauses[j] == 1): # OR
+                likelihood = likelihood + likelihood_j - likelihood * likelihood_j
+
+        # cap at some value to prevent rounding to 0/1 (can cause undefined behavior)
+        likelihood = max(likelihood, 1e-16)
+        likelihood = min(likelihood, 1 - (1e-16))
+
+        if y_j[i]:
+            log_loss -= math.log(likelihood) # cap at small value to prevent undefined behavior
+        else:
+            log_loss -= math.log(1 - likelihood)
+    return log_loss
+
+
 # ------- helper functions ----------------------
 def extension(l, r): # list range
     return (max(l, r) - min(l, r)) * bounds_extension
@@ -80,9 +116,9 @@ def print_with_padding(label, value):
 
 # ---------- Callback ------------------------
 def print_fun(x, f, accepted):
-    # debug("at minimum %.4f accepted %d" % (f, int(accepted)))
-    # debug("with parameters: ")
-    # debug(x)
+    debug("at minimum %.4f accepted %d" % (f, int(accepted)))
+    debug("with parameters: ")
+    debug(x)
     return
 
 # ---------- Bounds ------------------------
@@ -221,16 +257,70 @@ def run_optimizer(E_k_loc, y_j_loc, clauses_loc):
             break
     
     print_with_padding("Initial values", "|")
-    debug(input)
+    debug(input[0])
     
     # Run optimizer in parallel
-    with Pool(num_cores) as p:
-        output = p.map(run_optimizer_from_initial, input)
+    # with Pool(num_cores) as p:
+    #     output = p.map(run_optimizer_from_initial, input)
     
-    bestRes = min(output, key=lambda i: i.fun)
+    # bestRes = min(output, key=lambda i: i.fun)
+    bestRes = run_optimizer_from_initial(input[0])
     
     print_with_padding("Final parameters", "|")
     debug(bestRes.x)
     print_with_padding("Minimum value", bestRes.fun)
 
     return (bestRes.fun, list(bestRes.x))
+
+
+def run_optimizer_threads(E_k_arr, y_j, clauses_arr):
+    results = []
+    pool = Pool(len(E_k_arr))
+    results = pool.starmap(run_optimizer, zip(E_k_arr, repeat(y_j), clauses_arr))
+    return results
+
+
+
+
+
+
+
+
+
+
+# --------------------- testing -------------------------------------------
+
+def dist_traveled(v, dec):
+    return - v * v / (2 * dec)
+
+if __name__ == '__main__':
+
+    f = open('examples/emdips/out/data.json')
+    data = json.load(f)
+    E_k_test = []
+    y_j_test = []
+    clauses_test = [0]
+    arr_a = []
+    arr_b = []
+    for row in data:
+        if(row['start']['value'] == 'ACC'):
+            y_j_test.append(int(row['output']['value'] == 'CON'))
+            arr_a.append(row['v']['value'] - row['vMax']['value'])
+            arr_b.append(dist_traveled(row['v']['value'], row['decMax']['value']) + row['x']['value'] - row['target']['value'])
+
+    E_k_test = [arr_a, arr_b]
+
+    f.close()
+
+    run_optimizer(E_k_test, y_j_test, clauses_test)
+
+    global E_k, y_j, clauses
+    E_k = E_k_test
+    y_j = y_j_test
+    clauses = clauses_test
+
+    print("supposed")
+    print(log_loss([1, -1, 0.1, 0]))
+    print(log_loss([1, -1, 0, 0]))
+    print(log_loss([2, -2, 0, 0]))
+    print(log_loss([10, -10, 0, 0]))
