@@ -60,7 +60,6 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
     Example obsObject = dataToExample(ha, state, robot);
     for(uint i = 0; i < transitions.size(); i++){
         if(HAToString(ha) == transitions[i].first){
-            cout << preds[i] << endl;
             if(InterpretBool(preds[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
                 break;
@@ -151,7 +150,9 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     // Retrieve ASPs and accuracies    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
+
     EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, accuracies, aspFilePath, batch_size);
+
     preds = eo.ast_vec;
     accuracies = eo.log_likelihoods;
 
@@ -183,7 +184,8 @@ void setupLdips(){
 
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
-            if(i != j) transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            accuracies.push_back(numeric_limits<float>::max());
         }
     }
     
