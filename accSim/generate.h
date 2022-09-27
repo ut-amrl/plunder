@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <stdlib.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "robotSets.h"
 #include "asps.h"
 #include "ast/ast.hpp"

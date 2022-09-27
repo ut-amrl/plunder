@@ -6,7 +6,7 @@
 #include <cstring>
 
 #include "pf_runner.h"
-#include "../settings.h"
+#include "settings.h"
 
 using namespace std;
 

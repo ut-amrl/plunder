@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "generate.h"
-#include "../settings.h"
+#include "settings.h"
 
 using namespace std;
 

@@ -8,9 +8,9 @@
 #include <cstring>
 
 #include "pf.h"
-#include "../accSim/asps.h"
-#include "../accSim/robotSets.h"
-#include "../settings.h"
+#include "accSim/asps.h"
+#include "accSim/robotSets.h"
+#include "settings.h"
 
 using namespace std;
 

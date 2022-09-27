@@ -40,12 +40,11 @@ void assertConstraints() {
 int main(int argc, char** argv){
     assertConstraints();
 
-    if(argc < 2) {
-        cout << "please input which settings file to process" << endl;
-        exit(1);
+    string basePath = "settings";
+    if(argc >= 2) {
+        basePath = argv[1];
     }
 
-    string basePath = argv[1];
     string hPath = basePath + ".h";
     string txtPath = basePath + ".txt";
 

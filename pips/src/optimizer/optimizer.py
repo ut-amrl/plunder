@@ -28,7 +28,7 @@ import json
 # ------- Parameters -----------------------------
 opt_method = 0          # See below
 enumerateSigns = True   # Equivalent to enumerating over > and <
-print_debug = True      # Extra debugging info
+print_debug = False      # Extra debugging info
 initial_values = 2      # Initial values for x_0: 0 = all zeros, 1 = average, >1 = enumerate over random initial guesses (use this to specify how many)
 num_cores = 4           # Number of processes to run in parallel
 max_spread = 5.0        # Maximum absolute value of alpha (slope)

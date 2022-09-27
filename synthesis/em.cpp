@@ -17,8 +17,8 @@
 #include "visitors/interp_visitor.hpp"
 #include "ast/synthesis.hpp"
 
-#include "../particleFilter/pf_runner.h"
-#include "../settings.h"
+#include "particleFilter/pf_runner.h"
+#include "settings.h"
 
 // ignores the last 20 time steps of the particle filter because they are weird and introduce wrong transitions??
 #define END_PF_ERR 20
@@ -217,6 +217,7 @@ void emLoop(vector<Robot>& robots){
 
     // Initialization
     setupLdips();
+
     library = ReadLibrary(operationLibPath);
     asp_t* curASP = initialASP;
     vector<vector<Obs>> dataObs (robots.size());

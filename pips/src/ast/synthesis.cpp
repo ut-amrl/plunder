@@ -1,7 +1,7 @@
 #include "synthesis.hpp"
 
 #include <gflags/gflags.h>
-#include <Python.h>
+#include "Python.h"
 
 #include <algorithm>
 #include <chrono>
@@ -801,7 +801,7 @@ namespace AST {
         
         // Initialize python support
         Py_Initialize();
-        PyRun_SimpleString("import sys, os; sys.path.insert(0, os.path.join('./', 'src/', 'optimizer'))");
+        PyRun_SimpleString("import sys, os; sys.path.insert(0, os.path.join('./', 'pips/', 'src/', 'optimizer'))");
 
         // File name
         pName = PyUnicode_FromString((char*)"optimizer");

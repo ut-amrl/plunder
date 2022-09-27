@@ -7,8 +7,8 @@
 #include <cassert>
 #include <numeric>
 
-#include "../robot.h"
-#include "../accSim/asps.h"
+#include "robot.h"
+#include "accSim/asps.h"
 
 using namespace std;
 

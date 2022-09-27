@@ -4,9 +4,9 @@
 #include <math.h>
 
 #include "../pf_runner.h"
-#include "../../settings.h"
-#include "../../accSim/robotSets.h"
-#include "../../accSim/asps.h"
+#include "settings.h"
+#include "accSim/robotSets.h"
+#include "accSim/asps.h"
 
 using namespace std;
 

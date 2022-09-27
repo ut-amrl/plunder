@@ -1,8 +1,9 @@
-CC = g++
-CFLAGS = -g -std=c++17 -march=native -ggdb -O2 -fPIC -fopenmp -Wall -I/usr/include/python3.8 -I/usr/include/python3.8  -Wno-unused-result -Wsign-compare -fdebug-prefix-map=/build/python3.8-uvizni/python3.8-3.8.10=. -specs=/usr/share/dpkg/no-pie-compile.specs -fstack-protector -Wformat -Werror=format-security -DNDEBUG -fwrapv
+# include $(shell rospack find mk)/cmake.mk
 PY = python3
 
-export OMP_NUM_THREADS := 1
+#acceptable build_types: Release/Debug/Profile
+build_type=Release
+# build_type=Debug
 
 SETTINGS = settings
 GEN = gen
@@ -12,28 +13,33 @@ EM = em
 EMNG = emng
 EMTEST = emtest
 
-INCLUDES = -L pips/lib \
-			-l c++-pips-core -l amrl_shared_lib -l z3 \
-			-I pips/src -I pf_custom -I accSim -I pips/submodules/json/single_include/
+.SILENT:
 
+all: build build/CMakeLists.txt.copy
+	$(info Build_type is [${build_type}])
+	$(MAKE) --no-print-directory -C build
 
-.SILENT: $(SETTINGS) $(GEN) $(PF) $(PLT) $(EMNG) $(EM) clean
+build/CMakeLists.txt.copy: build CMakeLists.txt Makefile
+	cd build && cmake -DCMAKE_BUILD_TYPE=$(build_type) ..
+	cp CMakeLists.txt build/CMakeLists.txt.copy
+
+build:
+	mkdir -p build
 
 $(SETTINGS):
-			$(CC) $(CFLAGS) -o ts translateSettings.cpp
-			./ts settings
+			./bin/settings
 
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p accSim/out && \
-			$(CC) $(CFLAGS) -o accSim/out/gen accSim/generate.cpp $(INCLUDES) && \
-			accSim/out/gen && \
+			./bin/gen && \
 			cp accSim/out/data.json pips/examples/data.json
+
 $(PF):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p particleFilter/out && \
-			$(CC) $(CFLAGS) -o particleFilter/out/pf particleFilter/pf_runner.cpp && \
-			particleFilter/out/pf
+			mkdir -p synthesis/out/examples && \
+			./bin/pf
 
 $(PLT):
 			$(MAKE) $(SETTINGS) && \
@@ -41,26 +47,21 @@ $(PLT):
 			$(PY) particleFilter/plotter.py
 
 $(EMNG):
+			$(MAKE) $(SETTINGS) && \
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
-			$(CC) $(CFLAGS) synthesis/em.cpp $(INCLUDES) -o synthesis/out/em && \
-			synthesis/out/em
-
+			mkdir -p synthesis/out/asp && \
+			./bin/emloop
+			
 $(EM):
-			$(MAKE) clean && \
+			$(MAKE) clear_data && \
 			$(MAKE) $(GEN) && \
 			$(MAKE) $(EMNG)
 
-$(EMTEST):
-			rm -rf synthesis/out && \
-			mkdir -p synthesis/out/examples && \
-			echo Threads used: $$OMP_NUM_THREADS && \
-			$(CC) $(CFLAGS) synthesis/tests/unit_tests.cpp $(INCLUDES) -o synthesis/out/emtest && \
-			synthesis/out/emtest
+clean:
+	rm -rf bin build lib
 
-clean: 
-			rm -rf accSim/out \
-					particleFilter/out \
-					particleFilter/plots \
-					synthesis/plots \
-					synthesis/out
+clear_data:
+	rm -rf accSim/out particleFilter/out particleFilter/plots synthesis/plots synthesis/out settings.txt
+
+purge: clean clear_data

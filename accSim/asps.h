@@ -5,8 +5,8 @@
 #include <fstream>
 #include <iomanip>
 
-#include "../robot.h"
-#include "../settings.h"
+#include "robot.h"
+#include "settings.h"
 
 using namespace std;
 
