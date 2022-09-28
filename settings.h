@@ -30,19 +30,17 @@ const double velErrorDev = 0.00;
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
-const int sampleSize = 200;              // number of trajectories to pass into EMDIPS
+const int sampleSize = 20;              // number of trajectories to pass into EMDIPS
 const bool usePointError = true;        // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.9;       // probability of a correct (ASP-consistent) high-level transition
-const bool useBoundaryError = true;    // boundary error: threshold-dependent error in EMDIPS-generated ASP
-const double boundaryDeviation = 1.0;   // conditional deviation
-const bool useOptimizer = true;
 
 // EMDIPS parameters
 const int window_size = 3;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float max_error = 10;               // Target min accuracy
+const float max_error = 10;               // Target threshold
 const int batch_size = 8;
+const int max_examples = 2000;
 
 // Plot parameters
 const int particlesPlotted = 20;
@@ -51,5 +49,5 @@ const int timeStepsPlot = 1000;
 // Particle filter parameters
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.2;                            // higher = more resampling
-const double pf_stddevError = 1.0;
+const float resampleThreshold = 0.1;                            // higher = more resampling
+const double pf_stddevError = 2.0;

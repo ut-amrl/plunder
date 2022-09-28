@@ -74,7 +74,8 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    return pointError(ha, ha, r, true);
+    return ASP_random(ha, state, r);
+    // return pointError(ha, ha, r, true);
 }
 
 // Expectation step
@@ -114,6 +115,9 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     }
 
     examples = WindowExamples(examples, window_size);
+    
+    shuffle(begin(examples), end(examples), default_random_engine {});
+    examples = vector<Example>(examples.begin(), examples.begin() + max_examples);
     
     // Turn variables into roots
     vector<ast_ptr> inputs, roots;
@@ -231,12 +235,10 @@ void emLoop(vector<Robot>& robots){
         
         // Expectation
         cout << "Loop " << i << " expectation:" << endl;
-        if(useBoundaryError) setBoundaryStddev(boundaryDeviation); // use probabilistic ASP
         vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
 
         // Maximization
         cout << "Loop " << i << " maximization:" << endl;
-        setBoundaryStddev(0); // reset boundaries during LDIPS
         maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
 
         curASP = ldipsASP;
