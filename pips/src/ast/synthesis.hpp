@@ -4,6 +4,7 @@
 #pragma once
 
 #include <z3++.h>
+#include "Python.h"
 
 #include <ostream>
 #include <string>
@@ -58,7 +59,8 @@ namespace AST {
         const int sketch_depth,
         const std::vector<float> max_error,
         const std::string& output_path,
-        const uint32_t b_size);
+        const uint32_t b_size,
+        PyObject* optimizer);
 
     void SRTR(const std::vector<Example>& demos,
         const std::vector<ast_ptr>& programs,

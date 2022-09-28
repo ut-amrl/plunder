@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <z3++.h>
+#include "Python.h"
 
 #include <fstream>
 #include <iomanip>
@@ -34,6 +35,7 @@ vector<pair<string,string>> transitions;
 vector<float> accuracies;
 vector<ast_ptr> preds;
 vector<FunctionEntry> library;
+PyObject* pFunc;
 
 namespace std {
     ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
@@ -151,7 +153,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
 
-    EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, accuracies, aspFilePath, batch_size);
+    EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, accuracies, aspFilePath, batch_size, pFunc);
 
     preds = eo.ast_vec;
     accuracies = eo.log_likelihoods;
@@ -265,8 +267,40 @@ void emLoop(vector<Robot>& robots){
 }
 
 int main() {
+    // Set up Python
+    // Initialize python support
+    Py_Initialize();
+
+    PyRun_SimpleString(
+        "import os, sys \n"
+        "sys.path.append(os.getcwd() + '/pips/src/optimizer') \n");
+
+    // File name
+    PyObject* pName = PyUnicode_FromString((char*)"optimizer");
+
+    PyObject* pModule = PyImport_Import(pName);
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        // Function name
+        pFunc = PyObject_GetAttrString(pModule, (char*)"run_optimizer_threads");
+
+        if (!(pFunc && PyCallable_Check(pFunc))) {
+            if (PyErr_Occurred()) PyErr_Print();
+            fprintf(stderr, "Cannot find optimization function\n");
+        }
+    } else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load optimization file");
+    }
+
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
     emLoop(robots);
+
+    // Clean up python
+    Py_XDECREF(pFunc);
+    Py_DECREF(pModule);
+    Py_Finalize();
 
     return 0;
 }
