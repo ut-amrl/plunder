@@ -19,7 +19,6 @@
 #include "ast/synthesis.hpp"
 #include "visitors/interp_visitor.hpp"
 #include "visitors/print_visitor.hpp"
-// #include "sketches/sketches.hpp"
 
 DEFINE_string(ex_file, "examples/data.json", "Examples file");
 DEFINE_string(lib_file, "ops/emdips_test.json", "Operation library file");
