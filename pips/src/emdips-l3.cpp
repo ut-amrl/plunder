@@ -28,7 +28,7 @@ DEFINE_uint32(feat_depth, 3, "Maximum enumeration depth for features.");
 DEFINE_uint32(sketch_depth, 2, "Maximum enumeration depth for sketch.");
 DEFINE_uint32(window_size, 3,
               "Size of sliding window to subsample demonstrations with.");
-DEFINE_double(target_score, 10,
+DEFINE_double(target_score, 0.15,
               "What log likelihood should be achieved / what proportion of "
               "examples should be SAT to declare victory?");
 DEFINE_bool(write_features, false, "Write all enumerated features to a file");

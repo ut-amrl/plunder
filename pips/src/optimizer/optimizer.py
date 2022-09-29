@@ -162,7 +162,8 @@ def run_optimizer_from_initial(E_k, y_j, clauses, bounds, bounds_arr, bounds_obj
     print_with_padding("Minimum value", res.fun)
     debug("")
 
-    res.fun = np.nan_to_num(res.fun, nan=float("inf"))
+    # Remove NaNs and take the average
+    res.fun = np.nan_to_num(res.fun, nan=float("inf")) / len(y_j)
     return res
 
 # Handles initialization and enumeration, then calls the optimizer
