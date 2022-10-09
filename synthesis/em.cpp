@@ -20,6 +20,7 @@
 
 #include "particleFilter/pf_runner.h"
 #include "settings.h"
+#include "accSim/generate.h"
 
 // ignores the last 20 time steps of the particle filter because they are weird and introduce wrong transitions??
 #define END_PF_ERR 20
@@ -56,6 +57,22 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     return ex;
 }
 
+int distt(int v, int d){
+    return - v * v / (2 * d);
+}
+
+void printExampleInfo(Example e){
+    float x = e.symbol_table_["x"].GetFloat();
+    float v = e.symbol_table_["v"].GetFloat();
+    float decMax = e.symbol_table_["decMax"].GetFloat();
+    float vMax = e.symbol_table_["vMax"].GetFloat();
+    float target = e.symbol_table_["target"].GetFloat();
+    string start = e.start_.GetString();
+    string res = e.result_.GetString();
+    float exp = ((target-x) - distt(v, decMax)) < 0;
+    cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
+}
+
 // Runs LDIPS-generated ASP
 HA ldipsASP(HA ha, Obs state, Robot& robot){
     HA prevHA = ha;
@@ -74,14 +91,16 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
-    return ASP_random(ha, state, r);
-    // return pointError(ha, ha, r, true);
+    // return ASP_random(ha, state, r);
+    return pointError(ha, ha, r, true);
 }
+
 
 // Expectation step
 vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
 
     vector<vector<Example>> examples;
+    
 
     for(uint i = 0; i < robots.size(); i++){
         string in = stateGenPath + to_string(i) + ".csv";
@@ -102,6 +121,27 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
                 examples[i].push_back(ex);
             }
         }
+
+        // Run ASPs for all robots
+        string s = altPath+to_string(iteration)+"-"+to_string(i)+".csv";
+        ofstream outFile;
+        outFile.open(s);
+        for(uint n=0; n<10; n++){
+            vector<HA> traj = trajectories[n];
+            robots[i].ha = ACC;
+            outFile << robots[i].accMax << ",";
+            for(uint t=1; t<dataObs[i].size(); t++){
+                robots[i].updatePhysics(T_STEP);
+                robots[i].runASP(asp);
+                robots[i].updateLA();
+                int res = robots[i].ha==ACC ? robots[i].accMax : 
+                            robots[i].ha==DEC ? robots[i].decMax : 0;
+                outFile << res;
+                if(t!=dataObs[i].size()-1) outFile << ",";
+            }
+            outFile << endl;
+        }
+        outFile.close();
     }
 
     return examples;
@@ -115,6 +155,10 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     }
 
     examples = WindowExamples(examples, window_size);
+
+    for(Example e : examples){
+        printExampleInfo(e);
+    }
     
     shuffle(begin(examples), end(examples), default_random_engine {});
     examples = vector<Example>(examples.begin(), examples.begin() + max_examples);
@@ -190,34 +234,29 @@ void setupLdips(){
 
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
-            transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            // transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
             accuracies.push_back(numeric_limits<float>::max());
         }
     }
     
-    std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
-        if(a.first == b.first){
-            if(a.first == a.second) return 1;
-            if(b.first == b.second) return -1;
-            return a.second < b.second;
-        }
-        return a.first < b.first;
-    });
-    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    // transitions.push_back(pair<string, string> ("ACC", "CON"));
-    // transitions.push_back(pair<string, string> ("CON", "DEC"));
+    // std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
+    //     if(a.first == b.first){
+    //         if(a.first == a.second) return 1;
+    //         if(b.first == b.second) return -1;
+    //         return a.second < b.second;
+    //     }
+    //     return a.first < b.first;
+    // });
+    transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    transitions.push_back(pair<string, string> ("ACC", "CON"));
+    transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
+
 
 void testExampleOnASP(vector<Example> examples, Robot r){
     for(uint i=0; i<examples.size(); i++){
         Example e = examples[i];
-        float x = e.symbol_table_["x"].GetFloat();
-        float v = e.symbol_table_["v"].GetFloat();
-        float decMax = e.symbol_table_["decMax"].GetFloat();
-        float vMax = e.symbol_table_["vMax"].GetFloat();
-        float target = e.symbol_table_["target"].GetFloat();
-        string start = e.start_.GetString();
-        string res = e.result_.GetString();
+        printExampleInfo(e);
     }
 }
 

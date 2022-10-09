@@ -50,6 +50,7 @@ $(EMNG):
 			$(MAKE) $(SETTINGS) && \
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
+			mkdir -p synthesis/out/states && \
 			./bin/emloop
 			
 $(EM):

@@ -91,7 +91,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     // Setup JSON
     ofstream jsonFile;
     if(genJson){
-        cout << "Filling JSON with simulation data\n";
+        cout << "Filling JSON with simulation data: " << outputPath << ".json" << endl;
 
         jsonFile << fixed << setprecision(PRECISION);
         jsonFile.open(outputPath + ".json");
@@ -107,10 +107,12 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         // Setup CSV file
         ofstream csvFile;
         if(genCsv){
+            cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
             csvFile << fixed << setprecision(PRECISION);
             csvFile.open(outputPath + to_string(i) + ".csv");
             csvFile << rio.getCsvTitles() << "\n";
         }
+
 
         // Run simulation
         for(double t = 0; t < T_TOT; t += T_STEP){

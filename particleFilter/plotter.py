@@ -16,6 +16,8 @@ gtPosition = []
 
 settings = {}
 
+plotPure = True
+
 # ----- I/O ---------------------------------------------=
 
 # Reads in csv files
@@ -104,7 +106,11 @@ def main():
             gtPosition = []
 
             # I/O
-            inFile = settings["trajGenPath"]+str(iter)+"-"+str(robot)+".csv"
+            inFile = ""
+            if plotPure:
+                inFile = settings["altPath"]+str(iter)+"-"+str(robot)+".csv"
+            else:
+                inFile = settings["trajGenPath"]+str(iter)+"-"+str(robot)+".csv"
             gtFile = settings["stateGenPath"]+str(robot)+".csv"
             outPath = settings["plotGenPath"]+str(iter)+"-"+str(robot)+"-"
 

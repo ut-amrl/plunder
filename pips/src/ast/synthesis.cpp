@@ -98,6 +98,21 @@ namespace AST {
         nd_bool_array visited_;
     };
 
+
+    void SplitExamplesVector(const vector<Example>& examples,
+                        pair<string, string> transition,
+                        vector<Example>* yes, vector<Example>* no) {
+        string out = transition.second;
+        string in = transition.first;
+        for (const Example& example : examples) {
+            if (example.result_ == out && example.start_ == in) {
+                yes->push_back(example);
+            } else if (example.start_ == in) {
+                no->push_back(example);
+            }
+        }
+    }
+
     // Helper Function for scoring a candidate predicate given only a set
     // of examples and the desired transition
     float ScorePredicate(ast_ptr pred, const pair<string, string> &transition,
@@ -309,8 +324,8 @@ namespace AST {
 
     // Attempts to solve for the most likely assignment of real values for the
     // logistic equation. Returns the log likelihood and modifies sketch
-    vector<double> LikelihoodPredicateL1(vector<ast_ptr> sketches, const unordered_set<Example> &pos,
-                                const unordered_set<Example> &neg,
+    vector<double> LikelihoodPredicateL1(vector<ast_ptr> sketches, const vector<Example> &pos,
+                                const vector<Example> &neg,
                                 const bool srtr,
                                 uint32_t& sketches_completed) {
 
@@ -620,9 +635,9 @@ namespace AST {
         // Split up all the examples into a "yes" set or a "no" set based on
         // whether the result for the example matches the current example's
         // behavior.
-        unordered_set<Example> yes;
-        unordered_set<Example> no;
-        SplitExamples(examples, transition, &yes, &no);
+        vector<Example> yes;
+        vector<Example> no;
+        SplitExamplesVector(examples, transition, &yes, &no);
 
         if (debug) {
             cout << "Current Sketch: " << sketch << endl;
@@ -684,15 +699,15 @@ namespace AST {
                 }
             }
         } else {
-            // Since no errors occured while creating the model, we can take the
-            // hole values from it and use them to fill the holes in a copy of the
-            // condition.
-            ast_ptr cond_copy = DeepCopyAST(sketch);
-            const double log_likelihood = PredicateL1(cond_copy, yes, no, false);
-            if (log_likelihood <= current_best) {
-                solution_cond = cond_copy;
-                current_best = log_likelihood;
-            }
+            // // Since no errors occured while creating the model, we can take the
+            // // hole values from it and use them to fill the holes in a copy of the
+            // // condition.
+            // ast_ptr cond_copy = DeepCopyAST(sketch);
+            // const double log_likelihood = PredicateL1(cond_copy, yes, no, false);
+            // if (log_likelihood <= current_best) {
+            //     solution_cond = cond_copy;
+            //     current_best = log_likelihood;
+            // }
         }
         // Return the solution if one exists, otherwise return a nullptr.
         if (solution_cond != nullptr) {
@@ -805,6 +820,7 @@ namespace AST {
         // Enumerate possible sketches
         const auto sketches = EnumerateSketches(sketch_depth);
         cout << "Number of sketches: " << sketches.size() << endl;
+        cout << "Number of examples: " << demos.size() << endl;
         for (ast_ptr each : sketches) {
             cout << each << endl;
         }
@@ -829,9 +845,9 @@ namespace AST {
             cout << transition.second << " -----" << endl;
             cout << "Target log likelihood: < " << max_error[t] << endl;
 
-            unordered_set<Example> yes;
-            unordered_set<Example> no;
-            SplitExamples(examples, transition, &yes, &no);
+            vector<Example> yes;
+            vector<Example> no;
+            SplitExamplesVector(examples, transition, &yes, &no);
             cout << "Num transitions (pos): " << yes.size() << endl;
             cout << "Num transitions (neg): " << no.size() << endl;
 
