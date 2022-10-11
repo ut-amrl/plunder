@@ -1,0 +1,3 @@
+[submodule "pips"]
+	path = pips
+	url = https://github.com/ut-amrl/pips.git
