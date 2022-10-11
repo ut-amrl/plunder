@@ -155,13 +155,13 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     }
 
     examples = WindowExamples(examples, window_size);
-
-    for(Example e : examples){
-        printExampleInfo(e);
-    }
     
     shuffle(begin(examples), end(examples), default_random_engine {});
     examples = vector<Example>(examples.begin(), examples.begin() + max_examples);
+    
+    for(Example e : examples){
+        printExampleInfo(e);
+    }
     
     // Turn variables into roots
     vector<ast_ptr> inputs, roots;
@@ -234,22 +234,22 @@ void setupLdips(){
 
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
-            // transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
             accuracies.push_back(numeric_limits<float>::max());
         }
     }
     
-    // std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
-    //     if(a.first == b.first){
-    //         if(a.first == a.second) return 1;
-    //         if(b.first == b.second) return -1;
-    //         return a.second < b.second;
-    //     }
-    //     return a.first < b.first;
-    // });
-    transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    transitions.push_back(pair<string, string> ("ACC", "CON"));
-    transitions.push_back(pair<string, string> ("CON", "DEC"));
+    std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
+        if(a.first == b.first){
+            if(a.first == a.second) return 1;
+            if(b.first == b.second) return -1;
+            return a.second < b.second;
+        }
+        return a.first < b.first;
+    });
+    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    // transitions.push_back(pair<string, string> ("ACC", "CON"));
+    // transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
 
 
@@ -283,27 +283,27 @@ void emLoop(vector<Robot>& robots){
         curASP = ldipsASP;
 
 
-        // Update point accuracy
-        double satisfied = 0;
-        double total = 0;
-        for(uint r = 0; r < robots.size(); r++){
-            // testExampleOnASP(examples[r], robots[r]);
-            robots[r].pointAccuracy = 1; // make ASP deterministic
-            for(Example& ex: examples[r]){
-                total++;
-                Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-                if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
-                    satisfied++;
-                }
-            }
-        }
+        // // Update point accuracy
+        // double satisfied = 0;
+        // double total = 0;
+        // for(uint r = 0; r < robots.size(); r++){
+        //     // testExampleOnASP(examples[r], robots[r]);
+        //     robots[r].pointAccuracy = 1; // make ASP deterministic
+        //     for(Example& ex: examples[r]){
+        //         total++;
+        //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
+        //         if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
+        //             satisfied++;
+        //         }
+        //     }
+        // }
         
-        // Update point accuracy
-        double newPointAcc = min(satisfied / total, 0.9);
-        cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
-        for(Robot& r : robots){
-            r.pointAccuracy = newPointAcc;
-        }
+        // // Update point accuracy
+        // double newPointAcc = min(satisfied / total, 0.9);
+        // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
+        // for(Robot& r : robots){
+        //     r.pointAccuracy = newPointAcc;
+        // }
     }
 }
 
