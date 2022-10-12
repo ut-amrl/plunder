@@ -33,8 +33,8 @@ using json = nlohmann::json;
 
 unordered_set<Var> variables;
 vector<pair<string,string>> transitions;
-vector<float> accuracies;
-vector<ast_ptr> preds;
+std::shared_ptr<vector<float>> accuracies = make_shared<vector<float>>();
+std::shared_ptr<vector<ast_ptr>> preds = make_shared<vector<ast_ptr>>();
 vector<FunctionEntry> library;
 PyObject* pFunc;
 
@@ -70,7 +70,7 @@ void printExampleInfo(Example e){
     string start = e.start_.GetString();
     string res = e.result_.GetString();
     float exp = ((target-x) - distt(v, decMax)) < 0;
-    cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
+    // cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
 // Runs LDIPS-generated ASP
@@ -78,8 +78,11 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
     HA prevHA = ha;
     Example obsObject = dataToExample(ha, state, robot);
     for(uint i = 0; i < transitions.size(); i++){
-        if(HAToString(ha) == transitions[i].first){
-            if(InterpretBool(preds[i], obsObject)) {
+        // cout << "testing transition " << transitions[i].first << " -> " << transitions[i].second << endl;
+        // cout << (*preds)[i] << endl;
+
+        if(HAToString(prevHA) == transitions[i].first){
+            if(InterpretBool((*preds)[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
                 break;
             }
@@ -122,24 +125,29 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
             }
         }
 
+
         // Run ASPs for all robots
         string s = altPath+to_string(iteration)+"-"+to_string(i)+".csv";
         ofstream outFile;
         outFile.open(s);
         for(uint n=0; n<10; n++){
             vector<HA> traj = trajectories[n];
+            robots[i].reset();
             robots[i].ha = ACC;
+            double temp = robots[i].pointAccuracy;
+            robots[i].pointAccuracy = 1;
             outFile << robots[i].accMax << ",";
             for(uint t=1; t<dataObs[i].size(); t++){
                 robots[i].updatePhysics(T_STEP);
                 robots[i].runASP(asp);
                 robots[i].updateLA();
-                int res = robots[i].ha==ACC ? robots[i].accMax : 
+                double res = robots[i].ha==ACC ? robots[i].accMax : 
                             robots[i].ha==DEC ? robots[i].decMax : 0;
                 outFile << res;
                 if(t!=dataObs[i].size()-1) outFile << ",";
             }
             outFile << endl;
+            robots[i].pointAccuracy = temp;
         }
         outFile.close();
     }
@@ -194,14 +202,14 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     // Calculate new error tolerance
     // Cap each maximum error to speed up search
     for(uint i = 0; i < transitions.size(); i++){
-        accuracies[i] = max(accuracies[i], max_error);
+        (*accuracies)[i] = min((*accuracies)[i]+.00001, (double)max_error);
     }
 
     // Retrieve ASPs and accuracies    
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
 
-    EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, accuracies, aspFilePath, batch_size, pFunc);
+    EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, *accuracies, aspFilePath, batch_size, pFunc);
 
     preds = eo.ast_vec;
     accuracies = eo.log_likelihoods;
@@ -212,8 +220,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     aspStrFile.open(aspStrFilePath);
     for(uint i = 0; i < transitions.size(); i++){
         aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
-        aspStrFile << "Accuracy: " << accuracies[i] << endl;
-        aspStrFile << preds[i] << endl;
+        aspStrFile << "Accuracy: " << (*accuracies)[i] << endl;
+        aspStrFile << (*preds)[i] << endl;
     }
     aspStrFile.close();
 }
@@ -234,22 +242,22 @@ void setupLdips(){
 
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
-            transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-            accuracies.push_back(numeric_limits<float>::max());
+            // transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            (*accuracies).push_back(numeric_limits<float>::max());
         }
     }
     
-    std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
-        if(a.first == b.first){
-            if(a.first == a.second) return 1;
-            if(b.first == b.second) return -1;
-            return a.second < b.second;
-        }
-        return a.first < b.first;
-    });
-    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    // transitions.push_back(pair<string, string> ("ACC", "CON"));
-    // transitions.push_back(pair<string, string> ("CON", "DEC"));
+    // std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
+    //     if(a.first == b.first){
+    //         if(a.first == a.second) return 1;
+    //         if(b.first == b.second) return -1;
+    //         return a.second < b.second;
+    //     }
+    //     return a.first < b.first;
+    // });
+    transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    transitions.push_back(pair<string, string> ("ACC", "CON"));
+    transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
 
 
@@ -284,26 +292,26 @@ void emLoop(vector<Robot>& robots){
 
 
         // // Update point accuracy
-        // double satisfied = 0;
-        // double total = 0;
-        // for(uint r = 0; r < robots.size(); r++){
-        //     // testExampleOnASP(examples[r], robots[r]);
-        //     robots[r].pointAccuracy = 1; // make ASP deterministic
-        //     for(Example& ex: examples[r]){
-        //         total++;
-        //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-        //         if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
-        //             satisfied++;
-        //         }
-        //     }
-        // }
+        double satisfied = 0;
+        double total = 0;
+        for(uint r = 0; r < robots.size(); r++){
+            // testExampleOnASP(examples[r], robots[r]);
+            robots[r].pointAccuracy = 1; // make ASP deterministic
+            for(Example& ex: examples[r]){
+                total++;
+                Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
+                if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
+                    satisfied++;
+                }
+            }
+        }
         
-        // // Update point accuracy
-        // double newPointAcc = min(satisfied / total, 0.9);
-        // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
-        // for(Robot& r : robots){
-        //     r.pointAccuracy = newPointAcc;
-        // }
+        // Update point accuracy
+        double newPointAcc = min(satisfied / total, 0.9);
+        cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
+        for(Robot& r : robots){
+            r.pointAccuracy = newPointAcc;
+        }
     }
 }
 

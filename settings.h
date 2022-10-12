@@ -5,11 +5,11 @@
 using namespace std;
 
 // Robot parameters
-const int robotTestSet = 2;         // which robots to use (0-2)
-const int numRobots = 5;           // number of robots (depends on robot test set)
+const int robotTestSet = 0;         // which robots to use (0-2)
+const int numRobots = 15;           // number of robots (depends on robot test set)
 const int model = 0;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = .01;     // low-level action error standard deviation
+const double stddevError = .3;     // low-level action error standard deviation
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -31,7 +31,7 @@ const double velErrorDev = 0.00;
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
-const int sampleSize = 5;              // number of trajectories to pass into EMDIPS
+const int sampleSize = 10;              // number of trajectories to pass into EMDIPS
 const bool usePointError = true;        // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.9;       // probability of a correct (ASP-consistent) high-level transition
 
@@ -39,7 +39,7 @@ const double pointAccuracy = 0.9;       // probability of a correct (ASP-consist
 const int window_size = 3;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float max_error = 0.15;               // Target threshold
+const float max_error = 0.01;               // Target threshold
 const int batch_size = 8;
 const int max_examples = 100;
 
@@ -51,4 +51,4 @@ const int timeStepsPlot = 1000;
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
 const float resampleThreshold = 0.3;                            // higher = more resampling
-const double pf_stddevError = .01;
+const double pf_stddevError = .3;

@@ -16,7 +16,7 @@ gtPosition = []
 
 settings = {}
 
-plotPure = True
+plotPure = False
 
 # ----- I/O ---------------------------------------------=
 
