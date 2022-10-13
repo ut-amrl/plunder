@@ -210,7 +210,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     cout << endl;
 
     cout << "Number of examples: " << examples.size() << endl;
-    
+
     // Calculate new error tolerance
     // Cap each maximum error to speed up search
     for(uint i = 0; i < transitions.size(); i++){
@@ -261,12 +261,13 @@ void setupLdips(){
     
     std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
         if(a.first == b.first){
-            if(a.first == a.second) return 1;
-            if(b.first == b.second) return -1;
+            if(a.first == a.second) return false;
+            if(b.first == b.second) return true;
             return a.second < b.second;
         }
         return a.first < b.first;
     });
+
     // transitions.push_back(pair<string, string> ("ACC", "DEC"));
     // transitions.push_back(pair<string, string> ("ACC", "CON"));
     // transitions.push_back(pair<string, string> ("CON", "DEC"));

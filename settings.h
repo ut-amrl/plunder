@@ -39,7 +39,7 @@ const double pointAccuracy = 0.9;       // probability of a correct (ASP-consist
 const int window_size = 3;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float max_error = 0.0;               // Target threshold
+const float max_error = 0.1;               // Target threshold
 const int batch_size = 8;
 const int max_examples = 300;
 
