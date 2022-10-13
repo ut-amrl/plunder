@@ -162,7 +162,7 @@ class ParticleFilter {
             // Reweight particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
-                FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(system->r, dataLA[t], x_i, dataObs[t]);
+                FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(system->r, dataLA[t], x_i, dataObs[t]) * obsLikelihoodStrength;
                 log_weights[i] += log_LA_ti;
             }
 

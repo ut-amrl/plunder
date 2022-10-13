@@ -39,7 +39,7 @@ const double pointAccuracy = 0.9;       // probability of a correct (ASP-consist
 const int window_size = 3;
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float max_error = 0.1;               // Target threshold
+const float max_error = 0.2;               // Target threshold
 const int batch_size = 8;
 const int max_examples = 300;
 
@@ -51,4 +51,5 @@ const int timeStepsPlot = 1000;
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
 const float resampleThreshold = 0.3;                            // higher = more resampling
-const double pf_stddevError = .5;
+const double pf_stddevError = 0.5;
+const float obsLikelihoodStrength = 0.8;

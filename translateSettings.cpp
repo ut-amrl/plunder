@@ -11,7 +11,7 @@
 
 using namespace std;
 
-uint numSpaces = 20;
+uint numSpaces = 30;
 
 // ----- Asserts -------------------------------
 
@@ -24,6 +24,7 @@ void assertConstraints() {
     assert(stddevError >= 0 && "Standard deviation must be positive");
     assert(pf_stddevError >= 0 && "Standard deviation must be positive");
     assert(pf_stddevError >= stddevError && "PF stddev must be greater than actual stddev");
+    assert(obsLikelihoodStrength >= 0 && obsLikelihoodStrength <= 1 && "Observation likelihood strength must be between 0 and 1");
 
     assert(pointAccuracy >= 0 && pointAccuracy <= 1 && "HA probability must be between 0 and 1");
     assert(genAccuracy >= 0 && genAccuracy <= 1 && "HA probability must be between 0 and 1");
@@ -63,10 +64,10 @@ int main(int argc, char** argv){
             // shortcut, ignore if there are spaces on the RHS
             if(valStr.back() != ';') continue;
             // Remove semicolon
-            valStr = valStr.substr(0, valStr.end()-valStr.begin()-1);
+            valStr = valStr.substr(0, valStr.size()-1);
             // Remove quotation marks
-            if(typeStr == "string") valStr = valStr.substr(1, valStr.end()-valStr.begin()-2);
-            string spaces ((numSpaces - (varName.end()-varName.begin())), ' ');
+            if(typeStr == "string") valStr = valStr.substr(1, valStr.size()-2);
+            string spaces ((numSpaces - varName.size()), ' ');
             outFile << varName << spaces << valStr << endl;
         }
     }
