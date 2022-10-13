@@ -70,7 +70,7 @@ void printExampleInfo(Example e){
     string start = e.start_.GetString();
     string res = e.result_.GetString();
     float exp = ((target-x) - distt(v, decMax)) < 0;
-    cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
+    // cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
 // Runs LDIPS-generated ASP
@@ -99,12 +99,13 @@ HA initialASP(HA ha, Obs state, Robot& r){
 }
 
 bool isValidExample(Example ex){
-    return (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("CON")) ||
-            (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("ACC")) ||
-            (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("DEC")) ||
-            (ex.start_.GetString()==("CON") && ex.result_.GetString()==("DEC")) ||
-            (ex.start_.GetString()==("CON") && ex.result_.GetString()==("CON")) ||
-            (ex.start_.GetString()==("DEC") && ex.result_.GetString()==("DEC"));
+    // return (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("CON")) ||
+    //         (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("ACC")) ||
+    //         (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("DEC")) ||
+    //         (ex.start_.GetString()==("CON") && ex.result_.GetString()==("DEC")) ||
+    //         (ex.start_.GetString()==("CON") && ex.result_.GetString()==("CON")) ||
+    //         (ex.start_.GetString()==("DEC") && ex.result_.GetString()==("DEC"));
+    return true;
 }
 
 // Expectation step
@@ -203,16 +204,17 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     cout << "---- Number of Features Enumerated ----" << endl;
     cout << ops.size() << endl << endl;
+    for(auto& each: ops){
+        cout << each << endl;
+    }
     cout << endl;
 
     cout << "Number of examples: " << examples.size() << endl;
-
+    
     // Calculate new error tolerance
     // Cap each maximum error to speed up search
     for(uint i = 0; i < transitions.size(); i++){
-        // (*accuracies)[i] = min((*accuracies)[i]+.00001, (double)max_error);
-        if(iteration==0) (*accuracies)[i]=max_error;
-        else (*accuracies)[i] = max((*accuracies)[i], max_error);
+        (*accuracies)[i] = max_error;
     }
 
     // Retrieve ASPs and accuracies    
@@ -252,22 +254,22 @@ void setupLdips(){
 
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
-            // transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+            transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
             accuracies->push_back(numeric_limits<float>::max());
         }
     }
     
-    // std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
-    //     if(a.first == b.first){
-    //         if(a.first == a.second) return 1;
-    //         if(b.first == b.second) return -1;
-    //         return a.second < b.second;
-    //     }
-    //     return a.first < b.first;
-    // });
-    transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    transitions.push_back(pair<string, string> ("ACC", "CON"));
-    transitions.push_back(pair<string, string> ("CON", "DEC"));
+    std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
+        if(a.first == b.first){
+            if(a.first == a.second) return 1;
+            if(b.first == b.second) return -1;
+            return a.second < b.second;
+        }
+        return a.first < b.first;
+    });
+    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    // transitions.push_back(pair<string, string> ("ACC", "CON"));
+    // transitions.push_back(pair<string, string> ("CON", "DEC"));
 }
 
 
@@ -317,7 +319,7 @@ void emLoop(vector<Robot>& robots){
         }
         
         // Update point accuracy
-        double newPointAcc = min(satisfied / total, 0.98);
+        double newPointAcc = min(satisfied / total, 0.95);
         cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
         for(Robot& r : robots){
             r.pointAccuracy = newPointAcc;
