@@ -70,7 +70,7 @@ void printExampleInfo(Example e){
     string start = e.start_.GetString();
     string res = e.result_.GetString();
     float exp = ((target-x) - distt(v, decMax)) < 0;
-    // cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
+    cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
 // Runs LDIPS-generated ASP
@@ -98,6 +98,14 @@ HA initialASP(HA ha, Obs state, Robot& r){
     return pointError(ha, ha, r, true);
 }
 
+bool isValidExample(Example ex){
+    return (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("CON")) ||
+            (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("ACC")) ||
+            (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("DEC")) ||
+            (ex.start_.GetString()==("CON") && ex.result_.GetString()==("DEC")) ||
+            (ex.start_.GetString()==("CON") && ex.result_.GetString()==("CON")) ||
+            (ex.start_.GetString()==("DEC") && ex.result_.GetString()==("DEC"));
+}
 
 // Expectation step
 vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
@@ -121,7 +129,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
 
                 // Provide next high-level action
                 ex.result_ = SymEntry(HAToString(traj[t+1]));
-                examples[i].push_back(ex);
+                if(isValidExample(ex)) examples[i].push_back(ex);
             }
         }
 
@@ -203,7 +211,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     // Cap each maximum error to speed up search
     for(uint i = 0; i < transitions.size(); i++){
         // (*accuracies)[i] = min((*accuracies)[i]+.00001, (double)max_error);
-        (*accuracies)[i] = max((*accuracies)[i], max_error);
+        if(iteration==0) (*accuracies)[i]=max_error;
+        else (*accuracies)[i] = max((*accuracies)[i], max_error);
     }
 
     // Retrieve ASPs and accuracies    
@@ -308,7 +317,7 @@ void emLoop(vector<Robot>& robots){
         }
         
         // Update point accuracy
-        double newPointAcc = min(satisfied / total, 0.9);
+        double newPointAcc = min(satisfied / total, 0.98);
         cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
         for(Robot& r : robots){
             r.pointAccuracy = newPointAcc;
