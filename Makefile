@@ -44,6 +44,8 @@ $(PF):
 $(PLT):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p synthesis/plots && \
+			mkdir -p synthesis/plots/pure && \
+			mkdir -p synthesis/plots/pf && \
 			$(PY) particleFilter/plotter.py
 
 $(EMNG):

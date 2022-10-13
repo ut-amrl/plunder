@@ -16,8 +16,6 @@ gtPosition = []
 
 settings = {}
 
-plotPure = False
-
 # ----- I/O ---------------------------------------------=
 
 # Reads in csv files
@@ -84,17 +82,15 @@ def runSimulation():
     
     return
 
-
-# ----- Main ---------------------------------------------
-
-def main():
+def plotTraj(inF, outP, gtF):
     global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
 
-    # Read settings
-    readSettings("settings.txt")
-        
     for iter in range(0, int(settings["numIterations"])):
         for robot in range(0, int(settings["numRobots"])):
+            
+            inFile = inF + str(iter) + "-" + str(robot) + ".csv"
+            outPath = outP + str(iter) + "-" + str(robot) + "-"
+            gtFile = gtF + str(robot) + ".csv"
 
             trajectories = []
             velocities = []
@@ -104,15 +100,6 @@ def main():
             gtLA = []
             gtVelocity = []
             gtPosition = []
-
-            # I/O
-            inFile = ""
-            if plotPure:
-                inFile = settings["altPath"]+str(iter)+"-"+str(robot)+".csv"
-            else:
-                inFile = settings["trajGenPath"]+str(iter)+"-"+str(robot)+".csv"
-            gtFile = settings["stateGenPath"]+str(robot)+".csv"
-            outPath = settings["plotGenPath"]+str(iter)+"-"+str(robot)+"-"
 
             readTrajectories(inFile)
             readGroundTruth(gtFile)
@@ -213,7 +200,31 @@ def main():
             plt.close('all')
 
     return
+    
+# ----- Main ---------------------------------------------
 
+def main():
+    global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
+
+    # Read settings
+    readSettings("settings.txt")
+    
+    # I/O
+    pureInFile = settings["altPath"]
+    pfInFile = settings["trajGenPath"]
+
+    gtFile = settings["stateGenPath"]
+
+    pureOutPath = settings["plotGenPath"]+"pure/"
+    pfOutPath = settings["plotGenPath"]+"pf/"
+
+    try:
+        plotTraj(pureInFile, pureOutPath, gtFile)
+    except Exception as e: print(e)
+    
+    try:
+        plotTraj(pfInFile, pfOutPath, gtFile)
+    except Exception as e: print(e)
 
 if __name__ == "__main__":
     main()

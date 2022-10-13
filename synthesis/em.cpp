@@ -202,7 +202,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     // Calculate new error tolerance
     // Cap each maximum error to speed up search
     for(uint i = 0; i < transitions.size(); i++){
-        (*accuracies)[i] = min((*accuracies)[i]+.00001, (double)max_error);
+        // (*accuracies)[i] = min((*accuracies)[i]+.00001, (double)max_error);
+        (*accuracies)[i] = max((*accuracies)[i], max_error);
     }
 
     // Retrieve ASPs and accuracies    
@@ -243,7 +244,7 @@ void setupLdips(){
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
             // transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-            (*accuracies).push_back(numeric_limits<float>::max());
+            accuracies->push_back(numeric_limits<float>::max());
         }
     }
     
