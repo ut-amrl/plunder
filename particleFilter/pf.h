@@ -234,7 +234,7 @@ class ParticleFilter {
                 }
             } else {
                 // resample at last step to eliminate deviating particles
-                // particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
+                particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
             }
         }
 

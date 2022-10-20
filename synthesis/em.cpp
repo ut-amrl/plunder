@@ -215,14 +215,15 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(examples, transitions, all_sketches, accuracies, aspFilePath, batch_size, pFunc);
+        eo = emdipsL3(examples, transitions, all_sketches, accuracies, aspFilePath, batch_size, programs_enumerated, pFunc);
 
     } else {
 
         // Retrieve ASPs and accuracies    
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
-        eo = emdipsL3(examples, transitions, vector<ast_ptr>(), preds, accuracies, aspFilePath, batch_size, true, pFunc);
+        vector<ast_ptr> all_sketches;
+        eo = emdipsL3(examples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
 
     }
 
