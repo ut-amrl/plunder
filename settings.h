@@ -9,7 +9,7 @@ const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 15;           // number of robots (depends on robot test set)
 const int model = 0;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = .5;     // low-level action error standard deviation
+const double stddevError = .2;     // low-level action error standard deviation
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences

@@ -37,8 +37,8 @@ vector<FunctionEntry> library;
 vector<ast_ptr> roots;
 PyObject* pFunc;
 
-shared_ptr<vector<float>> accuracies = make_shared<vector<float>>();
-shared_ptr<vector<ast_ptr>> preds = make_shared<vector<ast_ptr>>();
+vector<float> accuracies;
+vector<ast_ptr> preds;
 
 namespace std {
     ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
@@ -81,10 +81,10 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
     Example obsObject = dataToExample(ha, state, robot);
     for(uint i = 0; i < transitions.size(); i++){
         // cout << "testing transition " << transitions[i].first << " -> " << transitions[i].second << endl;
-        // cout << (*preds)[i] << endl;
+        // cout << preds[i] << endl;
 
         if(HAToString(prevHA) == transitions[i].first){
-            if(InterpretBool((*preds)[i], obsObject)) {
+            if(InterpretBool(preds[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
                 break;
             }
@@ -201,7 +201,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         // Calculate new error tolerance
         // Cap each maximum error to speed up search
         for(uint i = 0; i < transitions.size(); i++){
-            (*accuracies)[i] = max_error;
+            accuracies[i] = max_error;
         }
 
         // Retrieve ASPs and accuracies    
@@ -215,14 +215,14 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(examples, transitions, all_sketches, *accuracies, aspFilePath, batch_size, pFunc);
+        eo = emdipsL3(examples, transitions, all_sketches, accuracies, aspFilePath, batch_size, pFunc);
 
     } else {
 
         // Retrieve ASPs and accuracies    
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
-        eo = emdipsL3(examples, transitions, vector<ast_ptr>(), preds, *accuracies, aspFilePath, batch_size, true, pFunc);
+        eo = emdipsL3(examples, transitions, vector<ast_ptr>(), preds, accuracies, aspFilePath, batch_size, true, pFunc);
 
     }
 
@@ -236,8 +236,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     aspStrFile.open(aspStrFilePath);
     for(uint i = 0; i < transitions.size(); i++){
         aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
-        aspStrFile << "Accuracy: " << (*accuracies)[i] << endl;
-        aspStrFile << (*preds)[i] << endl;
+        aspStrFile << "Accuracy: " << accuracies[i] << endl;
+        aspStrFile << preds[i] << endl;
     }
     aspStrFile.close();
 }
@@ -259,7 +259,7 @@ void setupLdips(){
     for(uint i = 0; i < numHA; i++){
         for(uint j = 0; j < numHA; j++){
             transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-            accuracies->push_back(numeric_limits<float>::max());
+            accuracies.push_back(numeric_limits<float>::max());
         }
     }
     
