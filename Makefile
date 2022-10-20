@@ -43,6 +43,7 @@ $(PF):
 
 $(PLT):
 			$(MAKE) $(SETTINGS) && \
+			rm -rf synthesis/plots && \
 			mkdir -p synthesis/plots && \
 			mkdir -p synthesis/plots/pure && \
 			mkdir -p synthesis/plots/pf && \

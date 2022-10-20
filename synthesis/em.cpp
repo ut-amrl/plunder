@@ -97,7 +97,7 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
     // return ASP_random(ha, state, r);
-    return pointError(ha, ha, r, true);
+    return pointError(ha, ha, r, false);
 }
 
 bool isValidExample(Example ex){
