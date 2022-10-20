@@ -221,6 +221,13 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     string aspFilePath = aspPathBase + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
 
+    vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
+    
+    cout << "Num total programs: " << all_sketches.size() << endl;
+    // for(ast_ptr each: all_sketches){
+    //     cout << each << endl;
+    // }
+
     EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, *accuracies, aspFilePath, batch_size, pFunc);
 
     preds = eo.ast_vec;
