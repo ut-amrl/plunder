@@ -34,10 +34,11 @@ const int numIterations = 10;           // number of iterations in the expectati
 const int sampleSize = 10;              // number of trajectories to pass into EMDIPS
 const bool usePointError = true;        // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.9;       // probability of a correct (ASP-consistent) high-level transition
+const int structuralChangeFrequency = 3;
 
 // EMDIPS parameters
 const int window_size = 3;
-const int feature_depth = 2;
+const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.2;               // Target threshold
 const int batch_size = 8;

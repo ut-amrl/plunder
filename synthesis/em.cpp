@@ -33,10 +33,12 @@ using json = nlohmann::json;
 
 unordered_set<Var> variables;
 vector<pair<string,string>> transitions;
-std::shared_ptr<vector<float>> accuracies = make_shared<vector<float>>();
-std::shared_ptr<vector<ast_ptr>> preds = make_shared<vector<ast_ptr>>();
 vector<FunctionEntry> library;
+vector<ast_ptr> roots;
 PyObject* pFunc;
+
+shared_ptr<vector<float>> accuracies = make_shared<vector<float>>();
+shared_ptr<vector<ast_ptr>> preds = make_shared<vector<ast_ptr>>();
 
 namespace std {
     ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
@@ -180,56 +182,51 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         printExampleInfo(e);
     }
     
-    // Turn variables into roots
-    vector<ast_ptr> inputs, roots;
-    for (const Var& variable : variables) {
-        roots.push_back(make_shared<Var>(variable));
+    EmdipsOutput eo;
+    if(iteration % structuralChangeFrequency == 0){
+
+        vector<ast_ptr> inputs; vector<Signature> sigs;
+        vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, examples, library,
+                                            feature_depth, &sigs);
+
+        cout << "---- Number of Features Enumerated ----" << endl;
+        cout << ops.size() << endl << endl;
+        for(auto& each: ops){
+            cout << each << endl;
+        }
+        cout << endl;
+
+        cout << "Number of examples: " << examples.size() << endl;
+
+        // Calculate new error tolerance
+        // Cap each maximum error to speed up search
+        for(uint i = 0; i < transitions.size(); i++){
+            (*accuracies)[i] = max_error;
+        }
+
+        // Retrieve ASPs and accuracies    
+        string aspFilePath = aspPathBase + to_string(iteration) + "/";
+        filesystem::create_directory(aspFilePath);
+
+        vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
+        
+        cout << "Num total programs: " << all_sketches.size() << endl;
+        // for(ast_ptr each: all_sketches){
+        //     cout << each << endl;
+        // }
+
+        eo = emdipsL3(examples, transitions, all_sketches, *accuracies, aspFilePath, batch_size, pFunc);
+
+    } else {
+
+        // Retrieve ASPs and accuracies    
+        string aspFilePath = aspPathBase + to_string(iteration) + "/";
+        filesystem::create_directory(aspFilePath);
+        eo = emdipsL3(examples, transitions, vector<ast_ptr>(), preds, *accuracies, aspFilePath, batch_size, true, pFunc);
+
     }
 
-    vector<Signature> signatures;
-    vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, examples, library,
-                                          feature_depth, &signatures);
-    // Debug
-    cout << "----Roots----" << endl;
-    for (auto& node : roots) {
-        cout << node << endl;
-    }
-    cout << endl;
-
-    cout << "----Transitions----" << endl;
-    for (auto& trans : transitions) {
-        cout << trans.first << "->" << trans.second << endl;
-    }
-    cout << endl;
-
-    cout << "---- Number of Features Enumerated ----" << endl;
-    cout << ops.size() << endl << endl;
-    for(auto& each: ops){
-        cout << each << endl;
-    }
-    cout << endl;
-
-    cout << "Number of examples: " << examples.size() << endl;
-
-    // Calculate new error tolerance
-    // Cap each maximum error to speed up search
-    for(uint i = 0; i < transitions.size(); i++){
-        (*accuracies)[i] = max_error;
-    }
-
-    // Retrieve ASPs and accuracies    
-    string aspFilePath = aspPathBase + to_string(iteration) + "/";
-    filesystem::create_directory(aspFilePath);
-
-    vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
     
-    cout << "Num total programs: " << all_sketches.size() << endl;
-    // for(ast_ptr each: all_sketches){
-    //     cout << each << endl;
-    // }
-
-    EmdipsOutput eo = emdipsL3(examples, transitions, all_sketches, *accuracies, aspFilePath, batch_size, pFunc);
-
     preds = eo.ast_vec;
     accuracies = eo.log_likelihoods;
 
@@ -278,6 +275,24 @@ void setupLdips(){
     // transitions.push_back(pair<string, string> ("ACC", "DEC"));
     // transitions.push_back(pair<string, string> ("ACC", "CON"));
     // transitions.push_back(pair<string, string> ("CON", "DEC"));
+
+    // Turn variables into roots
+    for (const Var& variable : variables) {
+        roots.push_back(make_shared<Var>(variable));
+    }
+
+    // Debug
+    cout << "----Roots----" << endl;
+    for (auto& node : roots) {
+        cout << node << endl;
+    }
+    cout << endl;
+
+    cout << "----Transitions----" << endl;
+    for (auto& trans : transitions) {
+        cout << trans.first << "->" << trans.second << endl;
+    }
+    cout << endl;
 }
 
 
