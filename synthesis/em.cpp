@@ -228,7 +228,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     //     cout << each << endl;
     // }
 
-    EmdipsOutput eo = emdipsL3(examples, transitions, ops, sketch_depth, *accuracies, aspFilePath, batch_size, pFunc);
+    EmdipsOutput eo = emdipsL3(examples, transitions, all_sketches, *accuracies, aspFilePath, batch_size, pFunc);
 
     preds = eo.ast_vec;
     accuracies = eo.log_likelihoods;

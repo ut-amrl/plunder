@@ -37,7 +37,7 @@ const double pointAccuracy = 0.9;       // probability of a correct (ASP-consist
 
 // EMDIPS parameters
 const int window_size = 3;
-const int feature_depth = 3;
+const int feature_depth = 2;
 const int sketch_depth = 2;
 const float max_error = 0.2;               // Target threshold
 const int batch_size = 8;
