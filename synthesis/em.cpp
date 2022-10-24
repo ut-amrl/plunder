@@ -181,9 +181,14 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     for(Example e : examples){
         printExampleInfo(e);
     }
+
+    // Set each maximum error to speed up search
+    for(uint i = 0; i < transitions.size(); i++){
+        accuracies[i] = max_error;
+    }
     
     EmdipsOutput eo;
-    if(iteration % structuralChangeFrequency == 0){
+    if(iteration % structuralChangeFrequency == 0 && !hardcode_program){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
         vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, examples, library,
@@ -197,12 +202,6 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         cout << endl;
 
         cout << "Number of examples: " << examples.size() << endl;
-
-        // Calculate new error tolerance
-        // Cap each maximum error to speed up search
-        for(uint i = 0; i < transitions.size(); i++){
-            accuracies[i] = max_error;
-        }
 
         // Retrieve ASPs and accuracies    
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
@@ -218,7 +217,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         eo = emdipsL3(examples, transitions, all_sketches, accuracies, aspFilePath, batch_size, programs_enumerated, pFunc);
 
     } else {
-
+        
         // Retrieve ASPs and accuracies    
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
@@ -294,6 +293,20 @@ void setupLdips(){
         cout << trans.first << "->" << trans.second << endl;
     }
     cout << endl;
+
+    // Set hard coded program structure, if desired
+    for (int t = 0; t < transitions.size(); t++) {
+        const auto &transition = transitions[t];
+        const string input_name =
+            gt_asp + transition.first + "_" + transition.second + ".json";
+
+        ifstream input_file;
+        input_file.open(input_name);
+        const json input = json::parse(input_file);
+        preds.push_back(AstFromJson(input));
+        
+        input_file.close();
+    }
 }
 
 
@@ -328,26 +341,26 @@ void emLoop(vector<Robot>& robots){
 
 
         // // Update point accuracy
-        double satisfied = 0;
-        double total = 0;
-        for(uint r = 0; r < robots.size(); r++){
-            // testExampleOnASP(examples[r], robots[r]);
-            robots[r].pointAccuracy = 1; // make ASP deterministic
-            for(Example& ex: examples[r]){
-                total++;
-                Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-                if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
-                    satisfied++;
-                }
-            }
-        }
+        // double satisfied = 0;
+        // double total = 0;
+        // for(uint r = 0; r < robots.size(); r++){
+        //     // testExampleOnASP(examples[r], robots[r]);
+        //     robots[r].pointAccuracy = 1; // make ASP deterministic
+        //     for(Example& ex: examples[r]){
+        //         total++;
+        //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
+        //         if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
+        //             satisfied++;
+        //         }
+        //     }
+        // }
         
-        // Update point accuracy
-        double newPointAcc = min(satisfied / total, 0.95);
-        cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
-        for(Robot& r : robots){
-            r.pointAccuracy = newPointAcc;
-        }
+        // // Update point accuracy
+        // double newPointAcc = min(satisfied / total, 0.95);
+        // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
+        // for(Robot& r : robots){
+        //     r.pointAccuracy = newPointAcc;
+        // }
     }
 }
 
