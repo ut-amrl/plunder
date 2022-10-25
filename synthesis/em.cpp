@@ -214,7 +214,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(examples, transitions, all_sketches, accuracies, aspFilePath, batch_size, programs_enumerated, pFunc);
+        eo = emdipsL3(examples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
 
     } else {
         
