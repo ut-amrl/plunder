@@ -45,7 +45,7 @@ const int sketch_depth = 2;
 const float max_error = 0.3;               // Target threshold
 const int batch_size = 8;
 const int max_examples = 500;
-const int programs_enumerated = 1000;
+const int programs_enumerated = 1;
 
 // Plot parameters
 const int particlesPlotted = 50;

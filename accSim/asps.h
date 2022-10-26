@@ -50,14 +50,20 @@ HA ASP_Hand(HA ha, Obs state, Robot& r){
     bool cond1 = state.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
     bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
 
-    if(cond2){
-        ha = DEC;
+    if(ha == ACC){                          // transitions starting with ACC
+        if(cond1 && !cond2) ha=CON;         // ACC -> CON (expected)
+        else if(cond2) ha=DEC;              // ACC -> DEC (expected)
+        else ACC;                           // "no transition" is the default
     }
-    if(cond1 && !cond2){
-        ha = CON;
+    if(ha == CON){                          // transitions starting with CON
+        if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
+        else if(cond2) ha=DEC;              // CON -> DEC (expected)
+        else CON;                           // "no transition" is the default
     }
-    if(!cond1 && !cond2){
-        ha = ACC;
+    if(ha == DEC){
+        if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        else DEC;                           // "no transition" is the default
     }
 
     return ha;

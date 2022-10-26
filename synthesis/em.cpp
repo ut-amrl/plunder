@@ -267,9 +267,9 @@ void setupLdips(){
         if(a.first == b.first){
             if(a.first == a.second) return false;
             if(b.first == b.second) return true;
-            return a.second < b.second;
+            return a.second > b.second;
         }
-        return a.first < b.first;
+        return a.first > b.first;
     });
 
     // transitions.push_back(pair<string, string> ("ACC", "DEC"));
