@@ -72,7 +72,7 @@ void printExampleInfo(Example e){
     string start = e.start_.GetString();
     string res = e.result_.GetString();
     float exp = ((target-x) - distt(v, decMax)) < 0;
-    // cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
+    cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
 // Runs LDIPS-generated ASP
@@ -168,18 +168,35 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
 
 // Maximization step
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
-    vector<Example> examples;
+    vector<Example> consolidated;
     for(vector<Example>& each : allExamples){
-        examples.insert(end(examples), begin(each), end(each));
+        consolidated.insert(end(consolidated), begin(each), end(each));
     }
 
-    examples = WindowExamples(examples, window_size);
-    
-    shuffle(begin(examples), end(examples), default_random_engine {});
-    examples = vector<Example>(examples.begin(), examples.begin() + max_examples);
-    
-    for(Example e : examples){
-        printExampleInfo(e);
+    consolidated = WindowExamples(consolidated, window_size);
+    shuffle(begin(consolidated), end(consolidated), default_random_engine {});
+
+    std::sort(consolidated.begin(), consolidated.end(), [](const Example& a, const Example& b) -> bool {
+        if(a.start_.GetString() == b.start_.GetString()){
+            if(a.start_.GetString() == a.result_.GetString()) return false;
+            if(b.start_.GetString() == b.result_.GetString()) return true;
+            return a.result_.GetString() < b.result_.GetString();
+        }
+        return a.start_.GetString() < b.start_.GetString();
+    });
+
+    vector<Example> examples;
+    int count = 0;
+    for(int i = 0; i < consolidated.size(); i++) {
+        if(i  != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
+                        consolidated[i].result_.GetString() != consolidated[i-1].result_.GetString())) {
+            count = 0;
+        } else {
+            if(count < max_examples) {
+                count++;
+                examples.push_back(consolidated[i]);
+            }
+        }
     }
 
     // Set each maximum error to speed up search
@@ -267,9 +284,9 @@ void setupLdips(){
         if(a.first == b.first){
             if(a.first == a.second) return false;
             if(b.first == b.second) return true;
-            return a.second > b.second;
+            return a.second < b.second;
         }
-        return a.first > b.first;
+        return a.first < b.first;
     });
 
     // transitions.push_back(pair<string, string> ("ACC", "DEC"));
