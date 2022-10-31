@@ -86,21 +86,21 @@ class MarkovSystem {
     RobotClass r;
 
     // Constructor
-    MarkovSystem( HA (*_sampleInitialHA)(), 
-                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
-                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs),
-                  RobotClass& _r):
-                        sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
-                  {
-    }
+    MarkovSystem(HA (*_sampleInitialHA)(), 
+                HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
+                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs),
+                RobotClass& _r):
+
+                sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
+    {}
     
     // Robot-less constructor
-    MarkovSystem( HA (*_sampleInitialHA)(), 
-                  HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
-                  FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs)):
-                        sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
-                  {
-    }
+    MarkovSystem(HA (*_sampleInitialHA)(), 
+                HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
+                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs)):
+
+                sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
+    {}
 };
 
 
@@ -156,6 +156,8 @@ class ParticleFilter {
         // motionModel(CON, dataObs[t-1]);
         // motionModel(DEC, dataObs[t-1]);
         // motionModel(ACC, dataObs[t-1]);
+
+        // cout << "Robot:\n\n\n";
 
         for(int t = 0; t < T; t++){
             
@@ -236,6 +238,17 @@ class ParticleFilter {
                 // resample at last step to eliminate deviating particles
                 particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
             }
+
+            // int count[3]; count[0] = 0; count[1] = 0; count[2] = 0;
+            // for(int i = 0; i < particles[t].size(); i++){
+            //     count[particles[t][i]]++;
+            // }
+
+            // cout << "Time " << t << ": ";
+            // for(int i = 0; i < 3; i++){
+            //     cout << HAToString((HA) i) << " count: " << count[i] << "; ";
+            // }
+            // cout << endl << endl;
         }
 
         cout << "Cumulative observation likelihood: e^" << log_obs << " = " << exp(log_obs) << endl;

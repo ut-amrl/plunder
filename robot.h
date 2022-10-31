@@ -4,6 +4,7 @@
 #include <random>
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
 
 #include "settings.h"
 
@@ -97,7 +98,7 @@ class Robot {
         
         if(ha == ACC){
             // acc = accMax;
-            acc = (vMax - state.vel) / vMax * accMax + activationMinAcc;
+            acc = max((vMax - state.vel) / vMax * accMax, 0.0) + activationMinAcc;
         } else if (ha == DEC) {
             acc = decMax;
             // acc = (vMax - state.vel) / vMax * decMax - activationMinAcc;

@@ -143,7 +143,7 @@ def plotTraj(inF, outP, gtF):
                     gt[0][t] = gt[0][t-1]
                     gt[1][t] = gt[1][t-1]
                     gt[2][t] = gt[2][t-1]
-
+            
             ax1.bar(times, actions[0], width=1, bottom=np.add(actions[2], actions[1]), color="#05a655", label="ACC")
             ax1.bar(times, actions[1], width=1, bottom=actions[2], color="#f8ff99", label="CON")
             ax1.bar(times, actions[2], width=1, color="#ff6040", label="DEC")
