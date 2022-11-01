@@ -129,7 +129,7 @@ class ParticleFilter {
     }
 
     // Run particle filter on numParticles particles (and some resampleThreshold between 0 and 1)
-    void forwardFilter(int numParticles, float resampleThreshold){
+    double forwardFilter(int numParticles, float resampleThreshold){
 
         // Initialization
         int N = numParticles;
@@ -168,7 +168,6 @@ class ParticleFilter {
                 log_weights[i] += log_LA_ti;
             }
 
-            // DEBUG
             // cout << "Processing time " << t << " and LA " << dataLA[t].acc << endl;
             // for(HA each: particles[t]){
             //     cout << each << " ";
@@ -198,7 +197,6 @@ class ParticleFilter {
             // Update log observation likelihood
             log_obs += log_z_t;
 
-            // DEBUG
             // cout << "Normalized weights: ";
             // for(FLOAT each: log_weights){
             //     cout << exp(each) << " ";
@@ -215,7 +213,6 @@ class ParticleFilter {
                     weights[i] = exp(log_weights[i]);
                 }
 
-                // DEBUG
                 // cout << "Resampling..." << endl;
                 // cout << "New particles: ";
                 // for(HA each: particles[t]){
@@ -251,11 +248,12 @@ class ParticleFilter {
             // cout << endl << endl;
         }
 
-        cout << "Cumulative observation likelihood: e^" << log_obs << " = " << exp(log_obs) << endl;
+        // cout << "Observation likelihood (provides a measure of the accuracy of an ASP): e^" << log_obs << " = " << exp(log_obs) << endl;
+        return log_obs;
     }
 
     // Retrieve high-level action sequences after running particle filter
-    vector<vector<HA>> retrieveTrajectories(int numTrajectories){        
+    vector<vector<HA>> retrieveTrajectories(vector<vector<HA>>& trajectories, int numTrajectories){        
         if(particles.size() == 0){
             cout << "Run the particle filter first!" << endl;
             return vector<vector<HA>>();
@@ -265,8 +263,7 @@ class ParticleFilter {
         int T = particles.size(); int N = particles[0].size();
         numTrajectories = min(numTrajectories, (int) particles[0].size());
 
-        vector<vector<HA>> trajectories;
-        for(int i = 0; i < numTrajectories; i++){
+        while(trajectories.size() < numTrajectories){
             trajectories.push_back(vector<HA>(T));
         }
 

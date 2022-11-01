@@ -81,7 +81,6 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
     Example obsObject = dataToExample(ha, state, robot);
     for(uint i = 0; i < transitions.size(); i++){
         // cout << "testing transition " << transitions[i].first << " -> " << transitions[i].second << endl;
-        // cout << preds[i] << endl;
 
         if(HAToString(prevHA) == transitions[i].first){
             if(InterpretBool(preds[i], obsObject)) {
@@ -114,15 +113,19 @@ bool isValidExample(Example ex){
 vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
 
     vector<vector<Example>> examples;
-    
 
+    cout << "Running particle filter with " << numParticles << " particles\n";
+    cout << "Parameters: resample threshold=" << resampleThreshold << ", observation strength=" << obsLikelihoodStrength << endl;
+
+    double cum_log_obs = 0;
     for(uint i = 0; i < robots.size(); i++){
         string in = stateGenPath + to_string(i) + ".csv";
         string out = trajGenPath + to_string(iteration) + "-" + to_string(i) + ".csv";
         examples.push_back(vector<Example>());
 
         // Run filter
-        vector<vector<HA>> trajectories = filterFromFile(numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
+        vector<vector<HA>> trajectories;
+        cum_log_obs += filterFromFile(trajectories, numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
         
         // Convert each particle trajectory point to LDIPS-supported Example
         for(uint n = 0; n < sampleSize; n++){
@@ -163,6 +166,8 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         outFile.close();
     }
 
+    cout << "\nCumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
+
     return examples;
 }
 
@@ -198,8 +203,10 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
             }
         }
     }
+    cout << "Number of examples: sampled " << examples.size() << " examples out of " << consolidated.size() << " total\n";
 
     // Set each maximum error to speed up search
+    cout << "Setting error threshold to " << max_error << "\n\n";
     for(uint i = 0; i < transitions.size(); i++){
         accuracies[i] = max_error;
     }
@@ -213,12 +220,10 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
         cout << "---- Number of Features Enumerated ----" << endl;
         cout << ops.size() << endl << endl;
-        // for(auto& each: ops){
-        //     cout << each << endl;
-        // }
-        // cout << endl;
-
-        cout << "Number of examples: " << examples.size() << endl;
+        for(int i = 0; i < 5; i++){
+            cout << ops[i] << endl;
+        }
+        cout << "...\n\n\n";
 
         // Retrieve ASPs and accuracies    
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
@@ -226,7 +231,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
         vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
         
-        cout << "Num total programs: " << all_sketches.size() << endl;
+        cout << "---- Number of Total Programs ----" << endl;
+        cout << all_sketches.size() << endl;
         // for(ast_ptr each: all_sketches){
         //     cout << each << endl;
         // }
@@ -261,6 +267,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
 // Settings
 void setupLdips(){
+    cout << "-------------Setup----------------" << endl;
+
     Var x ("x", Dimension(1, 0, 0), NUM);
     Var v ("v", Dimension(1, -1, 0), NUM);
     Var decMax ("decMax", Dimension(1, -2, 0), NUM);
@@ -311,7 +319,13 @@ void setupLdips(){
     }
     cout << endl;
 
-    // Set hard coded program structure, if desired
+    if(hardcode_program){
+        cout << "----Using fixed program----" << endl;
+    } else {
+        cout << "----Ground truth (target) program----" << endl;
+    }
+    
+    // Read hard coded program structure
     for (int t = 0; t < transitions.size(); t++) {
         const auto &transition = transitions[t];
         const string input_name =
@@ -320,7 +334,10 @@ void setupLdips(){
         ifstream input_file;
         input_file.open(input_name);
         const json input = json::parse(input_file);
-        preds.push_back(AstFromJson(input));
+        ast_ptr fixed = AstFromJson(input);
+        preds.push_back(fixed);
+
+        cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
         
         input_file.close();
     }
@@ -347,11 +364,11 @@ void emLoop(vector<Robot>& robots){
     for(int i = 0; i < numIterations; i++){
         
         // Expectation
-        cout << "Loop " << i << " expectation:" << endl;
+        cout << "\n-----------Loop " << i << " expectation-----------------\n";
         vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
 
         // Maximization
-        cout << "Loop " << i << " maximization:" << endl;
+        cout << "\n-----------Loop " << i << " maximization-----------------\n";
         maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
 
         curASP = ldipsASP;

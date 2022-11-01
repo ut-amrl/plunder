@@ -92,7 +92,7 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<O
 // ----- Particle Filter ---------------------------------------------
 
 // Full trajectory generation with particle filter
-vector<vector<HA>> runFilter(int N, int M, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
+double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
 
     // Initialization
     srand(PF_SEED);
@@ -101,28 +101,27 @@ vector<vector<HA>> runFilter(int N, int M, double resampleThreshold, Robot& r, v
     resampCount = 0;
     
     // Run particle filter
-    pf.forwardFilter(N, resampleThreshold);
+    double obs_likelihood = pf.forwardFilter(N, resampleThreshold);
 
-    vector<vector<HA>> trajectories = pf.retrieveTrajectories(M);
+    pf.retrieveTrajectories(trajectories, M);
 
-    // DEBUG
-    cout << "resample count: " << resampCount << endl;
+    // cout << "resample count: " << resampCount << endl;
 
-    return trajectories;
+    return obs_likelihood;
 }
 
 // Read input, run filter, write output
-vector<vector<HA>> filterFromFile(int N, int M, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
+double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
     // Read input
     if(dataObs.size() == 0 || dataLa.size() == 0){
         dataObs.clear(); dataLa.clear();
         readData(inputFile, dataObs, dataLa);
     }
 
-    vector<vector<HA>> trajectories = runFilter(N, M, resampleThreshold, r, dataObs, dataLa, asp);
+    double obs_likelihood = runFilter(trajectories, N, M, resampleThreshold, r, dataObs, dataLa, asp);
 
     // Write results
     writeData(outputFile, r, trajectories, dataObs);
 
-    return trajectories;
+    return obs_likelihood;
 }

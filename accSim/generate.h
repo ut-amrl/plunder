@@ -91,7 +91,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     // Setup JSON
     ofstream jsonFile;
     if(genJson){
-        cout << "Filling JSON with simulation data: " << outputPath << ".json" << endl;
+        // cout << "Filling JSON with simulation data: " << outputPath << ".json" << endl;
 
         jsonFile << fixed << setprecision(PRECISION);
         jsonFile.open(outputPath + ".json");
@@ -107,7 +107,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         // Setup CSV file
         ofstream csvFile;
         if(genCsv){
-            cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
+            // cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
             csvFile << fixed << setprecision(PRECISION);
             csvFile.open(outputPath + to_string(i) + ".csv");
             csvFile << rio.getCsvTitles() << "\n";
@@ -148,4 +148,9 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         jsonFile << "]";
         jsonFile.close();
     }
+
+    cout << "--------------Simulation---------------" << endl;
+    cout << "Running 1-D kinematic car simulation:\n";
+    cout << "Using " << numRobots << " robots and low-level action standard deviation=" << stddevError << endl;
+    cout << "Output stored in " << outputPath << "\n\n\n";
 }
