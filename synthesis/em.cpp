@@ -22,9 +22,6 @@
 #include "settings.h"
 #include "accSim/generate.h"
 
-// ignores the last 20 time steps of the particle filter because they are weird and introduce wrong transitions??
-#define END_PF_ERR 20
-
 using namespace std;
 using namespace AST;
 using namespace z3;
@@ -130,7 +127,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         // Convert each particle trajectory point to LDIPS-supported Example
         for(uint n = 0; n < sampleSize; n++){
             vector<HA> traj = trajectories[n];
-            for(uint t = 0; t < dataObs[i].size() - 1 - END_PF_ERR; t++){
+            for(uint t = 0; t < dataObs[i].size() - 1 - end_pf_err; t++){
                 Example ex = dataToExample(traj[t], dataObs[i][t+1], robots[i]);
 
                 // Provide next high-level action
@@ -364,11 +361,19 @@ void emLoop(vector<Robot>& robots){
     for(int i = 0; i < numIterations; i++){
         
         // Expectation
-        cout << "\n-----------Loop " << i << " expectation-----------------\n";
+        cout << "\n|-------------------------------------|\n";
+        cout << "|                                     |\n";
+        cout << "|          Loop " << i << " EXPECTATION         |\n";
+        cout << "|                                     |\n";
+        cout << "|-------------------------------------|\n";
         vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
 
         // Maximization
-        cout << "\n-----------Loop " << i << " maximization-----------------\n";
+        cout << "\n|-------------------------------------|\n";
+        cout << "|                                     |\n";
+        cout << "|         Loop " << i << " MAXIMIZATION         |\n";
+        cout << "|                                     |\n";
+        cout << "|-------------------------------------|\n";
         maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
 
         curASP = ldipsASP;

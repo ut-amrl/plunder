@@ -39,7 +39,7 @@ const int structuralChangeFrequency = 1;
 const bool hardcode_program = false;
 
 // EMDIPS parameters
-const int window_size = 5;
+const int window_size = 13;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold
@@ -57,3 +57,4 @@ const int numTrajectories = max(sampleSize, particlesPlotted);  // number of par
 const float resampleThreshold = 0.1;                            // higher = more resampling
 const double pf_stddevError = 0.3;
 const float obsLikelihoodStrength = 0.8;
+const int end_pf_err = 30;                                       // ignores last n timesteps because they didn't have a chance to get resampled
