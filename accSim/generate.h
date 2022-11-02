@@ -100,7 +100,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
 
     // Run simulations and generate json/csv files
     bool first = true;
-    for(uint i = 0; i < robots.size(); i++){
+    for(uint i = 0; i < numRobots; i++){
 
         RobotIO rio (robots[i]);
         

@@ -56,7 +56,7 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     return ex;
 }
 
-int distt(int v, int d){
+float distt(float v, float d){
     return - v * v / (2 * d);
 }
 
@@ -68,7 +68,7 @@ void printExampleInfo(Example e){
     float target = e.symbol_table_["target"].GetFloat();
     string start = e.start_.GetString();
     string res = e.result_.GetString();
-    float exp = ((target-x) - distt(v, decMax)) < 0;
+    float exp = x + distt(v, decMax);
     cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
@@ -115,7 +115,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
     cout << "Parameters: resample threshold=" << resampleThreshold << ", observation strength=" << obsLikelihoodStrength << endl;
 
     double cum_log_obs = 0;
-    for(uint i = 0; i < robots.size(); i++){
+    for(uint i = 0; i < numRobots; i++){
         string in = stateGenPath + to_string(i) + ".csv";
         string out = trajGenPath + to_string(iteration) + "-" + to_string(i) + ".csv";
         examples.push_back(vector<Example>());
@@ -190,7 +190,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     vector<Example> examples;
     int count = 0;
     for(int i = 0; i < consolidated.size(); i++) {
-        if(i  != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
+        if(i != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
                         consolidated[i].result_.GetString() != consolidated[i-1].result_.GetString())) {
             count = 0;
         } else {
@@ -355,8 +355,8 @@ void emLoop(vector<Robot>& robots){
 
     library = ReadLibrary(operationLibPath);
     asp_t* curASP = initialASP;
-    vector<vector<Obs>> dataObs (robots.size());
-    vector<vector<LA>> dataLa (robots.size());
+    vector<vector<Obs>> dataObs (numRobots);
+    vector<vector<LA>> dataLa (numRobots);
 
     for(int i = 0; i < numIterations; i++){
         
@@ -382,7 +382,7 @@ void emLoop(vector<Robot>& robots){
         // // Update point accuracy
         // double satisfied = 0;
         // double total = 0;
-        // for(uint r = 0; r < robots.size(); r++){
+        // for(uint r = 0; r < numRobots; r++){
         //     // testExampleOnASP(examples[r], robots[r]);
         //     robots[r].pointAccuracy = 1; // make ASP deterministic
         //     for(Example& ex: examples[r]){

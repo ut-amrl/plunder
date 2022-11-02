@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char** argv){
     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
 
-    for(int i = 0; i < robots.size(); i++){
+    for(int i = 0; i < numRobots; i++){
         string in = stateGenPath + to_string(i) + ".csv";
         string out = trajGenPath + to_string(i) + ".csv";
 

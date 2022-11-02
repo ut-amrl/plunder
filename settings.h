@@ -9,7 +9,7 @@ const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 11;           // number of robots (depends on robot test set)
 const int model = 0;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = 0.3;     // low-level action error standard deviation
+const double stddevError = 0.01;     // low-level action error standard deviation
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -34,17 +34,17 @@ const double velErrorDev = 0.00;
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
 const int sampleSize = 1000;              // number of trajectories to pass into EMDIPS
 const bool usePointError = true;        // point error: random transitions to a new high-level action
-const double pointAccuracy = 0.95;       // probability of a correct (ASP-consistent) high-level transition
+const double pointAccuracy = 0.99;       // probability of a correct (ASP-consistent) high-level transition
 const int structuralChangeFrequency = 1;
-const bool hardcode_program = false;
+const bool hardcode_program = true;
 
 // EMDIPS parameters
-const int window_size = 13;
+const int window_size = -1;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold
 const int batch_size = 8;
-const int max_examples = 50;
+const int max_examples = 5;
 const int programs_enumerated = 10;
 
 // Plot parameters
@@ -54,7 +54,7 @@ const int timeStepsPlot = 500;
 // Particle filter parameters
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.1;                            // higher = more resampling
-const double pf_stddevError = 0.3;
+const float resampleThreshold = 0.2;                            // higher = more resampling
+const double pf_stddevError = 0.01;
 const float obsLikelihoodStrength = 0.8;
 const int end_pf_err = 30;                                       // ignores last n timesteps because they didn't have a chance to get resampled
