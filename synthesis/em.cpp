@@ -36,6 +36,7 @@ PyObject* pFunc;
 
 vector<float> accuracies;
 vector<ast_ptr> preds;
+vector<ast_ptr> gt_truth;
 
 namespace std {
     ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
@@ -56,7 +57,7 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     return ex;
 }
 
-int distt(int v, int d){
+float distt(float v, float d){
     return - v * v / (2 * d);
 }
 
@@ -68,7 +69,7 @@ void printExampleInfo(Example e){
     float target = e.symbol_table_["target"].GetFloat();
     string start = e.start_.GetString();
     string res = e.result_.GetString();
-    float exp = ((target-x) - distt(v, decMax)) < 0;
+    float exp = x + distt(v, decMax);
     cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
@@ -115,7 +116,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
     cout << "Parameters: resample threshold=" << resampleThreshold << ", observation strength=" << obsLikelihoodStrength << endl;
 
     double cum_log_obs = 0;
-    for(uint i = 0; i < robots.size(); i++){
+    for(uint i = 0; i < numRobots; i++){
         string in = stateGenPath + to_string(i) + ".csv";
         string out = trajGenPath + to_string(iteration) + "-" + to_string(i) + ".csv";
         examples.push_back(vector<Example>());
@@ -190,7 +191,7 @@ void sampleFromExamples(vector<vector<Example>>& allExamples, vector<Example>& s
 
     int count = 0;
     for(int i = 0; i < consolidated.size(); i++) {
-        if(i  != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
+        if(i != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
                         consolidated[i].result_.GetString() != consolidated[i-1].result_.GetString())) {
             count = 0;
         } else {
@@ -408,7 +409,7 @@ void setupLdips(){
         input_file.open(input_name);
         const json input = json::parse(input_file);
         ast_ptr fixed = AstFromJson(input);
-        preds.push_back(fixed);
+        gt_truth.push_back(fixed);
 
         cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
         
@@ -431,8 +432,8 @@ void emLoop(vector<Robot>& robots){
 
     library = ReadLibrary(operationLibPath);
     asp_t* curASP = initialASP;
-    vector<vector<Obs>> dataObs (robots.size());
-    vector<vector<LA>> dataLa (robots.size());
+    vector<vector<Obs>> dataObs (numRobots);
+    vector<vector<LA>> dataLa (numRobots);
 
     for(int i = 0; i < numIterations; i++){
         
@@ -458,7 +459,7 @@ void emLoop(vector<Robot>& robots){
         // // Update point accuracy
         // double satisfied = 0;
         // double total = 0;
-        // for(uint r = 0; r < robots.size(); r++){
+        // for(uint r = 0; r < numRobots; r++){
         //     // testExampleOnASP(examples[r], robots[r]);
         //     robots[r].pointAccuracy = 1; // make ASP deterministic
         //     for(Example& ex: examples[r]){
