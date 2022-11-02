@@ -36,6 +36,7 @@ PyObject* pFunc;
 
 vector<float> accuracies;
 vector<ast_ptr> preds;
+vector<ast_ptr> gt_truth;
 
 namespace std {
     ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
@@ -234,7 +235,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(examples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
+        eo = emdipsL3(examples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
 
     } else {
         
@@ -242,7 +243,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        eo = emdipsL3(examples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
+        eo = emdipsL3(examples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
 
     }
 
@@ -332,7 +333,7 @@ void setupLdips(){
         input_file.open(input_name);
         const json input = json::parse(input_file);
         ast_ptr fixed = AstFromJson(input);
-        preds.push_back(fixed);
+        gt_truth.push_back(fixed);
 
         cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
         
