@@ -3,6 +3,7 @@ import numpy as np
 import csv
 import sys
 import os
+from matplotlib.colors import ListedColormap
 
 # Initialization
 trajectories = []
@@ -111,10 +112,10 @@ def plotTraj(inF, outP, gtF):
             runSimulation()
 
             # Acceleration
-            fig, (ax1, ax2, ax3) = plt.subplots(3, gridspec_kw={'height_ratios': [5, 1, 1]})
+            fig, (ax1, ax1b, ax2, ax3) = plt.subplots(4, gridspec_kw={'height_ratios': [3, 5, 1, 1]})
             fig.suptitle('hi-level actions vs. time')
 
-            freq = 2
+            freq = 1
             actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
             gt = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
             times = []
@@ -150,6 +151,18 @@ def plotTraj(inF, outP, gtF):
             ax1.bar(times, actions[0], width=1, bottom=np.add(actions[2], actions[1]), color="#05a655", label="ACC")
             ax1.bar(times, actions[1], width=1, bottom=actions[2], color="#f8ff99", label="CON")
             ax1.bar(times, actions[2], width=1, color="#ff6040", label="DEC")
+            color_graph = []
+            for i in range(particlesPlotted):
+                one_row = []
+                for j in range(len(trajectories[0])):
+                    c = 1
+                    if (trajectories[i][j]<0):
+                        c=0
+                    elif (trajectories[i][j]>0):
+                        c=2
+                    one_row.append(c)
+                color_graph.append(one_row)
+            ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0)
             
             ax2.bar(times, gt[0], color="#05a655", width=1)
             ax2.bar(times, gt[1], color="#f8ff99", width=1)
@@ -161,7 +174,7 @@ def plotTraj(inF, outP, gtF):
             ax1.set_ylabel('hi-level action percentages')
             ax2.set_ylabel('ground\ntruth')
 
-            ax1.legend(loc="upper left")
+            # ax1.legend(loc="upper left")
 
             plt.show()
             plt.savefig(outPath + "accel.png")
@@ -222,12 +235,13 @@ def main():
     pfOutPath = settings["plotGenPath"]+"pf/"
 
     try:
+        plotTraj(pfInFile, pfOutPath, gtFile)
+    except Exception as e: print(e)
+
+    try:
         plotTraj(pureInFile, pureOutPath, gtFile)
     except Exception as e: print(e)
     
-    try:
-        plotTraj(pfInFile, pfOutPath, gtFile)
-    except Exception as e: print(e)
 
 if __name__ == "__main__":
     main()

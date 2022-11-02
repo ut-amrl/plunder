@@ -168,22 +168,6 @@ class ParticleFilter {
                 log_weights[i] += log_LA_ti;
             }
 
-            // cout << "Processing time " << t << " and LA " << dataLA[t].acc << endl;
-            // for(HA each: particles[t]){
-            //     cout << each << " ";
-            // }
-            // cout << endl;
-            // cout << "New weights: ";
-            // for(FLOAT each: log_weights){
-            //     cout << each << " ";
-            // }
-            // cout << endl;
-            // cout << "New weights: ";
-            // for(FLOAT each: log_weights){
-            //     cout << exp(each) << " ";
-            // }
-            // cout << endl;
-
             // Normalize weights
             FLOAT log_z_t = logsumexp(log_weights);
             FLOAT sum = 0.0;
@@ -197,12 +181,6 @@ class ParticleFilter {
             // Update log observation likelihood
             log_obs += log_z_t;
 
-            // cout << "Normalized weights: ";
-            // for(FLOAT each: log_weights){
-            //     cout << exp(each) << " ";
-            // }
-            // cout << endl;
-
             // Optionally resample when number of effective particles is low
             if(effectiveParticles(weights) < N * resampleThreshold){
                 particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
@@ -212,13 +190,6 @@ class ParticleFilter {
                     log_weights[i] = -log(N);
                     weights[i] = exp(log_weights[i]);
                 }
-
-                // cout << "Resampling..." << endl;
-                // cout << "New particles: ";
-                // for(HA each: particles[t]){
-                //     cout << each << " ";
-                // }
-                // cout << endl;
             } else {
                 // Ancestor for each particle is itself
                 for(int i = 0; i < N; i++){
@@ -235,20 +206,7 @@ class ParticleFilter {
                 // resample at last step to eliminate deviating particles
                 particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
             }
-
-            // int count[3]; count[0] = 0; count[1] = 0; count[2] = 0;
-            // for(int i = 0; i < particles[t].size(); i++){
-            //     count[particles[t][i]]++;
-            // }
-
-            // cout << "Time " << t << ": ";
-            // for(int i = 0; i < 3; i++){
-            //     cout << HAToString((HA) i) << " count: " << count[i] << "; ";
-            // }
-            // cout << endl << endl;
         }
-
-        // cout << "Observation likelihood (provides a measure of the accuracy of an ASP): e^" << log_obs << " = " << exp(log_obs) << endl;
         return log_obs;
     }
 

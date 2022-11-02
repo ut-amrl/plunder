@@ -79,7 +79,7 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
     for(uint i = 0; i < transitions.size(); i++){
         // cout << "testing transition " << transitions[i].first << " -> " << transitions[i].second << endl;
 
-        if(HAToString(prevHA) == transitions[i].first){
+        if(HAToString(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
             if(InterpretBool(preds[i], obsObject)) {
                 ha = stringToHA(transitions[i].second);
                 break;
@@ -123,6 +123,9 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         // Run filter
         vector<vector<HA>> trajectories;
         cum_log_obs += filterFromFile(trajectories, numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
+
+
+        shuffle(begin(trajectories), end(trajectories), default_random_engine {});
         
         // Convert each particle trajectory point to LDIPS-supported Example
         for(uint n = 0; n < sampleSize; n++){
@@ -141,7 +144,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         string s = altPath+to_string(iteration)+"-"+to_string(i)+".csv";
         ofstream outFile;
         outFile.open(s);
-        for(uint n=0; n<10; n++){
+        for(uint n=0; n<particlesPlotted; n++){
             vector<HA> traj = trajectories[n];
             robots[i].reset();
             robots[i].ha = ACC;
@@ -151,26 +154,24 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
             for(uint t=1; t<dataObs[i].size(); t++){
                 robots[i].updatePhysics(T_STEP);
                 robots[i].runASP(asp);
-                robots[i].updateLA();
-                double res = robots[i].ha==ACC ? robots[i].accMax : 
-                            robots[i].ha==DEC ? robots[i].decMax : 0;
-                outFile << res;
+                robots[i].la = robots[i].motorModel(robots[i].ha, robots[i].state, false);
+                outFile << robots[i].la.acc;
                 if(t!=dataObs[i].size()-1) outFile << ",";
             }
             outFile << endl;
             robots[i].pointAccuracy = temp;
         }
         outFile.close();
+        cout << "*";
+        cout.flush();
     }
-
-    cout << "\nCumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
+    cout << "\r";
+    cout << "Cumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
 
     return examples;
 }
 
-// Maximization step
-void maximization(vector<vector<Example>>& allExamples, uint iteration){
-    vector<Example> consolidated;
+void sampleFromExamples(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExamples, vector<Example>& consolidated){
     for(vector<Example>& each : allExamples){
         consolidated.insert(end(consolidated), begin(each), end(each));
     }
@@ -187,7 +188,6 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         return a.start_.GetString() < b.start_.GetString();
     });
 
-    vector<Example> examples;
     int count = 0;
     for(int i = 0; i < consolidated.size(); i++) {
         if(i  != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
@@ -196,11 +196,91 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         } else {
             if(count < max_examples) {
                 count++;
-                examples.push_back(consolidated[i]);
+                sampleOfExamples.push_back(consolidated[i]);
             }
         }
     }
-    cout << "Number of examples: sampled " << examples.size() << " examples out of " << consolidated.size() << " total\n";
+}
+
+void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExamples){
+    // for(int i=0; i<numRobots; i++){
+    //     for(int i=0; i<numParticles; i++){
+    //         for(int i=0; i<numIterations; i++){
+    //             if(i am a transition){
+    //                 for(int i=0; i<window_size; i++){
+    //                     Example* e = new Example(allExamples(me));                        // make a copy of the example
+    //                     e.start=start;                                      // if not an actual transition, then a counterfactual
+    //                     sampleOfExamples.push_back(me-window_size/2+i);     // windowing
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+    for(uint r=0; r<numRobots; r++){
+        uint trajLength = allExamples[r].size()/sampleSize;
+        for(uint i=0; i<sampleSize; i++){
+            uint last_transition_t=0;
+            for(uint t=window_size/2; t<trajLength-window_size/2-1; t++){
+                Example e = allExamples[r][i*trajLength+t];
+                string expected_start = e.start_.GetString();
+                string expected_end = e.result_.GetString();
+                if(expected_start != expected_end){
+                    // CAPTURE MIDDLE BETWEEN THIS AND PREV TRANSITION - ADD CONSISTENCY
+                    if(t-last_transition_t>1){
+                        uint mid_t = (t+last_transition_t)/2;
+                        Example e_new = allExamples[r][i*trajLength+mid_t];
+                        if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
+                            sampleOfExamples.push_back(e_new);
+                        }
+                    }
+                    // LEFT OF TRANSITION
+                    for(uint w=1; w<=window_size/2; w++){
+                        Example e_new = allExamples[r][i*trajLength+t-w];
+                        if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
+                            sampleOfExamples.push_back(e_new);
+                        } else break;
+                    }
+                    // MIDDLE OF TRANSITION
+                    {
+                        Example e_new = allExamples[r][i*trajLength+t];
+                        if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_end){
+                            sampleOfExamples.push_back(e_new);
+                        }
+                    }
+                    // RIGHT OF TRANSITION
+                    for(uint w=1; w<=window_size/2; w++){
+                        Example e_new = allExamples[r][i*trajLength+t+w];
+                        if(e_new.start_.GetString()==expected_end && e_new.result_.GetString()==expected_end){
+                            e_new.start_ = e.start_;
+                            sampleOfExamples.push_back(e_new);
+                        } else break;
+                    }
+                    last_transition_t=t;
+                }
+            }
+            // MIDDLE BETNWEEN LAST TRANSITION AND ENDING
+            {
+                uint t=trajLength-1;
+                if(t-last_transition_t>1){
+                    uint mid_t = (t+last_transition_t)/2;
+                    Example e_new = allExamples[r][i*trajLength+mid_t];
+                    sampleOfExamples.push_back(e_new);
+                }
+            }
+        }
+    }
+}
+
+// Maximization step
+void maximization(vector<vector<Example>>& allExamples, uint iteration){
+    
+    // vector<Example> sampleOfExamples;
+    // vector<Example> consolidated;
+    // sampleFromExamples(allExamples, sampleOfExamples, consolidated);
+    // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
+    
+    vector<Example> sampleOfExamples;
+    sample2(allExamples, sampleOfExamples);
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";
@@ -212,7 +292,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     if(iteration % structuralChangeFrequency == 0 && !hardcode_program){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
-        vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, examples, library,
+        vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, sampleOfExamples, library,
                                             feature_depth, &sigs);
 
         cout << "---- Number of Features Enumerated ----" << endl;
@@ -234,7 +314,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(examples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
+        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
 
     } else {
         
@@ -242,7 +322,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        eo = emdipsL3(examples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
+        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
 
     }
 
@@ -293,10 +373,6 @@ void setupLdips(){
         }
         return a.first < b.first;
     });
-
-    // transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    // transitions.push_back(pair<string, string> ("ACC", "CON"));
-    // transitions.push_back(pair<string, string> ("CON", "DEC"));
 
     // Turn variables into roots
     for (const Var& variable : variables) {

@@ -25,7 +25,9 @@ int main(int argc, char** argv){
         vector<LA> dataLa;
         vector<vector<HA>> trajectories;
         filterFromFile(trajectories, numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs, dataLa, ASP_model(model));
+        cout << "*";
     }
+    cout << "\r";
     
     return 0;
 }
