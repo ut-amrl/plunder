@@ -112,7 +112,12 @@ def plotTraj(inF, outP, gtF):
             runSimulation()
 
             # Acceleration
-            fig, (ax1, ax1b, ax2, ax3) = plt.subplots(4, gridspec_kw={'height_ratios': [3, 5, 1, 1]})
+            fig, (ax1, ax1b, ax2, ax3) = plt.subplots(4, gridspec_kw={'height_ratios': [4, 4, 1, 1]})
+            ax1.margins(0)
+            ax1b.margins(0)
+            ax2.margins(0)
+            ax3.margins(0)
+
             fig.suptitle('hi-level actions vs. time')
 
             freq = 1
@@ -162,7 +167,7 @@ def plotTraj(inF, outP, gtF):
                         c=2
                     one_row.append(c)
                 color_graph.append(one_row)
-            ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0)
+            ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0, aspect='auto')
             
             ax2.bar(times, gt[0], color="#05a655", width=1)
             ax2.bar(times, gt[1], color="#f8ff99", width=1)
@@ -171,11 +176,12 @@ def plotTraj(inF, outP, gtF):
             ax3.bar(times, gtLA, color="red", width=1)
             
             plt.xlabel('time')
-            ax1.set_ylabel('hi-level action percentages')
+            ax1.set_ylabel('hi-level actions')
             ax2.set_ylabel('ground\ntruth')
 
             # ax1.legend(loc="upper left")
 
+            fig.tight_layout()  
             plt.show()
             plt.savefig(outPath + "accel.png")
 

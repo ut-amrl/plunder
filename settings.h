@@ -39,16 +39,12 @@ const int structuralChangeFrequency = 1;
 const bool hardcode_program = true;
 
 // EMDIPS parameters
-<<<<<<< HEAD
 const int window_size = 7;
-=======
-const int window_size = -1;
->>>>>>> 6f67ae8beeaad1205662c78768db23a03dfc6300
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold
 const int batch_size = 8;
-const int max_examples = 100;
+const int max_examples = 50;
 const int programs_enumerated = 10;
 
 // Plot parameters

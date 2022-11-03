@@ -275,13 +275,13 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
 // Maximization step
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
     
-    // vector<Example> sampleOfExamples;
-    // vector<Example> consolidated;
-    // sampleFromExamples(allExamples, sampleOfExamples, consolidated);
-    // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
-    
     vector<Example> sampleOfExamples;
-    sample2(allExamples, sampleOfExamples);
+    vector<Example> consolidated;
+    sampleFromExamples(allExamples, sampleOfExamples, consolidated);
+    cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
+    
+    // vector<Example> sampleOfExamples;
+    // sample2(allExamples, sampleOfExamples);
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";
@@ -315,7 +315,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
+        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
 
     } else {
         
@@ -323,7 +323,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
+        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
 
     }
 
