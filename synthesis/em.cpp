@@ -153,7 +153,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
             robots[i].pointAccuracy = 1;
             outFile << robots[i].accMax << ",";
             for(uint t=1; t<dataObs[i].size(); t++){
-                robots[i].updatePhysics(T_STEP);
+                robots[i].state = dataObs[i][t];
                 robots[i].runASP(asp);
                 robots[i].la = robots[i].motorModel(robots[i].ha, robots[i].state, false);
                 outFile << robots[i].la.acc;

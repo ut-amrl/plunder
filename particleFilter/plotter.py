@@ -167,7 +167,7 @@ def plotTraj(inF, outP, gtF):
                         c=2
                     one_row.append(c)
                 color_graph.append(one_row)
-            ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0, aspect='auto')
+            ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0, aspect='auto', interpolation='none')
             
             ax2.bar(times, gt[0], color="#05a655", width=1)
             ax2.bar(times, gt[1], color="#f8ff99", width=1)
