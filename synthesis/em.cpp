@@ -279,6 +279,10 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     vector<Example> consolidated;
     sampleFromExamples(allExamples, sampleOfExamples, consolidated);
     cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
+
+    for(Example e: sampleOfExamples){
+        printExampleInfo(e);
+    }
     
     // vector<Example> sampleOfExamples;
     // sample2(allExamples, sampleOfExamples);

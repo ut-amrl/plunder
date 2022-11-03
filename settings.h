@@ -39,7 +39,7 @@ const int structuralChangeFrequency = 1;
 const bool hardcode_program = true;
 
 // EMDIPS parameters
-const int window_size = 7;
+const int window_size = -1;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold
