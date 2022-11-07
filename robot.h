@@ -103,7 +103,9 @@ class Robot {
         
         if(ha == ACC){
             // acc = accMax;
-            acc = accMax;
+            acc = ((vMax - state.vel) / vMax) * (accMax*2/3) + (accMax/3);
+            // acc = max((vMax - state.vel) / vMax * accMax, activationMinAcc);
+            // acc = (pow(vMax, 2) - pow(state.vel, 2))/pow(vMax, 2) * accMax;
         } else if (ha == DEC) {
             acc = decMax;
             // acc = (vMax - state.vel) / vMax * decMax - activationMinAcc;
