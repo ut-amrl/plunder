@@ -79,6 +79,8 @@ class Robot {
         target = _target;
         accErrDistr = _accErrDistr;
         pointAccuracy = _pointAccuracy;
+        cond1err = (((double) rand())/RAND_MAX-.5)*3;
+        cond2err = (((double) rand())/RAND_MAX-.5)*6;
     }
 
     Robot() {}
@@ -86,6 +88,9 @@ class Robot {
     HA ha = ACC;                        // Initial high-level action
     LA la = { .acc = 0 };               // Initial low-level action
     Obs state = { .pos = 0, .vel = 0 }; // Initial observed state
+
+    double cond1err = 0;
+    double cond2err = 0;
 
     // MOTION MODEL (ACTION-SELECTION POLICY): Transition to new high-level action based on current action and state
     void runASP(HA (*ASP) (HA, Obs, Robot&)){
@@ -98,7 +103,7 @@ class Robot {
         
         if(ha == ACC){
             // acc = accMax;
-            acc = max((vMax - state.vel) / vMax * accMax, 0.0) + activationMinAcc;
+            acc = accMax;
         } else if (ha == DEC) {
             acc = decMax;
             // acc = (vMax - state.vel) / vMax * decMax - activationMinAcc;
@@ -124,9 +129,9 @@ class Robot {
             state.vel = 0;
         }
 
-        if(abs(state.vel - vMax) < robotEpsilon){ // Round to vMax
-            state.vel = vMax;
-        }
+        // if(abs(state.vel - vMax) < robotEpsilon){ // Round to vMax
+        //     state.vel = vMax;
+        // }
 
         if(abs(state.pos - target) < robotEpsilon){ // Round to target
             state.pos = target;

@@ -93,22 +93,54 @@ HA ASP_Hand_clean(HA ha, Obs state, Robot& r){
  */
 HA ASP_Hand_prob(HA ha, Obs state, Robot& r){
     double xToTarget = r.target - state.pos;                            // distance to the target
-    // bool cond1 = vMax - state.vel < 0;                                // is at max velocity (can no longer accelerate)
-    // bool cond2 = xToTarget - DistTraveled(state.vel, decMax) < 0;     // needs to decelerate or else it will pass target
 
-    bool cond1smooth = r.sampleDiscrete(logistic(r.vMax*0.1, -100.0/r.vMax, r.vMax-state.vel));
-    bool cond2smooth = r.sampleDiscrete(logistic(r.target*0.1, -100.0/r.target, xToTarget - r.DistTraveled(state.vel, r.decMax)));
+    bool cond1 = state.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
+    bool cond1smooth = r.sampleDiscrete(logistic(0, -.5, r.vMax-state.vel));
+    bool cond2smooth = r.sampleDiscrete(logistic(0, -.5, xToTarget - r.DistTraveled(state.vel, r.decMax)));
 
-    if(cond2smooth){
-        ha = DEC;
+    if(ha == ACC){                          // transitions starting with ACC
+        if(cond1smooth && !cond2) ha=CON;         // ACC -> CON (expected)
+        else if(cond2) ha=DEC;              // ACC -> DEC (expected)
+        else ACC;                           // "no transition" is the default
     }
-    if(cond1smooth && !cond2smooth){
-        ha = CON;
+    if(ha == CON){                          // transitions starting with CON
+        if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
+        else if(cond2) ha=DEC;              // CON -> DEC (expected)
+        else CON;                           // "no transition" is the default
     }
-    if(!cond1smooth && !cond2smooth){
-        ha = ACC;
+    if(ha == DEC){
+        if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        else DEC;                           // "no transition" is the default
     }
-    
+    return ha;
+}
+
+/*
+ * This is a probabilistic ASP that creates a consistent error at the start (modeling the user's plan) and uses it at each timestep
+ */
+HA ASP_consistent_prob(HA ha, Obs state, Robot& r){
+    double xToTarget = r.target - state.pos;                            // distance to the target
+
+    bool cond1 = state.vel - r.vMax + r.cond1err >= 0;                                     // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) + r.cond2err < robotEpsilon;  // needs to decelerate or else it will pass target
+
+    if(ha == ACC){                          // transitions starting with ACC
+        if(cond1 && !cond2) ha=CON;         // ACC -> CON (expected)
+        else if(cond2) ha=DEC;              // ACC -> DEC (expected)
+        else ACC;                           // "no transition" is the default
+    }
+    if(ha == CON){                          // transitions starting with CON
+        if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
+        else if(cond2) ha=DEC;              // CON -> DEC (expected)
+        else CON;                           // "no transition" is the default
+    }
+    if(ha == DEC){
+        if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        else DEC;                           // "no transition" is the default
+    }
     return ha;
 }
 
@@ -224,7 +256,8 @@ vector<asp_t*> ASPs = { &ASP_Hand,              // 0
                         &ASP_accDecOnly,        // 4
                         &ASP_random,            // 5
                         &ASP_Sim,               // 6
-                        &ASP_Hand_clean         // 7
+                        &ASP_Hand_clean,         // 7
+                        &ASP_consistent_prob    // 8
                         };
 
 asp_t* ASP_model(int model){

@@ -7,9 +7,9 @@ using namespace std;
 // Robot parameters
 const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 11;           // number of robots (depends on robot test set)
-const int model = 0;                // which ASP to use
+const int model = 8;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = 0.3;     // low-level action error standard deviation
+const double stddevError = 0.1;     // low-level action error standard deviation
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -24,7 +24,7 @@ const string gt_asp = "synthesis/gt_asp/";                      // Ground truth 
 const double T_STEP = .1;               // time step (s)
 const double T_TOT = 30;                // total time (s) per simulated scenario
 const double genAccuracy = 1.0;         // probability of a correct high-level transition
-const double activationMinAcc = 0.4;    // Minimum acceleration (acceleration will not go below this value, excluding 0)
+const double activationMinAcc = 0.0;    // Minimum acceleration (acceleration will not go below this value, excluding 0)
 const double distErrorMean = 0.0;       // Perception error for distance
 const double distErrorDev = 0.00;
 const double velErrorMean = 0.0;        // Perception error for velocity
@@ -34,12 +34,12 @@ const double velErrorDev = 0.00;
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
 const int sampleSize = 10;              // number of trajectories to process then pass into EMDIPS, per robot
 const bool usePointError = true;        // point error: random transitions to a new high-level action
-const double pointAccuracy = 0.95;       // probability of a correct (ASP-consistent) high-level transition
+const double pointAccuracy = 0.95;      // probability of a correct (ASP-consistent) high-level transition
 const int structuralChangeFrequency = 1;
 const bool hardcode_program = true;
 
 // EMDIPS parameters
-const int window_size = -1;
+const int window_size = 7;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold

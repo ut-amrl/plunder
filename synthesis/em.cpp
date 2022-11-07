@@ -204,19 +204,6 @@ void sampleFromExamples(vector<vector<Example>>& allExamples, vector<Example>& s
 }
 
 void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExamples){
-    // for(int i=0; i<numRobots; i++){
-    //     for(int i=0; i<numParticles; i++){
-    //         for(int i=0; i<numIterations; i++){
-    //             if(i am a transition){
-    //                 for(int i=0; i<window_size; i++){
-    //                     Example* e = new Example(allExamples(me));                        // make a copy of the example
-    //                     e.start=start;                                      // if not an actual transition, then a counterfactual
-    //                     sampleOfExamples.push_back(me-window_size/2+i);     // windowing
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
     for(uint r=0; r<numRobots; r++){
         uint trajLength = allExamples[r].size()/sampleSize;
         for(uint i=0; i<sampleSize; i++){
@@ -235,7 +222,7 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
                         }
                     }
                     // LEFT OF TRANSITION
-                    for(uint w=1; w<=window_size/2; w++){
+                    for(uint w=1; w<=window_size/2; w+=1){
                         Example e_new = allExamples[r][i*trajLength+t-w];
                         if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
                             sampleOfExamples.push_back(e_new);
@@ -249,7 +236,7 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
                         }
                     }
                     // RIGHT OF TRANSITION
-                    for(uint w=1; w<=window_size/2; w++){
+                    for(uint w=1; w<=window_size/2; w+=1){
                         Example e_new = allExamples[r][i*trajLength+t+w];
                         if(e_new.start_.GetString()==expected_end && e_new.result_.GetString()==expected_end){
                             e_new.start_ = e.start_;
@@ -280,12 +267,14 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     sampleFromExamples(allExamples, sampleOfExamples, consolidated);
     cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
 
-    for(Example e: sampleOfExamples){
-        printExampleInfo(e);
-    }
     
     // vector<Example> sampleOfExamples;
     // sample2(allExamples, sampleOfExamples);
+
+
+    // for(Example e: sampleOfExamples){
+    //     printExampleInfo(e);
+    // }
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";
