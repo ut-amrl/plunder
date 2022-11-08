@@ -36,7 +36,7 @@ const int sampleSize = 10;              // number of trajectories to process the
 const bool usePointError = true;        // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.95;      // probability of a correct (ASP-consistent) high-level transition
 const int structuralChangeFrequency = 1;
-const bool hardcode_program = true;
+const bool hardcode_program = false;
 
 // EMDIPS parameters
 const int window_size = -1;

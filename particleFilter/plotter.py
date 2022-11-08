@@ -83,7 +83,7 @@ def runSimulation():
     
     return
 
-def plotTraj(inF, outP, gtF):
+def plotTraj(inF, outP, gtF, title):
     global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
 
     for iter in range(0, int(settings["numIterations"])):
@@ -118,7 +118,7 @@ def plotTraj(inF, outP, gtF):
             ax2.margins(0)
             ax3.margins(0)
 
-            fig.suptitle('hi-level actions vs. time')
+            fig.suptitle(title)
 
             freq = 1
             actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
@@ -169,15 +169,17 @@ def plotTraj(inF, outP, gtF):
                 color_graph.append(one_row)
             ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0, aspect='auto', interpolation='none')
             
-            ax2.bar(times, gt[0], color="#05a655", width=1)
-            ax2.bar(times, gt[1], color="#f8ff99", width=1)
-            ax2.bar(times, gt[2], color="#ff6040", width=1)
+            ax2.bar(times, gtLA, color="red", width=1)
 
-            ax3.bar(times, gtLA, color="red", width=1)
+            ax3.bar(times, gt[0], color="#05a655", width=1)
+            ax3.bar(times, gt[1], color="#f8ff99", width=1)
+            ax3.bar(times, gt[2], color="#ff6040", width=1)
+
             
             plt.xlabel('time')
             ax1.set_ylabel('hi-level actions')
-            ax2.set_ylabel('ground\ntruth')
+            ax2.set_ylabel('demo')
+            ax3.set_ylabel('ground\ntruth')
 
             # ax1.legend(loc="upper left")
 
@@ -187,37 +189,37 @@ def plotTraj(inF, outP, gtF):
 
             plt.clf()
 
-            # Velocity
-            for i in range(0, particlesPlotted):
-                vel = velocities[i]
-                plt.plot(vel[:maxTime], alpha=0.5, linestyle="dashed") 
-            plt.plot(gtVelocity[:maxTime], alpha=1.0, label="ground truth")
+            # # Velocity
+            # for i in range(0, particlesPlotted):
+            #     vel = velocities[i]
+            #     plt.plot(vel[:maxTime], alpha=0.5, linestyle="dashed") 
+            # plt.plot(gtVelocity[:maxTime], alpha=1.0, label="ground truth")
                 
-            plt.xlabel('time') 
-            plt.ylabel('velocity') 
-            plt.title('velocity-time') 
+            # plt.xlabel('time') 
+            # plt.ylabel('velocity') 
+            # plt.title('velocity-time') 
             
-            plt.legend(loc="upper left")
+            # plt.legend(loc="upper left")
 
-            plt.show()
-            plt.savefig(outPath + "vel.png")
+            # plt.show()
+            # plt.savefig(outPath + "vel.png")
 
-            plt.clf()
+            # plt.clf()
 
-            # Position
-            for i in range(0, particlesPlotted):
-                pos = positions[i]
-                plt.plot(pos[:maxTime], alpha=0.5, linestyle="dashed") 
-            plt.plot(gtPosition[:maxTime], alpha=1.0, label="ground truth")
+            # # Position
+            # for i in range(0, particlesPlotted):
+            #     pos = positions[i]
+            #     plt.plot(pos[:maxTime], alpha=0.5, linestyle="dashed") 
+            # plt.plot(gtPosition[:maxTime], alpha=1.0, label="ground truth")
                 
-            plt.xlabel('time') 
-            plt.ylabel('position') 
-            plt.title('position-time')
+            # plt.xlabel('time') 
+            # plt.ylabel('position') 
+            # plt.title('position-time')
 
-            plt.legend(loc="upper left") 
+            # plt.legend(loc="upper left") 
             
-            plt.show()
-            plt.savefig(outPath + "pos.png")
+            # plt.show()
+            # plt.savefig(outPath + "pos.png")
 
             plt.close('all')
 
@@ -241,11 +243,11 @@ def main():
     pfOutPath = settings["plotGenPath"]+"pf/"
 
     try:
-        plotTraj(pfInFile, pfOutPath, gtFile)
+        plotTraj(pfInFile, pfOutPath, gtFile, 'Particle filter outputs')
     except Exception as e: print(e)
 
     try:
-        plotTraj(pureInFile, pureOutPath, gtFile)
+        plotTraj(pureInFile, pureOutPath, gtFile, 'ASP Test Run')
     except Exception as e: print(e)
     
 
