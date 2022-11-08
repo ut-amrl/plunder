@@ -7,7 +7,7 @@ using namespace std;
 // Robot parameters
 const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 11;           // number of robots (depends on robot test set)
-const int model = 8;                // which ASP to use
+const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
 
@@ -39,12 +39,12 @@ const int structuralChangeFrequency = 1;
 const bool hardcode_program = true;
 
 // EMDIPS parameters
-const int window_size = 7;
+const int window_size = -1;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold
 const int batch_size = 8;
-const int max_examples = 50;
+const int max_examples = 100;
 const int programs_enumerated = 10;
 
 // Plot parameters

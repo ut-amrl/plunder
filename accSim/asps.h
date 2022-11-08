@@ -56,13 +56,16 @@ HA ASP_Hand(HA ha, Obs state, Robot& r){
         else ACC;                           // "no transition" is the default
     }
     if(ha == CON){                          // transitions starting with CON
-        if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
+        // if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
+        if(false) ha=ACC;
         else if(cond2) ha=DEC;              // CON -> DEC (expected)
         else CON;                           // "no transition" is the default
     }
     if(ha == DEC){
-        if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
-        else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        // if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        // else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        if(false) ha=ACC;
+        else if(false) ha=CON;
         else DEC;                           // "no transition" is the default
     }
 
@@ -96,22 +99,26 @@ HA ASP_Hand_prob(HA ha, Obs state, Robot& r){
 
     bool cond1 = state.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
     bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
-    bool cond1smooth = r.sampleDiscrete(logistic(0, -.5, r.vMax-state.vel));
-    bool cond2smooth = r.sampleDiscrete(logistic(0, -.5, xToTarget - r.DistTraveled(state.vel, r.decMax)));
+
+    bool cond1smooth = r.sampleDiscrete(logistic(0, 2, state.vel - r.vMax));
+    bool cond2smooth = r.sampleDiscrete(logistic(0, -2, xToTarget - r.DistTraveled(state.vel, r.decMax)));
 
     if(ha == ACC){                          // transitions starting with ACC
-        if(cond1smooth && !cond2) ha=CON;         // ACC -> CON (expected)
-        else if(cond2) ha=DEC;              // ACC -> DEC (expected)
+        if(cond1smooth && !cond2smooth) ha=CON;         // ACC -> CON (expected)
+        else if(cond2smooth) ha=DEC;              // ACC -> DEC (expected)
         else ACC;                           // "no transition" is the default
     }
     if(ha == CON){                          // transitions starting with CON
-        if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
-        else if(cond2) ha=DEC;              // CON -> DEC (expected)
+        // if(!cond1smooth && !cond2smooth) ha=ACC;        // CON -> ACC (rare)
+        if(false) ha=ACC;        // CON -> ACC (rare)
+        else if(cond2smooth) ha=DEC;              // CON -> DEC (expected)
         else CON;                           // "no transition" is the default
     }
     if(ha == DEC){
-        if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
-        else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        // if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        // else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        if(false) ha=ACC;        // DEC -> ACC (0)
+        else if(false) ha=CON;    // DEC -> CON (0)
         else DEC;                           // "no transition" is the default
     }
     return ha;

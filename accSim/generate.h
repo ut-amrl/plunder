@@ -32,8 +32,9 @@ json fillJson(vector<int> dim, string type, string name){
 }
 
 class RobotIO {
-    private:
+public:
     Robot &r;
+    Robot& gt;
     json x_j;
     json v_j;
     json decMax_j;
@@ -41,10 +42,9 @@ class RobotIO {
     json target_j;
     json start_j;
     json output_j;
-    string prevHAStr = "ACC";
+    HA prevHA = ACC;
 
-    public:
-    RobotIO(Robot &_r): r(_r) {
+    RobotIO(Robot &_r, Robot &_gt): r(_r), gt(_gt) {
         x_j = fillJson(vector<int>{1, 0, 0}, "NUM", "x");
         v_j = fillJson(vector<int>{1, -1, 0}, "NUM", "v");
         decMax_j = fillJson(vector<int>{1, -2, 0}, "NUM", "decMax");
@@ -57,8 +57,10 @@ class RobotIO {
         return "time, x, v, LA, HA";
     }
     string getCsvRow(double t){
+        // return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
+                // + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
         return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
-                + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
+                + ", " + to_string(r.la.acc) + ", " + HAToString(gt.ha);
     }
     string getJsonRow(){
         x_j["value"] = r.state.pos;
@@ -66,9 +68,9 @@ class RobotIO {
         target_j["value"] = r.target;
         vMax_j["value"] = r.vMax;
         decMax_j["value"] = r.decMax;
-        start_j["value"] = prevHAStr;
+        start_j["value"] = HAToString(prevHA);
         output_j["value"] = HAToString(r.ha);
-        prevHAStr = HAToString(r.ha);
+        prevHA = r.ha;
 
         json all_j;
         all_j["x"] = x_j;
@@ -102,7 +104,8 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     bool first = true;
     for(uint i = 0; i < numRobots; i++){
 
-        RobotIO rio (robots[i]);
+        Robot gt (robots[i]);
+        RobotIO rio (robots[i], gt);
         
         // Setup CSV file
         ofstream csvFile;
@@ -122,6 +125,9 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
             robots[i].ha = pointError(ACC, robots[i].ha, robots[i], false);
             robots[i].updateLA();
 
+            gt.updatePhysics(T_STEP);
+            gt.runASP(ASP_Hand);
+            gt.updateLA();
 
             // Print trace
             if(genCsv) {

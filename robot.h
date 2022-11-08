@@ -83,6 +83,12 @@ class Robot {
         cond2err = (((double) rand())/RAND_MAX-.5)*6;
     }
 
+    Robot(const Robot& other) : accMax(other.accMax), decMax(other.decMax), vMax(other.vMax), target(other.target),
+                                accErrDistr(other.accErrDistr), pointAccuracy(other.pointAccuracy),
+                                ha(other.ha), la(other.la), state(other.state), cond1err(other.cond1err), cond2err(other.cond2err) {
+
+    }
+
     Robot() {}
 
     HA ha = ACC;                        // Initial high-level action
@@ -102,8 +108,8 @@ class Robot {
         double acc = 0;
         
         if(ha == ACC){
-            // acc = accMax;
-            acc = ((vMax - state.vel) / vMax) * (accMax*2/3) + (accMax/3);
+            acc = accMax;
+            // acc = ((vMax - state.vel) / vMax) * (accMax*2/3) + (accMax/3);
             // acc = max((vMax - state.vel) / vMax * accMax, activationMinAcc);
             // acc = (pow(vMax, 2) - pow(state.vel, 2))/pow(vMax, 2) * accMax;
         } else if (ha == DEC) {
@@ -131,9 +137,9 @@ class Robot {
             state.vel = 0;
         }
 
-        // if(abs(state.vel - vMax) < robotEpsilon){ // Round to vMax
-        //     state.vel = vMax;
-        // }
+        if(abs(state.vel - vMax) < robotEpsilon){ // Round to vMax
+            state.vel = vMax;
+        }
 
         if(abs(state.pos - target) < robotEpsilon){ // Round to target
             state.pos = target;
