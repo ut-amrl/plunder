@@ -10,7 +10,7 @@ using namespace std;
 // ----- Robot Test Sets ---------------------------------------------
 
 vector<Robot> getRobotSet(int setNum, normal_distribution<double> accErrDistr, double haProbCorrect){
-    if(setNum == 0){
+    if(setNum == 0){ // Varied assortment of robots
         return {
             Robot(6, -5, 10, 150, accErrDistr, haProbCorrect),
             Robot(3, -3, 20, 100, accErrDistr, haProbCorrect),
@@ -24,13 +24,20 @@ vector<Robot> getRobotSet(int setNum, normal_distribution<double> accErrDistr, d
             Robot(5, -2, 15, 200, accErrDistr, haProbCorrect),
             Robot(10, -10, 20, 500, accErrDistr, haProbCorrect),
         };
-    } else if(setNum == 1){
+    } else if(setNum == 1){ // One robot, multiple targets
         return {
-            Robot(5, -2, 15, 80, accErrDistr, haProbCorrect),
-            Robot(3, -3, 4, 80, accErrDistr, haProbCorrect),
-            Robot(2, -4, 50, 80, accErrDistr, haProbCorrect),
-            Robot(8, -6, 20, 80, accErrDistr, haProbCorrect),
-            Robot(4, -5, 100, 80, accErrDistr, haProbCorrect)
+            Robot(4, -3, 15, 150, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 150, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 150, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 50, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 50, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 50, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 25, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 25, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 25, accErrDistr, haProbCorrect),
         };
     } else {
         return {

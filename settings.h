@@ -5,8 +5,8 @@
 using namespace std;
 
 // Robot parameters
-const int robotTestSet = 0;         // which robots to use (0-2)
-const int numRobots = 11;           // number of robots (depends on robot test set)
+const int robotTestSet = 1;         // which robots to use (0-2)
+const int numRobots = 12;           // number of robots (depends on robot test set)
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
