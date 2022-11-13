@@ -125,3 +125,25 @@ double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double res
 
     return obs_likelihood;
 }
+
+void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp_t* asp){
+    ofstream outFile;
+    outFile.open(outputFile);
+    for(uint n=0; n<particlesPlotted; n++){
+        r.reset();
+        r.ha = ACC;
+        double temp = r.pointAccuracy;
+        r.pointAccuracy = 1;
+        outFile << r.accMax << ",";
+        for(uint t=1; t<dataObs.size(); t++){
+            r.state = dataObs[t];
+            r.runASP(asp);
+            r.la = r.motorModel(r.ha, r.state, false);
+            outFile << r.la.acc;
+            if(t!=dataObs.size()-1) outFile << ",";
+        }
+        outFile << endl;
+        r.pointAccuracy = temp;
+    }
+    outFile.close();
+}

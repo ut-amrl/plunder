@@ -34,7 +34,6 @@ json fillJson(vector<int> dim, string type, string name){
 class RobotIO {
 public:
     Robot &r;
-    Robot& gt;
     json x_j;
     json v_j;
     json decMax_j;
@@ -44,7 +43,7 @@ public:
     json output_j;
     HA prevHA = ACC;
 
-    RobotIO(Robot &_r, Robot &_gt): r(_r), gt(_gt) {
+    RobotIO(Robot &_r): r(_r) {
         x_j = fillJson(vector<int>{1, 0, 0}, "NUM", "x");
         v_j = fillJson(vector<int>{1, -1, 0}, "NUM", "v");
         decMax_j = fillJson(vector<int>{1, -2, 0}, "NUM", "decMax");
@@ -60,7 +59,7 @@ public:
         // return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
                 // + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
         return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
-                + ", " + to_string(r.la.acc) + ", " + HAToString(gt.ha);
+                + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
     }
     string getJsonRow(){
         x_j["value"] = r.state.pos;
@@ -104,8 +103,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     bool first = true;
     for(uint i = 0; i < numRobots; i++){
 
-        Robot gt (robots[i]);
-        RobotIO rio (robots[i], gt);
+        RobotIO rio (robots[i]);
         
         // Setup CSV file
         ofstream csvFile;
@@ -122,12 +120,8 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
 
             robots[i].updatePhysics(T_STEP);
             robots[i].runASP(ASP_model(useModel));
-            robots[i].ha = pointError(ACC, robots[i].ha, robots[i], false);
+            // robots[i].ha = pointError(ACC, robots[i].ha, robots[i], false);
             robots[i].updateLA();
-
-            gt.updatePhysics(T_STEP);
-            gt.runASP(ASP_Hand);
-            gt.updateLA();
 
             // Print trace
             if(genCsv) {

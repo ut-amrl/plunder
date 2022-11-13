@@ -55,8 +55,6 @@ HA stringToHA(string str){
 
 // ----- Robot Class ---------------------------------------------
 
-// class 
-
 class Robot {
 
     private:

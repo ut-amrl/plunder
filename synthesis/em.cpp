@@ -24,7 +24,6 @@
 
 using namespace std;
 using namespace AST;
-using namespace z3;
 using Eigen::Vector2f;
 using json = nlohmann::json;
 
@@ -140,32 +139,14 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
             }
         }
 
-
         // Run ASPs for all robots
         string s = altPath+to_string(iteration)+"-"+to_string(i)+".csv";
-        ofstream outFile;
-        outFile.open(s);
-        for(uint n=0; n<particlesPlotted; n++){
-            vector<HA> traj = trajectories[n];
-            robots[i].reset();
-            robots[i].ha = ACC;
-            double temp = robots[i].pointAccuracy;
-            robots[i].pointAccuracy = 1;
-            outFile << robots[i].accMax << ",";
-            for(uint t=1; t<dataObs[i].size(); t++){
-                robots[i].state = dataObs[i][t];
-                robots[i].runASP(asp);
-                robots[i].la = robots[i].motorModel(robots[i].ha, robots[i].state, false);
-                outFile << robots[i].la.acc;
-                if(t!=dataObs[i].size()-1) outFile << ",";
-            }
-            outFile << endl;
-            robots[i].pointAccuracy = temp;
-        }
-        outFile.close();
+        executeASP(robots[i], s, dataObs[i], asp);
+
         cout << "*";
         cout.flush();
     }
+
     cout << "\r";
     cout << "Cumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
 
@@ -427,6 +408,15 @@ void emLoop(vector<Robot>& robots){
     asp_t* curASP = initialASP;
     vector<vector<Obs>> dataObs (numRobots);
     vector<vector<LA>> dataLa (numRobots);
+
+    for(int r = 0; r < numRobots; r++){
+        // Run ground truth ASP
+
+        string inputFile = stateGenPath + to_string(r) + ".csv";
+        readData(inputFile, dataObs[r], dataLa[r]);
+        string s = altPath+"gt-"+to_string(r)+".csv";
+        executeASP(robots[r], s, dataObs[r], ASP_model(model));
+    }
 
     for(int i = 0; i < numIterations; i++){
         

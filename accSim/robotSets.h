@@ -24,20 +24,20 @@ vector<Robot> getRobotSet(int setNum, normal_distribution<double> accErrDistr, d
             Robot(5, -2, 15, 200, accErrDistr, haProbCorrect),
             Robot(10, -10, 20, 500, accErrDistr, haProbCorrect),
         };
-    } else if(setNum == 1){ // One robot, multiple targets
+    } else if(setNum == 1){ // Repeated demonstrations
         return {
-            Robot(4, -3, 15, 150, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 150, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 150, accErrDistr, haProbCorrect),
+            Robot(5, -6, 15, 150, accErrDistr, haProbCorrect),
+            Robot(5, -6, 15, 150, accErrDistr, haProbCorrect),
+            Robot(5, -6, 15, 150, accErrDistr, haProbCorrect),
+            Robot(5, -6, 15, 150, accErrDistr, haProbCorrect),
             Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
             Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
             Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 50, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 50, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 50, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 25, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 25, accErrDistr, haProbCorrect),
-            Robot(4, -3, 15, 25, accErrDistr, haProbCorrect),
+            Robot(4, -3, 15, 100, accErrDistr, haProbCorrect),
+            Robot(6, -5, 15, 50, accErrDistr, haProbCorrect),
+            Robot(6, -5, 15, 50, accErrDistr, haProbCorrect),
+            Robot(6, -5, 15, 50, accErrDistr, haProbCorrect),
+            Robot(6, -5, 15, 50, accErrDistr, haProbCorrect),
         };
     } else {
         return {
