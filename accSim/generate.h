@@ -154,3 +154,28 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     cout << "Using " << numRobots << " robots and low-level action standard deviation=" << stddevError << endl;
     cout << "Output stored in " << outputPath << "\n\n\n";
 }
+
+void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp_t* asp){
+
+    double temp = r.pointAccuracy;
+    r.pointAccuracy = 1;
+    
+    ofstream outFile;
+    outFile.open(outputFile);
+
+    for(uint n=0; n<particlesPlotted; n++){
+        r.reset();
+        outFile << r.ha << ",";
+        for(uint t=1; t<dataObs.size(); t++){
+            r.state = dataObs[t];
+            r.runASP(asp);
+            r.la = r.motorModel(r.ha, r.state, r.la, false);
+            outFile << r.ha;
+            if(t!=dataObs.size()-1) outFile << ",";
+        }
+        outFile << endl;
+    }
+    outFile.close();
+
+    r.pointAccuracy = temp;
+}

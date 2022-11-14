@@ -102,25 +102,28 @@ class Robot {
     }
 
     // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
-    LA motorModel(HA ha, Obs state, bool error){
-        double acc = 0;
-        
+    LA motorModel(HA ha, Obs state, LA la, bool error){
+
         if(ha == ACC){
-            acc = accMax;
-            // acc = ((vMax - state.vel) / vMax) * (accMax*2/3) + (accMax/3);
-            // acc = max((vMax - state.vel) / vMax * accMax, activationMinAcc);
-            // acc = (pow(vMax, 2) - pow(state.vel, 2))/pow(vMax, 2) * accMax;
+            // la.acc = min(la.acc + 1, accMax);
+            la.acc = accMax;
         } else if (ha == DEC) {
-            acc = decMax;
-            // acc = (vMax - state.vel) / vMax * decMax - activationMinAcc;
+            // la.acc = max(la.acc - 1, decMax);
+            la.acc = decMax;
+        } else {
+            // if(la.acc < 0)
+            //     la.acc = min(0.0, la.acc+1);
+            // if(la.acc > 0)
+            //     la.acc = max(0.0, la.acc-1);
+            la.acc = 0;
         }
 
         // Induce some error
         if(error){
-            acc += accErrDistr(gen);
+            la.acc += accErrDistr(gen);
         }
 
-        return LA { .acc = acc };
+        return la;
     }
 
     // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
@@ -148,7 +151,7 @@ class Robot {
 
     void updateLA(){
         // Select some action (acceleration)
-        la = motorModel(ha, state, true);
+        la = motorModel(ha, state, la, true);
     }
 
     // HELPER METHODS

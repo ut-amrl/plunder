@@ -26,7 +26,7 @@ def readTrajectories(inPath):
     for x in inFile:
         traj = []
         for elem in next(reader):
-            traj.append(float(elem))
+            traj.append(int(elem))
         trajectories.append(traj)
     return
 
@@ -105,9 +105,6 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     maxTime = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
     particlesPlotted = min(int(settings["particlesPlotted"]), len(trajectories))
 
-    # Calculate full state sequences
-    runSimulation()
-
     # Acceleration
     fig, (ax1, ax1b, ax2, ax3) = plt.subplots(4, gridspec_kw={'height_ratios': [4, 4, 1, 1]})
     ax1.margins(0)
@@ -126,11 +123,11 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
         if t % freq == 0:
             for i in range(0, len(trajectories)):
                 a = trajectories[i][t]
-                if a > 0:
+                if a == 0: # ACC
                     actions[0][t] += 1
-                elif a == 0:
+                elif a == 2: # CON
                     actions[1][t] += 1
-                elif a < 0:
+                elif a == 1: # DEC
                     actions[2][t] += 1
             a = gtTrajectory[t]
             if a == "ACC":
@@ -157,10 +154,10 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     for i in range(particlesPlotted):
         one_row = []
         for j in range(len(trajectories[0])):
-            c = 1
-            if (trajectories[i][j]<0):
+            c = 1 # CON
+            if (trajectories[i][j] == 1): # DEC
                 c=0
-            elif (trajectories[i][j]>0):
+            elif (trajectories[i][j] == 0): # ACC
                 c=2
             one_row.append(c)
         color_graph.append(one_row)
@@ -185,6 +182,10 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     plt.savefig(outPath + "accel.png")
 
     plt.clf()
+
+    
+    # # Calculate full state sequences
+    # runSimulation()
 
     # # Velocity
     # for i in range(0, particlesPlotted):

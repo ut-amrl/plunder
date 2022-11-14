@@ -39,7 +39,7 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
 FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs){
-    double mean = r.motorModel(ha, obs, false).acc;
+    double mean = r.motorModel(ha, obs, la, false).acc;
     double stddev = pf_stddevError;
     return logpdf(la.acc, mean, stddev);
 }
@@ -77,7 +77,7 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<O
 
     for(vector<HA>& traj : trajectories){
         for(uint i = 0; i < traj.size(); i++){
-            outFile << r.motorModel(traj[i], dataObs[i], false).acc;
+            outFile << traj[i];
             if(i != traj.size() - 1){
                 outFile << ",";
             }
@@ -124,26 +124,4 @@ double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double res
     writeData(outputFile, r, trajectories, dataObs);
 
     return obs_likelihood;
-}
-
-void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp_t* asp){
-    ofstream outFile;
-    outFile.open(outputFile);
-    for(uint n=0; n<particlesPlotted; n++){
-        r.reset();
-        r.ha = ACC;
-        double temp = r.pointAccuracy;
-        r.pointAccuracy = 1;
-        outFile << r.accMax << ",";
-        for(uint t=1; t<dataObs.size(); t++){
-            r.state = dataObs[t];
-            r.runASP(asp);
-            r.la = r.motorModel(r.ha, r.state, false);
-            outFile << r.la.acc;
-            if(t!=dataObs.size()-1) outFile << ",";
-        }
-        outFile << endl;
-        r.pointAccuracy = temp;
-    }
-    outFile.close();
 }
