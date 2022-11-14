@@ -38,8 +38,8 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 }
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs){
-    double mean = r.motorModel(ha, obs, la, false).acc;
+FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA){
+    double mean = r.motorModel(ha, obs, prevLA, false).acc; // should be using the previous LA
     double stddev = pf_stddevError;
     return logpdf(la.acc, mean, stddev);
 }

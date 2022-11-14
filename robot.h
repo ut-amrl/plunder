@@ -105,17 +105,17 @@ class Robot {
     LA motorModel(HA ha, Obs state, LA la, bool error){
 
         if(ha == ACC){
-            // la.acc = min(la.acc + 1, accMax);
-            la.acc = accMax;
+            la.acc = min(la.acc + laChangeSpeed, accMax);
+            // la.acc = accMax;
         } else if (ha == DEC) {
-            // la.acc = max(la.acc - 1, decMax);
-            la.acc = decMax;
+            la.acc = max(la.acc - laChangeSpeed, decMax);
+            // la.acc = decMax;
         } else {
-            // if(la.acc < 0)
-            //     la.acc = min(0.0, la.acc+1);
-            // if(la.acc > 0)
-            //     la.acc = max(0.0, la.acc-1);
-            la.acc = 0;
+            if(la.acc < 0)
+                la.acc = min(0.0, la.acc + laChangeSpeed);
+            if(la.acc > 0)
+                la.acc = max(0.0, la.acc - laChangeSpeed);
+            // la.acc = 0;
         }
 
         // Induce some error

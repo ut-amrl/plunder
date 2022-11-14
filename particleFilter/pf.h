@@ -82,13 +82,13 @@ class MarkovSystem {
 
     HA (*sampleInitialHA)(); // Initial distribution
     HA (*ASP)(HA prevHa, Obs prevObs, RobotClass& r); // Provided action-selection policy
-    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs); // Calculate likelihood of observed LA given the simulated HA sequence
+    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs, LA prevLA); // Calculate likelihood of observed LA given the simulated HA sequence
     RobotClass r;
 
     // Constructor
     MarkovSystem(HA (*_sampleInitialHA)(), 
                 HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
-                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs),
+                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs, LA prevLA),
                 RobotClass& _r):
 
                 sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
@@ -97,7 +97,7 @@ class MarkovSystem {
     // Robot-less constructor
     MarkovSystem(HA (*_sampleInitialHA)(), 
                 HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
-                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs)):
+                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs, LA prevLA)):
 
                 sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
     {}
@@ -164,7 +164,7 @@ class ParticleFilter {
             // Reweight particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
-                FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(system->r, dataLA[t], x_i, dataObs[t]) * obsLikelihoodStrength;
+                FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(system->r, dataLA[t], x_i, dataObs[t], t == 0 ? LA {.acc=0} : dataLA[t-1]) * obsLikelihoodStrength;
                 log_weights[i] += log_LA_ti;
             }
 

@@ -9,7 +9,7 @@ const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 10;           // number of robots (depends on robot test set)
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = 0.1;     // low-level action error standard deviation
+const double stddevError = 0.2;     // low-level action error standard deviation
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -29,6 +29,7 @@ const double distErrorMean = 0.0;       // Perception error for distance
 const double distErrorDev = 0.00;
 const double velErrorMean = 0.0;        // Perception error for velocity
 const double velErrorDev = 0.00;
+const double laChangeSpeed = 2.0;
 
 // EM Loop parameters
 const int numIterations = 10;           // number of iterations in the expectation-maximization loop
@@ -54,7 +55,7 @@ const int timeStepsPlot = 500;
 // Particle filter parameters
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.5;                            // higher = more resampling
-const double pf_stddevError = 0.3;
+const float resampleThreshold = 0.2;                            // higher = more resampling
+const double pf_stddevError = 0.2;
 const float obsLikelihoodStrength = 1.0;
 const int end_pf_err = 0;                                       // ignores last n timesteps because they didn't have a chance to get resampled
