@@ -110,16 +110,16 @@ class Robot {
         
         if(ha == ACC){
             la.acc = min(la.acc + change, accMax);
-            la.acc = accMax;
+            // la.acc = accMax;
         } else if (ha == DEC) {
             la.acc = max(la.acc - change, decMax);
-            la.acc = decMax;
+            // la.acc = decMax;
         } else {
             if(la.acc < 0)
                 la.acc = min(0.0, la.acc + change);
             if(la.acc > 0)
                 la.acc = max(0.0, la.acc - change);
-            la.acc = 0;
+            // la.acc = 0;
         }
 
         // Induce some additional lesser error
