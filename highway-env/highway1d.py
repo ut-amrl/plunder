@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 import os
 import math
 import random
-# os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 env = gym.make('highway-v0')
 env.config['lanes_count']=1
@@ -17,6 +16,8 @@ env.config['observation']={
     'features': ['presence', 'x', 'vx'],
     'absolute': False
 }
+
+highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 15
 env.reset()
 
 # observations
@@ -38,16 +39,16 @@ def sample(p):
 
 def prob_asp(p1, p2, x1, x2, vx1, vx2):
     rel_close1 = sample(logistic(-40, .2, x1))
-    rel_close2 = sample(logistic(-40, .2, x2))
+    # rel_close2 = sample(logistic(-40, .2, x2))
 
-    too_close1 = sample(logistic(-40, .1, x1))
-    too_close2 = sample(logistic(-40, .1, x2))
+    # too_close1 = sample(logistic(-40, .1, x1))
+    # too_close2 = sample(logistic(-40, .1, x2))
 
-    too_fast1 = sample(logistic(-20, 0, vx1))
-    too_fast2 = sample(logistic(-20, 0, vx2))
+    # too_fast1 = sample(logistic(-20, 0, vx1))
+    # too_fast2 = sample(logistic(-20, 0, vx2))
 
     action=0
-    if (p1 and rel_close1 and too_fast1) or (p1 and too_close1) or (p2 and rel_close2 and too_fast2) or (p2 and too_close2):
+    if (p1 and rel_close1):
         action = env.action_type.actions_indexes["SLOWER"]
     else:
         action = env.action_type.actions_indexes["FASTER"]
