@@ -2,6 +2,8 @@ import gym
 import highway_env
 from matplotlib import pyplot as plt
 import os
+import math
+import random
 # os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 env = gym.make('highway-v0')
@@ -28,16 +30,42 @@ env.reset()
 # then decelerate
 # if (vx<0 and x<.2) or (x<.1) then SLOWER
 
+def logistic(slope, offset, x):
+    return 1.0/(1.0+pow(math.e, -slope*(x-offset)))
+
+def sample(p):
+    return random.random()<p
+
+def prob_asp(p1, p2, x1, x2, vx1, vx2):
+    rel_close1 = sample(logistic(-40, .2, x1))
+    rel_close2 = sample(logistic(-40, .2, x2))
+
+    too_close1 = sample(logistic(-40, .1, x1))
+    too_close2 = sample(logistic(-40, .1, x2))
+
+    too_fast1 = sample(logistic(-20, 0, vx1))
+    too_fast2 = sample(logistic(-20, 0, vx2))
+
+    action=0
+    if (p1 and rel_close1 and too_fast1) or (p1 and too_close1) or (p2 and rel_close2 and too_fast2) or (p2 and too_close2):
+        action = env.action_type.actions_indexes["SLOWER"]
+    else:
+        action = env.action_type.actions_indexes["FASTER"]
+    return action
+
 
 action = env.action_type.actions_indexes["IDLE"]
 for _ in range(1000):
     obs, reward, done, truncated, info = env.step(action)
     env.render()
     print(obs)
-    if (obs[1][2]<0 and obs[1][1]<.2) or (obs[2][2]<0 and obs[2][1]<.2) or (obs[1][1]<.1) or (obs[2][1]<.1):
-        action = env.action_type.actions_indexes["SLOWER"]
-    else:
-        action = env.action_type.actions_indexes["FASTER"]
+    p1=obs[1][0]
+    p2=obs[2][0]
+    x1=obs[1][1]
+    x2=obs[2][1]
+    vx1=obs[1][2]
+    vx2=obs[2][2]
+    action = prob_asp(p1==1, p2==1, x1, x2, vx1, vx2)
 
 plt.imshow(env.render(mode="rgb_array"))
 plt.show()
