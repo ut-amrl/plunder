@@ -103,22 +103,26 @@ class Robot {
 
     // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
     LA motorModel(HA ha, Obs state, LA la, bool error){
-
+        double change = laChangeSpeed;
+        if(error){
+            change += accErrDistr(gen) * (switchingError / stddevError);
+        }
+        
         if(ha == ACC){
-            la.acc = min(la.acc + laChangeSpeed, accMax);
-            // la.acc = accMax;
+            la.acc = min(la.acc + change, accMax);
+            la.acc = accMax;
         } else if (ha == DEC) {
-            la.acc = max(la.acc - laChangeSpeed, decMax);
-            // la.acc = decMax;
+            la.acc = max(la.acc - change, decMax);
+            la.acc = decMax;
         } else {
             if(la.acc < 0)
-                la.acc = min(0.0, la.acc + laChangeSpeed);
+                la.acc = min(0.0, la.acc + change);
             if(la.acc > 0)
-                la.acc = max(0.0, la.acc - laChangeSpeed);
-            // la.acc = 0;
+                la.acc = max(0.0, la.acc - change);
+            la.acc = 0;
         }
 
-        // Induce some error
+        // Induce some additional lesser error
         if(error){
             la.acc += accErrDistr(gen);
         }
@@ -172,7 +176,8 @@ class Robot {
 
     // Robot has reached target and is at rest. End simulation.
     bool finished(){
-        return state.vel < robotEpsilon && state.pos >= target - robotEpsilon;
+        // return state.vel < robotEpsilon && state.pos >= target - robotEpsilon;
+        return false;
     }
 
     // Reset robot

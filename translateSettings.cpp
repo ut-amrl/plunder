@@ -33,6 +33,7 @@ void assertConstraints() {
 
     assert(sampleSize <= numParticles && "Sample size must be less than the number of particles");
     assert(particlesPlotted <= numParticles && "Particles plotted must be less than the number of particles");
+    assert(timeStepsPlot <= T_TOT / T_STEP);
 }
 
 // ----- Main -------------------------------

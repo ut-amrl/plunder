@@ -83,11 +83,76 @@ def runSimulation():
     
     return
 
+def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
+    global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
+    outPath = outP + str(iter) + "-" + str(robot) + "-"
+
+    maxTime = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
+    particlesPlotted = min(int(settings["particlesPlotted"]), len(trajectories))
+
+    for traj in trajectories:
+        traj = traj[0:maxTime]
+    velocities = velocities[0:maxTime]
+    positions = positions[0:maxTime]
+    gtTrajectory = gtTrajectory[0:maxTime]
+    gtLA = gtLA[0:maxTime]
+    gtVelocity = gtVelocity[0:maxTime]
+    gtPosition = gtPosition[0:maxTime]
+
+    times = []
+    for t in range(0, maxTime):
+        times.append(t)
+
+    # Acceleration
+    if useGT:
+        fig, (ax1, ax1b, ax2, ax3) = plt.subplots(4, gridspec_kw={'height_ratios': [4, 4, 1, 1]})
+        ax1.margins(0)
+        ax1b.margins(0)
+        ax2.margins(0)
+        ax3.margins(0)
+    else:
+        fig, (ax1, ax1b) = plt.subplots(2, gridspec_kw={'height_ratios': [1, 1]})
+        ax1.margins(0)
+        ax1b.margins(0)
+    
+
+    fig.suptitle(title)
+
+    sum = np.sum(actions, axis=0)
+    actions = np.multiply(np.nan_to_num(np.divide(actions, sum)), 100)
+
+    ax1.bar(times, actions[0], width=1, bottom=np.add(actions[2], actions[1]), color="#05a655", label="ACC")
+    ax1.bar(times, actions[1], width=1, bottom=actions[2], color="#f8ff99", label="CON")
+    ax1.bar(times, actions[2], width=1, color="#ff6040", label="DEC")
+
+    ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0, aspect='auto', interpolation='none')
+
+    plt.xlabel('time')
+    ax1.set_ylabel('hi-level actions')
+
+    if useGT:
+        ax2.bar(times, gtLA, color="red", width=1)
+
+        ax3.bar(times, gt[0], color="#05a655", width=1)
+        ax3.bar(times, gt[1], color="#f8ff99", width=1)
+        ax3.bar(times, gt[2], color="#ff6040", width=1)
+
+        ax2.set_ylabel('demo')
+        ax3.set_ylabel('ground\ntruth')
+
+    fig.tight_layout()  
+    plt.show()
+    plt.savefig(outPath + "accel.png")
+
+    plt.clf()
+    plt.close('all')
+
+    return (actions, color_graph)
+
 def plotSingle(inF, outP, gtF, title, iter, robot):
     global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
 
     inFile = inF + str(iter) + "-" + str(robot) + ".csv"
-    outPath = outP + str(iter) + "-" + str(robot) + "-"
     gtFile = gtF + str(robot) + ".csv"
 
     trajectories = []
@@ -105,21 +170,10 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     maxTime = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
     particlesPlotted = min(int(settings["particlesPlotted"]), len(trajectories))
 
-    # Acceleration
-    fig, (ax1, ax1b, ax2, ax3) = plt.subplots(4, gridspec_kw={'height_ratios': [4, 4, 1, 1]})
-    ax1.margins(0)
-    ax1b.margins(0)
-    ax2.margins(0)
-    ax3.margins(0)
-
-    fig.suptitle(title)
-
     freq = 1
     actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
     gt = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
-    times = []
     for t in range(0, maxTime):
-        times.append(t)
         if t % freq == 0:
             for i in range(0, len(trajectories)):
                 a = trajectories[i][t]
@@ -144,16 +198,10 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
             gt[1][t] = gt[1][t-1]
             gt[2][t] = gt[2][t-1]
     
-    sum = np.sum(actions, axis=0)
-    actions = np.multiply(np.divide(actions, sum), 100)
-    
-    ax1.bar(times, actions[0], width=1, bottom=np.add(actions[2], actions[1]), color="#05a655", label="ACC")
-    ax1.bar(times, actions[1], width=1, bottom=actions[2], color="#f8ff99", label="CON")
-    ax1.bar(times, actions[2], width=1, color="#ff6040", label="DEC")
     color_graph = []
     for i in range(particlesPlotted):
         one_row = []
-        for j in range(len(trajectories[0])):
+        for j in range(maxTime):
             c = 1 # CON
             if (trajectories[i][j] == 1): # DEC
                 c=0
@@ -161,28 +209,6 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
                 c=2
             one_row.append(c)
         color_graph.append(one_row)
-    ax1b.imshow(np.array(color_graph), cmap=ListedColormap(["red", "yellow", "green"]), origin="lower", vmin=0, aspect='auto', interpolation='none')
-    
-    ax2.bar(times, gtLA, color="red", width=1)
-
-    ax3.bar(times, gt[0], color="#05a655", width=1)
-    ax3.bar(times, gt[1], color="#f8ff99", width=1)
-    ax3.bar(times, gt[2], color="#ff6040", width=1)
-
-    
-    plt.xlabel('time')
-    ax1.set_ylabel('hi-level actions')
-    ax2.set_ylabel('demo')
-    ax3.set_ylabel('ground\ntruth')
-
-    # ax1.legend(loc="upper left")
-
-    fig.tight_layout()  
-    plt.show()
-    plt.savefig(outPath + "accel.png")
-
-    plt.clf()
-
     
     # # Calculate full state sequences
     # runSimulation()
@@ -218,14 +244,22 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     
     # plt.show()
     # plt.savefig(outPath + "pos.png")
-
-    plt.close('all')
-
+    return figureHandler(outP, actions, gt, color_graph, title, iter, robot, True)
 
 def plotTrajectories(inF, outP, gtF, title):
     for iter in range(0, int(settings["numIterations"])):
+        cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
+        cum_color_graph = []
+
         for robot in range(0, int(settings["numRobots"])):
-            plotSingle(inF, outP, gtF, title, iter, robot)
+            tup = plotSingle(inF, outP, gtF, title, iter, robot)
+
+            for i in range(len(cum_actions)):
+                for t in range(0, len(tup[0][i])):
+                    cum_actions[i][t] += tup[0][i][t]
+            cum_color_graph += tup[1]
+
+        figureHandler(outP, cum_actions, 0, cum_color_graph, title, iter, "cumulative", False)
 
     return
     
@@ -247,8 +281,18 @@ def main():
     pfOutPath = settings["plotGenPath"]+"pf/"
 
     # Plot ground truth
+    cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
+    cum_color_graph = []
+
     for robot in range(0, int(settings["numRobots"])):
-        plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Outputs', 'gt', robot)
+        tup = plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
+
+        for i in range(len(cum_actions)):
+            for t in range(0, len(tup[0][i])):
+                cum_actions[i][t] += tup[0][i][t]
+        cum_color_graph += tup[1]
+
+    figureHandler(pureOutPath, cum_actions, 0, cum_color_graph, 'Ground Truth Robots', 'gt', "cumulative", False)
 
     try:
         plotTrajectories(pfInFile, pfOutPath, gtFile, 'Particle filter outputs')

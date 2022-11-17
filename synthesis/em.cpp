@@ -253,9 +253,9 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     // sample2(allExamples, sampleOfExamples);
 
 
-    // for(Example e: sampleOfExamples){
-    //     printExampleInfo(e);
-    // }
+    for(Example e: sampleOfExamples){
+        printExampleInfo(e);
+    }
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";
