@@ -76,17 +76,21 @@ def closestVehicles(obs):
 
 
 # ASP
-# if the vehicle in front of it is too close,
-# then decelerate
-def prob_asp(p, x, vx):
-    too_close = sample(logistic(-10, .2, x))
+def det_asp(ego, closest):
+    car_in_front = closest[1][1] < 0.1
+    car_left = closest[0][1] < 0.1
+    car_right = closest[2][1] < 0.1
 
-    if (too_close):
-        action = env.action_type.actions_indexes["SLOWER"]
-    else:
-        action = env.action_type.actions_indexes["FASTER"]
+    if not car_in_front: # No car in front: accelerate
+        return env.action_type.actions_indexes["FASTER"]
 
-    return action
+    if not car_left: # No car on the left: merge left
+        return env.action_type.actions_indexes["LANE_LEFT"]
+    if not car_right: # No car on the right: merge right
+        return env.action_type.actions_indexes["LANE_RIGHT"]
+
+    # Nowhere to go: decelerate
+    return env.action_type.actions_indexes["SLOWER"]
 
 
 
@@ -100,5 +104,5 @@ for _ in range(1000):
     obs = classifyLane(obs)
     closest = closestVehicles(obs)
 
-    print(closest)
-    # action = prob_asp(p==1, x, vx)
+    # Run ASP
+    action = det_asp(obs[0], closest)
