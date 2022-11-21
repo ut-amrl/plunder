@@ -75,7 +75,7 @@ def closestVehicles(obs):
 
 
 
-# ASP
+# ASP (deterministic)
 def det_asp(ego, closest):
     car_in_front = closest[1][1] < 0.1
     car_left = closest[0][1] < 0.1
@@ -83,7 +83,6 @@ def det_asp(ego, closest):
 
     if not car_in_front: # No car in front: accelerate
         return env.action_type.actions_indexes["FASTER"]
-
     if not car_left: # No car on the left: merge left
         return env.action_type.actions_indexes["LANE_LEFT"]
     if not car_right: # No car on the right: merge right
@@ -92,7 +91,21 @@ def det_asp(ego, closest):
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
 
+# ASP (probabilistic)
+def prob_asp(ego, closest):
+    car_in_front = sample(logistic(-50, 0.15, closest[1][1]))
+    car_left = sample(logistic(-50, 0.15, closest[0][1]))
+    car_right = sample(logistic(-50, 0.15, closest[2][1]))
 
+    if not car_in_front: # No car in front: accelerate
+        return env.action_type.actions_indexes["FASTER"]
+    if not car_left: # No car on the left: merge left
+        return env.action_type.actions_indexes["LANE_LEFT"]
+    if not car_right: # No car on the right: merge right
+        return env.action_type.actions_indexes["LANE_RIGHT"]
+
+    # Nowhere to go: decelerate
+    return env.action_type.actions_indexes["SLOWER"]
 
 ######## Simulation ########
 action = env.action_type.actions_indexes["IDLE"]
@@ -105,4 +118,4 @@ for _ in range(1000):
     closest = closestVehicles(obs)
 
     # Run ASP
-    action = det_asp(obs[0], closest)
+    action = prob_asp(obs[0], closest)
