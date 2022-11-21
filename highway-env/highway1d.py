@@ -36,7 +36,7 @@ def sample(p):
 # ASP
 # if the vehicle in front of it is too close,
 # then decelerate
-def prob_asp(p, x, vx):
+def prob_asp(p, x, vx, lastAction):
     too_close = sample(logistic(-10, .2, x))
 
     if (too_close):
@@ -55,4 +55,4 @@ for _ in range(1000):
     p=obs[1][0]
     x=obs[1][1]
     vx=obs[1][2]
-    action = prob_asp(p==1, x, vx)
+    action = prob_asp(p==1, x, vx, action)
