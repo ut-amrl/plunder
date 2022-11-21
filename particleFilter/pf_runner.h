@@ -41,7 +41,7 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
 FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA){
     double mean = r.motorModel(ha, obs, prevLA, false).acc; // should be using the previous LA
     double stddev = pf_stddevError;
-    return logpdf(la.acc, mean, stddev);
+    return logpdf(la.acc, mean, obsLikelihoodStrength * stddev);
 }
 
 
