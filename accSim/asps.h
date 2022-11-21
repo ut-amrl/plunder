@@ -100,8 +100,8 @@ HA ASP_Hand_prob(HA ha, Obs state, Robot& r){
     bool cond1 = state.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
     bool cond2 = xToTarget - r.DistTraveled(state.vel, r.decMax) < robotEpsilon;  // needs to decelerate or else it will pass target
 
-    bool cond1smooth = r.sampleDiscrete(logistic(0, 4, state.vel - r.vMax));
-    bool cond2smooth = r.sampleDiscrete(logistic(0, -1.5, xToTarget - r.DistTraveled(state.vel, r.decMax)));
+    bool cond1smooth = r.sampleDiscrete(logistic(0, 2.5, state.vel - r.vMax));
+    bool cond2smooth = r.sampleDiscrete(logistic(0, -1, xToTarget - r.DistTraveled(state.vel, r.decMax)));
 
     if(ha == ACC){                          // transitions starting with ACC
         if(cond1smooth && !cond2smooth) ha=CON;         // ACC -> CON (expected)

@@ -79,6 +79,8 @@ class Robot {
         pointAccuracy = _pointAccuracy;
         cond1err = (((double) rand())/RAND_MAX-.5)*3;
         cond2err = (((double) rand())/RAND_MAX-.5)*6;
+
+        reset();
     }
 
     Robot(const Robot& other) : accMax(other.accMax), decMax(other.decMax), vMax(other.vMax), target(other.target),
@@ -89,9 +91,9 @@ class Robot {
 
     Robot() {}
 
-    HA ha = ACC;                        // Initial high-level action
-    LA la = { .acc = 0 };               // Initial low-level action
-    Obs state = { .pos = 0, .vel = 0 }; // Initial observed state
+    HA ha;
+    LA la;
+    Obs state;
 
     double cond1err = 0;
     double cond2err = 0;
@@ -109,10 +111,20 @@ class Robot {
         }
         
         if(ha == ACC){
-            la.acc = min(la.acc + change, accMax);
+            if(useSimplifiedMotorModel){
+                la.acc = min(la.acc + change, accMax);
+            } else {
+                la.acc = min(la.acc + change * 2, accMax);
+            }
+            
             // la.acc = accMax;
         } else if (ha == DEC) {
-            la.acc = max(la.acc - change, decMax);
+            if(useSimplifiedMotorModel){
+                la.acc = max(la.acc - change, decMax);
+            } else {
+                la.acc = max(la.acc - change * 2, decMax);
+            }
+            
             // la.acc = decMax;
         } else {
             if(la.acc < 0)
@@ -183,7 +195,7 @@ class Robot {
     // Reset robot
     void reset(){
         ha = ACC;
-        la = LA { .acc = 0 };
+        la = LA { .acc = accMax };
         state = Obs { .pos = 0, .vel = 0 };
     }
 };

@@ -104,7 +104,7 @@
         }
     },    
     "node": "BinOp",
-    "op": "And",
+    "op": "Or",
     "right": {
         "dim": [
             0,
