@@ -37,11 +37,30 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
     return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
 }
 
-// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA){
+// Remember to change GT_ASP to OR (ACC->CON)
+FLOAT pfMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
+    double mean = 0;
+    double stddev = min(r.accMax, abs(r.decMax));
+    if(ha == ACC) mean = r.accMax;
+    if(ha == DEC) mean = r.decMax;
+
+    return logpdf(la.acc, mean, obsLikelihoodStrength * stddev);
+}
+
+// Remember to change GT_ASP to AND (ACC->CON)
+FLOAT robotMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
     double mean = r.motorModel(ha, obs, prevLA, false).acc; // should be using the previous LA
     double stddev = pf_stddevError;
     return logpdf(la.acc, mean, obsLikelihoodStrength * stddev);
+}
+
+
+// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
+FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA){
+    if(useSimplifiedMotorModel){
+        return pfMotorModel(r, la, ha, obs, prevLA);
+    }
+    return robotMotorModel(r, la, ha, obs, prevLA);
 }
 
 

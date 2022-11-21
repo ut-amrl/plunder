@@ -9,8 +9,8 @@ const int robotTestSet = 2;         // which robots to use (0-2)
 const int numRobots = 9;           // number of robots (depends on robot test set)
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
-const double stddevError = 0.2;     // low-level action error standard deviation
-const double laChangeSpeed = 1.8;
+const double stddevError = 0.1;     // low-level action error standard deviation
+const double laChangeSpeed = 1;
 const double switchingError = 0.5;  // low-level action error standard deviation while transitioning
 
 // I/O parameters
@@ -56,7 +56,8 @@ const int timeStepsPlot = 150;
 // Particle filter parameters
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.2;                            // higher = more resampling
-const double pf_stddevError = 0.2;
-const float obsLikelihoodStrength = 2.0;                        // lower = stricter observation likelihood
+const float resampleThreshold = 0.5;                            // higher = more resampling
+const double pf_stddevError = 0.1;
+const float obsLikelihoodStrength = 0.25;                        // lower = stricter observation likelihood
 const int end_pf_err = 0;                                       // ignores last n timesteps because they didn't have a chance to get resampled
+const bool useSimplifiedMotorModel = true;                      // Use simulation motor model or a simplified version
