@@ -104,42 +104,50 @@ class Robot {
     }
 
     // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
-    LA motorModel(HA ha, Obs state, LA la, bool error){
+    LA motorModel(HA ha, Obs state, LA prevLa, bool error){
         double change = laChangeSpeed;
+        LA newLa;
         if(error){
             change += accErrDistr(gen) * (switchingError / stddevError);
         }
         
         if(ha == ACC){
             if(useSimplifiedMotorModel){
-                la.acc = min(la.acc + change, accMax);
+                newLa.acc = min(prevLa.acc + change, accMax);
             } else {
-                la.acc = min(la.acc + change * 2, accMax);
+                newLa.acc = min(prevLa.acc + change * 2, accMax);
             }
             
             // la.acc = accMax;
         } else if (ha == DEC) {
             if(useSimplifiedMotorModel){
-                la.acc = max(la.acc - change, decMax);
+                newLa.acc = max(prevLa.acc - change, decMax);
             } else {
-                la.acc = max(la.acc - change * 2, decMax);
+                newLa.acc = max(prevLa.acc - change * 2, decMax);
             }
             
             // la.acc = decMax;
         } else {
-            if(la.acc < 0)
-                la.acc = min(0.0, la.acc + change);
-            if(la.acc > 0)
-                la.acc = max(0.0, la.acc - change);
+            if(useSimplifiedMotorModel){
+                if(prevLa.acc < 0)
+                    newLa.acc = min(0.0, prevLa.acc + change);
+                if(prevLa.acc > 0)
+                    newLa.acc = max(0.0, prevLa.acc - change);
+            } else {
+                if(prevLa.acc < 0)
+                    newLa.acc = min(0.0, prevLa.acc + change*2);
+                if(prevLa.acc > 0)
+                    newLa.acc = max(0.0, prevLa.acc - change*2);
+            }
             // la.acc = 0;
         }
 
         // Induce some additional lesser error
         if(error){
-            la.acc += accErrDistr(gen);
+            newLa.acc += accErrDistr(gen);
         }
 
-        return la;
+        return newLa;
     }
 
     // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step

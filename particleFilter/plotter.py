@@ -4,6 +4,7 @@ import csv
 import sys
 import os
 from matplotlib.colors import ListedColormap
+import time
 
 # Initialization
 trajectories = []
@@ -21,6 +22,8 @@ settings = {}
 
 # Reads in csv files
 def readTrajectories(inPath):
+    while not os.path.exists(inPath):
+        time.sleep(1)
     inFile = open(inPath, "r")
     reader = csv.reader(inFile)
     for x in inFile:
@@ -31,6 +34,8 @@ def readTrajectories(inPath):
     return
 
 def readGroundTruth(gtPath):
+    while not os.path.exists(gtPath):
+        time.sleep(1)
     gtReader = csv.reader(open(gtPath, "r"))
     next(gtReader)
 

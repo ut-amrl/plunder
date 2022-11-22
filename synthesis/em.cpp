@@ -68,7 +68,7 @@ void printExampleInfo(Example e){
     float target = e.symbol_table_["target"].GetFloat();
     string start = e.start_.GetString();
     string res = e.result_.GetString();
-    float exp = x + distt(v, decMax);
+    float exp = v-vMax;
     cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
@@ -87,13 +87,13 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
         }
     }
 
-    return pointError(prevHA, ha, robot, false); // Introduce point errors - random transitions allow model to escape local minima
+    return pointError(prevHA, ha, robot, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
 HA initialASP(HA ha, Obs state, Robot& r){
     // return ASP_random(ha, state, r);
-    return pointError(ha, ha, r, false);
+    return pointError(ha, ha, r, useSafePointError);
 }
 
 bool isValidExample(Example ex){
@@ -153,12 +153,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
     return examples;
 }
 
-void sampleFromExamples(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExamples, vector<Example>& consolidated){
-    for(vector<Example>& each : allExamples){
-        consolidated.insert(end(consolidated), begin(each), end(each));
-    }
-
-    consolidated = WindowExamples(consolidated, window_size);
+void sampleFromExamples(vector<Example>& consolidated, vector<Example>& sampleOfExamples){
     shuffle(begin(consolidated), end(consolidated), default_random_engine {});
 
     std::sort(consolidated.begin(), consolidated.end(), [](const Example& a, const Example& b) -> bool {
@@ -184,12 +179,19 @@ void sampleFromExamples(vector<vector<Example>>& allExamples, vector<Example>& s
     }
 }
 
-void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExamples){
+void sample1(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
+    for(vector<Example>& each : allExamples){
+        consolidated.insert(end(consolidated), begin(each), end(each));
+    }
+    consolidated = WindowExamples(consolidated, window_size);
+}
+
+void sample2(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
     for(uint r=0; r<numRobots; r++){
         uint trajLength = allExamples[r].size()/sampleSize;
         for(uint i=0; i<sampleSize; i++){
             uint last_transition_t=0;
-            for(uint t=window_size/2; t<trajLength-window_size/2-1; t++){
+            for(uint t=window_size/2; t<trajLength-end_pf_err-window_size/2-1; t++){
                 Example e = allExamples[r][i*trajLength+t];
                 string expected_start = e.start_.GetString();
                 string expected_end = e.result_.GetString();
@@ -199,21 +201,21 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
                         uint mid_t = (t+last_transition_t)/2;
                         Example e_new = allExamples[r][i*trajLength+mid_t];
                         if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
-                            sampleOfExamples.push_back(e_new);
+                            consolidated.push_back(e_new);
                         }
                     }
                     // LEFT OF TRANSITION
                     for(uint w=1; w<=window_size/2; w+=1){
                         Example e_new = allExamples[r][i*trajLength+t-w];
                         if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
-                            sampleOfExamples.push_back(e_new);
+                            consolidated.push_back(e_new);
                         } else break;
                     }
                     // MIDDLE OF TRANSITION
                     {
                         Example e_new = allExamples[r][i*trajLength+t];
                         if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_end){
-                            sampleOfExamples.push_back(e_new);
+                            consolidated.push_back(e_new);
                         }
                     }
                     // RIGHT OF TRANSITION
@@ -221,7 +223,7 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
                         Example e_new = allExamples[r][i*trajLength+t+w];
                         if(e_new.start_.GetString()==expected_end && e_new.result_.GetString()==expected_end){
                             e_new.start_ = e.start_;
-                            sampleOfExamples.push_back(e_new);
+                            consolidated.push_back(e_new);
                         } else break;
                     }
                     last_transition_t=t;
@@ -233,7 +235,7 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
                 if(t-last_transition_t>1){
                     uint mid_t = (t+last_transition_t)/2;
                     Example e_new = allExamples[r][i*trajLength+mid_t];
-                    sampleOfExamples.push_back(e_new);
+                    consolidated.push_back(e_new);
                 }
             }
         }
@@ -243,14 +245,13 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& sampleOfExam
 // Maximization step
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
     
-    vector<Example> sampleOfExamples;
-    vector<Example> consolidated;
-    sampleFromExamples(allExamples, sampleOfExamples, consolidated);
-    cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
 
-    
-    // vector<Example> sampleOfExamples;
-    // sample2(allExamples, sampleOfExamples);
+    vector<Example> consolidated;
+    vector<Example> sampleOfExamples;
+    sample1(allExamples, consolidated);
+    // sample2(allExamples, consolidated);
+    sampleFromExamples(consolidated, sampleOfExamples);
+    // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
 
 
     for(Example e: sampleOfExamples){
@@ -333,12 +334,18 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    for(uint i = 0; i < numHA; i++){
-        for(uint j = 0; j < numHA; j++){
-            transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-            accuracies.push_back(numeric_limits<float>::max());
-        }
-    }
+    // for(uint i = 0; i < numHA; i++){
+    //     for(uint j = 0; j < numHA; j++){
+    //         transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+    //         accuracies.push_back(numeric_limits<float>::max());
+    //     }
+    // }
+    transitions.push_back(pair<string, string> ("ACC", "CON"));
+    accuracies.push_back(numeric_limits<float>::max());
+    transitions.push_back(pair<string, string> ("ACC", "DEC"));
+    accuracies.push_back(numeric_limits<float>::max());
+    transitions.push_back(pair<string, string> ("CON", "DEC"));
+    accuracies.push_back(numeric_limits<float>::max());
     
     std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
         if(a.first == b.first){

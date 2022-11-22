@@ -10,8 +10,8 @@ const int numRobots = 10;           // number of robots (depends on robot test s
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
-const double laChangeSpeed = 1.5;
-const double switchingError = 0.5;  // low-level action error standard deviation while transitioning
+const double laChangeSpeed = 2.0;
+const double switchingError = 0.0;  // additional low-level action error standard deviation while transitioning
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -41,13 +41,14 @@ const int structuralChangeFrequency = 1;
 const bool hardcode_program = false;
 
 // EMDIPS parameters
-const int window_size = -1;
+const int window_size = 11;
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;               // Target threshold
 const int batch_size = 8;
 const int max_examples = 40;
 const int programs_enumerated = 7;
+const bool useSafePointError = true;
 
 // Plot parameters
 const int particlesPlotted = 100;
@@ -56,8 +57,8 @@ const int timeStepsPlot = 150;
 // Particle filter parameters
 const int numParticles = 20000;                                  // number of particle trajectories created to represent the distribution
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
-const float resampleThreshold = 0.5;                            // higher = more resampling
+const float resampleThreshold = 1.0;                            // higher = more resampling
 const double pf_stddevError = 0.1;
-const float obsLikelihoodStrength = 0.25;                        // lower = stricter observation likelihood
+const float obsLikelihoodStrength = 1.0;                        // lower = stricter observation likelihood
 const int end_pf_err = 0;                                       // ignores last n timesteps because they didn't have a chance to get resampled
 const bool useSimplifiedMotorModel = true;                      // Use simulation motor model or a simplified version

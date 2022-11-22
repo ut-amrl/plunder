@@ -26,7 +26,7 @@ env.reset()
 
 # ASP
 # if either the vehicle in front of it is too close,
-# or the vehicle in front of it is relatively close and decelerating,
+# or the vehicle in front of it is relatively close and going slower than the ego vehicle,
 # then decelerate
 # if (vx<0 and x<.2) or (x<.1) then SLOWER
 
@@ -40,8 +40,8 @@ def prob_asp(p1, p2, x1, x2, vx1, vx2):
     rel_close1 = sample(logistic(-40, .2, x1))
     rel_close2 = sample(logistic(-40, .2, x2))
 
-    too_close1 = sample(logistic(-40, .1, x1))
-    too_close2 = sample(logistic(-40, .1, x2))
+    too_close1 = sample(logistic(-60, .1, x1))
+    too_close2 = sample(logistic(-60, .1, x2))
 
     too_fast1 = sample(logistic(-20, 0, vx1))
     too_fast2 = sample(logistic(-20, 0, vx2))
@@ -69,3 +69,6 @@ for _ in range(1000):
 
 plt.imshow(env.render(mode="rgb_array"))
 plt.show()
+
+
+
