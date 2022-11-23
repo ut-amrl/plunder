@@ -26,10 +26,10 @@ HA pointError(HA prevHA, HA ha, Robot& r, bool useSafePointError){
             else haDif = 2;
         }
         ha = static_cast<HA>((ha + haDif)%3);
-    }
-    if(useSafePointError){
-        if(prevHA == CON && ha == ACC) ha = CON;
-        if(prevHA == DEC) ha = DEC;
+        if(useSafePointError){
+            if(prevHA == CON && ha == ACC) ha = DEC;
+            if(prevHA == DEC) ha = DEC;
+        }
     }
     return ha;
 }

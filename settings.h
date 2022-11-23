@@ -10,7 +10,7 @@ const int numRobots = 10;           // number of robots (depends on robot test s
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
-const double laChangeSpeed = 2.0;
+const double laChangeSpeed = 0.5;
 const double switchingError = 0.0;  // additional low-level action error standard deviation while transitioning
 
 // I/O parameters
@@ -61,4 +61,4 @@ const float resampleThreshold = 1.0;                            // higher = more
 const double pf_stddevError = 0.1;
 const float obsLikelihoodStrength = 1.0;                        // lower = stricter observation likelihood
 const int end_pf_err = 0;                                       // ignores last n timesteps because they didn't have a chance to get resampled
-const bool useSimplifiedMotorModel = true;                      // Use simulation motor model or a simplified version
+const bool useSimplifiedMotorModel = false;                      // Use simulation motor model or a simplified version

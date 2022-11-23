@@ -248,15 +248,15 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     vector<Example> consolidated;
     vector<Example> sampleOfExamples;
-    sample1(allExamples, consolidated);
-    // sample2(allExamples, consolidated);
+    // sample1(allExamples, consolidated);
+    sample2(allExamples, consolidated);
     sampleFromExamples(consolidated, sampleOfExamples);
     // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
 
 
-    for(Example e: sampleOfExamples){
-        printExampleInfo(e);
-    }
+    // for(Example e: sampleOfExamples){
+    //     printExampleInfo(e);
+    // }
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";
@@ -334,18 +334,21 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    // for(uint i = 0; i < numHA; i++){
-    //     for(uint j = 0; j < numHA; j++){
-    //         transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
-    //         accuracies.push_back(numeric_limits<float>::max());
-    //     }
-    // }
-    transitions.push_back(pair<string, string> ("ACC", "CON"));
-    accuracies.push_back(numeric_limits<float>::max());
-    transitions.push_back(pair<string, string> ("ACC", "DEC"));
-    accuracies.push_back(numeric_limits<float>::max());
-    transitions.push_back(pair<string, string> ("CON", "DEC"));
-    accuracies.push_back(numeric_limits<float>::max());
+    if(useSafePointError){
+        transitions.push_back(pair<string, string> ("ACC", "CON"));
+        accuracies.push_back(numeric_limits<float>::max());
+        transitions.push_back(pair<string, string> ("ACC", "DEC"));
+        accuracies.push_back(numeric_limits<float>::max());
+        transitions.push_back(pair<string, string> ("CON", "DEC"));
+        accuracies.push_back(numeric_limits<float>::max());
+    } else {
+        for(uint i = 0; i < numHA; i++){
+            for(uint j = 0; j < numHA; j++){
+                transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+                accuracies.push_back(numeric_limits<float>::max());
+            }
+        }
+    }
     
     std::sort(transitions.begin(), transitions.end(), [](const pair<string, string>& a, const pair<string, string>& b) -> bool {
         if(a.first == b.first){

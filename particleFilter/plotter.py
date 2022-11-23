@@ -251,22 +251,28 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     # plt.savefig(outPath + "pos.png")
     return figureHandler(outP, actions, gt, color_graph, title, iter, robot, True)
 
-def plotTrajectories(inF, outP, gtF, title):
+
+def plotSingleTimestep(inF, outP, gtF, title, iter):
+    cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
+    cum_color_graph = []
+
+    for robot in range(0, int(settings["numRobots"])):
+        tup = plotSingle(inF, outP, gtF, title, iter, robot)
+
+        for i in range(len(cum_actions)):
+            for t in range(0, len(tup[0][i])):
+                cum_actions[i][t] += tup[0][i][t]
+        cum_color_graph += tup[1]
+
+    figureHandler(outP, cum_actions, 0, cum_color_graph, title, iter, "cumulative", False)
+
+def plotTrajectories(graph1, graph2):
     for iter in range(0, int(settings["numIterations"])):
-        cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
-        cum_color_graph = []
-
-        for robot in range(0, int(settings["numRobots"])):
-            tup = plotSingle(inF, outP, gtF, title, iter, robot)
-
-            for i in range(len(cum_actions)):
-                for t in range(0, len(tup[0][i])):
-                    cum_actions[i][t] += tup[0][i][t]
-            cum_color_graph += tup[1]
-
-        figureHandler(outP, cum_actions, 0, cum_color_graph, title, iter, "cumulative", False)
-
+        plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter)
+        plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter)
     return
+
+
     
 # ----- Main ---------------------------------------------
 
@@ -299,12 +305,20 @@ def main():
 
     figureHandler(pureOutPath, cum_actions, 0, cum_color_graph, 'Ground Truth Robots', 'gt', "cumulative", False)
 
-    try:
-        plotTrajectories(pfInFile, pfOutPath, gtFile, 'Particle filter outputs')
-    except Exception as e: print(e)
+
+    graph1 = {  'inF': pfInFile,
+                'outP': pfOutPath,
+                'gtF': gtFile,
+                'title': 'Particle filter outputs'
+            }
+    graph2 = {  'inF': pureInFile,
+                'outP': pureOutPath,
+                'gtF': gtFile,
+                'title': 'ASP Test Run'
+            }
 
     try:
-        plotTrajectories(pureInFile, pureOutPath, gtFile, 'ASP Test Run')
+        plotTrajectories(graph1, graph2)
     except Exception as e: print(e)
     
 
