@@ -18,12 +18,18 @@ gtPosition = []
 
 settings = {}
 
+settings_path=""
+settings_mod_time=0
+
 # ----- I/O ---------------------------------------------=
 
 # Reads in csv files
 def readTrajectories(inPath):
     while not os.path.exists(inPath):
         time.sleep(1)
+        if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
+            raise Exception('Settings file changed... restarting plotter')
+
     inFile = open(inPath, "r")
     reader = csv.reader(inFile)
     for x in inFile:
@@ -36,6 +42,8 @@ def readTrajectories(inPath):
 def readGroundTruth(gtPath):
     while not os.path.exists(gtPath):
         time.sleep(1)
+        if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
+            raise Exception('Settings file changed... restarting plotter')
     gtReader = csv.reader(open(gtPath, "r"))
     next(gtReader)
 
@@ -48,6 +56,8 @@ def readGroundTruth(gtPath):
 
 def readSettings(sgPath):
     with open(sgPath) as f:
+        settings_path = sgPath
+        settings_mod_time = os.path.getmtime(sgPath)
         lines = f.readlines()
         for line in lines:
             line = line.strip()
@@ -147,7 +157,10 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
 
     fig.tight_layout()  
     plt.show()
-    plt.savefig(outPath + "accel.png")
+    if os.path.exists(outPath[:outPath.rfind('/')]):
+        plt.savefig(outPath + "accel.png")
+    else:
+        raise Exception('Plots folder deleted... restarting plotter')
 
     plt.clf()
     plt.close('all')
@@ -279,6 +292,9 @@ def plotTrajectories(graph1, graph2):
 def main():
     global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
 
+    while not os.path.exists("settings.txt"):
+        time.sleep(1)
+    print("Settings file found...")
     # Read settings
     readSettings("settings.txt")
     
@@ -295,32 +311,33 @@ def main():
     cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
     cum_color_graph = []
 
-    for robot in range(0, int(settings["numRobots"])):
-        tup = plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
-
-        for i in range(len(cum_actions)):
-            for t in range(0, len(tup[0][i])):
-                cum_actions[i][t] += tup[0][i][t]
-        cum_color_graph += tup[1]
-
-    figureHandler(pureOutPath, cum_actions, 0, cum_color_graph, 'Ground Truth Robots', 'gt', "cumulative", False)
-
-
-    graph1 = {  'inF': pfInFile,
-                'outP': pfOutPath,
-                'gtF': gtFile,
-                'title': 'Particle filter outputs'
-            }
-    graph2 = {  'inF': pureInFile,
-                'outP': pureOutPath,
-                'gtF': gtFile,
-                'title': 'ASP Test Run'
-            }
-
     try:
+        for robot in range(0, int(settings["numRobots"])):
+            tup = plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
+
+            for i in range(len(cum_actions)):
+                for t in range(0, len(tup[0][i])):
+                    cum_actions[i][t] += tup[0][i][t]
+            cum_color_graph += tup[1]
+
+        figureHandler(pureOutPath, cum_actions, 0, cum_color_graph, 'Ground Truth Robots', 'gt', "cumulative", False)
+
+
+        graph1 = {  'inF': pfInFile,
+                    'outP': pfOutPath,
+                    'gtF': gtFile,
+                    'title': 'Particle filter outputs'
+                }
+        graph2 = {  'inF': pureInFile,
+                    'outP': pureOutPath,
+                    'gtF': gtFile,
+                    'title': 'ASP Test Run'
+                }
         plotTrajectories(graph1, graph2)
-    except Exception as e: print(e)
-    
+    except Exception as e:
+        print(e)
+        pass
 
 if __name__ == "__main__":
     main()
+    os.system("make plt")

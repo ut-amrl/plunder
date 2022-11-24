@@ -12,6 +12,7 @@ PLT = plt
 EM = em
 EMNG = emng
 EMTEST = emtest
+D=$(shell date +%d.%m.%y-%H:%M:%S)
 
 .SILENT:
 
@@ -65,6 +66,12 @@ clean:
 	rm -rf bin build lib
 
 clear_data:
-	rm -rf accSim/out particleFilter/out particleFilter/plots synthesis/plots synthesis/out settings.txt
+	rm -rf accSim/out synthesis/plots synthesis/out settings.txt
 
 purge: clean clear_data
+
+snapshot:
+	echo $D && \
+	mkdir -p saved_outputs/$D && \
+	cp -r accSim/out synthesis/plots synthesis/out settings.txt saved_outputs/$D
+	
