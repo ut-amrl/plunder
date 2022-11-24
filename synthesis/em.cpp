@@ -248,8 +248,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     vector<Example> consolidated;
     vector<Example> sampleOfExamples;
-    // sample1(allExamples, consolidated);
-    sample2(allExamples, consolidated);
+    if(sampling_method==1) sample1(allExamples, consolidated);
+    else if(sampling_method==2) sample2(allExamples, consolidated);
     sampleFromExamples(consolidated, sampleOfExamples);
     // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
 

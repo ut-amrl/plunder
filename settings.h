@@ -33,22 +33,26 @@ const double velErrorMean = 0.0;        // Perception error for velocity
 const double velErrorDev = 0.00;
 
 // EM Loop parameters
-const int numIterations = 10;           // number of iterations in the expectation-maximization loop
-const int sampleSize = 10;              // number of trajectories to process then pass into EMDIPS, per robot
-const bool usePointError = true;        // point error: random transitions to a new high-level action
-const double pointAccuracy = 0.95;      // probability of a correct (ASP-consistent) high-level transition
-const int structuralChangeFrequency = 1;
-const bool hardcode_program = false;
+const int numIterations = 10;             // number of iterations in the expectation-maximization loop
+const int sampleSize = 10;                // number of trajectories to process then pass into EMDIPS, per robot
+const bool usePointError = true;          // point error: random transitions to a new high-level action
+const double pointAccuracy = 0.95;        // probability of a correct (ASP-consistent) high-level transition
+const int structuralChangeFrequency = 1;  // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
+const bool hardcode_program = false;      // if true then only consider single hardcoded program structure
+
+// Optimization parameters
+// TODO: move to here; find a way to efficiently retrieve them from here to the Python script
 
 // EMDIPS parameters
 const int window_size = 11;
+const int sampling_method = 2;                    // 1 for default window sampling, or 2 for custom
 const int feature_depth = 3;
 const int sketch_depth = 2;
-const float max_error = 0.03;               // Target threshold
+const float max_error = 0.03;                     // Target log likelihood threshold to stop enumeration early
 const int batch_size = 8;
 const int max_examples = 40;
 const int programs_enumerated = 7;
-const bool useSafePointError = true;
+const bool useSafePointError = true;              // "safe" transitions (only allow user-specified transitions)
 
 // Plot parameters
 const int particlesPlotted = 100;

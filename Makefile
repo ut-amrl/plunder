@@ -12,7 +12,7 @@ PLT = plt
 EM = em
 EMNG = emng
 EMTEST = emtest
-D=$(shell date +%d.%m.%y-%H:%M:%S)
+D=$(shell date +%y.%m.%d-%H:%M:%S)
 
 .SILENT:
 
@@ -55,7 +55,8 @@ $(EMNG):
 			rm -rf synthesis/out && \
 			mkdir -p synthesis/out/examples && \
 			mkdir -p synthesis/out/states && \
-			./bin/emloop
+			touch synthesis/out/em.txt && \
+			./bin/emloop | tee synthesis/out/em.txt
 			
 $(EM):
 			$(MAKE) clear_data && \
@@ -71,7 +72,6 @@ clear_data:
 purge: clean clear_data
 
 snapshot:
-	echo $D && \
-	mkdir -p saved_outputs/$D && \
-	cp -r accSim/out synthesis/plots synthesis/out settings.txt saved_outputs/$D
-	
+	echo $(D)-$(FN) && \
+	mkdir -p saved_outputs/$(D)-$(FN) && \
+	cp -r accSim/out synthesis/plots synthesis/out settings.txt pips/src/optimizer/optimizer.py saved_outputs/$D-$(FN)
