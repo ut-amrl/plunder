@@ -250,6 +250,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     vector<Example> sampleOfExamples;
     if(sampling_method==1) sample1(allExamples, consolidated);
     else if(sampling_method==2) sample2(allExamples, consolidated);
+    else cout << "ERROR: INVALID SAMPLING METHOD" << endl;
     sampleFromExamples(consolidated, sampleOfExamples);
     // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
 

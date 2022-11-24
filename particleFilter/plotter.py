@@ -27,8 +27,8 @@ settings_mod_time=0
 def readTrajectories(inPath):
     while not os.path.exists(inPath):
         time.sleep(1)
-        if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
-            raise Exception('Settings file changed... restarting plotter')
+        # if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
+        #     raise Exception('Settings file changed... restarting plotter')
 
     inFile = open(inPath, "r")
     reader = csv.reader(inFile)
@@ -42,8 +42,8 @@ def readTrajectories(inPath):
 def readGroundTruth(gtPath):
     while not os.path.exists(gtPath):
         time.sleep(1)
-        if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
-            raise Exception('Settings file changed... restarting plotter')
+        # if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
+        #     raise Exception('Settings file changed... restarting plotter')
     gtReader = csv.reader(open(gtPath, "r"))
     next(gtReader)
 
@@ -340,4 +340,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    os.system("make plt")
+    # os.system("make plt")

@@ -45,7 +45,7 @@ const bool hardcode_program = false;      // if true then only consider single h
 
 // EMDIPS parameters
 const int window_size = 11;
-const int sampling_method = 2;                    // 1 for default window sampling, or 2 for custom
+const int sampling_method = 1;                    // 1 for default window sampling, or 2 for custom
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;                     // Target log likelihood threshold to stop enumeration early
