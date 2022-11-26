@@ -125,6 +125,9 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample
     pf.retrieveTrajectories(trajectories, M);
 
     // cout << "resample count: " << resampCount << endl;
+    if(useSmoothTrajectories){
+        trajectories = pf.smoothTrajectories(trajectories);
+    }
 
     return obs_likelihood;
 }

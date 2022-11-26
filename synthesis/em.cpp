@@ -87,7 +87,8 @@ HA ldipsASP(HA ha, Obs state, Robot& robot){
         }
     }
 
-    return pointError(prevHA, ha, robot, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
+    return ha;
+    // return pointError(prevHA, ha, robot, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
@@ -229,7 +230,7 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& consolidated
                     last_transition_t=t;
                 }
             }
-            // MIDDLE BETNWEEN LAST TRANSITION AND ENDING
+            // MIDDLE BETWEEN LAST TRANSITION AND ENDING
             {
                 uint t=trajLength-1;
                 if(t-last_transition_t>1){

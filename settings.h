@@ -10,8 +10,8 @@ const int numRobots = 10;           // number of robots (depends on robot test s
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
-const double laChangeSpeed = 0.5;
-const double switchingError = 0.0;  // additional low-level action error standard deviation while transitioning
+const double laChangeSpeed = 1;
+const double switchingError = 0.4;  // additional low-level action error standard deviation while transitioning
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -52,7 +52,7 @@ const float max_error = 0.03;                     // Target log likelihood thres
 const int batch_size = 8;
 const int max_examples = 40;
 const int programs_enumerated = 7;
-const bool useSafePointError = true;              // "safe" transitions (only allow user-specified transitions)
+const bool useSafePointError = false;              // "safe" transitions (only allow user-specified transitions)
 
 // Plot parameters
 const int particlesPlotted = 100;
@@ -65,4 +65,5 @@ const float resampleThreshold = 1.0;                            // higher = more
 const double pf_stddevError = 0.1;
 const float obsLikelihoodStrength = 1.0;                        // lower = stricter observation likelihood
 const int end_pf_err = 0;                                       // ignores last n timesteps because they didn't have a chance to get resampled
-const bool useSimplifiedMotorModel = false;                      // Use simulation motor model or a simplified version
+const bool useSimplifiedMotorModel = true;                      // Use simulation motor model or a simplified version
+const bool useSmoothTrajectories = false;                       // "Smooth" trajectories by removing single outlier timesteps

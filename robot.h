@@ -112,33 +112,16 @@ class Robot {
         }
         
         if(ha == ACC){
-            if(useSimplifiedMotorModel){
-                newLa.acc = min(prevLa.acc + change, accMax);
-            } else {
-                newLa.acc = min(prevLa.acc + change * 2, accMax);
-            }
-            
+            newLa.acc = min(prevLa.acc + change, accMax);
             // la.acc = accMax;
         } else if (ha == DEC) {
-            if(useSimplifiedMotorModel){
-                newLa.acc = max(prevLa.acc - change, decMax);
-            } else {
-                newLa.acc = max(prevLa.acc - change * 2, decMax);
-            }
-            
+            newLa.acc = max(prevLa.acc - change, decMax);
             // la.acc = decMax;
         } else {
-            if(useSimplifiedMotorModel){
-                if(prevLa.acc < 0)
-                    newLa.acc = min(0.0, prevLa.acc + change);
-                if(prevLa.acc > 0)
-                    newLa.acc = max(0.0, prevLa.acc - change);
-            } else {
-                if(prevLa.acc < 0)
-                    newLa.acc = min(0.0, prevLa.acc + change*2);
-                if(prevLa.acc > 0)
-                    newLa.acc = max(0.0, prevLa.acc - change*2);
-            }
+            if(prevLa.acc < 0)
+                newLa.acc = min(0.0, prevLa.acc + change);
+            if(prevLa.acc > 0)
+                newLa.acc = max(0.0, prevLa.acc - change);
             // la.acc = 0;
         }
 
