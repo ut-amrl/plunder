@@ -10,8 +10,8 @@ const int numRobots = 10;           // number of robots (depends on robot test s
 const int model = 3;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
-const double laChangeSpeed = 1;
-const double switchingError = 0.4;  // additional low-level action error standard deviation while transitioning
+const double laChangeSpeed = 2;
+const double switchingError = 0.3;  // additional low-level action error standard deviation while transitioning
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences
@@ -36,7 +36,7 @@ const double velErrorDev = 0.00;
 const int numIterations = 10;             // number of iterations in the expectation-maximization loop
 const int sampleSize = 10;                // number of trajectories to process then pass into EMDIPS, per robot
 const bool usePointError = true;          // point error: random transitions to a new high-level action
-const double pointAccuracy = 0.95;        // probability of a correct (ASP-consistent) high-level transition
+const double pointAccuracy = 0.9;        // probability of a correct (ASP-consistent) high-level transition
 const int structuralChangeFrequency = 1;  // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 const bool hardcode_program = false;      // if true then only consider single hardcoded program structure
 
@@ -44,14 +44,14 @@ const bool hardcode_program = false;      // if true then only consider single h
 // TODO: move to here; find a way to efficiently retrieve them from here to the Python script
 
 // EMDIPS parameters
-const int window_size = 11;
+const int window_size = -1;
 const int sampling_method = 1;                    // 1 for default window sampling, or 2 for custom
 const int feature_depth = 3;
 const int sketch_depth = 2;
 const float max_error = 0.03;                     // Target log likelihood threshold to stop enumeration early
 const int batch_size = 8;
-const int max_examples = 40;
-const int programs_enumerated = 7;
+const int max_examples = 100;
+const int programs_enumerated = 15;
 const bool useSafePointError = false;              // "safe" transitions (only allow user-specified transitions)
 
 // Plot parameters
@@ -63,7 +63,7 @@ const int numParticles = 20000;                                  // number of pa
 const int numTrajectories = max(sampleSize, particlesPlotted);  // number of particle trajectories sampled to be fed into the maximization step
 const float resampleThreshold = 1.0;                            // higher = more resampling
 const double pf_stddevError = 0.1;
-const float obsLikelihoodStrength = 1.0;                        // lower = stricter observation likelihood
+const float obsLikelihoodStrength = 2;                        // lower = stricter observation likelihood
 const int end_pf_err = 0;                                       // ignores last n timesteps because they didn't have a chance to get resampled
-const bool useSimplifiedMotorModel = true;                      // Use simulation motor model or a simplified version
+const bool useSimplifiedMotorModel = false;                      // Use simulation motor model or a simplified version
 const bool useSmoothTrajectories = false;                       // "Smooth" trajectories by removing single outlier timesteps
