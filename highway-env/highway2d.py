@@ -5,6 +5,7 @@ import os
 import numpy as np
 import math
 import random
+from typing import List, Tuple, Union, Optional
 
 ######## Configuration ########
 lane_diff = 0.25 # Distance lanes are apart from each other
@@ -14,6 +15,7 @@ env = gym.make('highway-v0')
 env.config['simulation_frequency']=20
 env.config['policy_frequency']=2 # Runs once every 10 simulation steps
 env.config['lanes_count']=lanes_count
+
 # Observations
 # ego vehicle:      presence, x, y, vx, vy
 # 9 other vehicles: presence, x, y, vx, vy        (relative to ego)
@@ -24,7 +26,17 @@ env.config['observation']={
     'absolute': False
 }
 
-highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 50 # Acceleration / Deceleration
+ACTIONS_ALL = { # A mapping of action indexes to labels
+    0: 'LANE_LEFT',
+    1: 'IDLE',
+    2: 'LANE_RIGHT',
+    3: 'FASTER',
+    4: 'SLOWER'
+}
+
+highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(20, 30, 5) # Speed bounds
+highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 5 # Acceleration / Deceleration
+
 env.reset()
 
 ######## ASP ########
@@ -107,15 +119,42 @@ def prob_asp(ego, closest):
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
 
+# copied from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
+# which also contains motor model
+def get_la(self, action: Union[dict, str] = None) -> None:
+    la = {"steering": self.steering_control(self.target_lane_index),
+            "acceleration": self.speed_control(self.target_speed)}
+    return la
+
+
+
 ######## Simulation ########
-action = env.action_type.actions_indexes["IDLE"]
+ha = env.action_type.actions_indexes["FASTER"]
+obs_out = open("obs_out.csv", "w")
+obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, steering, acc, HA\n")
+
+
+
 for _ in range(1000):
-    obs, reward, done, truncated, info = env.step(action)
+    obs, reward, done, truncated, info = env.step(ha)
     env.render()
 
     # Pre-process observations
     obs = classifyLane(obs)
     closest = closestVehicles(obs)
 
+    # Run motor model
+    la = get_la(env.vehicle, ha)
+
+    for v in closest:
+        for prop in v:
+            obs_out.write(str(prop)+", ")
+    obs_out.write(str(la['steering'])+", ")
+    obs_out.write(str(la['acceleration'])+", ")
+    obs_out.write(ACTIONS_ALL[ha])
+    obs_out.write("\n")
+    
     # Run ASP
-    action = prob_asp(obs[0], closest)
+    ha = prob_asp(env.vehicle, closest)
+
+obs_out.close()
