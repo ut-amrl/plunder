@@ -155,6 +155,6 @@ for _ in range(1000):
     obs_out.write("\n")
     
     # Run ASP
-    ha = prob_asp(env.vehicle, closest)
+    ha = prob_asp(obs[0], closest)
 
 obs_out.close()
