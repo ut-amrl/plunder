@@ -22,8 +22,6 @@ void assertConstraints() {
     assert(model >= 0 && model < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
 
     assert(stddevError >= 0 && "Standard deviation must be positive");
-    assert(pf_stddevError >= 0 && "Standard deviation must be positive");
-    assert(pf_stddevError >= stddevError && "PF stddev must be greater than actual stddev");
     assert(obsLikelihoodStrength >= 0 && obsLikelihoodStrength <= 1 && "Observation likelihood strength must be between 0 and 1");
 
     assert(pointAccuracy >= 0 && pointAccuracy <= 1 && "HA probability must be between 0 and 1");

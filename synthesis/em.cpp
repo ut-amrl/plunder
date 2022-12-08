@@ -154,7 +154,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
     return examples;
 }
 
-void sampleFromExamples(vector<Example>& consolidated, vector<Example>& sampleOfExamples){
+void sample(vector<Example>& consolidated, vector<Example>& sample){
     shuffle(begin(consolidated), end(consolidated), default_random_engine {});
 
     std::sort(consolidated.begin(), consolidated.end(), [](const Example& a, const Example& b) -> bool {
@@ -168,26 +168,32 @@ void sampleFromExamples(vector<Example>& consolidated, vector<Example>& sampleOf
 
     int count = 0;
     for(int i = 0; i < consolidated.size(); i++) {
-        if(i != 0 && (consolidated[i].start_.GetString() != consolidated[i-1].start_.GetString() || 
-                        consolidated[i].result_.GetString() != consolidated[i-1].result_.GetString())) {
+        string start = consolidated[i].start_.GetString();
+        string end = consolidated[i].result_.GetString();
+        if(i != 0 && (start != consolidated[i-1].start_.GetString() || 
+                        end != consolidated[i-1].result_.GetString())) {
             count = 0;
         } else {
+            int max_examples = (start == end) ? max_examples_same : max_examples_diff;
             if(count < max_examples) {
                 count++;
-                sampleOfExamples.push_back(consolidated[i]);
+                sample.push_back(consolidated[i]);
             }
         }
     }
 }
 
-void sample1(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
+void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
+    for(int i = 0; i < allExamples.size(); i++){
+        allExamples[i] = WindowExamples(allExamples[i], window_size);
+    }
+
     for(vector<Example>& each : allExamples){
         consolidated.insert(end(consolidated), begin(each), end(each));
     }
-    consolidated = WindowExamples(consolidated, window_size);
 }
 
-void sample2(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
+void merge2(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
     for(uint r=0; r<numRobots; r++){
         uint trajLength = allExamples[r].size()/sampleSize;
         for(uint i=0; i<sampleSize; i++){
@@ -245,18 +251,15 @@ void sample2(vector<vector<Example>>& allExamples, vector<Example>& consolidated
 
 // Maximization step
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
-    
-
     vector<Example> consolidated;
-    vector<Example> sampleOfExamples;
-    if(sampling_method==1) sample1(allExamples, consolidated);
-    else if(sampling_method==2) sample2(allExamples, consolidated);
+    vector<Example> samples;
+    if(sampling_method==1) default_merge(allExamples, consolidated);
+    else if(sampling_method==2) merge2(allExamples, consolidated);
     else cout << "ERROR: INVALID SAMPLING METHOD" << endl;
-    sampleFromExamples(consolidated, sampleOfExamples);
-    // cout << "Number of examples: sampled " << sampleOfExamples.size() << " examples out of " << consolidated.size() << " total\n";
+    sample(consolidated, samples);
+    cout << "Number of examples: sampled " << samples.size() << " examples out of " << consolidated.size() << " total\n";
 
-
-    // for(Example e: sampleOfExamples){
+    // for(Example e: sample){
     //     printExampleInfo(e);
     // }
 
@@ -270,7 +273,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     if(iteration % structuralChangeFrequency == 0 && !hardcode_program){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
-        vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, sampleOfExamples, library,
+        vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
                                             feature_depth, &sigs);
 
         cout << "---- Number of Features Enumerated ----" << endl;
@@ -292,7 +295,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
+        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
 
     } else {
         
@@ -300,7 +303,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         string aspFilePath = aspPathBase + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        eo = emdipsL3(sampleOfExamples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
+        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
 
     }
 
