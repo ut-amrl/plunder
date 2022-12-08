@@ -6,7 +6,6 @@ import numpy as np
 import math
 import random
 from typing import List, Tuple, Union, Optional
-import keyboard
 
 ######## Configuration ########
 lane_diff = 0.25 # Distance lanes are apart from each other
@@ -16,6 +15,7 @@ env = gym.make('highway-v0')
 env.config['simulation_frequency']=20
 env.config['policy_frequency']=2 # Runs once every 10 simulation steps
 env.config['lanes_count']=lanes_count
+
 # Observations
 # ego vehicle:      presence, x, y, vx, vy
 # 9 other vehicles: presence, x, y, vx, vy        (relative to ego)
@@ -26,7 +26,17 @@ env.config['observation']={
     'absolute': False
 }
 
-highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 50 # Acceleration / Deceleration
+ACTIONS_ALL = { # A mapping of action indexes to labels
+    0: 'LANE_LEFT',
+    1: 'IDLE',
+    2: 'LANE_RIGHT',
+    3: 'FASTER',
+    4: 'SLOWER'
+}
+
+highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(20, 30, 5) # Speed bounds
+highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 5 # Acceleration / Deceleration
+
 env.reset()
 
 ######## ASP ########
@@ -109,43 +119,19 @@ def prob_asp(ego, closest):
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
 
-
 # copied from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # which also contains motor model
 def get_la(self, action: Union[dict, str] = None) -> None:
-    """
-    Perform a high-level action to change the desired lane or speed.
-    - If a high-level action is provided, update the target speed and lane;
-    - then, perform longitudinal and lateral control.
-    :param action: a high-level action
-    """
-    self.follow_road()
-    if action == "FASTER":
-        self.target_speed += self.DELTA_SPEED
-    elif action == "SLOWER":
-        self.target_speed -= self.DELTA_SPEED
-    elif action == "LANE_RIGHT":
-        _from, _to, _id = self.target_lane_index
-        target_lane_index = _from, _to, np.clip(_id + 1, 0, len(self.road.network.graph[_from][_to]) - 1)
-        if self.road.network.get_lane(target_lane_index).is_reachable_from(self.position):
-            self.target_lane_index = target_lane_index
-    elif action == "LANE_LEFT":
-        _from, _to, _id = self.target_lane_index
-        target_lane_index = _from, _to, np.clip(_id - 1, 0, len(self.road.network.graph[_from][_to]) - 1)
-        if self.road.network.get_lane(target_lane_index).is_reachable_from(self.position):
-            self.target_lane_index = target_lane_index
-
-    action = {"steering": self.steering_control(self.target_lane_index),
-                "acceleration": self.speed_control(self.target_speed)}
-    action['steering'] = np.clip(action['steering'], -self.MAX_STEERING_ANGLE, self.MAX_STEERING_ANGLE)
-    return action
+    la = {"steering": self.steering_control(self.target_lane_index),
+            "acceleration": self.speed_control(self.target_speed)}
+    return la
 
 
 
 ######## Simulation ########
-ha = env.action_type.actions_indexes["IDLE"]
+ha = env.action_type.actions_indexes["FASTER"]
 obs_out = open("obs_out.csv", "w")
-obs_out.write("l_present, l_x, l_y, l_vx, l_vy, f_present, f_x, f_y, f_vx, f_vy, r_present, r_x, r_y, r_vx, r_vy, steering, acc, HA\n")
+obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, steering, acc, HA\n")
 
 
 
@@ -157,9 +143,7 @@ for _ in range(1000):
     obs = classifyLane(obs)
     closest = closestVehicles(obs)
 
-
-    # Run ASP
-    ha = prob_asp(obs[0], closest)
+    # Run motor model
     la = get_la(env.vehicle, ha)
 
     for v in closest:
@@ -167,7 +151,10 @@ for _ in range(1000):
             obs_out.write(str(prop)+", ")
     obs_out.write(str(la['steering'])+", ")
     obs_out.write(str(la['acceleration'])+", ")
-    obs_out.write(str(ha))
+    obs_out.write(ACTIONS_ALL[ha])
     obs_out.write("\n")
+    
+    # Run ASP
+    ha = prob_asp(env.vehicle, closest)
 
 obs_out.close()
