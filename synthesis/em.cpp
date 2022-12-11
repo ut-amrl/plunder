@@ -251,17 +251,10 @@ void merge2(vector<vector<Example>>& allExamples, vector<Example>& consolidated)
 
 // Maximization step
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
-    vector<Example> consolidated;
     vector<Example> samples;
-    if(sampling_method==1) default_merge(allExamples, consolidated);
-    else if(sampling_method==2) merge2(allExamples, consolidated);
+    if(sampling_method==1) default_merge(allExamples, samples);
+    else if(sampling_method==2) merge2(allExamples, samples);
     else cout << "ERROR: INVALID SAMPLING METHOD" << endl;
-    sample(consolidated, samples);
-    cout << "Number of examples: sampled " << samples.size() << " examples out of " << consolidated.size() << " total\n";
-
-    // for(Example e: sample){
-    //     printExampleInfo(e);
-    // }
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";

@@ -34,7 +34,7 @@ const double velErrorDev = 0.00;
 
 // EM Loop parameters
 const int numIterations = 10;             // number of iterations in the expectation-maximization loop
-const int sampleSize = 100;               // number of trajectories to process then pass into EMDIPS, per robot
+const int sampleSize = 10;               // number of trajectories to process then pass into EMDIPS, per robot
 const bool usePointError = true;          // point error: random transitions to a new high-level action
 const double pointAccuracy = 0.95;        // probability of a correct (ASP-consistent) high-level transition
 const int structuralChangeFrequency = 1;  // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
@@ -48,11 +48,11 @@ const int window_size = -1;                       // Size of sampling window. -1
 const int sampling_method = 1;                    // 1 for default window sampling, or 2 for custom
 const int feature_depth = 3;                      // Feature depth [using variables like v, vmax]
 const int sketch_depth = 2;                       // Number of conjunctions/disjunctions
-const float max_error = 0.03;                     // Target log likelihood threshold to stop enumeration early
+const float max_error = 0.3;                      // Target log likelihood threshold to stop enumeration early
 const int batch_size = 8;                         // Number of programs to optimize in parallel
-const int max_examples_diff = 50;                 // Total number of examples when a label changes
-const int max_examples_same = 150;                // Total number of examples when a label does not change
-const int programs_enumerated = 31;               // Number of programs to enumerate and optimize per iteration
+const int max_examples_diff = 50;                 // Total number of examples when a label changes [currently unused, see optimizer.py]
+const int max_examples_same = 150;                // Total number of examples when a label does not change [currently unused, optimizer.py]
+const int programs_enumerated = 7;               // Number of programs to enumerate and optimize per iteration
 const bool useSafePointError = false;             // "safe" transitions (only allow user-specified transitions)
 
 // Plot parameters
