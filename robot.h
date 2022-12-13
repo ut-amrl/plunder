@@ -28,7 +28,7 @@ struct LA { // Low-level actions
     double acc; // target acceleration
 };
 
-struct Obs { // State observations
+struct Obs { // Observations
     double pos; // position
     double vel; // velocity
 };
@@ -77,15 +77,12 @@ class Robot {
         target = _target;
         accErrDistr = _accErrDistr;
         pointAccuracy = _pointAccuracy;
-        cond1err = (((double) rand())/RAND_MAX-.5)*3;
-        cond2err = (((double) rand())/RAND_MAX-.5)*6;
-
         reset();
     }
 
     Robot(const Robot& other) : accMax(other.accMax), decMax(other.decMax), vMax(other.vMax), target(other.target),
                                 accErrDistr(other.accErrDistr), pointAccuracy(other.pointAccuracy),
-                                ha(other.ha), la(other.la), state(other.state), cond1err(other.cond1err), cond2err(other.cond2err) {
+                                ha(other.ha), la(other.la), obs(other.obs) {
 
     }
 
@@ -93,18 +90,15 @@ class Robot {
 
     HA ha;
     LA la;
-    Obs state;
-
-    double cond1err = 0;
-    double cond2err = 0;
+    Obs obs;
 
     // MOTION MODEL (ACTION-SELECTION POLICY): Transition to new high-level action based on current action and state
     void runASP(HA (*ASP) (HA, Obs, Robot&)){
-        ha = ASP(ha, state, *this);
+        ha = ASP(ha, obs, *this);
     }
 
     // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
-    LA motorModel(HA ha, Obs state, LA prevLa, bool error){
+    LA motorModel(HA ha, Obs obs, LA prevLa, bool error){
         double change = laChangeSpeed;
         LA newLa;
         if(error){
@@ -113,16 +107,13 @@ class Robot {
         
         if(ha == ACC){
             newLa.acc = min(prevLa.acc + change, accMax);
-            // la.acc = accMax;
         } else if (ha == DEC) {
             newLa.acc = max(prevLa.acc - change, decMax);
-            // la.acc = decMax;
         } else {
             if(prevLa.acc < 0)
                 newLa.acc = min(0.0, prevLa.acc + change);
             if(prevLa.acc > 0)
                 newLa.acc = max(0.0, prevLa.acc - change);
-            // la.acc = 0;
         }
 
         // Induce some additional lesser error
@@ -135,30 +126,30 @@ class Robot {
 
     // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
     void updatePhysics(double t_step){
-        double vPrev = state.vel;
-        double xPrev = state.pos;
+        double vPrev = obs.vel;
+        double xPrev = obs.pos;
         
         // Update velocity and displacement accordingly
-        state.vel = vPrev + la.acc * t_step;
+        obs.vel = vPrev + la.acc * t_step;
 
-        if(state.vel < robotEpsilon){ // Round to 0
-            state.vel = 0;
+        if(obs.vel < robotEpsilon){ // Round to 0
+            obs.vel = 0;
         }
 
-        if(abs(state.vel - vMax) < robotEpsilon){ // Round to vMax
-            state.vel = vMax;
+        if(abs(obs.vel - vMax) < robotEpsilon){ // Round to vMax
+            obs.vel = vMax;
         }
 
-        if(abs(state.pos - target) < robotEpsilon){ // Round to target
-            state.pos = target;
+        if(abs(obs.pos - target) < robotEpsilon){ // Round to target
+            obs.pos = target;
         }
 
-        state.pos = xPrev + (state.vel + vPrev)/2 * t_step;
+        obs.pos = xPrev + (obs.vel + vPrev)/2 * t_step;
     }
 
     void updateLA(){
         // Select some action (acceleration)
-        la = motorModel(ha, state, la, true);
+        la = motorModel(ha, obs, la, true);
     }
 
     // HELPER METHODS
@@ -166,9 +157,6 @@ class Robot {
     // Return the distance this robot would travel before stopping if it began decelerating immediately
     double DistTraveled(double v, double dec){
         return - v * v / (2 * dec);
-        // double ln = log(((decMax - activationMinAcc) * vMax) / ((decMax - activationMinAcc) * vMax - decMax * state.vel));
-        // double num = vMax * ((decMax - activationMinAcc) * vMax * ln - decMax * state.vel);
-        // return - num / (decMax * decMax);
     }
 
     // Seeded random generator
@@ -177,16 +165,10 @@ class Robot {
         return rv <= probTrue;
     }
 
-    // Robot has reached target and is at rest. End simulation.
-    bool finished(){
-        // return state.vel < robotEpsilon && state.pos >= target - robotEpsilon;
-        return false;
-    }
-
     // Reset robot
     void reset(){
         ha = ACC;
         la = LA { .acc = accMax };
-        state = Obs { .pos = 0, .vel = 0 };
+        obs = Obs { .pos = 0, .vel = 0 };
     }
 };

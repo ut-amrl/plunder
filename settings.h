@@ -7,7 +7,7 @@ using namespace std;
 // Robot parameters
 const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 11;           // number of robots (depends on robot test set)
-const int model = 3;                // which ASP to use
+const int model = 1;                // which ASP to use
 const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
 const double laChangeSpeed = 2;     // rate of change of acceleration (jerk)
@@ -26,11 +26,6 @@ const string gt_asp = "synthesis/gt_asp/";                      // Ground truth 
 const double T_STEP = .1;               // time step (s)
 const double T_TOT = 15;                // total time (s) per simulated scenario
 const double genAccuracy = 1.0;         // probability of a correct high-level transition
-const double activationMinAcc = 0.0;    // Minimum acceleration (acceleration will not go below this value, excluding 0)
-const double distErrorMean = 0.0;       // Perception error for distance
-const double distErrorDev = 0.00;
-const double velErrorMean = 0.0;        // Perception error for velocity
-const double velErrorDev = 0.00;
 
 // EM Loop parameters
 const int numIterations = 10;             // number of iterations in the expectation-maximization loop
@@ -45,13 +40,10 @@ const bool hardcode_program = false;      // if true then only consider single h
 
 // EMDIPS parameters
 const int window_size = -1;                       // Size of sampling window. -1 for n/a
-const int sampling_method = 1;                    // 1 for default window sampling, or 2 for custom
 const int feature_depth = 3;                      // Feature depth [using variables like v, vmax]
 const int sketch_depth = 2;                       // Number of conjunctions/disjunctions
-const float max_error = 0.3;                      // Target log likelihood threshold to stop enumeration early
+const float max_error = 0.3;                      // Target loss threshold to stop enumeration early
 const int batch_size = 8;                         // Number of programs to optimize in parallel
-const int max_examples_diff = 50;                 // Total number of examples when a label changes [currently unused, see optimizer.py]
-const int max_examples_same = 150;                // Total number of examples when a label does not change [currently unused, optimizer.py]
 const int programs_enumerated = 7;               // Number of programs to enumerate and optimize per iteration
 const bool useSafePointError = false;             // "safe" transitions (only allow user-specified transitions)
 

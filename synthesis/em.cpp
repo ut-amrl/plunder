@@ -56,10 +56,6 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     return ex;
 }
 
-float distt(float v, float d){
-    return - v * v / (2 * d);
-}
-
 void printExampleInfo(Example e){
     float x = e.symbol_table_["x"].GetFloat();
     float v = e.symbol_table_["v"].GetFloat();
@@ -154,35 +150,6 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
     return examples;
 }
 
-void sample(vector<Example>& consolidated, vector<Example>& sample){
-    shuffle(begin(consolidated), end(consolidated), default_random_engine {});
-
-    std::sort(consolidated.begin(), consolidated.end(), [](const Example& a, const Example& b) -> bool {
-        if(a.start_.GetString() == b.start_.GetString()){
-            if(a.start_.GetString() == a.result_.GetString()) return false;
-            if(b.start_.GetString() == b.result_.GetString()) return true;
-            return a.result_.GetString() < b.result_.GetString();
-        }
-        return a.start_.GetString() < b.start_.GetString();
-    });
-
-    int count = 0;
-    for(int i = 0; i < consolidated.size(); i++) {
-        string start = consolidated[i].start_.GetString();
-        string end = consolidated[i].result_.GetString();
-        if(i != 0 && (start != consolidated[i-1].start_.GetString() || 
-                        end != consolidated[i-1].result_.GetString())) {
-            count = 0;
-        } else {
-            int max_examples = (start == end) ? max_examples_same : max_examples_diff;
-            if(count < max_examples) {
-                count++;
-                sample.push_back(consolidated[i]);
-            }
-        }
-    }
-}
-
 void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
     for(int i = 0; i < allExamples.size(); i++){
         allExamples[i] = WindowExamples(allExamples[i], window_size);
@@ -193,68 +160,10 @@ void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consol
     }
 }
 
-void merge2(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
-    for(uint r=0; r<numRobots; r++){
-        uint trajLength = allExamples[r].size()/sampleSize;
-        for(uint i=0; i<sampleSize; i++){
-            uint last_transition_t=0;
-            for(uint t=window_size/2; t<trajLength-end_pf_err-window_size/2-1; t++){
-                Example e = allExamples[r][i*trajLength+t];
-                string expected_start = e.start_.GetString();
-                string expected_end = e.result_.GetString();
-                if(expected_start != expected_end){
-                    // CAPTURE MIDDLE BETWEEN THIS AND PREV TRANSITION - ADD CONSISTENCY
-                    if(t-last_transition_t>1){
-                        uint mid_t = (t+last_transition_t)/2;
-                        Example e_new = allExamples[r][i*trajLength+mid_t];
-                        if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
-                            consolidated.push_back(e_new);
-                        }
-                    }
-                    // LEFT OF TRANSITION
-                    for(uint w=1; w<=window_size/2; w+=1){
-                        Example e_new = allExamples[r][i*trajLength+t-w];
-                        if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_start){
-                            consolidated.push_back(e_new);
-                        } else break;
-                    }
-                    // MIDDLE OF TRANSITION
-                    {
-                        Example e_new = allExamples[r][i*trajLength+t];
-                        if(e_new.start_.GetString()==expected_start && e_new.result_.GetString()==expected_end){
-                            consolidated.push_back(e_new);
-                        }
-                    }
-                    // RIGHT OF TRANSITION
-                    for(uint w=1; w<=window_size/2; w+=1){
-                        Example e_new = allExamples[r][i*trajLength+t+w];
-                        if(e_new.start_.GetString()==expected_end && e_new.result_.GetString()==expected_end){
-                            e_new.start_ = e.start_;
-                            consolidated.push_back(e_new);
-                        } else break;
-                    }
-                    last_transition_t=t;
-                }
-            }
-            // MIDDLE BETWEEN LAST TRANSITION AND ENDING
-            {
-                uint t=trajLength-1;
-                if(t-last_transition_t>1){
-                    uint mid_t = (t+last_transition_t)/2;
-                    Example e_new = allExamples[r][i*trajLength+mid_t];
-                    consolidated.push_back(e_new);
-                }
-            }
-        }
-    }
-}
-
 // Maximization step
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
     vector<Example> samples;
-    if(sampling_method==1) default_merge(allExamples, samples);
-    else if(sampling_method==2) merge2(allExamples, samples);
-    else cout << "ERROR: INVALID SAMPLING METHOD" << endl;
+    default_merge(allExamples, samples);
 
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << max_error << "\n\n";
@@ -419,7 +328,6 @@ void emLoop(vector<Robot>& robots){
 
     for(int r = 0; r < numRobots; r++){
         // Run ground truth ASP
-
         string inputFile = stateGenPath + to_string(r) + ".csv";
         readData(inputFile, dataObs[r], dataLa[r]);
         string s = altPath+"gt-"+to_string(r)+".csv";
@@ -434,7 +342,7 @@ void emLoop(vector<Robot>& robots){
         cout << "|          Loop " << i << " EXPECTATION         |\n";
         cout << "|                                     |\n";
         cout << "|-------------------------------------|\n";
-        vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);      // uses preds
+        vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);
 
         // Maximization
         cout << "\n|-------------------------------------|\n";
@@ -442,7 +350,7 @@ void emLoop(vector<Robot>& robots){
         cout << "|         Loop " << i << " MAXIMIZATION         |\n";
         cout << "|                                     |\n";
         cout << "|-------------------------------------|\n";
-        maximization(examples, i);     // updates preds, which is used by transitionUsingASPTree
+        maximization(examples, i);
 
         curASP = ldipsASP;
 

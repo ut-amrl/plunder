@@ -18,18 +18,15 @@ using namespace std;
 
 // Initial distribution
 HA sampleInitialHA(){
-    // Distribution 1: Point distribution
-    return ACC;
-
-    // Distribution 2: Uniformly Randomly Distributed
-    // double rv = ((double) rand()) / RAND_MAX;
-    // if(rv <= 0.33){
-    //     return ACC;
-    // } else if (rv <= 0.67){
-    //     return DEC;
-    // } else {
-    //     return CON;
-    // }
+    // Uniformly Randomly Distributed
+    double rv = ((double) rand()) / RAND_MAX;
+    if(rv <= 0.33){
+        return ACC;
+    } else if (rv <= 0.67){
+        return DEC;
+    } else {
+        return CON;
+    }
 }
 
 // Calculate pdf of N(mu, sigma) at x, then take the natural log
@@ -37,7 +34,6 @@ FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
     return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
 }
 
-// Remember to change GT_ASP to OR (ACC->CON)
 FLOAT pfMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
     double mean = 0;
     double stddev = min(r.accMax, abs(r.decMax));
@@ -47,7 +43,6 @@ FLOAT pfMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
     return logpdf(la.acc, mean, obsLikelihoodStrength * stddev);
 }
 
-// Remember to change GT_ASP to AND (ACC->CON)
 FLOAT robotMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
     double mean = r.motorModel(ha, obs, prevLA, false).acc; // should be using the previous LA
     return logpdf(la.acc, mean, obsLikelihoodStrength * stddevError);

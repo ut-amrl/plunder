@@ -83,11 +83,11 @@ public:
     }
 };
 
-void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double haProbCorrect, string outputPath){
+void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double genAccuracy, string outputPath){
     
     // Initialization
     normal_distribution<double> accErrDistr(accErrMean, accErrStdDev);
-    vector<Robot> robots = getRobotSet(robotTestSet, accErrDistr, haProbCorrect);
+    vector<Robot> robots = getRobotSet(robotTestSet, accErrDistr, genAccuracy);
     
     // Setup JSON
     ofstream jsonFile;
@@ -132,10 +132,6 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
                 if(first) first = false;
                 else jsonFile << ",";
                 jsonFile << rio.getJsonRow() << endl;
-            }
-            
-            if(robots[i].finished()){
-                break;
             }
         }
 
