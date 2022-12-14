@@ -53,8 +53,8 @@ const double genAccuracy = 1.0;         // probability of a correct high-level t
 // EM Loop parameters
 const int numIterations = 10;             // number of iterations in the expectation-maximization loop
 const int sampleSize = 10;               // number of trajectories to process then pass into EMDIPS, per robot
-const bool usePointError = true;          // point error: random transitions to a new high-level action
-const double pointAccuracy = 0.95;        // probability of a correct (ASP-consistent) high-level transition
+bool usePointError = true;                // point error: random transitions to a new high-level action
+const double pointAccuracy = 0.9;        // probability of a correct (ASP-consistent) high-level transition
 const int structuralChangeFrequency = 1;  // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 const bool hardcode_program = false;      // if true then only consider single hardcoded program structure
 

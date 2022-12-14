@@ -153,6 +153,9 @@ void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){
     ofstream outFile;
     outFile.open(outputFile);
 
+    bool pointError = usePointError;
+    usePointError = false;
+
     for(uint n=0; n<particlesPlotted; n++){
         r.reset();
         outFile << r.state.ha << ",";
@@ -166,4 +169,6 @@ void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){
         outFile << endl;
     }
     outFile.close();
+
+    usePointError = pointError;
 }

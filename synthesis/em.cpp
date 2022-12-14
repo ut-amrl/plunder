@@ -67,8 +67,8 @@ HA emdipsASP(State state, Robot& robot){
         }
     }
 
-    return state.ha;
-    // return pointError(ha, pointAccuracy, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
+    // return state.ha;
+    return pointError(state.ha, pointAccuracy, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
