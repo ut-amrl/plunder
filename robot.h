@@ -1,174 +1,208 @@
 #pragma once
 
-#include <iostream>
-#include <random>
-#include <fstream>
-#include <iomanip>
-#include <algorithm>
-
-#include "settings.h"
-
-#define PRECISION 10
-#define robotEpsilon 10E-10
-#define SEED 0 // Random seed
+#include "domain.h"
+#include "utils.h"
 
 using namespace std;
 
-// ----- Markov System definitions ---------------------------------------------
+// -----------------------------------------------------------------------------
+// ----- Robot Class--- --------------------------------------------------------
+// -----------------------------------------------------------------------------
+class Robot;
 
-enum HA { // High-level actions
-    ACC, // Constant acceleration
-    DEC, // Constant deceleration
-    CON  // No acceleration
-};
-
-const uint numHA = 3;
-
-struct LA { // Low-level actions
-    double acc; // target acceleration
-};
-
-struct Obs { // Observations
-    double pos; // position
-    double vel; // velocity
-};
-
-// Random error distributions
-random_device rd;
-default_random_engine gen(SEED);
-
-// Helper functions
-string HAToString(HA ha){
-    if(ha == ACC) return "ACC";
-    if(ha == DEC) return "DEC";
-    if(ha == CON) return "CON";
-    return "CON";
-}
-
-HA stringToHA(string str){
-    if(str == "ACC") return ACC;
-    if(str == "DEC") return DEC;
-    if(str == "CON") return CON;
-    return CON;
-}
-
-
-// ----- Robot Class ---------------------------------------------
+typedef HA asp(State, Robot&);
+typedef LA motor(State, Robot&, bool);
+typedef Obs phys(State, Robot&, double);
 
 class Robot {
+public:
 
-    private:
-    public:
-
-    // Constant inputs into LDIPS
+    // ------- Robot parameters -----------
     double accMax; // Maximum constant acceleration
     double decMax; // Maximum constant deceleration 
     double vMax;   // Maximum velocity
     double target; // Target distance
 
+    State state;
 
-    normal_distribution<double> accErrDistr;      // Acceleration error distribution
-    double pointAccuracy;                         // Probability of transitioning to the correct high-level action
-
-    Robot(double _accMax, double _decMax, double _vMax, double _target, normal_distribution<double> _accErrDistr, double _pointAccuracy){
-        accMax = _accMax;
-        decMax = _decMax;
-        vMax = _vMax;
-        target = _target;
-        accErrDistr = _accErrDistr;
-        pointAccuracy = _pointAccuracy;
+    Robot(double _accMax, double _decMax, double _vMax, double _target) : accMax(_accMax), decMax(_decMax), vMax(_vMax), target(_target) {
         reset();
-    }
-
-    Robot(const Robot& other) : accMax(other.accMax), decMax(other.decMax), vMax(other.vMax), target(other.target),
-                                accErrDistr(other.accErrDistr), pointAccuracy(other.pointAccuracy),
-                                ha(other.ha), la(other.la), obs(other.obs) {
-
     }
 
     Robot() {}
 
-    HA ha;
-    LA la;
-    Obs obs;
-
-    // MOTION MODEL (ACTION-SELECTION POLICY): Transition to new high-level action based on current action and state
-    void runASP(HA (*ASP) (HA, Obs, Robot&)){
-        ha = ASP(ha, obs, *this);
-    }
-
-    // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
-    LA motorModel(HA ha, Obs obs, LA prevLa, bool error){
-        double change = laChangeSpeed;
-        LA newLa;
-        if(error){
-            change += accErrDistr(gen) * (switchingError / stddevError);
-        }
-        
-        if(ha == ACC){
-            newLa.acc = min(prevLa.acc + change, accMax);
-        } else if (ha == DEC) {
-            newLa.acc = max(prevLa.acc - change, decMax);
-        } else {
-            if(prevLa.acc < 0)
-                newLa.acc = min(0.0, prevLa.acc + change);
-            if(prevLa.acc > 0)
-                newLa.acc = max(0.0, prevLa.acc - change);
-        }
-
-        // Induce some additional lesser error
-        if(error){
-            newLa.acc += accErrDistr(gen);
-        }
-
-        return newLa;
-    }
-
-    // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
-    void updatePhysics(double t_step){
-        double vPrev = obs.vel;
-        double xPrev = obs.pos;
-        
-        // Update velocity and displacement accordingly
-        obs.vel = vPrev + la.acc * t_step;
-
-        if(obs.vel < robotEpsilon){ // Round to 0
-            obs.vel = 0;
-        }
-
-        if(abs(obs.vel - vMax) < robotEpsilon){ // Round to vMax
-            obs.vel = vMax;
-        }
-
-        if(abs(obs.pos - target) < robotEpsilon){ // Round to target
-            obs.pos = target;
-        }
-
-        obs.pos = xPrev + (obs.vel + vPrev)/2 * t_step;
-    }
-
-    void updateLA(){
-        // Select some action (acceleration)
-        la = motorModel(ha, obs, la, true);
-    }
-
-    // HELPER METHODS
-
-    // Return the distance this robot would travel before stopping if it began decelerating immediately
-    double DistTraveled(double v, double dec){
-        return - v * v / (2 * dec);
-    }
-
-    // Seeded random generator
-    bool sampleDiscrete(double probTrue){
-        double rv = ((double) rand())/RAND_MAX;
-        return rv <= probTrue;
-    }
+    void runASP(asp*);
+    void updateLA(motor*);
+    void updateObs(phys*, double);
 
     // Reset robot
     void reset(){
-        ha = ACC;
-        la = LA { .acc = accMax };
-        obs = Obs { .pos = 0, .vel = 0 };
+        state = {};
     }
 };
+
+
+// ACTION-SELECTION POLICY: Transition to new high-level action based on current action and state
+// ----- Curated Selection of ASPs ---------------------------------------------
+
+/*
+* This is a hand-crafted, non-probabilistic action-selection policy.
+*/
+HA ASP_Hand(State state, Robot& r){
+    Obs obs = state.obs;
+    HA ha = state.ha;
+
+    double xToTarget = r.target - obs.pos;                                  // distance to the target
+
+    bool cond1 = obs.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < epsilon;  // needs to decelerate or else it will pass target
+
+    if(ha == ACC){                          // transitions starting with ACC
+        if(cond1 && !cond2) ha=CON;         // ACC -> CON (expected)
+        else if(cond2) ha=DEC;              // ACC -> DEC (expected)
+        else ha=ACC;                           // "no transition" is the default
+    }
+    else if(ha == CON){                          // transitions starting with CON
+        // if(!cond1 && !cond2) ha=ACC;        // CON -> ACC (rare)
+        if(false) ha=ACC;
+        else if(cond2) ha=DEC;              // CON -> DEC (expected)
+        else ha=CON;                           // "no transition" is the default
+    }
+    else if(ha == DEC){
+        // if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        // else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        if(false) ha=ACC;
+        else if(false) ha=CON;
+        else ha=DEC;                           // "no transition" is the default
+    }
+
+    return ha;
+}
+
+/*
+* This is a probabilistic hand-crafted action-selection policy.
+*/
+HA ASP_Hand_prob(State state, Robot& r){
+    Obs obs = state.obs;
+    HA ha = state.ha;
+
+    double xToTarget = r.target - obs.pos;                            // distance to the target
+
+    bool cond1 = obs.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < epsilon;  // needs to decelerate or else it will pass target
+
+    bool cond1smooth = flip(logistic(0, 2.5, obs.vel - r.vMax));
+    bool cond2smooth = flip(logistic(0, -1, xToTarget - DistTraveled(obs.vel, r.decMax)));
+
+    if(ha == ACC){                          // transitions starting with ACC
+        if(cond1smooth && !cond2smooth) ha=CON;         // ACC -> CON (expected)
+        else if(cond2smooth) ha=DEC;              // ACC -> DEC (expected)
+        else ha=ACC;                           // "no transition" is the default
+    }
+    else if(ha == CON){                          // transitions starting with CON
+        // if(!cond1smooth && !cond2smooth) ha=ACC;        // CON -> ACC (rare)
+        if(false) ha=ACC;        // CON -> ACC (rare)
+        else if(cond2smooth) ha=DEC;              // CON -> DEC (expected)
+        else ha=CON;                           // "no transition" is the default
+    }
+    else if(ha == DEC){
+        // if(!cond1 && !cond2) ha=ACC;        // DEC -> ACC (0)
+        // else if(cond1 && !cond2) ha=CON;    // DEC -> CON (0)
+        if(false) ha=ACC;        // DEC -> ACC (0)
+        else if(false) ha=CON;    // DEC -> CON (0)
+        else ha=DEC;                           // "no transition" is the default
+    }
+
+    return ha;
+}
+
+/*
+* This is a uniformly random ASP.
+*/
+HA ASP_random(State state, Robot& r){
+    int mod = rand() % numHA;
+    HA ha = static_cast<HA>(mod);
+
+    return ha;
+}
+
+// Select an ASP to use
+vector<asp*> ASPs = { &ASP_Hand,              // 0
+                      &ASP_Hand_prob,         // 1
+                      &ASP_random,            // 2
+                    };
+
+asp* ASP_model(int model){
+    return ASPs[model];
+}
+
+// MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
+normal_distribution<double> la_error = normal_distribution<double>(meanError, stddevError);
+LA motorModel(State state, Robot& r, bool error){
+    HA ha = state.ha; LA la = state.la; Obs obs = state.obs;
+
+    double change = laChangeSpeed;
+    if(error){
+        change += la_error(gen) * (switchingError / stddevError);
+    }
+    
+    if(ha == ACC){
+        la.acc = min(la.acc + change, r.accMax);
+    } else if (ha == DEC) {
+        la.acc = max(la.acc - change, r.decMax);
+    } else {
+        if(la.acc < 0)
+            la.acc = min(0.0, la.acc + change);
+        if(la.acc > 0)
+            la.acc = max(0.0, la.acc - change);
+    }
+
+    // Induce some additional lesser error
+    if(error){
+        la.acc += la_error(gen);
+    }
+
+    return la;
+}
+
+
+
+// PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
+Obs physicsModel(State state, Robot& r, double t_step){
+    Obs obs = state.obs;
+    LA la = state.la;
+
+    double vPrev = obs.vel;
+    double xPrev = obs.pos;
+    
+    // Update velocity and displacement accordingly
+    obs.vel = vPrev + la.acc * t_step;
+
+    if(obs.vel < epsilon){ // Round to 0
+        obs.vel = 0;
+    }
+
+    if(abs(obs.vel - r.vMax) < epsilon){ // Round to vMax
+        obs.vel = r.vMax;
+    }
+
+    if(abs(obs.pos - r.target) < epsilon){ // Round to target
+        obs.pos = r.target;
+    }
+
+    obs.pos = xPrev + (obs.vel + vPrev)/2 * t_step;
+
+    return obs;
+}
+
+void Robot::runASP(asp* ASP = ASP_Hand_prob){
+    this->state.ha = ASP(state, *this);
+}
+
+void Robot::updateLA(motor* motor_model = motorModel){
+    this->state.la = motor_model(state, *this, true);
+}
+
+void Robot::updateObs(phys* phys_model = physicsModel, double t_step = T_STEP){
+    this->state.obs = phys_model(state, *this, t_step);
+}

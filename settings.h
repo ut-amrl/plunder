@@ -1,6 +1,15 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <iostream>
+#include <random>
+#include <fstream>
+#include <iomanip>
+#include <algorithm>
+#include <sstream>
+#include <assert.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -12,6 +21,7 @@ const double meanError = 0.0;       // low-level action error
 const double stddevError = 0.1;     // low-level action error standard deviation
 const double laChangeSpeed = 2;     // rate of change of acceleration (jerk)
 const double switchingError = 0.3;  // additional low-level action error standard deviation while transitioning
+const double epsilon = 10E-10;
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences

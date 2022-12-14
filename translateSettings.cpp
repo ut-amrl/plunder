@@ -1,13 +1,6 @@
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <assert.h>
-
 #include "settings.h"
 #include "robot.h"
 #include "accSim/robotSets.h"
-#include "accSim/asps.h"
 
 using namespace std;
 
@@ -17,7 +10,7 @@ uint numSpaces = 30;
 
 void assertConstraints() {
     assert(robotTestSet >= 0 && robotTestSet <= 2 && "Robot test set must be between 0 and 2");
-    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(0, 0), 0);
+    vector<Robot> robots = getRobotSet(robotTestSet);
     assert(numRobots <= robots.size() && "numRobots does not match size of test set");
     assert(model >= 0 && model < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
 
