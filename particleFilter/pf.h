@@ -1,42 +1,17 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <cmath>
-#include <algorithm>
-#include <cassert>
-#include <numeric>
-
 #include "robot.h"
-#include "accSim/asps.h"
 
 using namespace std;
-
-#define FLOAT double // Set to double (for precision) or float (for speed)
-
-#define PF_SEED time(0)
 
 static uint resampCount = 0; // Debug
 
 // ----- Helper Functions ---------------------------------------------
 
-// Exponentiate some values, take their sum, then take the log of the sum
-FLOAT logsumexp(vector<FLOAT>& vals) {
-    if (vals.size() == 0){
-        return 0;
-    }
-
-    FLOAT max_elem = *max_element(vals.begin(), vals.end());
-    FLOAT sum = accumulate(vals.begin(), vals.end(), 0.0, 
-        [max_elem](FLOAT a, FLOAT b) { return a + exp(b - max_elem); });
-    
-    return max_elem + log(sum);
-}
-
 // Metric to calculate "effective" particles
-FLOAT effectiveParticles(vector<FLOAT>& weights){
-    FLOAT sum = 0;
-    for(FLOAT x: weights){
+double effectiveParticles(vector<double>& weights){
+    double sum = 0;
+    for(double x: weights){
         sum += x * x;
     }
     return 1 / sum;
@@ -45,19 +20,19 @@ FLOAT effectiveParticles(vector<FLOAT>& weights){
 // Resample particles given their current weights. 
 // This method performs the resampling systematically to reduce variance.
 template <typename HA>
-vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int>& ancestor){
+vector<HA> systematicResample(vector<HA>& ha, vector<double>& weights, vector<int>& ancestor){
     resampCount++;
     int n = weights.size();
-    vector<FLOAT> cumulativeWeights;
+    vector<double> cumulativeWeights;
     vector<HA> haResampled;
-    FLOAT runningSum = 0;
-    for(FLOAT w: weights){
+    double runningSum = 0;
+    for(double w: weights){
         runningSum += w;
         cumulativeWeights.push_back(runningSum);
     }
 
-    FLOAT interval = 1.0 / (FLOAT) n;
-    FLOAT pos = ((FLOAT) rand()) / RAND_MAX * interval; // Initial offset
+    double interval = 1.0 / (double) n;
+    double pos = ((double) rand()) / RAND_MAX * interval; // Initial offset
     for(int i = 0, j = 0; i < n; i++){
 
         while(cumulativeWeights[j] < pos){
@@ -71,7 +46,6 @@ vector<HA> systematicResample(vector<HA>& ha, vector<FLOAT>& weights, vector<int
 }
 
 
-
 // ----- Markov System ---------------------------------------------
 
 template<typename HA, typename LA, typename Obs, typename RobotClass>
@@ -81,14 +55,14 @@ class MarkovSystem {
     public:
 
     HA (*sampleInitialHA)(); // Initial distribution
-    HA (*ASP)(HA prevHa, Obs prevObs, RobotClass& r); // Provided action-selection policy
-    FLOAT (*logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs, LA prevLA); // Calculate likelihood of observed LA given the simulated HA sequence
+    HA (*ASP)(State prevState, RobotClass& r); // Provided action-selection policy
+    double (*logLikelihoodGivenMotorModel)(State state, RobotClass& r, LA prevLA); // Calculate likelihood of observed LA given the simulated HA sequence
     RobotClass r;
 
     // Constructor
     MarkovSystem(HA (*_sampleInitialHA)(), 
-                HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
-                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs, LA prevLA),
+                HA (*_ASP)(State prevState, RobotClass& r),
+                double (*_logLikelihoodGivenMotorModel)(State state, RobotClass& r, LA prevLA),
                 RobotClass& _r):
 
                 sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
@@ -96,9 +70,8 @@ class MarkovSystem {
     
     // Robot-less constructor
     MarkovSystem(HA (*_sampleInitialHA)(), 
-                HA (*_ASP)(HA prevHa, Obs prevObs, RobotClass& r),
-                FLOAT (*_logLikelihoodGivenMotorModel)(RobotClass& r, LA la, HA ha, Obs obs, LA prevLA)):
-
+                HA (*_ASP)(State prevState, RobotClass& r),
+                double (*_logLikelihoodGivenMotorModel)(State state, RobotClass& r, LA prevLA)) :
                 sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
     {}
 };
@@ -135,9 +108,9 @@ class ParticleFilter {
         int N = numParticles;
         int T = dataObs.size();
 
-        vector<FLOAT> log_weights(N);
-        vector<FLOAT> weights(N);
-        FLOAT log_obs = 0.0;
+        vector<double> log_weights(N);
+        vector<double> weights(N);
+        double log_obs = 0.0;
 
         for(int t = 0; t < T; t++){
             particles.push_back(vector<HA>(N));
@@ -164,19 +137,20 @@ class ParticleFilter {
             // Reweight particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
-                FLOAT log_LA_ti = system->logLikelihoodGivenMotorModel(system->r, dataLA[t], x_i, dataObs[t], t == 0 ? LA {.acc=0} : dataLA[t-1]);
+                LA prevLA = (t == 0) ? LA{} : dataLA[t-1];
+                double log_LA_ti = system->logLikelihoodGivenMotorModel(State { x_i, prevLA, dataObs[t] }, system->r, dataLA[t]);
                 log_weights[i] += log_LA_ti;
             }
 
             // Normalize weights
-            FLOAT log_z_t = logsumexp(log_weights);
-            FLOAT sum = 0.0;
+            double log_z_t = logsumexp(log_weights);
+            double sum = 0.0;
             for(int i = 0; i < N; i++){
                 log_weights[i] -= log_z_t;
                 weights[i] = exp(log_weights[i]);
                 sum += weights[i];
             }
-            assert(abs(sum - 1.0) < robotEpsilon*N);
+            assert(abs(sum - 1.0) < epsilon*N);
 
             // Update log observation likelihood
             log_obs += log_z_t;
@@ -200,9 +174,9 @@ class ParticleFilter {
             // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = system->ASP(particles[t][i], dataObs[t], system->r);
+                    particles[t+1][i] = system->ASP(State { particles[t][i], LA {}, dataObs[t] } , system->r);
                 }
-            } else {
+            } else { 
                 // resample at last step to eliminate deviating particles
                 particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
             }

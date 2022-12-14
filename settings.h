@@ -10,6 +10,18 @@
 #include <sstream>
 #include <assert.h>
 #include <stdlib.h>
+#include <filesystem>
+#include <memory>
+#include <unordered_map>
+#include <unordered_set>
+#include <cmath>
+#include <cassert>
+#include <numeric>
+#include <math.h>
+#include <cstring>
+
+#include <dlfcn.h>
+#include <z3++.h>
 
 using namespace std;
 
@@ -22,6 +34,7 @@ const double stddevError = 0.1;     // low-level action error standard deviation
 const double laChangeSpeed = 2;     // rate of change of acceleration (jerk)
 const double switchingError = 0.3;  // additional low-level action error standard deviation while transitioning
 const double epsilon = 10E-10;
+const int precision = 10;
 
 // I/O parameters
 const string stateGenPath = "accSim/out/data";                  // Generated data from simulation, contains HA, LA, and observed state sequences

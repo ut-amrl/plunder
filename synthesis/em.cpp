@@ -1,16 +1,3 @@
-#include <dlfcn.h>
-#include <z3++.h>
-#include "Python.h"
-
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <filesystem>
-#include <memory>
-#include <algorithm>
-#include <unordered_map>
-#include <unordered_set>
-
 #include "ast/ast.hpp"
 #include "ast/enumeration.hpp"
 #include "ast/library_functions.hpp"
@@ -19,7 +6,6 @@
 #include "ast/synthesis.hpp"
 
 #include "particleFilter/pf_runner.h"
-#include "settings.h"
 #include "accSim/generate.h"
 
 using namespace std;
@@ -41,7 +27,7 @@ namespace std {
     ostream& operator<<(ostream& os, const AST::ast_ptr& ast);
 }
 
-// Convert transition to LDIPS-compatible Example
+// Convert transition to EMDIPS-compatible Example
 Example dataToExample(HA ha, Obs state, Robot& robot){
     Example ex;
 
@@ -68,29 +54,26 @@ void printExampleInfo(Example e){
     cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
 }
 
-// Runs LDIPS-generated ASP
-HA ldipsASP(HA ha, Obs state, Robot& robot){
-    HA prevHA = ha;
-    Example obsObject = dataToExample(ha, state, robot);
+// Runs EMDIPS-generated ASP
+HA emdipsASP(State state, Robot& robot){
+    HA prevHA = state.ha;
+    Example obsObject = dataToExample(state.ha, state.obs, robot);
     for(uint i = 0; i < transitions.size(); i++){
-        // cout << "testing transition " << transitions[i].first << " -> " << transitions[i].second << endl;
-
         if(HAToString(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
             if(InterpretBool(preds[i], obsObject)) {
-                ha = stringToHA(transitions[i].second);
+                state.ha = stringToHA(transitions[i].second);
                 break;
             }
         }
     }
 
-    return ha;
-    // return pointError(prevHA, ha, robot, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
+    return state.ha;
+    // return pointError(ha, pointAccuracy, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
 }
 
 // Initial ASP: random transitions
-HA initialASP(HA ha, Obs state, Robot& r){
-    // return ASP_random(ha, state, r);
-    return pointError(ha, ha, r, useSafePointError);
+HA initialASP(State state, Robot& r) {
+    return pointError(state.ha, pointAccuracy, useSafePointError);
 }
 
 bool isValidExample(Example ex){
@@ -104,7 +87,7 @@ bool isValidExample(Example ex){
 }
 
 // Expectation step
-vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp_t* asp){
+vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp* asp){
 
     vector<vector<Example>> examples;
 
@@ -124,7 +107,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
 
         shuffle(begin(trajectories), end(trajectories), default_random_engine {});
         
-        // Convert each particle trajectory point to LDIPS-supported Example
+        // Convert each particle trajectory point to EMDIPS-supported Example
         for(uint n = 0; n < sampleSize; n++){
             vector<HA> traj = trajectories[n];
             for(uint t = 0; t < dataObs[i].size() - 1 - end_pf_err; t++){
@@ -322,7 +305,7 @@ void emLoop(vector<Robot>& robots){
     setupLdips();
 
     library = ReadLibrary(operationLibPath);
-    asp_t* curASP = initialASP;
+    asp* curASP = initialASP;
     vector<vector<Obs>> dataObs (numRobots);
     vector<vector<LA>> dataLa (numRobots);
 
@@ -352,7 +335,7 @@ void emLoop(vector<Robot>& robots){
         cout << "|-------------------------------------|\n";
         maximization(examples, i);
 
-        curASP = ldipsASP;
+        curASP = emdipsASP;
 
 
         // // Update point accuracy
@@ -407,7 +390,7 @@ int main() {
         fprintf(stderr, "Failed to load optimization file");
     }
 
-    vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), pointAccuracy);
+    vector<Robot> robots = getRobotSet(robotTestSet);
     emLoop(robots);
 
     // Clean up python

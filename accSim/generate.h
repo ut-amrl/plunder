@@ -6,9 +6,8 @@
 #include <iomanip>
 #include <stdlib.h>
 
-#include "settings.h"
 #include "robotSets.h"
-#include "asps.h"
+#include "robot.h"
 #include "ast/ast.hpp"
 
 using nlohmann::json;
@@ -56,20 +55,18 @@ public:
         return "time, x, v, LA, HA";
     }
     string getCsvRow(double t){
-        // return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
-                // + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
-        return to_string(t) + ", " + to_string(r.state.pos) + ", " + to_string(r.state.vel)
-                + ", " + to_string(r.la.acc) + ", " + HAToString(r.ha);
+        return to_string(t) + ", " + to_string(r.state.obs.pos) + ", " + to_string(r.state.obs.vel)
+                + ", " + to_string(r.state.la.acc) + ", " + HAToString(r.state.ha);
     }
     string getJsonRow(){
-        x_j["value"] = r.state.pos;
-        v_j["value"] = r.state.vel;
+        x_j["value"] = r.state.obs.pos;
+        v_j["value"] = r.state.obs.vel;
         target_j["value"] = r.target;
         vMax_j["value"] = r.vMax;
         decMax_j["value"] = r.decMax;
         start_j["value"] = HAToString(prevHA);
-        output_j["value"] = HAToString(r.ha);
-        prevHA = r.ha;
+        output_j["value"] = HAToString(r.state.ha);
+        prevHA = r.state.ha;
 
         json all_j;
         all_j["x"] = x_j;
@@ -83,18 +80,18 @@ public:
     }
 };
 
-void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdDev, double genAccuracy, string outputPath){
+void runSim(int robotTestSet, int useModel, double genAccuracy, string outputPath){
     
     // Initialization
-    normal_distribution<double> accErrDistr(accErrMean, accErrStdDev);
-    vector<Robot> robots = getRobotSet(robotTestSet, accErrDistr, genAccuracy);
+
+    vector<Robot> robots = getRobotSet(robotTestSet);
     
     // Setup JSON
     ofstream jsonFile;
     if(genJson){
         // cout << "Filling JSON with simulation data: " << outputPath << ".json" << endl;
 
-        jsonFile << fixed << setprecision(PRECISION);
+        jsonFile << fixed << setprecision(precision);
         jsonFile.open(outputPath + ".json");
         jsonFile << "[";
     }
@@ -109,7 +106,7 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         ofstream csvFile;
         if(genCsv){
             // cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
-            csvFile << fixed << setprecision(PRECISION);
+            csvFile << fixed << setprecision(precision);
             csvFile.open(outputPath + to_string(i) + ".csv");
             csvFile << rio.getCsvTitles() << "\n";
         }
@@ -118,9 +115,9 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
         // Run simulation
         for(double t = 0; t < T_TOT; t += T_STEP){
 
-            robots[i].updatePhysics(T_STEP);
+            robots[i].updateObs();
             robots[i].runASP(ASP_model(useModel));
-            // robots[i].ha = pointError(ACC, robots[i].ha, robots[i], false);
+            robots[i].state.ha = pointError(robots[i].state.ha, genAccuracy);
             robots[i].updateLA();
 
             // Print trace
@@ -151,27 +148,22 @@ void runSim(int robotTestSet, int useModel, double accErrMean, double accErrStdD
     cout << "Output stored in " << outputPath << "\n\n\n";
 }
 
-void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp_t* asp){
+void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){
 
-    double temp = r.pointAccuracy;
-    r.pointAccuracy = 1;
-    
     ofstream outFile;
     outFile.open(outputFile);
 
     for(uint n=0; n<particlesPlotted; n++){
         r.reset();
-        outFile << r.ha << ",";
+        outFile << r.state.ha << ",";
         for(uint t=1; t<dataObs.size(); t++){
-            r.state = dataObs[t];
+            r.state.obs = dataObs[t];
             r.runASP(asp);
-            r.la = r.motorModel(r.ha, r.state, r.la, false);
-            outFile << r.ha;
+            r.updateLA(false);
+            outFile << r.state.ha;
             if(t!=dataObs.size()-1) outFile << ",";
         }
         outFile << endl;
     }
     outFile.close();
-
-    r.pointAccuracy = temp;
 }

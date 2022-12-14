@@ -32,7 +32,7 @@ public:
     Robot() {}
 
     void runASP(asp*);
-    void updateLA(motor*);
+    void updateLA(bool, motor*);
     void updateObs(phys*, double);
 
     // Reset robot
@@ -199,8 +199,8 @@ void Robot::runASP(asp* ASP = ASP_Hand_prob){
     this->state.ha = ASP(state, *this);
 }
 
-void Robot::updateLA(motor* motor_model = motorModel){
-    this->state.la = motor_model(state, *this, true);
+void Robot::updateLA(bool error = true, motor* motor_model = motorModel){
+    this->state.la = motor_model(state, *this, error);
 }
 
 void Robot::updateObs(phys* phys_model = physicsModel, double t_step = T_STEP){

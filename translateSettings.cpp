@@ -9,18 +9,16 @@ uint numSpaces = 30;
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
-    assert(robotTestSet >= 0 && robotTestSet <= 2 && "Robot test set must be between 0 and 2");
     vector<Robot> robots = getRobotSet(robotTestSet);
     assert(numRobots <= robots.size() && "numRobots does not match size of test set");
     assert(model >= 0 && model < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
 
     assert(stddevError >= 0 && "Standard deviation must be positive");
-    assert(obsLikelihoodStrength >= 0 && obsLikelihoodStrength <= 1 && "Observation likelihood strength must be between 0 and 1");
+    assert(obsLikelihoodStrength >= 0 && "Observation likelihood strength must be greater than 0");
 
     assert(pointAccuracy >= 0 && pointAccuracy <= 1 && "HA probability must be between 0 and 1");
     assert(genAccuracy >= 0 && genAccuracy <= 1 && "HA probability must be between 0 and 1");
     assert(max_error >= 0 && "max_error must be >= 0");
-    // assert(resampleThreshold >= 0 && resampleThreshold <= 1 && "Resample threshold must be between 0 and 1");
 
     assert(sampleSize <= numParticles && "Sample size must be less than the number of particles");
     assert(particlesPlotted <= numParticles && "Particles plotted must be less than the number of particles");

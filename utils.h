@@ -25,18 +25,37 @@ double logistic(double midpoint, double spread, double input){
 }
 
 // randomly transition to another HA
-HA pointError(HA ha, bool useSafePointError){
+HA pointError(HA ha = static_cast<HA>(0), double accuracy = pointAccuracy, bool useSafePointError = false){
     if(usePointError){
         HA prevHA = ha;
-        if(!flip(pointAccuracy)){
+        if(!flip(accuracy)){
             int mod = rand() % numHA;
             ha = static_cast<HA>(mod);
 
-            if(useSafePointError){
-                if(prevHA == CON && ha == ACC) ha = DEC;
-                if(prevHA == DEC) ha = DEC;
-            }
+            // TODO: abstract away safe transitions
+            // if(useSafePointError){
+            //     if(prevHA == CON && ha == ACC) ha = DEC;
+            //     if(prevHA == DEC) ha = DEC;
+            // }
         }
     }
     return ha;
+}
+
+// Exponentiate some values, take their sum, then take the log of the sum
+double logsumexp(vector<double>& vals) {
+    if (vals.size() == 0){
+        return 0;
+    }
+
+    double max_elem = *max_element(vals.begin(), vals.end());
+    double sum = accumulate(vals.begin(), vals.end(), 0.0, 
+        [max_elem](double a, double b) { return a + exp(b - max_elem); });
+    
+    return max_elem + log(sum);
+}
+
+// Calculate pdf of N(mu, sigma) at x, then take the natural log
+double logpdf(double x, double mu, double sigma){
+    return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
 }

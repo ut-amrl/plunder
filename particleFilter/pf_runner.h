@@ -1,14 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <math.h>
-#include <string>
-#include <cstring>
-
 #include "pf.h"
-#include "accSim/asps.h"
 #include "accSim/robotSets.h"
 #include "settings.h"
 
@@ -19,42 +11,31 @@ using namespace std;
 // Initial distribution
 HA sampleInitialHA(){
     // Uniformly Randomly Distributed
-    double rv = ((double) rand()) / RAND_MAX;
-    if(rv <= 0.33){
-        return ACC;
-    } else if (rv <= 0.67){
-        return DEC;
-    } else {
-        return CON;
-    }
+    int mod = rand() % numHA;
+    return static_cast<HA>(mod);
 }
 
-// Calculate pdf of N(mu, sigma) at x, then take the natural log
-FLOAT logpdf(FLOAT x, FLOAT mu, FLOAT sigma){
-    return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
-}
-
-FLOAT pfMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
+double pfMotorModel(State state, Robot& r, LA nextLA) {
     double mean = 0;
     double stddev = min(r.accMax, abs(r.decMax));
-    if(ha == ACC) mean = r.accMax;
-    if(ha == DEC) mean = r.decMax;
+    if(state.ha == ACC) mean = r.accMax;
+    if(state.ha == DEC) mean = r.decMax;
 
-    return logpdf(la.acc, mean, obsLikelihoodStrength * stddev);
+    return logpdf(nextLA.acc, mean, obsLikelihoodStrength * stddev);
 }
 
-FLOAT robotMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA) {
-    double mean = r.motorModel(ha, obs, prevLA, false).acc; // should be using the previous LA
-    return logpdf(la.acc, mean, obsLikelihoodStrength * stddevError);
+double robotMotorModel(State state, Robot& r, LA nextLA) {
+    double mean = motorModel(state, r, false).acc; // should be using the previous LA
+    return logpdf(nextLA.acc, mean, obsLikelihoodStrength * stddevError);
 }
 
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-FLOAT logLikelihoodGivenMotorModel(Robot& r, LA la, HA ha, Obs obs, LA prevLA){
+double logLikelihoodGivenMotorModel(State state, Robot& r, LA nextLA){
     if(useSimplifiedMotorModel){
-        return pfMotorModel(r, la, ha, obs, prevLA);
+        return pfMotorModel(state, r, nextLA);
     }
-    return robotMotorModel(r, la, ha, obs, prevLA);
+    return robotMotorModel(state, r, nextLA);
 }
 
 
@@ -105,10 +86,10 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<O
 // ----- Particle Filter ---------------------------------------------
 
 // Full trajectory generation with particle filter
-double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
+double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
 
     // Initialization
-    srand(PF_SEED);
+    srand(0);
     MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, asp, &logLikelihoodGivenMotorModel, r);
     ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
     resampCount = 0;
@@ -127,7 +108,7 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample
 }
 
 // Read input, run filter, write output
-double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp_t* asp){
+double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
     // Read input
     if(dataObs.size() == 0 || dataLa.size() == 0){
         dataObs.clear(); dataLa.clear();
