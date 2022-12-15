@@ -1,11 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <random>
-#include <fstream>
-#include <iomanip>
-#include <stdlib.h>
-
 #include "robotSets.h"
 #include "robot.h"
 #include "ast/ast.hpp"
@@ -14,103 +8,30 @@ using nlohmann::json;
 using namespace std;
 using namespace AST;
 
-// ----- Configuration ---------------------------------------------
-
-// Global variables
-static const bool genCsv = true;            // generate CSV trace file
-static const bool genJson = true;           // generate JSON trace file
-
 // ----- Simulation ------------------------------------------------
 
-json fillJson(vector<int> dim, string type, string name){
-    json j;
-    j["dim"] = dim;
-    j["type"] = type;
-    j["name"] = name;
-    return j;
+string getCsvTitles(){
+    return "time, x, v, LA, HA";
 }
 
-class RobotIO {
-public:
-    Robot &r;
-    json x_j;
-    json v_j;
-    json decMax_j;
-    json vMax_j;
-    json target_j;
-    json start_j;
-    json output_j;
-    HA prevHA = ACC;
+string getCsvRow(State state, double t){
+    return to_string(t) + ", " + to_string(state.obs.pos) + ", " + to_string(state.obs.vel)
+            + ", " + to_string(state.la.acc) + ", " + HAToString(state.ha);
+}
 
-    RobotIO(Robot &_r): r(_r) {
-        x_j = fillJson(vector<int>{1, 0, 0}, "NUM", "x");
-        v_j = fillJson(vector<int>{1, -1, 0}, "NUM", "v");
-        decMax_j = fillJson(vector<int>{1, -2, 0}, "NUM", "decMax");
-        vMax_j = fillJson(vector<int>{1, -1, 0}, "NUM", "vMax");
-        target_j = fillJson(vector<int>{1, 0, 0}, "NUM", "target");
-        start_j = fillJson(vector<int>{0, 0, 0}, "STATE", "start");
-        output_j = fillJson(vector<int>{0, 0, 0}, "STATE", "output");
-    }
-    string getCsvTitles(){
-        return "time, x, v, LA, HA";
-    }
-    string getCsvRow(double t){
-        return to_string(t) + ", " + to_string(r.state.obs.pos) + ", " + to_string(r.state.obs.vel)
-                + ", " + to_string(r.state.la.acc) + ", " + HAToString(r.state.ha);
-    }
-    string getJsonRow(){
-        x_j["value"] = r.state.obs.pos;
-        v_j["value"] = r.state.obs.vel;
-        target_j["value"] = r.target;
-        vMax_j["value"] = r.vMax;
-        decMax_j["value"] = r.decMax;
-        start_j["value"] = HAToString(prevHA);
-        output_j["value"] = HAToString(r.state.ha);
-        prevHA = r.state.ha;
+vector<Trajectory> gen_trajectories(int robotTestSet, int useModel, double genAccuracy) {
 
-        json all_j;
-        all_j["x"] = x_j;
-        all_j["v"] = v_j;
-        all_j["decMax"] = decMax_j;
-        all_j["vMax"] = vMax_j;
-        all_j["target"] = target_j;
-        all_j["start"] = start_j;
-        all_j["output"] = output_j;
-        return to_string(all_j);
-    }
-};
+    cout << "--------------Simulation---------------" << endl;
+    cout << "Running 1-D kinematic car simulation:\n";
+    cout << "Using " << numRobots << " robots and low-level action standard deviation=" << stddevError << endl;
 
-void runSim(int robotTestSet, int useModel, double genAccuracy, string outputPath){
-    
     // Initialization
-
     vector<Robot> robots = getRobotSet(robotTestSet);
     
-    // Setup JSON
-    ofstream jsonFile;
-    if(genJson){
-        // cout << "Filling JSON with simulation data: " << outputPath << ".json" << endl;
+    vector<Trajectory> trajectories;
 
-        jsonFile << fixed << setprecision(precision);
-        jsonFile.open(outputPath + ".json");
-        jsonFile << "[";
-    }
-
-    // Run simulations and generate json/csv files
-    bool first = true;
     for(uint i = 0; i < numRobots; i++){
-
-        RobotIO rio (robots[i]);
-        
-        // Setup CSV file
-        ofstream csvFile;
-        if(genCsv){
-            // cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
-            csvFile << fixed << setprecision(precision);
-            csvFile.open(outputPath + to_string(i) + ".csv");
-            csvFile << rio.getCsvTitles() << "\n";
-        }
-
+        Trajectory traj(robots[i]);
 
         // Run simulation
         for(double t = 0; t < T_TOT; t += T_STEP){
@@ -120,32 +41,46 @@ void runSim(int robotTestSet, int useModel, double genAccuracy, string outputPat
             robots[i].state.ha = pointError(robots[i].state.ha, genAccuracy);
             robots[i].updateLA();
 
+            traj.append(robots[i].state);
+        }
+
+        trajectories.push_back(traj);
+    }
+
+    return trajectories;
+}
+
+void print_traj(vector<Trajectory> trajectories) {
+    for(Trajectory traj : trajectories) {
+        for (int i = 1; i < traj.T; i++) {
+            if(traj.get(i).ha != traj.get(i-1).ha){
+                cout << HAToString(traj.get(i-1).ha) << " --> " << HAToString(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
+            }
+        }
+        cout << "\n";
+    }
+}
+
+void write_traj(vector<Trajectory> traj, string outputPath){
+    cout << "Printing trajectories to " << outputPath << "\n\n\n";
+
+    // Generate csv files
+    for(uint i = 0; i < traj.size(); i++){
+
+        // Setup CSV file
+        ofstream csvFile;
+        // cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
+        csvFile << fixed << setprecision(precision);
+        csvFile.open(outputPath + to_string(i) + ".csv");
+        csvFile << getCsvTitles() << "\n";
+        
+        for(double t = 0; t < traj[i].T; t++) {
             // Print trace
-            if(genCsv) {
-                csvFile << rio.getCsvRow(t) << "\n";
-            }
-
-            if(genJson){
-                if(first) first = false;
-                else jsonFile << ",";
-                jsonFile << rio.getJsonRow() << endl;
-            }
+            csvFile << getCsvRow(traj[i].get(t), t) << "\n";
         }
 
-        if(genCsv){
-            csvFile.close();
-        }
+        csvFile.close();
     }
-
-    if(genJson){
-        jsonFile << "]";
-        jsonFile.close();
-    }
-
-    cout << "--------------Simulation---------------" << endl;
-    cout << "Running 1-D kinematic car simulation:\n";
-    cout << "Using " << numRobots << " robots and low-level action standard deviation=" << stddevError << endl;
-    cout << "Output stored in " << outputPath << "\n\n\n";
 }
 
 void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){

@@ -33,8 +33,7 @@ $(SETTINGS):
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
 			mkdir -p accSim/out && \
-			./bin/gen && \
-			cp accSim/out/data.json pips/examples/data.json
+			./bin/gen
 
 $(PF):
 			$(MAKE) $(SETTINGS) && \

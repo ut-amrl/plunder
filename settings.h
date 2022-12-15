@@ -25,6 +25,9 @@
 
 using namespace std;
 
+// Configuration
+const bool DEBUG = false;
+
 // Robot parameters
 const int robotTestSet = 0;         // which robots to use (0-2)
 const int numRobots = 11;           // number of robots (depends on robot test set)

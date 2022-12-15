@@ -93,7 +93,6 @@ set(CXX_PIPS_SRCS
     pips/src/ast/parsing.hpp
     pips/src/ast/synthesis.cpp
     pips/src/ast/synthesis.hpp
-    accSim/asps.h
     accSim/generate.cpp
     accSim/generate.h
     accSim/robotSets.h
@@ -103,6 +102,8 @@ set(CXX_PIPS_SRCS
     particleFilter/plotter.py
     particleFilter/pf_runner.cpp
     synthesis/em.cpp
+    domain.h
+    utils.h
     robot.h
     settings.h
     translateSettings.cpp)

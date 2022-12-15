@@ -6,7 +6,11 @@ using namespace std;
 // ----- Main ---------------------------------------------
 
 int main(int argc, char** argv) {
-    runSim(robotTestSet, model, genAccuracy, stateGenPath);
+    vector<Trajectory> traj = gen_trajectories(robotTestSet, model, genAccuracy);
+
+    if(DEBUG)
+        print_traj(traj);
+    write_traj(traj, stateGenPath);
     
     return 0;
 }

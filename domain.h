@@ -50,3 +50,36 @@ struct State {
     Obs obs;
 };
 
+class Robot;
+
+struct Trajectory {
+    int T;
+    Robot& r;
+    vector<State> traj;
+
+    Trajectory(Robot& robot) : T(0), r(robot) {}
+
+    void append(State s) {
+        traj.push_back(s);
+        T++;
+    }
+
+    State get(int t) {
+        return traj[t];
+    }
+
+    // void append(HA ha){
+    //     traj.push_back(State { ha });
+    //     T++;
+    // }
+
+    // void append(LA la){
+    //     traj.push_back(State { HA{}, la });
+    //     T++;
+    // }
+
+    // void append(Obs obs){
+    //     traj.push_back(State { HA{}, LA{}, obs});
+    //     T++;
+    // }
+};
