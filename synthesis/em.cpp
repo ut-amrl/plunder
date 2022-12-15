@@ -37,7 +37,7 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     ex.symbol_table_["vMax"] = SymEntry((float) robot.vMax);
     ex.symbol_table_["target"] = SymEntry((float) robot.target);
 
-    ex.start_ = SymEntry(HAToString(ha));
+    ex.start_ = SymEntry(to_string(ha));
 
     return ex;
 }
@@ -59,15 +59,14 @@ HA emdipsASP(State state, Robot& robot){
     HA prevHA = state.ha;
     Example obsObject = dataToExample(state.ha, state.obs, robot);
     for(uint i = 0; i < transitions.size(); i++){
-        if(HAToString(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
+        if(to_string(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
             if(InterpretBool(preds[i], obsObject)) {
-                state.ha = stringToHA(transitions[i].second);
+                state.ha = to_label(transitions[i].second);
                 break;
             }
         }
     }
 
-    // return state.ha;
     return pointError(state.ha, pointAccuracy, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
 }
 
@@ -114,7 +113,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
                 Example ex = dataToExample(traj[t], dataObs[i][t+1], robots[i]);
 
                 // Provide next high-level action
-                ex.result_ = SymEntry(HAToString(traj[t+1]));
+                ex.result_ = SymEntry(to_string(traj[t+1]));
                 if(isValidExample(ex)) examples[i].push_back(ex);
             }
         }
@@ -234,7 +233,7 @@ void setupLdips(){
     } else {
         for(uint i = 0; i < numHA; i++){
             for(uint j = 0; j < numHA; j++){
-                transitions.push_back(pair<string, string> (HAToString(static_cast<HA>(i)), HAToString(static_cast<HA>(j))));
+                transitions.push_back(pair<string, string> (to_string(to_label(i)), to_string(to_label(i))));
                 accuracies.push_back(numeric_limits<float>::max());
             }
         }
@@ -347,7 +346,7 @@ void emLoop(vector<Robot>& robots){
         //     for(Example& ex: examples[r]){
         //         total++;
         //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-        //         if(curASP(stringToHA(ex.start_.GetString()), obs, robots[r]) == stringToHA(ex.result_.GetString())){
+        //         if(curASP(to_label(ex.start_.GetString()), obs, robots[r]) == to_label(ex.result_.GetString())){
         //             satisfied++;
         //         }
         //     }

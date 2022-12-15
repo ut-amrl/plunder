@@ -28,14 +28,14 @@ struct Obs { // Observations
 };
 
 // Helper functions
-string HAToString(HA ha){
+string to_string(HA ha){
     if(ha == ACC) return "ACC";
     if(ha == DEC) return "DEC";
     if(ha == CON) return "CON";
     return "CON";
 }
 
-HA stringToHA(string str){
+HA to_label(string str){
     if(str == "ACC") return ACC;
     if(str == "DEC") return DEC;
     if(str == "CON") return CON;

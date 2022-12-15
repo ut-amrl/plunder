@@ -121,7 +121,7 @@ HA ASP_Hand_prob(State state, Robot& r){
 */
 HA ASP_random(State state, Robot& r){
     int mod = rand() % numHA;
-    HA ha = static_cast<HA>(mod);
+    HA ha = to_label(mod);
 
     return ha;
 }

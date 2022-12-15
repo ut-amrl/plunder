@@ -12,7 +12,7 @@ using namespace std;
 HA sampleInitialHA(){
     // Uniformly Randomly Distributed
     int mod = rand() % numHA;
-    return static_cast<HA>(mod);
+    return to_label(mod);
 }
 
 double pfMotorModel(State state, Robot& r, LA nextLA) {

@@ -4,6 +4,10 @@
 
 using namespace std;
 
+HA to_label(int ha){
+    return static_cast<HA>(ha);
+}
+
 // Random error distributions
 random_device rd;
 default_random_engine gen(0);
@@ -25,12 +29,12 @@ double logistic(double midpoint, double spread, double input){
 }
 
 // randomly transition to another HA
-HA pointError(HA ha = static_cast<HA>(0), double accuracy = pointAccuracy, bool useSafePointError = false){
+HA pointError(HA ha = to_label(0), double accuracy = pointAccuracy, bool useSafePointError = false){
     if(usePointError){
         HA prevHA = ha;
         if(!flip(accuracy)){
             int mod = rand() % numHA;
-            ha = static_cast<HA>(mod);
+            ha = to_label(mod);
 
             // TODO: abstract away safe transitions
             // if(useSafePointError){
