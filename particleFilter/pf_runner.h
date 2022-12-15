@@ -21,18 +21,18 @@ double pfMotorModel(State state, Robot& r, LA nextLA) {
     if(state.ha == ACC) mean = r.accMax;
     if(state.ha == DEC) mean = r.decMax;
 
-    return logpdf(nextLA.acc, mean, obsLikelihoodStrength * stddev);
+    return logpdf(nextLA.acc, mean, OBS_LIKELIHOOD_STRENGTH * stddev);
 }
 
 double robotMotorModel(State state, Robot& r, LA nextLA) {
     double mean = motorModel(state, r, false).acc; // should be using the previous LA
-    return logpdf(nextLA.acc, mean, obsLikelihoodStrength * stddevError);
+    return logpdf(nextLA.acc, mean, OBS_LIKELIHOOD_STRENGTH * STDDEV_ERROR);
 }
 
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
 double logLikelihoodGivenMotorModel(State state, Robot& r, LA nextLA){
-    if(useSimplifiedMotorModel){
+    if(USE_SIMPLE_MOTOR){
         return pfMotorModel(state, r, nextLA);
     }
     return robotMotorModel(state, r, nextLA);
@@ -86,7 +86,7 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<O
 // ----- Particle Filter ---------------------------------------------
 
 // Full trajectory generation with particle filter
-double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
+double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample_threshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
 
     // Initialization
     srand(0);
@@ -95,12 +95,12 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample
     resampCount = 0;
     
     // Run particle filter
-    double obs_likelihood = pf.forwardFilter(N, resampleThreshold);
+    double obs_likelihood = pf.forwardFilter(N, resample_threshold);
 
     pf.retrieveTrajectories(trajectories, M);
 
     // cout << "resample count: " << resampCount << endl;
-    if(useSmoothTrajectories){
+    if(SMOOTH_TRAJECTORIES){
         trajectories = pf.smoothTrajectories(trajectories);
     }
 
@@ -108,14 +108,14 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample
 }
 
 // Read input, run filter, write output
-double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double resampleThreshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
+double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double resample_threshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
     // Read input
     if(dataObs.size() == 0 || dataLa.size() == 0){
         dataObs.clear(); dataLa.clear();
         readData(inputFile, dataObs, dataLa);
     }
 
-    double obs_likelihood = runFilter(trajectories, N, M, resampleThreshold, r, dataObs, dataLa, asp);
+    double obs_likelihood = runFilter(trajectories, N, M, resample_threshold, r, dataObs, dataLa, asp);
 
     // Write results
     writeData(outputFile, r, trajectories, dataObs);

@@ -159,7 +159,7 @@
     
 //     // Initialization
 //     setupLdips();
-//     library = ReadLibrary(operationLibPath);
+//     library = ReadLibrary(OPERATION_LIB);
 //     setBoundaryStddev(boundaryDeviation);
 
 //     probabilisticProgramTest();

@@ -101,11 +101,11 @@ class ParticleFilter {
         assert(dataObs.size() == dataLA.size());
     }
 
-    // Run particle filter on numParticles particles (and some resampleThreshold between 0 and 1)
-    double forwardFilter(int numParticles, float resampleThreshold){
+    // Run particle filter on NUM_PARTICLES particles (and some RESAMPLE_THRESHOLD between 0 and 1)
+    double forwardFilter(int NUM_PARTICLES, float RESAMPLE_THRESHOLD){
 
         // Initialization
-        int N = numParticles;
+        int N = NUM_PARTICLES;
         int T = dataObs.size();
 
         vector<double> log_weights(N);
@@ -150,13 +150,13 @@ class ParticleFilter {
                 weights[i] = exp(log_weights[i]);
                 sum += weights[i];
             }
-            assert(abs(sum - 1.0) < epsilon*N);
+            assert(abs(sum - 1.0) < EPSILON*N);
 
             // Update log observation likelihood
             log_obs += log_z_t;
 
             // Optionally resample when number of effective particles is low
-            if(effectiveParticles(weights) < N * resampleThreshold){
+            if(effectiveParticles(weights) < N * RESAMPLE_THRESHOLD){
                 particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
 
                 // Reset weights
@@ -185,7 +185,7 @@ class ParticleFilter {
     }
 
     // Retrieve high-level action sequences after running particle filter
-    vector<vector<HA>> retrieveTrajectories(vector<vector<HA>>& trajectories, int numTrajectories){        
+    vector<vector<HA>> retrieveTrajectories(vector<vector<HA>>& trajectories, int num_trajectories){        
         if(particles.size() == 0){
             cout << "Run the particle filter first!" << endl;
             return vector<vector<HA>>();
@@ -193,23 +193,23 @@ class ParticleFilter {
         assert(particles.size() == ancestors.size());
 
         int T = particles.size(); int N = particles[0].size();
-        numTrajectories = min(numTrajectories, (int) particles[0].size());
+        num_trajectories = min(num_trajectories, (int) particles[0].size());
 
-        while(trajectories.size() < numTrajectories){
+        while(trajectories.size() < num_trajectories){
             trajectories.push_back(vector<HA>(T));
         }
 
         vector<uint> activeParticles;
-        for(uint i = 0; (int) activeParticles.size() < numTrajectories; i += (N / numTrajectories)){
+        for(uint i = 0; (int) activeParticles.size() < num_trajectories; i += (N / num_trajectories)){
             activeParticles.push_back(i);
         }
 
         for(int t = T - 1; t >= 0; t--){
-            for(int i = 0; i < numTrajectories; i++){
+            for(int i = 0; i < num_trajectories; i++){
                 trajectories[i][t] = particles[t][activeParticles[i]];
             }
             if(t != 0){
-                for(int i = 0; i < numTrajectories; i++){
+                for(int i = 0; i < num_trajectories; i++){
                     activeParticles[i] = ancestors[t][activeParticles[i]];
                 }
             }

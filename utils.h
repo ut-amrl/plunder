@@ -29,15 +29,15 @@ double logistic(double midpoint, double spread, double input){
 }
 
 // randomly transition to another HA
-HA pointError(HA ha = to_label(0), double accuracy = pointAccuracy, bool useSafePointError = false){
-    if(usePointError){
+HA pointError(HA ha = to_label(0), double accuracy = POINT_ACCURACY, bool use_safe_transitions = false){
+    if(USE_POINT_ERROR){
         HA prevHA = ha;
         if(!flip(accuracy)){
             int mod = rand() % numHA;
             ha = to_label(mod);
 
             // TODO: abstract away safe transitions
-            // if(useSafePointError){
+            // if(use_safe_transitions){
             //     if(prevHA == CON && ha == ACC) ha = DEC;
             //     if(prevHA == DEC) ha = DEC;
             // }

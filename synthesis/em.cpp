@@ -67,12 +67,12 @@ HA emdipsASP(State state, Robot& robot){
         }
     }
 
-    return pointError(state.ha, pointAccuracy, useSafePointError); // Introduce point errors - random transitions allow model to escape local minima
+    return pointError(state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS); // Introduce point errors - random transitions allow GT_ASP to escape local minima
 }
 
 // Initial ASP: random transitions
 HA initialASP(State state, Robot& r) {
-    return pointError(state.ha, pointAccuracy, useSafePointError);
+    return pointError(state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS);
 }
 
 bool isValidExample(Example ex){
@@ -90,26 +90,26 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
 
     vector<vector<Example>> examples;
 
-    cout << "Running particle filter with " << numParticles << " particles\n";
-    cout << "Parameters: resample threshold=" << resampleThreshold << ", observation strength=" << obsLikelihoodStrength << endl;
+    cout << "Running particle filter with " << NUM_PARTICLES << " particles\n";
+    cout << "Parameters: resample threshold=" << RESAMPLE_THRESHOLD << ", observation strength=" << OBS_LIKELIHOOD_STRENGTH << endl;
 
     double cum_log_obs = 0;
-    for(uint i = 0; i < numRobots; i++){
-        string in = stateGenPath + to_string(i) + ".csv";
-        string out = trajGenPath + to_string(iteration) + "-" + to_string(i) + ".csv";
+    for(uint i = 0; i < NUM_ROBOTS; i++){
+        string in = SIM_DATA + to_string(i) + ".csv";
+        string out = PF_TRAJ + to_string(iteration) + "-" + to_string(i) + ".csv";
         examples.push_back(vector<Example>());
 
         // Run filter
         vector<vector<HA>> trajectories;
-        cum_log_obs += filterFromFile(trajectories, numParticles, numTrajectories, resampleThreshold, robots[i], in, out, dataObs[i], dataLa[i], asp);
+        cum_log_obs += filterFromFile(trajectories, NUM_PARTICLES, NUM_TRAJECTORIES, RESAMPLE_THRESHOLD, robots[i], in, out, dataObs[i], dataLa[i], asp);
 
 
         shuffle(begin(trajectories), end(trajectories), default_random_engine {});
         
         // Convert each particle trajectory point to EMDIPS-supported Example
-        for(uint n = 0; n < sampleSize; n++){
+        for(uint n = 0; n < SAMPLE_SIZE; n++){
             vector<HA> traj = trajectories[n];
-            for(uint t = 0; t < dataObs[i].size() - 1 - end_pf_err; t++){
+            for(uint t = 0; t < dataObs[i].size() - 1 - END_PF_ERROR; t++){
                 Example ex = dataToExample(traj[t], dataObs[i][t+1], robots[i]);
 
                 // Provide next high-level action
@@ -119,7 +119,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         }
 
         // Run ASPs for all robots
-        string s = altPath+to_string(iteration)+"-"+to_string(i)+".csv";
+        string s = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
         executeASP(robots[i], s, dataObs[i], asp);
 
         cout << "*";
@@ -134,7 +134,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
 
 void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
     for(int i = 0; i < allExamples.size(); i++){
-        allExamples[i] = WindowExamples(allExamples[i], window_size);
+        allExamples[i] = WindowExamples(allExamples[i], WINDOW_SIZE);
     }
 
     for(vector<Example>& each : allExamples){
@@ -148,17 +148,17 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     default_merge(allExamples, samples);
 
     // Set each maximum error to speed up search
-    cout << "Setting error threshold to " << max_error << "\n\n";
+    cout << "Setting error threshold to " << TARGET_LOSS << "\n\n";
     for(uint i = 0; i < transitions.size(); i++){
-        accuracies[i] = max_error;
+        accuracies[i] = TARGET_LOSS;
     }
     
     EmdipsOutput eo;
-    if(iteration % structuralChangeFrequency == 0 && !hardcode_program){
+    if(iteration % STRUCT_CHANGE_FREQ == 0 && !HARDCODE_PROG){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
         vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
-                                            feature_depth, &sigs);
+                                            FEATURE_DEPTH, &sigs);
 
         cout << "---- Number of Features Enumerated ----" << endl;
         cout << ops.size() << endl << endl;
@@ -168,10 +168,10 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         cout << "...\n\n\n";
 
         // Retrieve ASPs and accuracies    
-        string aspFilePath = aspPathBase + to_string(iteration) + "/";
+        string aspFilePath = GEN_ASP + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
 
-        vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
+        vector<ast_ptr> all_sketches = EnumerateL3(ops, SKETCH_DEPTH);
         
         cout << "---- Number of Total Programs ----" << endl;
         cout << all_sketches.size() << endl;
@@ -179,15 +179,15 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, false, pFunc);
+        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, BATCH_SIZE, PROG_ENUM, false, pFunc);
 
     } else {
         
         // Retrieve ASPs and accuracies    
-        string aspFilePath = aspPathBase + to_string(iteration) + "/";
+        string aspFilePath = GEN_ASP + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, batch_size, programs_enumerated, true, pFunc);
+        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, BATCH_SIZE, PROG_ENUM, true, pFunc);
 
     }
 
@@ -197,7 +197,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     // Write ASP info to file
     ofstream aspStrFile;
-    string aspStrFilePath = aspPathBase + to_string(iteration) + "/asp.txt";
+    string aspStrFilePath = GEN_ASP + to_string(iteration) + "/asp.txt";
     aspStrFile.open(aspStrFilePath);
     for(uint i = 0; i < transitions.size(); i++){
         aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
@@ -223,7 +223,7 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    if(useSafePointError){
+    if(USE_SAFE_TRANSITIONS){
         transitions.push_back(pair<string, string> ("ACC", "CON"));
         accuracies.push_back(numeric_limits<float>::max());
         transitions.push_back(pair<string, string> ("ACC", "DEC"));
@@ -233,7 +233,7 @@ void setupLdips(){
     } else {
         for(uint i = 0; i < numHA; i++){
             for(uint j = 0; j < numHA; j++){
-                transitions.push_back(pair<string, string> (to_string(to_label(i)), to_string(to_label(i))));
+                transitions.push_back(pair<string, string> (to_string(to_label(i)), to_string(to_label(j))));
                 accuracies.push_back(numeric_limits<float>::max());
             }
         }
@@ -266,7 +266,7 @@ void setupLdips(){
     }
     cout << endl;
 
-    if(hardcode_program){
+    if(HARDCODE_PROG){
         cout << "----Using fixed program----" << endl;
     } else {
         cout << "----Ground truth (target) program----" << endl;
@@ -276,7 +276,7 @@ void setupLdips(){
     for (int t = 0; t < transitions.size(); t++) {
         const auto &transition = transitions[t];
         const string input_name =
-            gt_asp + transition.first + "_" + transition.second + ".json";
+            GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
 
         ifstream input_file;
         input_file.open(input_name);
@@ -303,20 +303,20 @@ void emLoop(vector<Robot>& robots){
     // Initialization
     setupLdips();
 
-    library = ReadLibrary(operationLibPath);
+    library = ReadLibrary(OPERATION_LIB);
     asp* curASP = initialASP;
-    vector<vector<Obs>> dataObs (numRobots);
-    vector<vector<LA>> dataLa (numRobots);
+    vector<vector<Obs>> dataObs (NUM_ROBOTS);
+    vector<vector<LA>> dataLa (NUM_ROBOTS);
 
-    for(int r = 0; r < numRobots; r++){
+    for(int r = 0; r < NUM_ROBOTS; r++){
         // Run ground truth ASP
-        string inputFile = stateGenPath + to_string(r) + ".csv";
+        string inputFile = SIM_DATA + to_string(r) + ".csv";
         readData(inputFile, dataObs[r], dataLa[r]);
-        string s = altPath+"gt-"+to_string(r)+".csv";
-        executeASP(robots[r], s, dataObs[r], ASP_model(model));
+        string s = PURE_TRAJ+"gt-"+to_string(r)+".csv";
+        executeASP(robots[r], s, dataObs[r], ASP_model(GT_ASP));
     }
 
-    for(int i = 0; i < numIterations; i++){
+    for(int i = 0; i < NUM_ITER; i++){
         
         // Expectation
         cout << "\n|-------------------------------------|\n";
@@ -340,9 +340,9 @@ void emLoop(vector<Robot>& robots){
         // // Update point accuracy
         // double satisfied = 0;
         // double total = 0;
-        // for(uint r = 0; r < numRobots; r++){
+        // for(uint r = 0; r < NUM_ROBOTS; r++){
         //     // testExampleOnASP(examples[r], robots[r]);
-        //     robots[r].pointAccuracy = 1; // make ASP deterministic
+        //     robots[r].POINT_ACCURACY = 1; // make ASP deterministic
         //     for(Example& ex: examples[r]){
         //         total++;
         //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
@@ -356,7 +356,7 @@ void emLoop(vector<Robot>& robots){
         // double newPointAcc = min(satisfied / total, 0.95);
         // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
         // for(Robot& r : robots){
-        //     r.pointAccuracy = newPointAcc;
+        //     r.POINT_ACCURACY = newPointAcc;
         // }
     }
 }
@@ -389,7 +389,7 @@ int main() {
         fprintf(stderr, "Failed to load optimization file");
     }
 
-    vector<Robot> robots = getRobotSet(robotTestSet);
+    vector<Robot> robots = getRobotSet(ROBOT_SET);
     emLoop(robots);
 
     // Clean up python

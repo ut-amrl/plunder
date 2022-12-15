@@ -55,7 +55,7 @@ HA ASP_Hand(State state, Robot& r){
     double xToTarget = r.target - obs.pos;                                  // distance to the target
 
     bool cond1 = obs.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < epsilon;  // needs to decelerate or else it will pass target
+    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < EPSILON;  // needs to decelerate or else it will pass target
 
     if(ha == ACC){                          // transitions starting with ACC
         if(cond1 && !cond2) ha=CON;         // ACC -> CON (expected)
@@ -89,7 +89,7 @@ HA ASP_Hand_prob(State state, Robot& r){
     double xToTarget = r.target - obs.pos;                            // distance to the target
 
     bool cond1 = obs.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < epsilon;  // needs to decelerate or else it will pass target
+    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < EPSILON;  // needs to decelerate or else it will pass target
 
     bool cond1smooth = flip(logistic(0, 2.5, obs.vel - r.vMax));
     bool cond2smooth = flip(logistic(0, -1, xToTarget - DistTraveled(obs.vel, r.decMax)));
@@ -137,13 +137,13 @@ asp* ASP_model(int model){
 }
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
-normal_distribution<double> la_error = normal_distribution<double>(meanError, stddevError);
+normal_distribution<double> la_error = normal_distribution<double>(MEAN_ERROR, STDDEV_ERROR);
 LA motorModel(State state, Robot& r, bool error){
     HA ha = state.ha; LA la = state.la; Obs obs = state.obs;
 
-    double change = laChangeSpeed;
+    double change = JERK;
     if(error){
-        change += la_error(gen) * (switchingError / stddevError);
+        change += la_error(gen) * (JERK_ERROR / STDDEV_ERROR);
     }
     
     if(ha == ACC){
@@ -178,15 +178,15 @@ Obs physicsModel(State state, Robot& r, double t_step){
     // Update velocity and displacement accordingly
     obs.vel = vPrev + la.acc * t_step;
 
-    if(obs.vel < epsilon){ // Round to 0
+    if(obs.vel < EPSILON){ // Round to 0
         obs.vel = 0;
     }
 
-    if(abs(obs.vel - r.vMax) < epsilon){ // Round to vMax
+    if(abs(obs.vel - r.vMax) < EPSILON){ // Round to vMax
         obs.vel = r.vMax;
     }
 
-    if(abs(obs.pos - r.target) < epsilon){ // Round to target
+    if(abs(obs.pos - r.target) < EPSILON){ // Round to target
         obs.pos = r.target;
     }
 

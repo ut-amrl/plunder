@@ -102,8 +102,8 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     global trajectories, velocities, positions, gtTrajectory, gtLA, gtVelocity, gtPosition
     outPath = outP + str(iter) + "-" + str(robot) + "-"
 
-    maxTime = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
-    particlesPlotted = min(int(settings["particlesPlotted"]), len(trajectories))
+    maxTime = min(int(settings["PLOT_TIME"]), min(len(gtTrajectory), len(trajectories[0])))
+    PARTICLES_PLOTTED = min(int(settings["PARTICLES_PLOTTED"]), len(trajectories))
 
     for traj in trajectories:
         traj = traj[0:maxTime]
@@ -185,8 +185,8 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     readTrajectories(inFile)
     readGroundTruth(gtFile)
 
-    maxTime = min(int(settings["timeStepsPlot"]), min(len(gtTrajectory), len(trajectories[0])))
-    particlesPlotted = min(int(settings["particlesPlotted"]), len(trajectories))
+    maxTime = min(int(settings["PLOT_TIME"]), min(len(gtTrajectory), len(trajectories[0])))
+    PARTICLES_PLOTTED = min(int(settings["PARTICLES_PLOTTED"]), len(trajectories))
 
     freq = 1
     actions = [[0] * maxTime, [0] * maxTime, [0] * maxTime]
@@ -217,7 +217,7 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
             gt[2][t] = gt[2][t-1]
     
     color_graph = []
-    for i in range(particlesPlotted):
+    for i in range(PARTICLES_PLOTTED):
         one_row = []
         for j in range(maxTime):
             c = 1 # CON
@@ -232,7 +232,7 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     # runSimulation()
 
     # # Velocity
-    # for i in range(0, particlesPlotted):
+    # for i in range(0, PARTICLES_PLOTTED):
     #     vel = velocities[i]
     #     plt.plot(vel[:maxTime], alpha=0.5, linestyle="dashed") 
     # plt.plot(gtVelocity[:maxTime], alpha=1.0, label="ground truth")
@@ -249,7 +249,7 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     # plt.clf()
 
     # # Position
-    # for i in range(0, particlesPlotted):
+    # for i in range(0, PARTICLES_PLOTTED):
     #     pos = positions[i]
     #     plt.plot(pos[:maxTime], alpha=0.5, linestyle="dashed") 
     # plt.plot(gtPosition[:maxTime], alpha=1.0, label="ground truth")
@@ -266,10 +266,10 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
 
 
 def plotSingleTimestep(inF, outP, gtF, title, iter):
-    cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
+    cum_actions = [[0] * int(settings["PLOT_TIME"]), [0] * int(settings["PLOT_TIME"]), [0] * int(settings["PLOT_TIME"])]
     cum_color_graph = []
 
-    for robot in range(0, int(settings["numRobots"])):
+    for robot in range(0, int(settings["NUM_ROBOTS"])):
         tup = plotSingle(inF, outP, gtF, title, iter, robot)
 
         for i in range(len(cum_actions)):
@@ -280,7 +280,7 @@ def plotSingleTimestep(inF, outP, gtF, title, iter):
     figureHandler(outP, cum_actions, 0, cum_color_graph, title, iter, "cumulative", False)
 
 def plotTrajectories(graph1, graph2):
-    for iter in range(0, int(settings["numIterations"])):
+    for iter in range(0, int(settings["NUM_ITER"])):
         plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter)
         plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter)
     return
@@ -299,20 +299,20 @@ def main():
     readSettings("settings.txt")
     
     # I/O
-    pureInFile = settings["altPath"]
-    pfInFile = settings["trajGenPath"]
+    pureInFile = settings["PURE_TRAJ"]
+    pfInFile = settings["PF_TRAJ"]
 
-    gtFile = settings["stateGenPath"]
+    gtFile = settings["SIM_DATA"]
 
-    pureOutPath = settings["plotGenPath"]+"pure/"
-    pfOutPath = settings["plotGenPath"]+"pf/"
+    pureOutPath = settings["PLOT_PATH"]+"pure/"
+    pfOutPath = settings["PLOT_PATH"]+"pf/"
 
     # Plot ground truth
-    cum_actions = [[0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"]), [0] * int(settings["timeStepsPlot"])]
+    cum_actions = [[0] * int(settings["PLOT_TIME"]), [0] * int(settings["PLOT_TIME"]), [0] * int(settings["PLOT_TIME"])]
     cum_color_graph = []
 
     try:
-        for robot in range(0, int(settings["numRobots"])):
+        for robot in range(0, int(settings["NUM_ROBOTS"])):
             tup = plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
 
             for i in range(len(cum_actions)):

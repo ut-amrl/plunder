@@ -19,26 +19,26 @@ string getCsvRow(State state, double t){
             + ", " + to_string(state.la.acc) + ", " + to_string(state.ha);
 }
 
-vector<Trajectory> gen_trajectories(int robotTestSet, int useModel, double genAccuracy) {
+vector<Trajectory> gen_trajectories(int robot_set, int use_model, double gen_accuracy) {
 
     cout << "--------------Simulation---------------" << endl;
     cout << "Running 1-D kinematic car simulation:\n";
-    cout << "Using " << numRobots << " robots and low-level action standard deviation=" << stddevError << endl;
+    cout << "Using " << NUM_ROBOTS << " robots and low-level action standard deviation=" << STDDEV_ERROR << endl;
 
     // Initialization
-    vector<Robot> robots = getRobotSet(robotTestSet);
+    vector<Robot> robots = getRobotSet(robot_set);
     
     vector<Trajectory> trajectories;
 
-    for(uint i = 0; i < numRobots; i++){
+    for(uint i = 0; i < NUM_ROBOTS; i++){
         Trajectory traj(robots[i]);
 
         // Run simulation
         for(double t = 0; t < T_TOT; t += T_STEP){
 
             robots[i].updateObs();
-            robots[i].runASP(ASP_model(useModel));
-            robots[i].state.ha = pointError(robots[i].state.ha, genAccuracy);
+            robots[i].runASP(ASP_model(use_model));
+            robots[i].state.ha = pointError(robots[i].state.ha, gen_accuracy);
             robots[i].updateLA();
 
             traj.append(robots[i].state);
@@ -70,7 +70,7 @@ void write_traj(vector<Trajectory> traj, string outputPath){
         // Setup CSV file
         ofstream csvFile;
         // cout << "Filling CSV with simulation data: " << outputPath << to_string(i) << ".csv" << endl;
-        csvFile << fixed << setprecision(precision);
+        csvFile << fixed << setprecision(PRECISION);
         csvFile.open(outputPath + to_string(i) + ".csv");
         csvFile << getCsvTitles() << "\n";
         
@@ -88,10 +88,10 @@ void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){
     ofstream outFile;
     outFile.open(outputFile);
 
-    bool pointError = usePointError;
-    usePointError = false;
+    bool pointError = USE_POINT_ERROR;
+    USE_POINT_ERROR = false;
 
-    for(uint n=0; n<particlesPlotted; n++){
+    for(uint n=0; n<PARTICLES_PLOTTED; n++){
         r.reset();
         outFile << r.state.ha << ",";
         for(uint t=1; t<dataObs.size(); t++){
@@ -105,5 +105,5 @@ void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){
     }
     outFile.close();
 
-    usePointError = pointError;
+    USE_POINT_ERROR = pointError;
 }

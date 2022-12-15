@@ -9,20 +9,20 @@ uint numSpaces = 30;
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
-    vector<Robot> robots = getRobotSet(robotTestSet);
-    assert(numRobots <= robots.size() && "numRobots does not match size of test set");
-    assert(model >= 0 && model < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
+    vector<Robot> robots = getRobotSet(ROBOT_SET);
+    assert(NUM_ROBOTS <= robots.size() && "NUM_ROBOTS does not match size of test set");
+    assert(GT_ASP >= 0 && GT_ASP < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
 
-    assert(stddevError >= 0 && "Standard deviation must be positive");
-    assert(obsLikelihoodStrength >= 0 && "Observation likelihood strength must be greater than 0");
+    assert(STDDEV_ERROR >= 0 && "Standard deviation must be positive");
+    assert(OBS_LIKELIHOOD_STRENGTH >= 0 && "Observation likelihood strength must be greater than 0");
 
-    assert(pointAccuracy >= 0 && pointAccuracy <= 1 && "HA probability must be between 0 and 1");
-    assert(genAccuracy >= 0 && genAccuracy <= 1 && "HA probability must be between 0 and 1");
-    assert(max_error >= 0 && "max_error must be >= 0");
+    assert(POINT_ACCURACY >= 0 && POINT_ACCURACY <= 1 && "HA probability must be between 0 and 1");
+    assert(GEN_ACCURACY >= 0 && GEN_ACCURACY <= 1 && "HA probability must be between 0 and 1");
+    assert(TARGET_LOSS >= 0 && "TARGET_LOSS must be >= 0");
 
-    assert(sampleSize <= numParticles && "Sample size must be less than the number of particles");
-    assert(particlesPlotted <= numParticles && "Particles plotted must be less than the number of particles");
-    assert(timeStepsPlot <= T_TOT / T_STEP);
+    assert(SAMPLE_SIZE <= NUM_PARTICLES && "Sample size must be less than the number of particles");
+    assert(PARTICLES_PLOTTED <= NUM_PARTICLES && "Particles plotted must be less than the number of particles");
+    assert(PLOT_TIME <= T_TOT / T_STEP);
 }
 
 // ----- Main -------------------------------

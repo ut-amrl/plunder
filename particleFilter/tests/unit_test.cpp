@@ -29,14 +29,14 @@
 //         sum += exp(each);
 //     }
 
-//     assert(abs(res - log(sum)) < epsilon);
+//     assert(abs(res - log(sum)) < EPSILON);
 
 //     vec.push_back(-1.1);
 
 //     res = logsumexp(vec);
 //     sum += exp(vec[vec.size()-1]);
 
-//     assert(abs(res - log(sum)) < epsilon);
+//     assert(abs(res - log(sum)) < EPSILON);
 // }
 
 // void testSystematicResample(){
@@ -60,7 +60,7 @@
 //         double x = ((double) x) / RAND_MAX * 2;
 //         double pdf_gaussian = ( 1 / ( stddev * sqrt(2*M_PI) ) ) * exp( -0.5 * pow( (x-mu)/stddev, 2.0 ) );
 
-//         assert(abs(log(pdf_gaussian) - logpdf(x, mu, stddev)) < epsilon);
+//         assert(abs(log(pdf_gaussian) - logpdf(x, mu, stddev)) < EPSILON);
 //     }
 // }
 
@@ -73,10 +73,10 @@
 
 // void testTrajectoryRetrieval(){
 
-//     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), haProbCorrect);
+//     vector<Robot> robots = getRobotSet(ROBOT_SET, normal_distribution<double>(MEAN_ERROR, STDDEV_ERROR), haProbCorrect);
 
 //     int i = 0;
-//     string in = stateGenPath + to_string(i) + ".csv";
+//     string in = SIM_DATA + to_string(i) + ".csv";
 
 //     vector<Obs> dataObs;
 //     vector<LA> dataLa;
@@ -89,7 +89,7 @@
 //     int T = 4;
 //     int N = 5;
 
-//     MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, ASP_model(model), &logLikelihoodGivenMotorModel, robots[i]);
+//     MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, ASP_GT_ASP(GT_ASP), &logLikelihoodGivenMotorModel, robots[i]);
 //     ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
 
 //     pf.particles = {
@@ -148,8 +148,8 @@
 
 //     int i = 0;
 
-//     vector<Robot> robots = getRobotSet(robotTestSet, normal_distribution<double>(meanError, stddevError), haProbCorrect);
-//     string in = "../../" + stateGenPath + to_string(i) + ".csv";
+//     vector<Robot> robots = getRobotSet(ROBOT_SET, normal_distribution<double>(MEAN_ERROR, STDDEV_ERROR), haProbCorrect);
+//     string in = "../../" + SIM_DATA + to_string(i) + ".csv";
 
 //     vector<Obs> dataObs;
 //     vector<LA> dataLa;
@@ -159,7 +159,7 @@
 //         readData(in, dataObs, dataLa);
 //     }
 
-//     vector<vector<HA>> traj = runFilter(N, M, resampleThreshold, robots[i], dataObs, dataLa, ASP_model(model));
+//     vector<vector<HA>> traj = runFilter(N, M, RESAMPLE_THRESHOLD, robots[i], dataObs, dataLa, ASP_GT_ASP(GT_ASP));
 
 //     cout << "PF test - trajectories: " << endl;
 //     for(vector<HA> each: traj){
