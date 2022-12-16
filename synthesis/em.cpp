@@ -86,6 +86,23 @@ bool isValidExample(Example ex){
     return true;
 }
 
+void plot_pure(Trajectory& traj, asp* asp, string output_path) {
+
+    ofstream outFile;
+    outFile.open(output_path);
+
+    for(uint32_t n = 0; n < PARTICLES_PLOTTED; n++){
+        execute_pure(traj, asp);
+
+        for(uint32_t t = 0; t < traj.T - 1; t++) {
+            outFile << traj.get(t).ha << ",";
+        }
+        outFile << traj.get(traj.T - 1).ha << endl;
+
+    }
+    outFile.close();
+}
+
 // Expectation step
 vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp* asp){
 
@@ -120,8 +137,12 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         }
 
         // Run ASPs for all robots
-        string s = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
-        executeASP(robots[i], s, dataObs[i], asp);
+        Trajectory traj (robots[i]);
+        for(int j = 0; j < dataObs[i].size(); j++){
+            traj.append(State { HA{}, LA{}, dataObs[i][j] });
+        }
+        string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
+        plot_pure(traj, asp, plot);
 
         cout << "*";
         cout.flush();
@@ -313,8 +334,14 @@ void emLoop(vector<Robot>& robots){
         // Run ground truth ASP
         string inputFile = SIM_DATA + to_string(r) + ".csv";
         readData(inputFile, dataObs[r], dataLa[r]);
-        string s = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-        executeASP(robots[r], s, dataObs[r], ASP_model(GT_ASP));
+
+        // Run ASPs for all robots
+        Trajectory traj (robots[r]);
+        for(int j = 0; j < dataObs[r].size(); j++){
+            traj.append(State { HA{}, LA{}, dataObs[r][j] });
+        }
+        string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
+        plot_pure(traj, ASP_model(GT_ASP), plot);
     }
 
     for(int i = 0; i < NUM_ITER; i++){

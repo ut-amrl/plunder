@@ -68,6 +68,10 @@ struct Trajectory {
         return traj[t];
     }
 
+    void set(int t, State s){
+        traj[t] = s;
+    }
+
     // void append(HA ha){
     //     traj.push_back(State { ha });
     //     T++;

@@ -51,18 +51,23 @@ vector<Trajectory> gen_trajectories(int robot_set, int use_model, double gen_acc
     return trajectories;
 }
 
-void print_traj(vector<Trajectory> trajectories) {
-    for(Trajectory traj : trajectories) {
-        for (int i = 1; i < traj.T; i++) {
-            if(traj.get(i).ha != traj.get(i-1).ha){
-                cout << to_string(traj.get(i-1).ha) << " --> " << to_string(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
-            }
+void print_traj(Trajectory& traj) {
+    cout << "Printing trajectory with total time " << traj.T * T_STEP << "...";
+    for (int i = 1; i < traj.T; i++) {
+        if(traj.get(i).ha != traj.get(i-1).ha){
+            cout << to_string(traj.get(i-1).ha) << " --> " << to_string(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
         }
-        cout << "\n";
+    }
+    cout << "\n";
+}
+
+void print_traj(vector<Trajectory>& trajectories) {
+    for(Trajectory traj : trajectories) {
+        print_traj(trajectories);
     }
 }
 
-void write_traj(vector<Trajectory> traj, string outputPath){
+void write_traj(vector<Trajectory>& traj, string outputPath){
     cout << "Printing trajectories to " << outputPath << "\n\n\n";
 
     // Generate csv files
@@ -84,27 +89,20 @@ void write_traj(vector<Trajectory> traj, string outputPath){
     }
 }
 
-void executeASP(Robot& r, string outputFile, vector<Obs>& dataObs, asp* asp){
+void execute_pure(Trajectory& traj, asp* asp){
 
-    ofstream outFile;
-    outFile.open(outputFile);
-
-    bool pointError = USE_POINT_ERROR;
+    // Turn off point error
+    bool point_error = USE_POINT_ERROR;
     USE_POINT_ERROR = false;
 
-    for(uint n=0; n<PARTICLES_PLOTTED; n++){
-        r.reset();
-        outFile << r.state.ha << ",";
-        for(uint t=1; t<dataObs.size(); t++){
-            r.state.obs = dataObs[t];
-            r.runASP(asp);
-            r.updateLA(false);
-            outFile << r.state.ha;
-            if(t!=dataObs.size()-1) outFile << ",";
-        }
-        outFile << endl;
-    }
-    outFile.close();
+    for(uint32_t t = 0; t < traj.T; t++){
+        State last = (t == 0) ? State {} : traj.get(t-1);
+        State cur = traj.get(t);
+        State s { last.ha, last.la, cur.obs };
 
-    USE_POINT_ERROR = pointError;
+        traj.traj[t].ha = asp(s, traj.r);
+    }
+
+    // Restore point error
+    USE_POINT_ERROR = point_error;
 }
