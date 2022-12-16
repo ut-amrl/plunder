@@ -1,6 +1,7 @@
 #include "pf_runner.h"
 
 using namespace std;
+using namespace SETTINGS;
 
 // ----- Main ---------------------------------------------
 

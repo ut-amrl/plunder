@@ -3,6 +3,7 @@
 #include "robot.h"
 
 using namespace std;
+using namespace SETTINGS;
 
 static uint resampCount = 0; // Debug
 

@@ -3,6 +3,7 @@
 #include "accSim/robotSets.h"
 
 using namespace std;
+using namespace SETTINGS;
 
 uint numSpaces = 30;
 

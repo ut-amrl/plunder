@@ -7,6 +7,7 @@
 using nlohmann::json;
 using namespace std;
 using namespace AST;
+using namespace SETTINGS;
 
 // ----- Simulation ------------------------------------------------
 

@@ -2,6 +2,7 @@
 #include "settings.h"
 
 using namespace std;
+using namespace SETTINGS;
 
 // ----- Main ---------------------------------------------
 

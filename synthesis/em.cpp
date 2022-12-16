@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace AST;
+using namespace SETTINGS;
 using Eigen::Vector2f;
 using json = nlohmann::json;
 

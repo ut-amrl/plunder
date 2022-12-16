@@ -3,6 +3,7 @@
 #include "domain.h"
 
 using namespace std;
+using namespace SETTINGS;
 
 HA to_label(int ha){
     return static_cast<HA>(ha);
