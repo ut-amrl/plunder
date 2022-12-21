@@ -7,6 +7,9 @@ using namespace SETTINGS;
 
 static uint resampCount = 0; // Debug
 
+typedef HA init();
+typedef double obs_likelihood(State, Robot&, LA);
+
 // ----- Helper Functions ---------------------------------------------
 
 // Metric to calculate "effective" particles
@@ -20,7 +23,6 @@ double effectiveParticles(vector<double>& weights){
 
 // Resample particles given their current weights. 
 // This method performs the resampling systematically to reduce variance.
-template <typename HA>
 vector<HA> systematicResample(vector<HA>& ha, vector<double>& weights, vector<int>& ancestor){
     resampCount++;
     int n = weights.size();
@@ -46,68 +48,27 @@ vector<HA> systematicResample(vector<HA>& ha, vector<double>& weights, vector<in
     return haResampled;
 }
 
-
-// ----- Markov System ---------------------------------------------
-
-template<typename HA, typename LA, typename Obs, typename RobotClass>
-class MarkovSystem {
-    
-    private:
-    public:
-
-    HA (*sampleInitialHA)(); // Initial distribution
-    HA (*ASP)(State prevState, RobotClass& r); // Provided action-selection policy
-    double (*logLikelihoodGivenMotorModel)(State state, RobotClass& r, LA prevLA); // Calculate likelihood of observed LA given the simulated HA sequence
-    RobotClass r;
-
-    // Constructor
-    MarkovSystem(HA (*_sampleInitialHA)(), 
-                HA (*_ASP)(State prevState, RobotClass& r),
-                double (*_logLikelihoodGivenMotorModel)(State state, RobotClass& r, LA prevLA),
-                RobotClass& _r):
-
-                sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r(_r)
-    {}
-    
-    // Robot-less constructor
-    MarkovSystem(HA (*_sampleInitialHA)(), 
-                HA (*_ASP)(State prevState, RobotClass& r),
-                double (*_logLikelihoodGivenMotorModel)(State state, RobotClass& r, LA prevLA)) :
-                sampleInitialHA(_sampleInitialHA), ASP(_ASP), logLikelihoodGivenMotorModel(_logLikelihoodGivenMotorModel), r()
-    {}
-};
-
-
-
 // ----- Particle Filter ---------------------------------------------
 
-template<typename HA, typename LA, typename Obs, typename RobotClass>
 class ParticleFilter {
-    
-    private:
-    public:
+public:
 
-    MarkovSystem<HA, LA, Obs, RobotClass>* system;
-    vector<Obs> dataObs;    // Observed state sequence
-    vector<LA> dataLA;      // Observed low-level action sequence
-
+    Trajectory state_traj;    // Observed state sequence
     vector<vector<HA>> particles;   // Gives the high-level trajectories of each particle
     vector<vector<int>> ancestors;  // Stores ancestors during resampling
 
-    ParticleFilter(MarkovSystem<HA, LA, Obs, RobotClass>* _system, vector<Obs>& _dataObs, vector<LA>& _dataLA){
-        system = _system;
-        dataObs = _dataObs;
-        dataLA = _dataLA;
+    asp* asp_pf;
+    init* init_pf;
+    obs_likelihood* obs_likelihood_pf;
 
-        assert(dataObs.size() == dataLA.size());
-    }
+    ParticleFilter(Trajectory& _state_traj, asp* _asp, init* _init, obs_likelihood* _obs_likelihood) : state_traj(_state_traj), asp_pf(_asp), init_pf(_init), obs_likelihood_pf(_obs_likelihood) {}
 
-    // Run particle filter on NUM_PARTICLES particles (and some RESAMPLE_THRESHOLD between 0 and 1)
-    double forwardFilter(int NUM_PARTICLES, float RESAMPLE_THRESHOLD){
+    // Run particle filter on num_particles particles
+    double forwardFilter(int num_particles){
 
         // Initialization
-        int N = NUM_PARTICLES;
-        int T = dataObs.size();
+        int N = num_particles;
+        int T = state_traj.T;
 
         vector<double> log_weights(N);
         vector<double> weights(N);
@@ -120,26 +81,19 @@ class ParticleFilter {
         
         // Sample from initial distribution
         for(int i = 0; i < N; i++){
-            particles[0][i] = system->sampleInitialHA();
+            particles[0][i] = init_pf();
             ancestors[0][i] = i;
             log_weights[i] = -log(N);
             weights[i] = exp(log_weights[i]);
         }
-
-        // Extension: iterate through enum calculating possible future HA as optimization. Ex:
-        // motionModel(CON, dataObs[t-1]);
-        // motionModel(DEC, dataObs[t-1]);
-        // motionModel(ACC, dataObs[t-1]);
-
-        // cout << "Robot:\n\n\n";
 
         for(int t = 0; t < T; t++){
             
             // Reweight particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
-                LA prevLA = (t == 0) ? LA{} : dataLA[t-1];
-                double log_LA_ti = system->logLikelihoodGivenMotorModel(State { x_i, prevLA, dataObs[t] }, system->r, dataLA[t]);
+                LA prevLA = (t == 0) ? LA{} : state_traj.get(t-1).la;
+                double log_LA_ti = obs_likelihood_pf(State { x_i, prevLA, state_traj.get(t).obs }, state_traj.r, state_traj.get(t).la);
                 log_weights[i] += log_LA_ti;
             }
 
@@ -158,7 +112,7 @@ class ParticleFilter {
 
             // Optionally resample when number of effective particles is low
             if(effectiveParticles(weights) < N * RESAMPLE_THRESHOLD){
-                particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
+                particles[t] = systematicResample(particles[t], weights, ancestors[t]);
 
                 // Reset weights
                 for(int i = 0; i < N; i++){
@@ -175,11 +129,11 @@ class ParticleFilter {
             // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = system->ASP(State { particles[t][i], LA {}, dataObs[t] } , system->r);
+                    particles[t+1][i] = asp_pf(State { particles[t][i], LA {}, state_traj.get(t).obs }, state_traj.r);
                 }
             } else { 
                 // resample at last step to eliminate deviating particles
-                particles[t] = systematicResample<HA>(particles[t], weights, ancestors[t]);
+                particles[t] = systematicResample(particles[t], weights, ancestors[t]);
             }
         }
         return log_obs;

@@ -59,7 +59,6 @@ namespace SETTINGS {
     bool USE_POINT_ERROR = true;                // point error: random transitions to a new high-level action
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
-    const bool USE_SIMPLE_MOTOR = false;        // Use simulation motor GT_ASP or a simplified version
 
     // Plot parameters
     const int PARTICLES_PLOTTED = 100;                                  // Number of particles plotted

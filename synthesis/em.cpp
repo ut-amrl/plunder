@@ -104,7 +104,7 @@ void plot_pure(Trajectory& traj, asp* asp, string output_path) {
 }
 
 // Expectation step
-vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<vector<Obs>>& dataObs, vector<vector<LA>>& dataLa, asp* asp){
+vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<Trajectory>& state_traj, asp* asp){
 
     vector<vector<Example>> examples;
 
@@ -119,7 +119,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
 
         // Run filter
         vector<vector<HA>> trajectories;
-        cum_log_obs += filterFromFile(trajectories, NUM_PARTICLES, NUM_TRAJECTORIES, RESAMPLE_THRESHOLD, robots[i], in, out, dataObs[i], dataLa[i], asp);
+        cum_log_obs += filterFromFile(trajectories, NUM_PARTICLES, NUM_TRAJECTORIES, in, out, state_traj[i], asp);
 
 
         shuffle(begin(trajectories), end(trajectories), default_random_engine {});
@@ -127,8 +127,8 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         // Convert each particle trajectory point to EMDIPS-supported Example
         for(uint n = 0; n < SAMPLE_SIZE; n++){
             vector<HA> traj = trajectories[n];
-            for(uint t = 0; t < dataObs[i].size() - 1 - END_PF_ERROR; t++){
-                Example ex = dataToExample(traj[t], dataObs[i][t+1], robots[i]);
+            for(uint t = 0; t < state_traj[i].T - 1 - END_PF_ERROR; t++){
+                Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs, robots[i]);
 
                 // Provide next high-level action
                 ex.result_ = SymEntry(to_string(traj[t+1]));
@@ -136,13 +136,8 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
             }
         }
 
-        // Run ASPs for all robots
-        Trajectory traj (robots[i]);
-        for(int j = 0; j < dataObs[i].size(); j++){
-            traj.append(State { HA{}, LA{}, dataObs[i][j] });
-        }
         string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
-        plot_pure(traj, asp, plot);
+        plot_pure(state_traj[i], asp, plot);
 
         cout << "*";
         cout.flush();
@@ -327,21 +322,19 @@ void emLoop(vector<Robot>& robots){
 
     library = ReadLibrary(OPERATION_LIB);
     asp* curASP = initialASP;
-    vector<vector<Obs>> dataObs (NUM_ROBOTS);
-    vector<vector<LA>> dataLa (NUM_ROBOTS);
+    vector<Trajectory> state_traj;
 
     for(int r = 0; r < NUM_ROBOTS; r++){
         // Run ground truth ASP
         string inputFile = SIM_DATA + to_string(r) + ".csv";
-        readData(inputFile, dataObs[r], dataLa[r]);
+        Trajectory traj (robots[r]);
+        readData(inputFile, traj);
 
         // Run ASPs for all robots
-        Trajectory traj (robots[r]);
-        for(int j = 0; j < dataObs[r].size(); j++){
-            traj.append(State { HA{}, LA{}, dataObs[r][j] });
-        }
         string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
         plot_pure(traj, ASP_model(GT_ASP), plot);
+
+        state_traj.push_back(traj);
     }
 
     for(int i = 0; i < NUM_ITER; i++){
@@ -352,7 +345,7 @@ void emLoop(vector<Robot>& robots){
         cout << "|          Loop " << i << " EXPECTATION         |\n";
         cout << "|                                     |\n";
         cout << "|-------------------------------------|\n";
-        vector<vector<Example>> examples = expectation(i, robots, dataObs, dataLa, curASP);
+        vector<vector<Example>> examples = expectation(i, robots, state_traj, curASP);
 
         // Maximization
         cout << "\n|-------------------------------------|\n";

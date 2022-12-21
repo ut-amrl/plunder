@@ -16,34 +16,17 @@ HA sampleInitialHA(){
     return to_label(mod);
 }
 
-double pfMotorModel(State state, Robot& r, LA nextLA) {
-    double mean = 0;
-    double stddev = min(r.accMax, abs(r.decMax));
-    if(state.ha == ACC) mean = r.accMax;
-    if(state.ha == DEC) mean = r.decMax;
-
-    return logpdf(nextLA.acc, mean, OBS_LIKELIHOOD_STRENGTH * stddev);
-}
-
-double robotMotorModel(State state, Robot& r, LA nextLA) {
+// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
+double obs_likelihood_given_model(State state, Robot& r, LA nextLA){
     double mean = motorModel(state, r, false).acc; // should be using the previous LA
     return logpdf(nextLA.acc, mean, OBS_LIKELIHOOD_STRENGTH * STDDEV_ERROR);
-}
-
-
-// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-double logLikelihoodGivenMotorModel(State state, Robot& r, LA nextLA){
-    if(USE_SIMPLE_MOTOR){
-        return pfMotorModel(state, r, nextLA);
-    }
-    return robotMotorModel(state, r, nextLA);
 }
 
 
 // ----- I/O ---------------------------------------------
 
 // Read low-level action sequence and observed state sequence from file
-void readData(string file, vector<Obs>& dataObs, vector<LA>& dataLA){
+void readData(string file, Trajectory& traj){
     ifstream infile;
     infile.open(file);
     string res;
@@ -58,15 +41,14 @@ void readData(string file, vector<Obs>& dataObs, vector<LA>& dataLA){
         iss >> time >> comma >> x >> comma >> v >> comma >> a;
 
         Obs obs = { .pos = x, .vel = v };
-        dataObs.push_back(obs);
-
         LA la = { .acc = a };
-        dataLA.push_back(la);
+
+        traj.append(State { HA{}, la, obs });
     }
 }
 
 // Write high-level action sequences (trajectories) to file
-void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<Obs>& dataObs){
+void writeData(string file, vector<vector<HA>>& trajectories){
     ofstream outFile;
     outFile.open(file);
 
@@ -87,20 +69,21 @@ void writeData(string file, Robot& r, vector<vector<HA>>& trajectories, vector<O
 // ----- Particle Filter ---------------------------------------------
 
 // Full trajectory generation with particle filter
-double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample_threshold, Robot& r, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
+double runFilter(vector<vector<HA>>& trajectories, int N, int M, Trajectory& traj, asp* asp){
 
     // Initialization
     srand(0);
-    MarkovSystem<HA, LA, Obs, Robot> ms (&sampleInitialHA, asp, &logLikelihoodGivenMotorModel, r);
-    ParticleFilter<HA, LA, Obs, Robot> pf (&ms, dataObs, dataLa);
+    ParticleFilter pf (traj, asp, &sampleInitialHA, &obs_likelihood_given_model);
     resampCount = 0;
     
     // Run particle filter
-    double obs_likelihood = pf.forwardFilter(N, resample_threshold);
+    double obs_likelihood = pf.forwardFilter(N);
 
     pf.retrieveTrajectories(trajectories, M);
 
-    // cout << "resample count: " << resampCount << endl;
+    if(DEBUG)
+        cout << "resample count: " << resampCount << endl;
+    
     if(SMOOTH_TRAJECTORIES){
         trajectories = pf.smoothTrajectories(trajectories);
     }
@@ -109,17 +92,16 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, double resample
 }
 
 // Read input, run filter, write output
-double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, double resample_threshold, Robot& r, string inputFile, string outputFile, vector<Obs>& dataObs, vector<LA>& dataLa, asp* asp){
+double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, string inputFile, string outputFile, Trajectory& traj, asp* asp){
     // Read input
-    if(dataObs.size() == 0 || dataLa.size() == 0){
-        dataObs.clear(); dataLa.clear();
-        readData(inputFile, dataObs, dataLa);
+    if(traj.T == 0){
+        readData(inputFile, traj);
     }
 
-    double obs_likelihood = runFilter(trajectories, N, M, resample_threshold, r, dataObs, dataLa, asp);
+    double obs_likelihood = runFilter(trajectories, N, M, traj, asp);
 
     // Write results
-    writeData(outputFile, r, trajectories, dataObs);
+    writeData(outputFile, trajectories);
 
     return obs_likelihood;
 }

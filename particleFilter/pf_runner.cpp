@@ -12,10 +12,9 @@ int main(int argc, char** argv){
         string in = SIM_DATA + to_string(i) + ".csv";
         string out = PF_TRAJ + to_string(i) + ".csv";
 
-        vector<Obs> dataObs;
-        vector<LA> dataLa;
+        Trajectory traj (robots[i]);
         vector<vector<HA>> trajectories;
-        filterFromFile(trajectories, NUM_PARTICLES, NUM_TRAJECTORIES, RESAMPLE_THRESHOLD, robots[i], in, out, dataObs, dataLa, ASP_model(GT_ASP));
+        filterFromFile(trajectories, NUM_PARTICLES, NUM_TRAJECTORIES, in, out, traj, ASP_model(GT_ASP));
         cout << "*";
     }
     cout << "\r";
