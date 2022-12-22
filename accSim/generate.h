@@ -20,7 +20,7 @@ string getCsvRow(State state, double t){
             + ", " + to_string(state.la.acc) + ", " + to_string(state.ha);
 }
 
-vector<Trajectory> gen_trajectories(int robot_set, int use_model, double gen_accuracy) {
+vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy) {
 
     cout << "--------------Simulation---------------" << endl;
     cout << "Running 1-D kinematic car simulation:\n";
@@ -38,7 +38,7 @@ vector<Trajectory> gen_trajectories(int robot_set, int use_model, double gen_acc
         for(double t = 0; t < T_TOT; t += T_STEP){
 
             robots[i].updateObs();
-            robots[i].runASP(ASP_model(use_model));
+            robots[i].runASP(asp);
             robots[i].state.ha = pointError(robots[i].state.ha, gen_accuracy);
             robots[i].updateLA();
 

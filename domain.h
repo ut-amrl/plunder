@@ -18,6 +18,8 @@ enum HA { // High-level labels
 
 const uint numHA = 3;
 
+// TODO (major overhaul): convert these all to a map<string, double>, abstracting them away
+
 struct LA { // Low-level actions
     double acc; // acceleration
 };
