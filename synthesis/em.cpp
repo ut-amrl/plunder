@@ -84,10 +84,10 @@ void plot_pure(Trajectory& traj, asp* asp, string output_path) {
     for(uint32_t n = 0; n < PARTICLES_PLOTTED; n++){
         execute_pure(traj, asp);
 
-        for(uint32_t t = 0; t < traj.T - 1; t++) {
+        for(uint32_t t = 0; t < traj.size() - 1; t++) {
             outFile << traj.get(t).ha << ",";
         }
-        outFile << traj.get(traj.T - 1).ha << endl;
+        outFile << traj.get(traj.size() - 1).ha << endl;
 
     }
     outFile.close();
@@ -117,7 +117,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         // Convert each particle trajectory point to EMDIPS-supported Example
         for(uint n = 0; n < SAMPLE_SIZE; n++){
             vector<HA> traj = trajectories[n];
-            for(uint t = 0; t < state_traj[i].T - 1 - END_PF_ERROR; t++){
+            for(uint t = 0; t < state_traj[i].size() - 1 - END_PF_ERROR; t++){
                 Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs, robots[i]);
 
                 // Provide next high-level action

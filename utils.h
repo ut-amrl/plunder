@@ -18,15 +18,13 @@ struct State {
 class Robot;
 
 struct Trajectory {
-    int T;
     Robot& r;
     vector<State> traj;
 
-    Trajectory(Robot& robot) : T(0), r(robot) {}
+    Trajectory(Robot& robot) : r(robot) {}
 
     void append(State s) {
         traj.push_back(s);
-        T++;
     }
 
     State get(int t) {
@@ -37,20 +35,9 @@ struct Trajectory {
         traj[t] = s;
     }
 
-    // void append(HA ha){
-    //     traj.push_back(State { ha });
-    //     T++;
-    // }
-
-    // void append(LA la){
-    //     traj.push_back(State { HA{}, la });
-    //     T++;
-    // }
-
-    // void append(Obs obs){
-    //     traj.push_back(State { HA{}, LA{}, obs});
-    //     T++;
-    // }
+    int size() {
+        return traj.size();
+    }
 };
 
 // Helper functions

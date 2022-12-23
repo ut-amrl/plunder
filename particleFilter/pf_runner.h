@@ -93,7 +93,7 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, Trajectory& tra
 // Read input, run filter, write output
 double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, string inputFile, string outputFile, Trajectory& traj, asp* asp){
     // Read input
-    if(traj.T == 0){
+    if(traj.size() == 0){
         readData(inputFile, traj);
     }
 

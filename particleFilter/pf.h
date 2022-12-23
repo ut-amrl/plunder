@@ -68,7 +68,7 @@ public:
 
         // Initialization
         int N = num_particles;
-        int T = state_traj.T;
+        int T = state_traj.size();
 
         vector<double> log_weights(N);
         vector<double> weights(N);

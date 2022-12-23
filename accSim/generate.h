@@ -52,8 +52,8 @@ vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy
 }
 
 void print_traj(Trajectory& traj) {
-    cout << "Printing trajectory with total time " << traj.T * T_STEP << "...";
-    for (int i = 1; i < traj.T; i++) {
+    cout << "Printing trajectory with total time " << traj.size() * T_STEP << "...";
+    for (int i = 1; i < traj.size(); i++) {
         if(traj.get(i).ha != traj.get(i-1).ha){
             cout << print(traj.get(i-1).ha) << " --> " << print(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
         }
@@ -80,7 +80,7 @@ void write_traj(vector<Trajectory>& traj, string outputPath){
         csvFile.open(outputPath + to_string(i) + ".csv");
         csvFile << getCsvTitles() << "\n";
         
-        for(double t = 0; t < traj[i].T; t++) {
+        for(double t = 0; t < traj[i].size(); t++) {
             // Print trace
             csvFile << getCsvRow(traj[i].get(t), t) << "\n";
         }
@@ -95,7 +95,7 @@ void execute_pure(Trajectory& traj, asp* asp){
     bool point_error = USE_POINT_ERROR;
     USE_POINT_ERROR = false;
 
-    for(uint32_t t = 0; t < traj.T; t++){
+    for(uint32_t t = 0; t < traj.size(); t++){
         State last = (t == 0) ? State {} : traj.get(t-1);
         State cur = traj.get(t);
         State s { last.ha, last.la, cur.obs };
