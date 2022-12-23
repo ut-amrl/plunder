@@ -5,8 +5,68 @@
 using namespace std;
 using namespace SETTINGS;
 
-HA to_label(int ha){
-    return static_cast<HA>(ha);
+
+// ----- Markov System Definitions --------------------------------
+typedef int HA;
+
+struct State {
+    HA ha;
+    LA la;
+    Obs obs;
+};
+
+class Robot;
+
+struct Trajectory {
+    int T;
+    Robot& r;
+    vector<State> traj;
+
+    Trajectory(Robot& robot) : T(0), r(robot) {}
+
+    void append(State s) {
+        traj.push_back(s);
+        T++;
+    }
+
+    State get(int t) {
+        return traj[t];
+    }
+
+    void set(int t, State s){
+        traj[t] = s;
+    }
+
+    // void append(HA ha){
+    //     traj.push_back(State { ha });
+    //     T++;
+    // }
+
+    // void append(LA la){
+    //     traj.push_back(State { HA{}, la });
+    //     T++;
+    // }
+
+    // void append(Obs obs){
+    //     traj.push_back(State { HA{}, LA{}, obs});
+    //     T++;
+    // }
+};
+
+// Helper functions
+const uint numHA = HA_Labels.size();
+
+string print(HA ha){
+    return HA_Labels[ha];
+}
+
+HA to_label(string str){
+    for(int i = 0; i < numHA; i++){
+        if(HA_Labels[i] == str){
+            return i;
+        }
+    }
+    return 0;
 }
 
 // Random error distributions
@@ -34,14 +94,9 @@ HA pointError(HA ha = to_label(0), double accuracy = POINT_ACCURACY, bool use_sa
     if(USE_POINT_ERROR){
         HA prevHA = ha;
         if(!flip(accuracy)){
-            int mod = rand() % numHA;
-            ha = to_label(mod);
+            ha = rand() % numHA;
 
             // TODO: abstract away safe transitions
-            // if(use_safe_transitions){
-            //     if(prevHA == CON && ha == ACC) ha = DEC;
-            //     if(prevHA == DEC) ha = DEC;
-            // }
         }
     }
     return ha;

@@ -5,7 +5,7 @@
 using namespace std;
 using namespace SETTINGS;
 
-uint numSpaces = 30;
+const uint numSpaces = 30;
 
 // ----- Asserts -------------------------------
 

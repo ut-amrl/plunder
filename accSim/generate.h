@@ -17,7 +17,7 @@ string getCsvTitles(){
 
 string getCsvRow(State state, double t){
     return to_string(t) + ", " + to_string(state.obs.pos) + ", " + to_string(state.obs.vel)
-            + ", " + to_string(state.la.acc) + ", " + to_string(state.ha);
+            + ", " + to_string(state.la.acc) + ", " + print(state.ha);
 }
 
 vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy) {
@@ -55,7 +55,7 @@ void print_traj(Trajectory& traj) {
     cout << "Printing trajectory with total time " << traj.T * T_STEP << "...";
     for (int i = 1; i < traj.T; i++) {
         if(traj.get(i).ha != traj.get(i-1).ha){
-            cout << to_string(traj.get(i-1).ha) << " --> " << to_string(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
+            cout << print(traj.get(i-1).ha) << " --> " << print(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
         }
     }
     cout << "\n";

@@ -12,8 +12,7 @@ using namespace SETTINGS;
 // Initial distribution
 HA sampleInitialHA(){
     // Uniformly Randomly Distributed
-    int mod = rand() % numHA;
-    return to_label(mod);
+    return rand() % numHA;
 }
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log

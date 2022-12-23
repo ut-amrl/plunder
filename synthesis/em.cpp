@@ -38,7 +38,7 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
     ex.symbol_table_["vMax"] = SymEntry((float) robot.vMax);
     ex.symbol_table_["target"] = SymEntry((float) robot.target);
 
-    ex.start_ = SymEntry(to_string(ha));
+    ex.start_ = SymEntry(print(ha));
 
     return ex;
 }
@@ -60,7 +60,7 @@ HA emdipsASP(State state, Robot& robot){
     HA prevHA = state.ha;
     Example obsObject = dataToExample(state.ha, state.obs, robot);
     for(uint i = 0; i < transitions.size(); i++){
-        if(to_string(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
+        if(print(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
             if(InterpretBool(preds[i], obsObject)) {
                 state.ha = to_label(transitions[i].second);
                 break;
@@ -74,16 +74,6 @@ HA emdipsASP(State state, Robot& robot){
 // Initial ASP: random transitions
 HA initialASP(State state, Robot& r) {
     return pointError(state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS);
-}
-
-bool isValidExample(Example ex){
-    // return (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("CON")) ||
-    //         (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("ACC")) ||
-    //         (ex.start_.GetString()==("ACC") && ex.result_.GetString()==("DEC")) ||
-    //         (ex.start_.GetString()==("CON") && ex.result_.GetString()==("DEC")) ||
-    //         (ex.start_.GetString()==("CON") && ex.result_.GetString()==("CON")) ||
-    //         (ex.start_.GetString()==("DEC") && ex.result_.GetString()==("DEC"));
-    return true;
 }
 
 void plot_pure(Trajectory& traj, asp* asp, string output_path) {
@@ -131,8 +121,8 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
                 Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs, robots[i]);
 
                 // Provide next high-level action
-                ex.result_ = SymEntry(to_string(traj[t+1]));
-                if(isValidExample(ex)) examples[i].push_back(ex);
+                ex.result_ = SymEntry(print(traj[t+1]));
+                examples[i].push_back(ex);
             }
         }
 
@@ -241,6 +231,7 @@ void setupLdips(){
     variables.insert(target);
 
     if(USE_SAFE_TRANSITIONS){
+        // TODO: abstract away safe transitions
         transitions.push_back(pair<string, string> ("ACC", "CON"));
         accuracies.push_back(numeric_limits<float>::max());
         transitions.push_back(pair<string, string> ("ACC", "DEC"));
@@ -250,7 +241,7 @@ void setupLdips(){
     } else {
         for(uint i = 0; i < numHA; i++){
             for(uint j = 0; j < numHA; j++){
-                transitions.push_back(pair<string, string> (to_string(to_label(i)), to_string(to_label(j))));
+                transitions.push_back(pair<string, string> (print(i), print(j)));
                 accuracies.push_back(numeric_limits<float>::max());
             }
         }

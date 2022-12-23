@@ -121,10 +121,7 @@ HA ASP_Hand_prob(State state, Robot& r){
 * This is a uniformly random ASP.
 */
 HA ASP_random(State state, Robot& r){
-    int mod = rand() % numHA;
-    HA ha = to_label(mod);
-
-    return ha;
+    return rand() % numHA;
 }
 
 // Select an ASP to use
