@@ -1,3 +1,6 @@
+# Set target directory here OR pass in through command line
+target_dir ?= 1D-target
+
 #acceptable build_types: Release/Debug/Profile
 build_type=Release
 # build_type=Debug
@@ -28,34 +31,36 @@ build:
 	mkdir -p build
 
 $(SETTINGS):
-			./bin/settings
+			cp $(target_dir)/settings.h settings.h && \
+			./bin/settings && \
+			rm settings.h
 
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
-			mkdir -p simulation/out && \
+			mkdir -p $(target_dir)/sim && \
 			./bin/gen
 
 $(PF):
 			$(MAKE) $(SETTINGS) && \
-			mkdir -p particleFilter/out && \
-			mkdir -p synthesis/out/examples && \
+			mkdir -p $(target_dir)/out && \
+			mkdir -p $(target_dir)/out/pf_traj && \
 			./bin/pf
 
 $(PLT):
 			$(MAKE) $(SETTINGS) && \
-			rm -rf synthesis/plots && \
-			mkdir -p synthesis/plots && \
-			mkdir -p synthesis/plots/pure && \
-			mkdir -p synthesis/plots/pf && \
+			rm -rf $(target_dir)/plots && \
+			mkdir -p $(target_dir)/plots && \
+			mkdir -p $(target_dir)/plots/pure && \
+			mkdir -p $(target_dir)/plots/pf && \
 			$(PY) particleFilter/plotter.py
 
 $(EMNG):
 			$(MAKE) $(SETTINGS) && \
-			rm -rf synthesis/out && \
-			mkdir -p synthesis/out/examples && \
-			mkdir -p synthesis/out/states && \
-			touch synthesis/out/em.txt && \
-			./bin/emloop | tee synthesis/out/em.txt
+			rm -rf $(target_dir)/out && \
+			mkdir -p $(target_dir)/out/pf_traj && \
+			mkdir -p $(target_dir)/out/pure_traj && \
+			touch $(target_dir)/out/em.txt && \
+			./bin/emloop | tee $(target_dir)/out/em.txt
 			
 $(EM):
 			$(MAKE) clear_data && \
@@ -66,11 +71,11 @@ clean:
 	rm -rf bin build lib
 
 clear_data:
-	rm -rf simulation/out synthesis/plots synthesis/out settings.txt
+	rm -rf $(target_dir)/sim $(target_dir)/plots $(target_dir)/out settings.txt
 
 purge: clean clear_data
 
 snapshot:
 	echo $(D)-$(FN) && \
-	mkdir -p saved_outputs/$(D)-$(FN) && \
-	cp -r simulation/out synthesis/plots synthesis/out settings.txt pips/src/optimizer/optimizer.py saved_outputs/$D-$(FN)
+	mkdir -p $(target_dir)/saved_outputs/$(D)-$(FN) && \
+	cp -r $(target_dir)/sim $(target_dir)/plots $(target_dir)/out settings.txt pips/src/optimizer/optimizer.py saved_outputs/$D-$(FN)

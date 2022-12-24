@@ -30,25 +30,28 @@ See **pips/**. No further dependencies are required. (scipy?)
 
 ---
 # How to run
-To get the project running, you will need to make the following changes:
-
-- in **domain.h**, define your high-level action space, low-level action space, and state space.
-- in **robot.h**, define your motor model.
-- in **pips/**, follow the instructions to define the desired operations and the dimensions of each observed variable.
-- optionally, tune the desired hyperparameters in **settings.h**.
+To get the project running, you will need to do the following:
+- Create a new folder to house your problem domain. 
+- In that directory, create the files **domain.h, robot.h,** and **settings.h**. 
+- In **domain.h**, define your high-level action space, low-level action space, and state space.
+- In **robot.h**, define your motor model.
+- In **settings.h**, tune the desired parameters (including I/O paths).
+- In **pips/**, follow the instructions to define the desired operations and the dimensions of each observed variable. // TODO: should not be necessary
 
 If you need to simulate your own demonstrations, you can also use our interface to:
 - Define the ground-truth ASP and the physics model in **robot.h**.
-- Set the desired demonstration robot(s) in **simulation/robotSets.h**.
+- Set the desired demonstration robot(s) in **robotSets.h**.
+
+An example setup is defined in *1D-target*; it may be easier to copy paste that folder and work from there.
 
 Then, you can use *make* commands to run the project:
-- **make** to build the project
+- **make <target_dir>** to build the project. (Alternatively, go into the Makefile and set the variable *target_dir* to the desired folder, then run *make*.)
 - **make em** to run the full EM Synthesis algorithm, including simulating demonstrations
 - **make emng** to run the EM Synthesis algorithm, without simulating demonstrations
 - **make plt** to plot the algorithm outputs and store them into *synthesis/plots/*
 - **make clean, make clear_data, make purge** to delete all build files, to clear all data/plots/trajectories, or both
 
-Other *make* commands which are not required:
+Other *make* commands which are not commonly used:
 - **make gen** to run only the simulation
 - **make pf** to run only the particle filter (E-step)
 - **make settings** to compile settings
@@ -57,13 +60,12 @@ Other *make* commands which are not required:
 ## Project Organization
 This project is roughly split into the following components:
 
-- **simulation/** - simulated demonstrations for a 1D vehicle simulation
-- **highway-env/** - gathering demonstrations for a lane-merging, 2D highway environment
+- **simulation/** - for simulating demonstrations given a ground-truth ASP
 - **particleFilter/** (expectation step) - runs a particle filter to get a set of most likely high-level actions
 - **pips/** (maximization step) - runs a program synthesizer to generate the program that is maximally consistent with the given high-level actions
 - **synthesis/** - runs the EM-loop, alternating between expectation and maximization steps
-- **domain.h** - defines the problem domain, including the spaces $H$, $L$, and $O$
-- **robot.h** - defines world models, including the simulation ASP, motor model, and physics model
-- **settings.h** - consolidated list of hyperparameters and settings
+- **<target_dir>/domain.h** - defines the problem domain, including the spaces $H$, $L$, and $O$
+- **<target_dir>/robot.h** - defines world models, including the simulation ASP, motor model, and physics model
+- **<target_dir>/settings.h** - consolidated list of hyperparameters and settings
 - **utils.h** - useful functions for general use
 - **translateSettings.cpp** - converts settings.h into a text file (settings.txt) for easy Python interpretation
