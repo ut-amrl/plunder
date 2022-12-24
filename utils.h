@@ -55,6 +55,21 @@ HA to_label(string str){
     return 0;
 }
 
+// Define valid transitions
+vector<HA> all;
+vector<HA> get_valid_ha(HA ha, bool use_safe_transitions){
+    if(use_safe_transitions){
+        return valid_transitions[ha];
+    }
+    if(all.size() != 0)
+        return all;
+
+    for(int i = 0; i < numHA; i++){
+        all.push_back(i);
+    }
+    return all;
+}
+
 // Random error distributions
 random_device rd;
 default_random_engine gen(0);
@@ -77,7 +92,7 @@ double logistic(double midpoint, double spread, double input){
 
 // randomly transition to another HA
 HA pointError(HA prev_ha=0, HA ha=0, double accuracy=POINT_ACCURACY, bool use_safe_transitions=false){
-    vector<HA> all_possible_ha = valid_transitions(prev_ha, use_safe_transitions);
+    vector<HA> all_possible_ha = get_valid_ha(prev_ha, use_safe_transitions);
     if(USE_POINT_ERROR){
         if(!flip(accuracy)){
             int index = rand() % all_possible_ha.size();

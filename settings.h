@@ -14,6 +14,8 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <map>
+#include <set>
 #include <cmath>
 #include <cassert>
 #include <numeric>

@@ -229,20 +229,12 @@ void setupLdips(){
     variables.insert(vMax);
     variables.insert(target);
 
-    if(USE_SAFE_TRANSITIONS){
-        // TODO: abstract away safe transitions
-        transitions.push_back(pair<string, string> ("ACC", "CON"));
-        accuracies.push_back(numeric_limits<float>::max());
-        transitions.push_back(pair<string, string> ("ACC", "DEC"));
-        accuracies.push_back(numeric_limits<float>::max());
-        transitions.push_back(pair<string, string> ("CON", "DEC"));
-        accuracies.push_back(numeric_limits<float>::max());
-    } else {
-        for(uint i = 0; i < numHA; i++){
-            for(uint j = 0; j < numHA; j++){
-                transitions.push_back(pair<string, string> (print(i), print(j)));
-                accuracies.push_back(numeric_limits<float>::max());
-            }
+    // Insert transitions
+    for(uint i = 0; i < numHA; i++){
+        vector<HA> valid_ha = get_valid_ha(i, USE_SAFE_TRANSITIONS);
+        for(uint j = 0; j < valid_ha.size(); j++){
+            transitions.push_back(pair<string, string> (print(i), print(valid_ha[j])));
+            accuracies.push_back(numeric_limits<float>::max());
         }
     }
     

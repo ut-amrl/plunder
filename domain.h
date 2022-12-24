@@ -21,18 +21,12 @@ vector<string> HA_Labels = { // High-level action labels
     "CON"  // No acceleration
 };
 
-// Define valid transitions
-vector<HA> valid_transitions(HA ha, bool use_safe_transitions){
-    vector<HA> valid;
-    if(use_safe_transitions){
-        if(ha == ACC) valid={ACC, CON, DEC};
-        if(ha == CON) valid={CON, DEC};
-        if(ha == DEC) valid={DEC};
-    } else {
-        valid={ACC, DEC, CON};
-    }
-    return valid;
-}
+// Optional: create safe transitions. To turn this feature on, toggle USE_SAFE_TRANSITIONS in settings.
+map<HA, vector<HA>> valid_transitions = {
+    { ACC, {ACC, DEC, CON} },
+    { CON, {DEC, CON} },
+    { DEC, {DEC} }
+};
 
 // TODO (major overhaul): convert these all to a map<string, double>, abstracting them away
 
