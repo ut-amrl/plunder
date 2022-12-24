@@ -51,7 +51,7 @@ SET(libs glog amrl_shared_lib boost_system gflags
     pthread)
 
 include_directories(pips/src/)
-include_directories(accSim/)
+include_directories(simulation/)
 include_directories(particleFilter/)
 include_directories(synthesis/)
 include_directories(./)
@@ -68,7 +68,7 @@ add_subdirectory(pips/submodules/gflags)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(pips/submodules/json)
 
-# Build the core of C++ PIPS as a static library, which the executables can
+# Build the core of C++ EM Synthesis as a static library, which the executables can
 # link to. This enables shorter compile times since these files only need to be
 # built once.
 set(CXX_PIPS_SRCS
@@ -93,19 +93,13 @@ set(CXX_PIPS_SRCS
     pips/src/ast/parsing.hpp
     pips/src/ast/synthesis.cpp
     pips/src/ast/synthesis.hpp
-    accSim/generate.cpp
-    accSim/generate.h
-    accSim/robotSets.h
+    simulation/generate.cpp
+    simulation/generate.h
     particleFilter/pf_runner.cpp
     particleFilter/pf_runner.h
     particleFilter/pf.h
-    particleFilter/plotter.py
-    particleFilter/pf_runner.cpp
     synthesis/em.cpp
-    domain.h
     utils.h
-    robot.h
-    settings.h
     translateSettings.cpp)
 add_library(c++-pips-core ${CXX_PIPS_SRCS})
 # target_link_libraries(c++-pips-core amrl_shared_lib)
@@ -125,7 +119,7 @@ target_link_libraries(settings c++-pips-core stdc++fs)
 add_executable(pf particleFilter/pf_runner.cpp)
 target_link_libraries(pf c++-pips-core stdc++fs)
 
-add_executable(gen accSim/generate.cpp)
+add_executable(gen simulation/generate.cpp)
 target_link_libraries(gen c++-pips-core stdc++fs)
 
 add_executable(emloop synthesis/em.cpp)

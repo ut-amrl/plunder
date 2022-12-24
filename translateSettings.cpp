@@ -1,6 +1,6 @@
 #include "settings.h"
 #include "robot.h"
-#include "accSim/robotSets.h"
+#include "robotSets.h"
 
 using namespace std;
 using namespace SETTINGS;

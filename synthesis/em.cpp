@@ -6,7 +6,7 @@
 #include "ast/synthesis.hpp"
 
 #include "particleFilter/pf_runner.h"
-#include "accSim/generate.h"
+#include "simulation/generate.h"
 
 using namespace std;
 using namespace AST;

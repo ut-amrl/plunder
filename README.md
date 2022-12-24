@@ -39,7 +39,7 @@ To get the project running, you will need to make the following changes:
 
 If you need to simulate your own demonstrations, you can also use our interface to:
 - Define the ground-truth ASP and the physics model in **robot.h**.
-- Set the desired demonstration robot(s) in **accSim/robotSets.h**.
+- Set the desired demonstration robot(s) in **simulation/robotSets.h**.
 
 Then, you can use *make* commands to run the project:
 - **make** to build the project
@@ -57,7 +57,7 @@ Other *make* commands which are not required:
 ## Project Organization
 This project is roughly split into the following components:
 
-- **accSim/** - simulated demonstrations for a 1D vehicle simulation
+- **simulation/** - simulated demonstrations for a 1D vehicle simulation
 - **highway-env/** - gathering demonstrations for a lane-merging, 2D highway environment
 - **particleFilter/** (expectation step) - runs a particle filter to get a set of most likely high-level actions
 - **pips/** (maximization step) - runs a program synthesizer to generate the program that is maximally consistent with the given high-level actions

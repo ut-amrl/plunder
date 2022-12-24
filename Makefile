@@ -32,7 +32,7 @@ $(SETTINGS):
 
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
-			mkdir -p accSim/out && \
+			mkdir -p simulation/out && \
 			./bin/gen
 
 $(PF):
@@ -66,11 +66,11 @@ clean:
 	rm -rf bin build lib
 
 clear_data:
-	rm -rf accSim/out synthesis/plots synthesis/out settings.txt
+	rm -rf simulation/out synthesis/plots synthesis/out settings.txt
 
 purge: clean clear_data
 
 snapshot:
 	echo $(D)-$(FN) && \
 	mkdir -p saved_outputs/$(D)-$(FN) && \
-	cp -r accSim/out synthesis/plots synthesis/out settings.txt pips/src/optimizer/optimizer.py saved_outputs/$D-$(FN)
+	cp -r simulation/out synthesis/plots synthesis/out settings.txt pips/src/optimizer/optimizer.py saved_outputs/$D-$(FN)
