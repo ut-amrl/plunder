@@ -16,6 +16,10 @@ struct State {
 
 class Robot;
 
+typedef HA asp(State, Robot&);
+typedef LA motor(State, Robot&, bool);
+typedef Obs phys(State, Robot&, double);
+
 struct Trajectory {
     Robot& r;
     vector<State> traj;

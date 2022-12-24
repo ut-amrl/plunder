@@ -1,9 +1,10 @@
 project(c++-pips)
 cmake_minimum_required(VERSION 3.10.2)
 
+set(TARGET_DIR "target_dir_not_set" CACHE STRING "set target dir")
+
 # Tell CMake where it can find our custom .cmake files
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/pips/submodules/")
-
 # Use C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -55,6 +56,7 @@ include_directories(simulation/)
 include_directories(particleFilter/)
 include_directories(synthesis/)
 include_directories(./)
+include_directories(${TARGET_DIR})
 # Load amrl_shared_lib from submodule
 add_subdirectory(pips/submodules/amrl_shared_lib/)
 include_directories(pips/submodules/amrl_shared_lib/)

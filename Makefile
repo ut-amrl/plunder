@@ -1,6 +1,3 @@
-# include $(shell rospack find mk)/cmake.mk
-PY = python3
-
 #acceptable build_types: Release/Debug/Profile
 build_type=Release
 # build_type=Debug
@@ -14,6 +11,9 @@ EMNG = emng
 EMTEST = emtest
 D=$(shell date +%y.%m.%d-%H:%M:%S)
 
+# include $(shell rospack find mk)/cmake.mk
+PY = python3
+
 .SILENT:
 
 all: build build/CMakeLists.txt.copy
@@ -21,7 +21,7 @@ all: build build/CMakeLists.txt.copy
 	$(MAKE) --no-print-directory -C build
 
 build/CMakeLists.txt.copy: build CMakeLists.txt Makefile
-	cd build && cmake -DCMAKE_BUILD_TYPE=$(build_type) ..
+	cd build && cmake -DCMAKE_BUILD_TYPE=$(build_type) -DTARGET_DIR=$(target_dir) ..
 	cp CMakeLists.txt build/CMakeLists.txt.copy
 
 build:

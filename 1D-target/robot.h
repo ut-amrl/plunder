@@ -9,12 +9,6 @@ using namespace SETTINGS;
 // -----------------------------------------------------------------------------
 // ----- Robot Class--- --------------------------------------------------------
 // -----------------------------------------------------------------------------
-class Robot;
-
-typedef HA asp(State, Robot&);
-typedef LA motor(State, Robot&, bool);
-typedef Obs phys(State, Robot&, double);
-
 class Robot {
 public:
 
