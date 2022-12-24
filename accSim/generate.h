@@ -35,11 +35,13 @@ vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy
         Trajectory traj(robots[i]);
 
         // Run simulation
+        HA prev_ha = 0;
         for(double t = 0; t < T_TOT; t += T_STEP){
 
             robots[i].updateObs();
             robots[i].runASP(asp);
-            robots[i].state.ha = pointError(robots[i].state.ha, gen_accuracy);
+            robots[i].state.ha = pointError(prev_ha, robots[i].state.ha, gen_accuracy);
+            prev_ha = robots[i].state.ha;
             robots[i].updateLA();
 
             traj.append(robots[i].state);

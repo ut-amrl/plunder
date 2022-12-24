@@ -52,7 +52,7 @@ Other *make* commands which are not required:
 - **make gen** to run only the simulation
 - **make pf** to run only the particle filter (E-step)
 - **make settings** to compile settings
-- **make snapshot** to ???
+- **make snapshot** to archive current settings and output files to a given folder
 
 ## Project Organization
 This project is roughly split into the following components:

@@ -57,10 +57,10 @@ void printExampleInfo(Example e){
 
 // Runs EMDIPS-generated ASP
 HA emdipsASP(State state, Robot& robot){
-    HA prevHA = state.ha;
+    HA prev_ha = state.ha;
     Example obsObject = dataToExample(state.ha, state.obs, robot);
     for(uint i = 0; i < transitions.size(); i++){
-        if(print(prevHA) == transitions[i].first && transitions[i].first!=transitions[i].second){
+        if(print(prev_ha) == transitions[i].first && transitions[i].first!=transitions[i].second){
             if(InterpretBool(preds[i], obsObject)) {
                 state.ha = to_label(transitions[i].second);
                 break;
@@ -68,12 +68,12 @@ HA emdipsASP(State state, Robot& robot){
         }
     }
 
-    return pointError(state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS); // Introduce point errors - random transitions allow GT_ASP to escape local minima
+    return pointError(prev_ha, state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS); // Introduce point errors - random transitions allow GT_ASP to escape local minima
 }
 
 // Initial ASP: random transitions
 HA initialASP(State state, Robot& r) {
-    return pointError(state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS);
+    return pointError(state.ha, state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS);
 }
 
 void plot_pure(Trajectory& traj, asp* asp, string output_path) {
@@ -197,7 +197,6 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, BATCH_SIZE, PROG_ENUM, true, pFunc);
 
     }
-
     
     preds = eo.ast_vec;
     accuracies = eo.log_likelihoods;
@@ -298,6 +297,29 @@ void setupLdips(){
     }
 }
 
+void update_point_accuracies(vector<Robot>& robots, vector<vector<Example>>& examples){
+    // double satisfied = 0;
+    // double total = 0;
+    // for(uint r = 0; r < NUM_ROBOTS; r++){
+    //     // testExampleOnASP(examples[r], robots[r]);
+    //     robots[r].POINT_ACCURACY = 1; // make ASP deterministic
+    //     for(Example& ex: examples[r]){
+    //         total++;
+    //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
+    //         if(curASP(to_label(ex.start_.GetString()), obs, robots[r]) == to_label(ex.result_.GetString())){
+    //             satisfied++;
+    //         }
+    //     }
+    // }
+
+    // // Update point accuracy
+    // double newPointAcc = min(satisfied / total, 0.95);
+    // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
+    // for(Robot& r : robots){
+    //     r.POINT_ACCURACY = newPointAcc;
+    // }
+}
+
 
 void testExampleOnASP(vector<Example> examples, Robot r){
     for(uint i=0; i<examples.size(); i++){
@@ -348,28 +370,7 @@ void emLoop(vector<Robot>& robots){
 
         curASP = emdipsASP;
 
-
-        // // Update point accuracy
-        // double satisfied = 0;
-        // double total = 0;
-        // for(uint r = 0; r < NUM_ROBOTS; r++){
-        //     // testExampleOnASP(examples[r], robots[r]);
-        //     robots[r].POINT_ACCURACY = 1; // make ASP deterministic
-        //     for(Example& ex: examples[r]){
-        //         total++;
-        //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-        //         if(curASP(to_label(ex.start_.GetString()), obs, robots[r]) == to_label(ex.result_.GetString())){
-        //             satisfied++;
-        //         }
-        //     }
-        // }
-        
-        // // Update point accuracy
-        // double newPointAcc = min(satisfied / total, 0.95);
-        // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
-        // for(Robot& r : robots){
-        //     r.POINT_ACCURACY = newPointAcc;
-        // }
+        // update_point_accuracies(robots, examples);
     }
 }
 

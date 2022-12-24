@@ -7,7 +7,6 @@ using namespace SETTINGS;
 
 
 // ----- Markov System Definitions --------------------------------
-typedef int HA;
 
 struct State {
     HA ha;
@@ -77,13 +76,12 @@ double logistic(double midpoint, double spread, double input){
 }
 
 // randomly transition to another HA
-HA pointError(HA ha = to_label(0), double accuracy = POINT_ACCURACY, bool use_safe_transitions = false){
+HA pointError(HA prev_ha=0, HA ha=0, double accuracy=POINT_ACCURACY, bool use_safe_transitions=false){
+    vector<HA> all_possible_ha = valid_transitions(prev_ha, use_safe_transitions);
     if(USE_POINT_ERROR){
-        HA prevHA = ha;
         if(!flip(accuracy)){
-            ha = rand() % numHA;
-
-            // TODO: abstract away safe transitions
+            int index = rand() % all_possible_ha.size();
+            ha = all_possible_ha[index];
         }
     }
     return ha;

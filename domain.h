@@ -3,6 +3,7 @@
 #include "settings.h"
 
 using namespace std;
+typedef int HA;
 
 // -----------------------------------------------------------------------------
 // ----- Problem domain --------------------------------------------------------
@@ -19,6 +20,19 @@ vector<string> HA_Labels = { // High-level action labels
     "DEC", // Constant deceleration
     "CON"  // No acceleration
 };
+
+// Define valid transitions
+vector<HA> valid_transitions(HA ha, bool use_safe_transitions){
+    vector<HA> valid;
+    if(use_safe_transitions){
+        if(ha == ACC) valid={ACC, CON, DEC};
+        if(ha == CON) valid={CON, DEC};
+        if(ha == DEC) valid={DEC};
+    } else {
+        valid={ACC, DEC, CON};
+    }
+    return valid;
+}
 
 // TODO (major overhaul): convert these all to a map<string, double>, abstracting them away
 
