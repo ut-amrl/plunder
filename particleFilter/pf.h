@@ -8,7 +8,7 @@ using namespace SETTINGS;
 static uint resampCount = 0; // Debug
 
 typedef HA init();
-typedef double obs_likelihood(State, Robot&, LA);
+typedef double obs_likelihood(State, Robot&, Obs);
 
 // ----- Helper Functions ---------------------------------------------
 
@@ -92,8 +92,9 @@ public:
             // Reweight particles
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
-                LA prevLA = (t == 0) ? LA{} : state_traj.get(t-1).la;
-                double log_LA_ti = obs_likelihood_pf(State { x_i, prevLA, state_traj.get(t).obs }, state_traj.r, state_traj.get(t).la);
+                Obs obs = state_traj.get(t).obs;
+                obs.acc = (t == 0) ? 0 : state_traj.get(t-1).obs.acc;
+                double log_LA_ti = obs_likelihood_pf(State { x_i, obs }, state_traj.r, state_traj.get(t).obs);
                 log_weights[i] += log_LA_ti;
             }
 
@@ -129,7 +130,7 @@ public:
             // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = asp_pf(State { particles[t][i], LA {}, state_traj.get(t).obs }, state_traj.r);
+                    particles[t+1][i] = asp_pf(State { particles[t][i], state_traj.get(t).obs }, state_traj.r);
                 }
             } else { 
                 // resample at last step to eliminate deviating particles

@@ -17,7 +17,7 @@ string getCsvTitles(){
 
 string getCsvRow(State state, double t){
     return to_string(t) + ", " + to_string(state.obs.pos) + ", " + to_string(state.obs.vel)
-            + ", " + to_string(state.la.acc) + ", " + print(state.ha);
+            + ", " + to_string(state.obs.acc) + ", " + print(state.ha);
 }
 
 vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy) {
@@ -100,7 +100,8 @@ void execute_pure(Trajectory& traj, asp* asp){
     for(uint32_t t = 0; t < traj.size(); t++){
         State last = (t == 0) ? State {} : traj.get(t-1);
         State cur = traj.get(t);
-        State s { last.ha, last.la, cur.obs };
+        cur.obs.acc = last.obs.acc;
+        State s { last.ha, cur.obs };
 
         traj.traj[t].ha = asp(s, traj.r);
     }

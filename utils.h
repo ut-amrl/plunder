@@ -5,44 +5,6 @@
 using namespace std;
 using namespace SETTINGS;
 
-
-// ----- Markov System Definitions --------------------------------
-
-struct State {
-    HA ha;
-    LA la;
-    Obs obs;
-};
-
-class Robot;
-
-typedef HA asp(State, Robot&);
-typedef LA motor(State, Robot&, bool);
-typedef Obs phys(State, Robot&, double);
-
-struct Trajectory {
-    Robot& r;
-    vector<State> traj;
-
-    Trajectory(Robot& robot) : r(robot) {}
-
-    void append(State s) {
-        traj.push_back(s);
-    }
-
-    State get(int t) {
-        return traj[t];
-    }
-
-    void set(int t, State s){
-        traj[t] = s;
-    }
-
-    int size() {
-        return traj.size();
-    }
-};
-
 // Helper functions
 const uint numHA = HA_Labels.size();
 

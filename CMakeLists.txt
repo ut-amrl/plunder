@@ -102,6 +102,7 @@ set(CXX_PIPS_SRCS
     particleFilter/pf.h
     synthesis/em.cpp
     utils.h
+    system.h
     translateSettings.cpp)
 add_library(c++-pips-core ${CXX_PIPS_SRCS})
 # target_link_libraries(c++-pips-core amrl_shared_lib)

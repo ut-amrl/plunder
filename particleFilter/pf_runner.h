@@ -16,7 +16,7 @@ HA sampleInitialHA(){
 }
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-double obs_likelihood_given_model(State state, Robot& r, LA nextLA){
+double obs_likelihood_given_model(State state, Robot& r, Obs nextLA){
     double mean = motorModel(state, r, false).acc; // should be using the previous LA
     return logpdf(nextLA.acc, mean, OBS_LIKELIHOOD_STRENGTH * STDDEV_ERROR);
 }
@@ -39,10 +39,9 @@ void readData(string file, Trajectory& traj){
         float time, x, v, a; string comma;
         iss >> time >> comma >> x >> comma >> v >> comma >> a;
 
-        Obs obs = { .pos = x, .vel = v };
-        LA la = { .acc = a };
+        Obs obs = { .pos = x, .vel = v, .acc = a };
 
-        traj.append(State { HA{}, la, obs });
+        traj.append(State { HA{}, obs });
     }
 }
 

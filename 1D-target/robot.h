@@ -1,7 +1,7 @@
 #pragma once
 
-#include "domain.h"
 #include "utils.h"
+#include "system.h"
 
 using namespace std;
 using namespace SETTINGS;
@@ -130,8 +130,8 @@ asp* ASP_model(int model){
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 normal_distribution<double> la_error = normal_distribution<double>(MEAN_ERROR, STDDEV_ERROR);
-LA motorModel(State state, Robot& r, bool error){
-    HA ha = state.ha; LA la = state.la; Obs obs = state.obs;
+Obs motorModel(State state, Robot& r, bool error){
+    HA ha = state.ha; Obs obs = state.obs;
 
     double change = JERK;
     if(error){
@@ -139,22 +139,22 @@ LA motorModel(State state, Robot& r, bool error){
     }
     
     if(ha == ACC){
-        la.acc = min(la.acc + change, r.accMax);
+        obs.acc = min(obs.acc + change, r.accMax);
     } else if (ha == DEC) {
-        la.acc = max(la.acc - change, r.decMax);
+        obs.acc = max(obs.acc - change, r.decMax);
     } else {
-        if(la.acc < 0)
-            la.acc = min(0.0, la.acc + change);
-        if(la.acc > 0)
-            la.acc = max(0.0, la.acc - change);
+        if(obs.acc < 0)
+            obs.acc = min(0.0, obs.acc + change);
+        if(obs.acc > 0)
+            obs.acc = max(0.0, obs.acc - change);
     }
 
     // Induce some additional lesser error
     if(error){
-        la.acc += la_error(gen);
+        obs.acc += la_error(gen);
     }
 
-    return la;
+    return obs;
 }
 
 
@@ -162,13 +162,12 @@ LA motorModel(State state, Robot& r, bool error){
 // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
 Obs physicsModel(State state, Robot& r, double t_step){
     Obs obs = state.obs;
-    LA la = state.la;
 
     double vPrev = obs.vel;
     double xPrev = obs.pos;
     
     // Update velocity and displacement accordingly
-    obs.vel = vPrev + la.acc * t_step;
+    obs.vel = vPrev + obs.acc * t_step;
 
     if(obs.vel < EPSILON){ // Round to 0
         obs.vel = 0;
@@ -192,7 +191,7 @@ void Robot::runASP(asp* ASP = ASP_Hand_prob){
 }
 
 void Robot::updateLA(bool error = true, motor* motor_model = motorModel){
-    this->state.la = motor_model(state, *this, error);
+    this->state.obs = motor_model(state, *this, error);
 }
 
 void Robot::updateObs(phys* phys_model = physicsModel, double t_step = T_STEP){
