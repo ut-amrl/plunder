@@ -6,36 +6,6 @@
 using namespace std;
 using namespace SETTINGS;
 
-// -----------------------------------------------------------------------------
-// ----- Robot Class--- --------------------------------------------------------
-// -----------------------------------------------------------------------------
-class Robot {
-public:
-
-    // ------- Robot parameters -----------
-    double accMax; // Maximum constant acceleration
-    double decMax; // Maximum constant deceleration 
-    double vMax;   // Maximum velocity
-    double target; // Target distance
-
-    State state;
-
-    Robot(double _accMax, double _decMax, double _vMax, double _target) : accMax(_accMax), decMax(_decMax), vMax(_vMax), target(_target) {
-        reset();
-    }
-
-    Robot() {}
-
-    void runASP(asp*);
-    void updateLA(bool, motor*);
-    void updateObs(phys*, double);
-
-    // Reset robot
-    void reset(){
-        state = {};
-    }
-};
-
 
 // ACTION-SELECTION POLICY: Transition to new high-level action based on current action and state
 // ----- Curated Selection of ASPs ---------------------------------------------
@@ -43,14 +13,13 @@ public:
 /*
 * This is a hand-crafted, non-probabilistic action-selection policy.
 */
-HA ASP_Hand(State state, Robot& r){
-    Obs obs = state.obs;
+HA ASP_Hand(State state){
     HA ha = state.ha;
 
-    double xToTarget = r.target - obs.pos;                                  // distance to the target
+    double xToTarget = state.get("target") - state.get("pos");                                  // distance to the target
 
-    bool cond1 = obs.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < EPSILON;  // needs to decelerate or else it will pass target
+    bool cond1 = state.get("target") - state.get("vMax") >= 0;                                     // is at max velocity (can no longer accelerate)
+    bool cond2 = xToTarget - DistTraveled(state.get("vel"), state.get("decMax")) < EPSILON;  // needs to decelerate or else it will pass target
 
     if(ha == ACC){                          // transitions starting with ACC
         if(cond1 && !cond2) ha=CON;         // ACC -> CON (expected)
@@ -77,17 +46,13 @@ HA ASP_Hand(State state, Robot& r){
 /*
 * This is a probabilistic hand-crafted action-selection policy.
 */
-HA ASP_Hand_prob(State state, Robot& r){
-    Obs obs = state.obs;
+HA ASP_Hand_prob(State state){
     HA ha = state.ha;
 
-    double xToTarget = r.target - obs.pos;                            // distance to the target
+    double xToTarget = state.get("target") - state.get("pos");                            // distance to the target
 
-    bool cond1 = obs.vel - r.vMax >= 0;                                     // is at max velocity (can no longer accelerate)
-    bool cond2 = xToTarget - DistTraveled(obs.vel, r.decMax) < EPSILON;  // needs to decelerate or else it will pass target
-
-    bool cond1smooth = flip(logistic(0, 2.5, obs.vel - r.vMax));
-    bool cond2smooth = flip(logistic(0, -1, xToTarget - DistTraveled(obs.vel, r.decMax)));
+    bool cond1smooth = flip(logistic(0, 2.5, state.get("vel") - state.get("vMax")));
+    bool cond2smooth = flip(logistic(0, -1, xToTarget - DistTraveled(state.get("vel"), state.get("decMax"))));
 
     if(ha == ACC){                          // transitions starting with ACC
         if(cond1smooth && !cond2smooth) ha=CON;         // ACC -> CON (expected)
@@ -114,7 +79,7 @@ HA ASP_Hand_prob(State state, Robot& r){
 /*
 * This is a uniformly random ASP.
 */
-HA ASP_random(State state, Robot& r){
+HA ASP_random(State state){
     return rand() % numHA;
 }
 
@@ -129,9 +94,10 @@ asp* ASP_model(int model){
 }
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
+// TODO: deal with error (abstract away std deviation) and deal with different stddev for different variables
 normal_distribution<double> la_error = normal_distribution<double>(MEAN_ERROR, STDDEV_ERROR);
-Obs motorModel(State state, Robot& r, bool error){
-    HA ha = state.ha; Obs obs = state.obs;
+Obs motorModel(State state, bool error){
+    HA ha = state.ha;
 
     double change = JERK;
     if(error){
@@ -139,61 +105,47 @@ Obs motorModel(State state, Robot& r, bool error){
     }
     
     if(ha == ACC){
-        obs.acc = min(obs.acc + change, r.accMax);
+        state.put("acc", min(state.get("acc") + change, state.get("accMax")));
     } else if (ha == DEC) {
-        obs.acc = max(obs.acc - change, r.decMax);
+        state.put("acc", max(state.get("acc") - change, state.get("decMax")));
     } else {
-        if(obs.acc < 0)
-            obs.acc = min(0.0, obs.acc + change);
-        if(obs.acc > 0)
-            obs.acc = max(0.0, obs.acc - change);
+        if(state.get("acc") < 0)
+            state.put("acc", min(state.get("acc") + change, state.get("accMax")));
+        if(state.get("acc") > 0)
+            state.put("acc", max(state.get("acc") - change, state.get("decMax")));
     }
 
     // Induce some additional lesser error
     if(error){
-        obs.acc += la_error(gen);
+        state.put("acc", state.get("acc") + la_error(gen));
     }
 
-    return obs;
+    return state.obs;
 }
 
 
 
 // PHYSICS SIM: Given a current high-level action, apply a motor controller and update observed state. Runs once per time step
-Obs physicsModel(State state, Robot& r, double t_step){
-    Obs obs = state.obs;
-
-    double vPrev = obs.vel;
-    double xPrev = obs.pos;
+Obs physicsModel(State state, double t_step){
+    double vPrev = state.get("vel");
+    double xPrev = state.get("pos");
     
     // Update velocity and displacement accordingly
-    obs.vel = vPrev + obs.acc * t_step;
+    state.put("vel", vPrev + state.get("acc") * t_step);
 
-    if(obs.vel < EPSILON){ // Round to 0
-        obs.vel = 0;
+    if(state.get("vel") < EPSILON){ // Round to 0
+        state.put("vel", 0);
     }
 
-    if(abs(obs.vel - r.vMax) < EPSILON){ // Round to vMax
-        obs.vel = r.vMax;
+    if(abs(state.get("vel") - state.get("vMax")) < EPSILON){ // Round to vMax
+        state.put("vel", state.get("vMax"));
     }
 
-    if(abs(obs.pos - r.target) < EPSILON){ // Round to target
-        obs.pos = r.target;
+    if(abs(state.get("pos") - state.get("target")) < EPSILON){ // Round to target
+        state.put("pos", state.get("target"));
     }
 
-    obs.pos = xPrev + (obs.vel + vPrev)/2 * t_step;
+    state.put("pos", xPrev + (state.get("vel") + vPrev) / 2 * t_step);
 
-    return obs;
-}
-
-void Robot::runASP(asp* ASP = ASP_Hand_prob){
-    this->state.ha = ASP(state, *this);
-}
-
-void Robot::updateLA(bool error = true, motor* motor_model = motorModel){
-    this->state.obs = motor_model(state, *this, error);
-}
-
-void Robot::updateObs(phys* phys_model = physicsModel, double t_step = T_STEP){
-    this->state.obs = phys_model(state, *this, t_step);
+    return state.obs;
 }

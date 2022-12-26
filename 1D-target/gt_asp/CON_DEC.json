@@ -64,7 +64,7 @@
                             -1,
                             0
                         ],
-                        "name": "v",
+                        "name": "vel",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -99,7 +99,7 @@
                             0,
                             0
                         ],
-                        "name": "x",
+                        "name": "pos",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
