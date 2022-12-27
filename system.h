@@ -1,6 +1,7 @@
 #pragma once
 
 #include "robot.h"
+#include "utils.h"
 
 using namespace std;
 using namespace SETTINGS;
@@ -41,9 +42,9 @@ struct State {
     HA ha;
     Obs obs;
 
-    State () : ha(0), obs() {}
+    State () {}
 
-    State (map<string, double> _table) : ha(0), obs(_table) {}
+    State (map<string, double> _table) : ha(), obs(_table) {}
 
     State (HA _ha, Obs _obs) : ha(_ha), obs(_obs) {}
 
@@ -64,7 +65,7 @@ struct State {
         for(Var each: Obs_vars) {
             s += ", " + each.name_ + " : " + std::to_string(get(each.name_));
         }
-        return s;
+        return s + "\n";
     }
 };
 
@@ -126,6 +127,10 @@ struct Trajectory {
 
     void set(int t, HA ha){
         traj[t].ha = ha;
+    }
+
+    void set(int t, Obs obs){
+        traj[t].obs = obs;
     }
 
     int size() {
