@@ -20,7 +20,7 @@ double obs_likelihood_given_model(State state, Obs nextLA){
     Obs mean = motorModel(state, false); // Use the previous state + current HA
     double obs_log = 0;
     for(string each: LA_vars) {
-        obs_log += logpdf(nextLA.get(each), mean.get(each), OBS_LIKELIHOOD_STRENGTH * STDDEV_ERROR);
+        obs_log += logpdf(nextLA.get(each), mean.get(each), OBS_LIKELIHOOD_STRENGTH * la_error[each].stddev());
     }
     return obs_log;
 }

@@ -19,15 +19,9 @@ namespace SETTINGS {
     const bool DEBUG = false;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
+    const int NUM_ROBOTS = 11;              // number of robots (depends on robot test set)
 
     // Simulation parameters
-    const int ROBOT_SET = 0;                // which robots to use (0-2)
-    const int NUM_ROBOTS = 11;              // number of robots (depends on robot test set)
-    const int GT_ASP = 1;                   // which ASP to use
-    const double MEAN_ERROR = 0.0;          // low-level action error
-    const double STDDEV_ERROR = 0.1;        // low-level action error standard deviation
-    const double JERK = 2;                  // rate of change of acceleration (jerk)
-    const double JERK_ERROR = 0.3;          // additional low-level action error standard deviation while transitioning
     const double T_STEP = .1;               // time step (s)
     const double T_TOT = 15;                // total time (s) per simulated scenario
     const double GEN_ACCURACY = 1.0;        // probability of a correct high-level transition

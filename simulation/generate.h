@@ -28,13 +28,13 @@ string getCsvRow(State state, double t){
     return s;
 }
 
-vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy) {
+vector<Trajectory> gen_trajectories(asp* asp, double gen_accuracy) {
 
     cout << "--------------Simulation---------------" << endl;
-    cout << "Using " << NUM_ROBOTS << " robots and low-level action standard deviation=" << STDDEV_ERROR << endl;
+    cout << "Using " << NUM_ROBOTS << " robots" << endl;
 
     // Initialization
-    vector<State> robots = getInitStates(robot_set);
+    vector<State> robots = getInitStates();
     
     vector<Trajectory> trajectories;
 

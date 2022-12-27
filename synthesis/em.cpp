@@ -319,7 +319,7 @@ void emLoop(){
 
         // Run ASPs for all robots
         string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-        plot_pure(traj, ASP_model(GT_ASP), plot);
+        plot_pure(traj, ASP_model, plot);
 
         state_traj.push_back(traj);
     }
