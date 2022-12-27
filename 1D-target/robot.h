@@ -110,9 +110,9 @@ Obs motorModel(State state, bool error){
         state.put("acc", max(state.get("acc") - change, state.get("decMax")));
     } else {
         if(state.get("acc") < 0)
-            state.put("acc", min(state.get("acc") + change, state.get("accMax")));
+            state.put("acc", min(0.0, state.get("acc") + change));
         if(state.get("acc") > 0)
-            state.put("acc", max(state.get("acc") - change, state.get("decMax")));
+            state.put("acc", max(0.0, state.get("acc") - change));
     }
 
     // Induce some additional lesser error

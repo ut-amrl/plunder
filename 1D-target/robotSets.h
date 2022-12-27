@@ -13,8 +13,6 @@ State make_state(double _accMax, double _decMax, double _vMax, double _target) {
         { "target", _target }
     };
 
-    State s(table);
-
     return State (table);
 }
 
