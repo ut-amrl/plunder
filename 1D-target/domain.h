@@ -1,12 +1,6 @@
 #pragma once
 
 #include "settings.h"
-#include "ast/ast.hpp"
-#include "ast/enumeration.hpp"
-#include "ast/library_functions.hpp"
-#include "ast/parsing.hpp"
-#include "visitors/interp_visitor.hpp"
-#include "ast/synthesis.hpp"
 
 using namespace std;
 using namespace AST;
