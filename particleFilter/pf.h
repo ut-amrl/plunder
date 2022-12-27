@@ -8,7 +8,7 @@ using namespace SETTINGS;
 static uint resampCount = 0; // Debug
 
 typedef HA init();
-typedef double obs_likelihood(State, Robot&, Obs);
+typedef double obs_likelihood(State, Obs);
 
 // ----- Helper Functions ---------------------------------------------
 
@@ -93,8 +93,10 @@ public:
             for(int i = 0; i < N; i++){
                 HA x_i = particles[t][i];
                 Obs obs = state_traj.get(t).obs;
-                obs.acc = (t == 0) ? 0 : state_traj.get(t-1).obs.acc;
-                double log_LA_ti = obs_likelihood_pf(State { x_i, obs }, state_traj.r, state_traj.get(t).obs);
+                for(string each: LA_vars) {
+                    obs.put(each, (t == 0) ? 0 : state_traj.get(t-1).get(each));
+                }
+                double log_LA_ti = obs_likelihood_pf(State (x_i, obs), state_traj.get(t).obs);
                 log_weights[i] += log_LA_ti;
             }
 
@@ -130,7 +132,7 @@ public:
             // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = asp_pf(State { particles[t][i], state_traj.get(t).obs }, state_traj.r);
+                    particles[t+1][i] = asp_pf(State ( particles[t][i], state_traj.get(t).obs ));
                 }
             } else { 
                 // resample at last step to eliminate deviating particles

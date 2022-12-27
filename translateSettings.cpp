@@ -10,7 +10,7 @@ const uint numSpaces = 30;
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
-    vector<Robot> robots = getRobotSet(ROBOT_SET);
+    vector<State> robots = getInitStates(ROBOT_SET);
     assert(NUM_ROBOTS <= robots.size() && "NUM_ROBOTS does not match size of test set");
     assert(GT_ASP >= 0 && GT_ASP < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
 

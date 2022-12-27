@@ -1,10 +1,3 @@
-#include "ast/ast.hpp"
-#include "ast/enumeration.hpp"
-#include "ast/library_functions.hpp"
-#include "ast/parsing.hpp"
-#include "visitors/interp_visitor.hpp"
-#include "ast/synthesis.hpp"
-
 #include "particleFilter/pf_runner.h"
 #include "simulation/generate.h"
 
@@ -14,7 +7,6 @@ using namespace SETTINGS;
 using Eigen::Vector2f;
 using json = nlohmann::json;
 
-unordered_set<Var> variables;
 vector<pair<string,string>> transitions;
 vector<FunctionEntry> library;
 vector<ast_ptr> roots;
@@ -29,14 +21,14 @@ namespace std {
 }
 
 // Convert transition to EMDIPS-compatible Example
-Example dataToExample(HA ha, Obs state, Robot& robot){
+Example dataToExample(HA ha, Obs state){
     Example ex;
 
-    ex.symbol_table_["x"] = SymEntry((float) state.pos);
-    ex.symbol_table_["v"] = SymEntry((float) state.vel);
-    ex.symbol_table_["decMax"] = SymEntry((float) robot.decMax);
-    ex.symbol_table_["vMax"] = SymEntry((float) robot.vMax);
-    ex.symbol_table_["target"] = SymEntry((float) robot.target);
+    for(Var each: Obs_vars) {
+        if(each.root_) {
+            ex.symbol_table_[each.name_] = SymEntry((float) state.get(each.name_));
+        }
+    }
 
     ex.start_ = SymEntry(print(ha));
 
@@ -44,21 +36,21 @@ Example dataToExample(HA ha, Obs state, Robot& robot){
 }
 
 void printExampleInfo(Example e){
-    float x = e.symbol_table_["x"].GetFloat();
-    float v = e.symbol_table_["v"].GetFloat();
-    float decMax = e.symbol_table_["decMax"].GetFloat();
-    float vMax = e.symbol_table_["vMax"].GetFloat();
-    float target = e.symbol_table_["target"].GetFloat();
     string start = e.start_.GetString();
     string res = e.result_.GetString();
-    float exp = v-vMax;
-    cout << start << "->" << res << ", x " << x << ", v " << v << ", decMax " << decMax << ", vMax " << vMax << ", target " << target << ", exp " << exp << endl;
+    cout << start << "->" << res;
+    for(Var each: Obs_vars) {
+        if(each.root_){
+            cout << ", " << each.name_ << " : " << e.symbol_table_[each.name_].GetFloat();
+        }
+    }
+    cout << endl;
 }
 
 // Runs EMDIPS-generated ASP
-HA emdipsASP(State state, Robot& robot){
+HA emdipsASP(State state){
     HA prev_ha = state.ha;
-    Example obsObject = dataToExample(state.ha, state.obs, robot);
+    Example obsObject = dataToExample(state.ha, state.obs);
     for(uint i = 0; i < transitions.size(); i++){
         if(print(prev_ha) == transitions[i].first && transitions[i].first!=transitions[i].second){
             if(InterpretBool(preds[i], obsObject)) {
@@ -72,7 +64,7 @@ HA emdipsASP(State state, Robot& robot){
 }
 
 // Initial ASP: random transitions
-HA initialASP(State state, Robot& r) {
+HA initialASP(State state) {
     return pointError(state.ha, state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS);
 }
 
@@ -94,7 +86,7 @@ void plot_pure(Trajectory& traj, asp* asp, string output_path) {
 }
 
 // Expectation step
-vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vector<Trajectory>& state_traj, asp* asp){
+vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_traj, asp* asp){
 
     vector<vector<Example>> examples;
 
@@ -118,7 +110,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Robot>& robots, vecto
         for(uint n = 0; n < SAMPLE_SIZE; n++){
             vector<HA> traj = trajectories[n];
             for(uint t = 0; t < state_traj[i].size() - 1 - END_PF_ERROR; t++){
-                Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs, robots[i]);
+                Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs);
 
                 // Provide next high-level action
                 ex.result_ = SymEntry(print(traj[t+1]));
@@ -217,17 +209,11 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 void setupLdips(){
     cout << "-------------Setup----------------" << endl;
 
-    Var x ("x", Dimension(1, 0, 0), NUM);
-    Var v ("v", Dimension(1, -1, 0), NUM);
-    Var decMax ("decMax", Dimension(1, -2, 0), NUM);
-    Var vMax ("vMax", Dimension(1, -1, 0), NUM);
-    Var target ("target", Dimension(1, 0, 0), NUM);
-
-    variables.insert(x);
-    variables.insert(v);
-    variables.insert(decMax);
-    variables.insert(vMax);
-    variables.insert(target);
+    for(Var each: Obs_vars) {
+        if(each.root_) {
+            roots.push_back(make_shared<Var>(each));
+        }
+    }
 
     // Insert transitions
     for(uint i = 0; i < numHA; i++){
@@ -246,11 +232,6 @@ void setupLdips(){
         }
         return a.first < b.first;
     });
-
-    // Turn variables into roots
-    for (const Var& variable : variables) {
-        roots.push_back(make_shared<Var>(variable));
-    }
 
     // Debug
     cout << "----Roots----" << endl;
@@ -289,6 +270,7 @@ void setupLdips(){
     }
 }
 
+// TODO: this is deprecated
 void update_point_accuracies(vector<Robot>& robots, vector<vector<Example>>& examples){
     // double satisfied = 0;
     // double total = 0;
@@ -320,7 +302,7 @@ void testExampleOnASP(vector<Example> examples, Robot r){
     }
 }
 
-void emLoop(vector<Robot>& robots){
+void emLoop(){
 
     // Initialization
     setupLdips();
@@ -332,7 +314,7 @@ void emLoop(vector<Robot>& robots){
     for(int r = 0; r < NUM_ROBOTS; r++){
         // Run ground truth ASP
         string inputFile = SIM_DATA + to_string(r) + ".csv";
-        Trajectory traj (robots[r]);
+        Trajectory traj;
         readData(inputFile, traj);
 
         // Run ASPs for all robots
@@ -350,7 +332,7 @@ void emLoop(vector<Robot>& robots){
         cout << "|          Loop " << i << " EXPECTATION         |\n";
         cout << "|                                     |\n";
         cout << "|-------------------------------------|\n";
-        vector<vector<Example>> examples = expectation(i, robots, state_traj, curASP);
+        vector<vector<Example>> examples = expectation(i, state_traj, curASP);
 
         // Maximization
         cout << "\n|-------------------------------------|\n";
@@ -394,8 +376,7 @@ int main() {
         fprintf(stderr, "Failed to load optimization file");
     }
 
-    vector<Robot> robots = getRobotSet(ROBOT_SET);
-    emLoop(robots);
+    emLoop();
 
     // Clean up python
     Py_XDECREF(pFunc);
