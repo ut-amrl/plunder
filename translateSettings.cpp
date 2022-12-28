@@ -10,10 +10,6 @@ const uint numSpaces = 30;
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
-    vector<Robot> robots = getRobotSet(ROBOT_SET);
-    assert(NUM_ROBOTS <= robots.size() && "NUM_ROBOTS does not match size of test set");
-    assert(GT_ASP >= 0 && GT_ASP < ASPs.size() && ("Model must be between 0 and " + (ASPs.size() - 1)));
-
     assert(STDDEV_ERROR >= 0 && "Standard deviation must be positive");
     assert(OBS_LIKELIHOOD_STRENGTH >= 0 && "Observation likelihood strength must be greater than 0");
 

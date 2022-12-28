@@ -2,7 +2,6 @@
 
 #include "robotSets.h"
 #include "robot.h"
-#include "ast/ast.hpp"
 
 using nlohmann::json;
 using namespace std;
@@ -12,39 +11,47 @@ using namespace SETTINGS;
 // ----- Simulation ------------------------------------------------
 
 string getCsvTitles(){
-    return "time, x, v, LA, HA";
+    string s = "time, ";
+    for(Var each: Obs_vars){
+        s += each.name_ + ", ";
+    }
+    s += "HA";
+    return s;
 }
 
 string getCsvRow(State state, double t){
-    return to_string(t) + ", " + to_string(state.obs.pos) + ", " + to_string(state.obs.vel)
-            + ", " + to_string(state.obs.acc) + ", " + print(state.ha);
+    string s = to_string(t) + ", ";
+    for(Var each: Obs_vars){
+        s += to_string(state.get(each.name_)) + ", ";
+    }
+    s += print(state.ha);
+    return s;
 }
 
-vector<Trajectory> gen_trajectories(int robot_set, asp* asp, double gen_accuracy) {
+vector<Trajectory> gen_trajectories(asp* asp, double gen_accuracy) {
 
     cout << "--------------Simulation---------------" << endl;
-    cout << "Running 1-D kinematic car simulation:\n";
-    cout << "Using " << NUM_ROBOTS << " robots and low-level action standard deviation=" << STDDEV_ERROR << endl;
+    cout << "Using " << NUM_ROBOTS << " robots" << endl;
 
     // Initialization
-    vector<Robot> robots = getRobotSet(robot_set);
+    vector<State> robots = getInitStates();
     
     vector<Trajectory> trajectories;
 
     for(uint i = 0; i < NUM_ROBOTS; i++){
-        Trajectory traj(robots[i]);
 
+        Robot r (robots[i]);
+        Trajectory traj;
+        
         // Run simulation
-        HA prev_ha = 0;
         for(double t = 0; t < T_TOT; t += T_STEP){
+            r.updateObs(physicsModel);
+            r.runASP(asp);
+            HA prev_ha = (t == 0) ? 0 : traj.get(t-1).ha;
+            r.state.ha = pointError(prev_ha, r.state.ha, gen_accuracy);
+            r.updateLA(motorModel);
 
-            robots[i].updateObs();
-            robots[i].runASP(asp);
-            robots[i].state.ha = pointError(prev_ha, robots[i].state.ha, gen_accuracy);
-            prev_ha = robots[i].state.ha;
-            robots[i].updateLA();
-
-            traj.append(robots[i].state);
+            traj.append(r.state);
         }
 
         trajectories.push_back(traj);
@@ -100,10 +107,12 @@ void execute_pure(Trajectory& traj, asp* asp){
     for(uint32_t t = 0; t < traj.size(); t++){
         State last = (t == 0) ? State {} : traj.get(t-1);
         State cur = traj.get(t);
-        cur.obs.acc = last.obs.acc;
-        State s { last.ha, cur.obs };
+        for(string each: LA_vars) {
+            cur.put(each, last.get(each));
+        }
+        State s (last.ha, cur.obs);
 
-        traj.traj[t].ha = asp(s, traj.r);
+        traj.set(t, asp(s));
     }
 
     // Restore point error

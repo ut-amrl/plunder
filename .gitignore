@@ -39,12 +39,10 @@ CMakeCache.txt
 CMakeFiles/
 lib/
 
-# Other
-gen
-generate
+# Generated data files
 out
 plots
-ts
+sim
 
 # Clang
 .clangd/
@@ -52,12 +50,6 @@ compile_commands.json
 
 # VSCode
 .vscode/
-
-data.csv
-data.json
-
-pips/examples/data.json
-
 .DS_Store
 
 settings.txt

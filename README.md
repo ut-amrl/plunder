@@ -6,9 +6,9 @@ Our system is a *discrete-time Markov process* defined by:
    - a **high-level action space** $H$ = a set of discrete high-level actions $h \in H$
      - Ex: $h \in$ {ACC, DEC, CON}
    - a **low-level action space** $L$ = a continuous domain of low-level actions $l \in L$: controlled joystick directives, motor inputs, etc.
-     - Ex: $l = accel \in \mathbb{R}$, where $a$ is the acceleration
+     - Ex: $l = acc \in \mathbb{R}$, where $a$ is the acceleration
    - a **observed state space** $O$ = a continuous domain of observed variables $o \in O$.
-     - Ex: $o = (pos, vel, accel) \in \mathbb{R}^3$
+     - Ex: $o = (pos, vel, acc) \in \mathbb{R}^3$
    - an **action-selection policy (ASP)** $\pi: H \times O \rightarrow H$ that maps the current high-level action and the current observed variables to the next high-level action
    - a **motor model** $\phi: H \rightarrow L$ that maps the current high-level action to the current low-level action
 
@@ -26,7 +26,7 @@ We would like to:
 
 ---
 ## Dependencies & Setup
-See **pips/**. No further dependencies are required. (scipy?)
+See **pips/**. No further dependencies are required. (scipy?) TODO
 
 ---
 # How to run
@@ -36,11 +36,11 @@ To get the project running, you will need to do the following:
 - In **domain.h**, define your high-level action space, low-level action space, and state space.
 - In **robot.h**, define your motor model.
 - In **settings.h**, tune the desired parameters (including I/O paths).
-- In **pips/**, follow the instructions to define the desired operations and the dimensions of each observed variable. // TODO: should not be necessary
+- In **pips/**, follow the instructions to define the desired operations (plus, minus, times, etc.)
 
 If you need to simulate your own demonstrations, you can also use our interface to:
 - Define the ground-truth ASP and the physics model in **robot.h**.
-- Set the desired demonstration robot(s) in another file **robotSets.h**.
+- Set the desired demonstration robot(s) / initial states in another file **robotSets.h**.
 
 An example setup is defined in *1D-target*; it may be easier to copy paste that folder and work from there.
 
@@ -64,5 +64,7 @@ This project is roughly split into the following components:
 - **particleFilter/** (expectation step) - runs a particle filter to get a set of most likely high-level actions
 - **pips/** (maximization step) - runs a program synthesizer to generate the program that is maximally consistent with the given high-level actions
 - **synthesis/** - runs the EM-loop, alternating between expectation and maximization steps
+- **system.h** - fully defines the discrete-time Markov process given *domain.h* and *robot.h*
 - **utils.h** - useful functions for general use
+- **includes.h** - all include statements for tidiness
 - **translateSettings.cpp** - converts settings.h into a text file (settings.txt) for easy Python interpretation

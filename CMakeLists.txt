@@ -107,11 +107,8 @@ set(EMDIPS_SRCS
     synthesis/em.cpp
     utils.h
     system.h
-    translateSettings.cpp
-    ${TARGET_DIR}/domain.h
-    ${TARGET_DIR}/robot.h
-    ${TARGET_DIR}/robotSets.h
-    ${TARGET_DIR}/settings.h)
+    includes.h
+    translateSettings.cpp)
 add_library(emdips-core ${EMDIPS_SRCS})
 
 # target_link_libraries(c++-pips-core amrl_shared_lib)
