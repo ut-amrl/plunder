@@ -1,66 +1,70 @@
 # Set target directory here OR pass in through command line
 target_dir ?= 1D-target
 
-#acceptable build_types: Release/Debug/Profile
-build_type=Release
-# build_type=Debug
+# acceptable build_types: Release/Debug/Profile
+build_type := Release
+# build_type := Debug
 
-SETTINGS = settings
-GEN = gen
-PF = pf
-PLT = plt
-EM = em
-EMNG = emng
-EMTEST = emtest
-D=$(shell date +%y.%m.%d-%H:%M:%S)
+SETTINGS := settings
+GEN := gen
+PF := pf
+PLT := plt
+EM := em
+EMNG := emng
+EMTEST := emtest
+D := $(shell date +%y.%m.%d-%H:%M:%S)
 
 # include $(shell rospack find mk)/cmake.mk
-PY = python3
+PY := python3
 
 .SILENT:
 
-all: build build/CMakeLists.txt.copy
-	$(info Build_type is [${build_type}])
-	$(MAKE) --no-print-directory -C build
+all: $(target_dir)/build $(target_dir)/build/CMakeLists.txt.copy
+	$(info Build_type is [$(build_type)])
+	$(info Target dir is [$(target_dir)])
+	$(MAKE) --no-print-directory -C $(target_dir)/build
 
-build/CMakeLists.txt.copy: build CMakeLists.txt Makefile
-	cd build && cmake -DCMAKE_BUILD_TYPE=$(build_type) -DTARGET_DIR=$(target_dir) ..
-	cp CMakeLists.txt build/CMakeLists.txt.copy
+$(target_dir)/build/CMakeLists.txt.copy: $(target_dir)/build CMakeLists.txt Makefile
+	cmake -DCMAKE_BUILD_TYPE=$(build_type) -DTARGET_DIR=$(target_dir) . -B$(target_dir)/build
+	cp CMakeLists.txt $(target_dir)/build/CMakeLists.txt.copy
 
-build:
-	mkdir -p build
+$(target_dir)/build:
+	mkdir -p $(target_dir)/build
 
 $(SETTINGS):
-			cp $(target_dir)/settings.h settings.h && \
-			./bin/settings && \
-			rm settings.h
+			cd $(target_dir) && \
+			./bin/settings
 
 $(GEN):
 			$(MAKE) $(SETTINGS) && \
-			mkdir -p $(target_dir)/sim && \
+			cd $(target_dir) && \
+			mkdir -p sim && \
 			./bin/gen
 
 $(PF):
 			$(MAKE) $(SETTINGS) && \
-			mkdir -p $(target_dir)/out && \
-			mkdir -p $(target_dir)/out/pf_traj && \
+			cd $(target_dir) && \
+			mkdir -p out && \
+			mkdir -p out/pf_traj && \
 			./bin/pf
 
 $(PLT):
 			$(MAKE) $(SETTINGS) && \
-			rm -rf $(target_dir)/plots && \
-			mkdir -p $(target_dir)/plots && \
-			mkdir -p $(target_dir)/plots/pure && \
-			mkdir -p $(target_dir)/plots/pf && \
-			$(PY) particleFilter/plotter.py
+			cd $(target_dir) && \
+			rm -rf plots && \
+			mkdir -p plots && \
+			mkdir -p plots/pure && \
+			mkdir -p plots/pf && \
+			$(PY) ../particleFilter/plotter.py
 
 $(EMNG):
 			$(MAKE) $(SETTINGS) && \
-			rm -rf $(target_dir)/out && \
-			mkdir -p $(target_dir)/out/pf_traj && \
-			mkdir -p $(target_dir)/out/pure_traj && \
-			touch $(target_dir)/out/em.txt && \
-			./bin/emloop | tee $(target_dir)/out/em.txt
+			cd $(target_dir) && \
+			rm -rf out && \
+			mkdir -p out/pf_traj && \
+			mkdir -p out/pure_traj && \
+			touch out/em.txt && \
+			bin/emloop | tee out/em.txt
 			
 $(EM):
 			$(MAKE) clear_data && \

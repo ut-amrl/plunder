@@ -43,8 +43,8 @@ find_package(Z3 REQUIRED)
 find_package(PythonLibs REQUIRED)
 
 # Set final locations for binaries
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${TARGET_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${TARGET_DIR}/lib)
 
 # Libraries
 # SET(libs roslib roscpp rosbag boost_system pthread)
@@ -70,6 +70,7 @@ add_subdirectory(pips/submodules/gflags)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(pips/submodules/json)
 
+
 # Build the core of C++ EM Synthesis as a static library, which the executables can
 # link to. This enables shorter compile times since these files only need to be
 # built once.
@@ -94,7 +95,10 @@ set(CXX_PIPS_SRCS
     pips/src/ast/parsing.cpp
     pips/src/ast/parsing.hpp
     pips/src/ast/synthesis.cpp
-    pips/src/ast/synthesis.hpp
+    pips/src/ast/synthesis.hpp)
+add_library(c++-pips-core ${CXX_PIPS_SRCS})
+
+set(EMDIPS_SRCS 
     simulation/generate.cpp
     simulation/generate.h
     particleFilter/pf_runner.cpp
@@ -103,28 +107,34 @@ set(CXX_PIPS_SRCS
     synthesis/em.cpp
     utils.h
     system.h
-    translateSettings.cpp)
-add_library(c++-pips-core ${CXX_PIPS_SRCS})
+    translateSettings.cpp
+    ${TARGET_DIR}/domain.h
+    ${TARGET_DIR}/robot.h
+    ${TARGET_DIR}/robotSets.h
+    ${TARGET_DIR}/settings.h)
+add_library(emdips-core ${EMDIPS_SRCS})
+
 # target_link_libraries(c++-pips-core amrl_shared_lib)
 target_link_libraries(c++-pips-core Eigen3::Eigen)
 target_link_libraries(c++-pips-core nlohmann_json::nlohmann_json)
 target_link_libraries(c++-pips-core ${Z3_LIBRARIES})
 target_link_libraries(c++-pips-core ${libs})
 target_link_libraries(c++-pips-core ${PYTHON_LIBRARIES})
+target_link_libraries(emdips-core c++-pips-core)
 
 # Add an executable for each command
 add_executable(emdips-l3 pips/src/emdips-l3.cpp)
-target_link_libraries(emdips-l3 c++-pips-core stdc++fs)
+target_link_libraries(emdips-l3 emdips-core stdc++fs)
 
 add_executable(settings translateSettings.cpp)
-target_link_libraries(settings c++-pips-core stdc++fs)
+target_link_libraries(settings emdips-core stdc++fs)
 
 add_executable(pf particleFilter/pf_runner.cpp)
-target_link_libraries(pf c++-pips-core stdc++fs)
+target_link_libraries(pf emdips-core stdc++fs)
 
 add_executable(gen simulation/generate.cpp)
-target_link_libraries(gen c++-pips-core stdc++fs)
+target_link_libraries(gen emdips-core stdc++fs)
 
 add_executable(emloop synthesis/em.cpp)
-target_link_libraries(emloop c++-pips-core stdc++fs)
+target_link_libraries(emloop emdips-core stdc++fs)
 

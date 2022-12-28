@@ -371,9 +371,9 @@ int main() {
     // Initialize python support
     Py_Initialize();
 
-    PyRun_SimpleString(
-        "import os, sys \n"
-        "sys.path.append(os.getcwd() + '/pips/src/optimizer') \n");
+    string s = "import os, sys \nsys.path.append(os.getcwd() + '/"+OPTIMIZER_PATH+"') \n";
+
+    PyRun_SimpleString(s.c_str());
 
     // File name
     PyObject* pName = PyUnicode_FromString((char*)"optimizer");
@@ -391,7 +391,7 @@ int main() {
         }
     } else {
         PyErr_Print();
-        fprintf(stderr, "Failed to load optimization file");
+        fprintf(stderr, "Failed to load optimization file\n");
     }
 
     vector<Robot> robots = getRobotSet(ROBOT_SET);
