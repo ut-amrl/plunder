@@ -13,6 +13,9 @@ using namespace SETTINGS;
 string getCsvTitles(){
     string s = "time, ";
     for(Var each: Obs_vars){
+        if(count(LA_vars.begin(), LA_vars.end(), each.name_) > 0){
+            s += "LA.";
+        }
         s += each.name_ + ", ";
     }
     s += "HA";
@@ -24,7 +27,7 @@ string getCsvRow(State state, double t){
     for(Var each: Obs_vars){
         s += to_string(state.get(each.name_)) + ", ";
     }
-    s += print(state.ha);
+    s += std::to_string(state.ha);
     return s;
 }
 
@@ -105,14 +108,13 @@ void execute_pure(Trajectory& traj, asp* asp){
     USE_POINT_ERROR = false;
 
     for(uint32_t t = 0; t < traj.size(); t++){
-        State last = (t == 0) ? State {} : traj.get(t-1);
+        State last = (t == 0) ? State () : traj.get(t-1);
         State cur = traj.get(t);
         for(string each: LA_vars) {
             cur.put(each, last.get(each));
         }
-        State s (last.ha, cur.obs);
 
-        traj.set(t, asp(s));
+        traj.set(t, asp(State(last.ha, cur.obs)));
     }
 
     // Restore point error

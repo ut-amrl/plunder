@@ -69,18 +69,12 @@ HA initialASP(State state) {
 }
 
 void plot_pure(Trajectory& traj, asp* asp, string output_path) {
-
     ofstream outFile;
     outFile.open(output_path);
 
     for(uint32_t n = 0; n < PARTICLES_PLOTTED; n++){
         execute_pure(traj, asp);
-
-        for(uint32_t t = 0; t < traj.size() - 1; t++) {
-            outFile << traj.get(t).ha << ",";
-        }
-        outFile << traj.get(traj.size() - 1).ha << endl;
-
+        outFile << traj.to_string();
     }
     outFile.close();
 }

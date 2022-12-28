@@ -42,7 +42,7 @@ struct State {
     HA ha;
     Obs obs;
 
-    State () {}
+    State () : ha(), obs() {}
 
     State (map<string, double> _table) : ha(), obs(_table) {}
 
@@ -135,5 +135,14 @@ struct Trajectory {
 
     int size() {
         return traj.size();
+    }
+
+    string to_string() {
+        string s = "";
+        for(uint32_t t = 0; t < traj.size() - 1; t++) {
+            s += std::to_string(traj[t].ha) + ",";
+        }
+        s += std::to_string(traj[traj.size() - 1].ha) + "\n";
+        return s;
     }
 };

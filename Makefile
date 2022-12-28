@@ -72,7 +72,7 @@ $(EM):
 			$(MAKE) $(EMNG)
 
 clean:
-	rm -rf bin build lib
+	rm -rf $(target_dir)/bin $(target_dir)/build $(target_dir)/lib
 
 clear_data:
 	rm -rf $(target_dir)/sim $(target_dir)/plots $(target_dir)/out settings.txt
