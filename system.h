@@ -69,8 +69,6 @@ struct State {
     }
 };
 
-class Robot;
-
 typedef HA asp(State);
 typedef Obs motor(State, bool);
 typedef Obs phys(State, double);

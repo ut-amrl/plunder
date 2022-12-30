@@ -31,3 +31,5 @@
 #include "ast/parsing.hpp"
 #include "visitors/interp_visitor.hpp"
 #include "ast/synthesis.hpp"
+
+typedef int HA;
