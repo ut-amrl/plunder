@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 1D-target
+target_dir ?= 2D-highway-env
 
 # acceptable build_types: Release/Debug/Profile
 build_type := Release

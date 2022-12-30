@@ -131,7 +131,7 @@ def get_la(self, action: Union[dict, str] = None) -> None:
 ######## Simulation ########
 ha = env.action_type.actions_indexes["FASTER"]
 obs_out = open("obs_out.csv", "w")
-obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, steering, acc, HA\n")
+obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA\n")
 
 
 
