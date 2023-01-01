@@ -35,5 +35,13 @@ vector<string> LA_vars = {
 
 // Obs: Defines the world state of a robot. 
 vector<Var> Obs_vars = {
-    // TODO
+    Var ("l_x", Dimension(0, 0, 0), true),
+    Var ("l_vx", Dimension(0, 0, 0), true),
+    Var ("l_vy", Dimension(0, 0, 0), true),
+    Var ("f_x", Dimension(0, 0, 0), true),
+    Var ("f_vx", Dimension(0, 0, 0), true),
+    Var ("f_vy", Dimension(0, 0, 0), true),
+    Var ("r_x", Dimension(0, 0, 0), true),
+    Var ("r_vx", Dimension(0, 0, 0), true),
+    Var ("r_vy", Dimension(0, 0, 0), true),
 };

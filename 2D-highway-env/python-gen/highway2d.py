@@ -10,6 +10,7 @@ from typing import List, Tuple, Union, Optional
 ######## Configuration ########
 lane_diff = 0.25 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
+use_absolute_lanes = True
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=20
@@ -32,6 +33,13 @@ ACTIONS_ALL = { # A mapping of action indexes to labels
     2: 'LANE_RIGHT',
     3: 'FASTER',
     4: 'SLOWER'
+}
+ACTION_REORDER = {
+    0: 2,
+    1: -1,
+    2: 3,
+    3: 0,
+    4: 1
 }
 
 highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(20, 30, 5) # Speed bounds
@@ -131,7 +139,7 @@ def get_la(self, action: Union[dict, str] = None) -> None:
 ######## Simulation ########
 ha = env.action_type.actions_indexes["FASTER"]
 obs_out = open("obs_out.csv", "w")
-obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA\n")
+obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA, target_lane\n")
 
 
 
@@ -151,7 +159,8 @@ for _ in range(1000):
             obs_out.write(str(prop)+", ")
     obs_out.write(str(la['steering'])+", ")
     obs_out.write(str(la['acceleration'])+", ")
-    obs_out.write(ACTIONS_ALL[ha])
+    obs_out.write(str(ACTION_REORDER[ha])+", ")
+    obs_out.write(str(env.vehicle.target_lane_index[2]))
     obs_out.write("\n")
     
     # Run ASP

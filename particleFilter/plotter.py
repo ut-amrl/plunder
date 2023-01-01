@@ -44,8 +44,6 @@ def readGroundTruth(gtPath):
 
     while not os.path.exists(gtPath):
         time.sleep(1)
-        # if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
-        #     raise Exception('Settings file changed... restarting plotter')
     gtReader = csv.reader(open(gtPath, "r"))
     title_row = next(gtReader)
 
@@ -59,7 +57,8 @@ def readGroundTruth(gtPath):
         return
     
     for info in gtReader:
-        gtTrajectory.append(int(info[ha_index].strip()))
+        if len(info)>0:
+            gtTrajectory.append(int(info[ha_index].strip()))
 
     return
 

@@ -312,8 +312,10 @@ void emLoop(){
         readData(inputFile, traj);
 
         // Run ASPs for all robots
-        string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-        plot_pure(traj, ASP_model, plot);
+        if(GT_PRESENT){
+            string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
+            plot_pure(traj, ASP_model, plot);
+        }
 
         state_traj.push_back(traj);
     }

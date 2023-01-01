@@ -35,6 +35,7 @@ namespace SETTINGS {
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
+    const bool GT_PRESENT = true;
     const int PARTICLES_PLOTTED = 100;                                  // Number of particles plotted
     const int PLOT_TIME = 150;                                          // Maximum time step plotted
     const int NUM_TRAJECTORIES = max(SAMPLE_SIZE, PARTICLES_PLOTTED);   // number of particle trajectories sampled to be fed into the maximization step
