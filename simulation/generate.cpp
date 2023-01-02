@@ -6,7 +6,7 @@ using namespace SETTINGS;
 
 // ----- Main ---------------------------------------------
 
-int main(int argc, char** argv) {
+int main() {
     vector<Trajectory> traj = gen_trajectories(ASP_model, GEN_ACCURACY);
 
     if(DEBUG)

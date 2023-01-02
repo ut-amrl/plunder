@@ -12,8 +12,8 @@ vector<FunctionEntry> library;
 vector<ast_ptr> roots;
 PyObject* pFunc;
 
-vector<float> accuracies;
-vector<ast_ptr> preds;
+vector<float> loss;
+vector<ast_ptr> solution_preds;
 vector<ast_ptr> gt_truth;
 
 namespace std {
@@ -53,7 +53,7 @@ HA emdipsASP(State state){
     Example obsObject = dataToExample(state.ha, state.obs);
     for(uint i = 0; i < transitions.size(); i++){
         if(print(prev_ha) == transitions[i].first && transitions[i].first!=transitions[i].second){
-            if(InterpretBool(preds[i], obsObject)) {
+            if(InterpretBool(solution_preds[i], obsObject)) {
                 state.ha = to_label(transitions[i].second);
                 break;
             }
@@ -103,7 +103,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
         // Convert each particle trajectory point to EMDIPS-supported Example
         for(uint n = 0; n < SAMPLE_SIZE; n++){
             vector<HA> traj = trajectories[n];
-            for(uint t = 0; t < state_traj[i].size() - 1 - END_PF_ERROR; t++){
+            for(int t = 0; t < state_traj[i].size() - 1 - END_PF_ERROR; t++){
                 Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs);
 
                 // Provide next high-level action
@@ -126,7 +126,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
 }
 
 void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
-    for(int i = 0; i < allExamples.size(); i++){
+    for(uint i = 0; i < allExamples.size(); i++){
         allExamples[i] = WindowExamples(allExamples[i], WINDOW_SIZE);
     }
 
@@ -143,10 +143,9 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     // Set each maximum error to speed up search
     cout << "Setting error threshold to " << TARGET_LOSS << "\n\n";
     for(uint i = 0; i < transitions.size(); i++){
-        accuracies[i] = TARGET_LOSS;
+        loss[i] = TARGET_LOSS;
     }
     
-    EmdipsOutput eo;
     if(iteration % STRUCT_CHANGE_FREQ == 0 && !HARDCODE_PROG){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
@@ -172,7 +171,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         //     cout << each << endl;
         // }
 
-        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, BATCH_SIZE, PROG_ENUM, false, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, false, pFunc);
 
     } else {
         
@@ -180,12 +179,9 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         string aspFilePath = GEN_ASP + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        eo = emdipsL3(samples, transitions, all_sketches, preds, gt_truth, accuracies, aspFilePath, BATCH_SIZE, PROG_ENUM, true, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, true, pFunc);
 
     }
-    
-    preds = eo.ast_vec;
-    accuracies = eo.log_likelihoods;
 
     // Write ASP info to file
     ofstream aspStrFile;
@@ -193,8 +189,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     aspStrFile.open(aspStrFilePath);
     for(uint i = 0; i < transitions.size(); i++){
         aspStrFile << transitions[i].first + " -> " + transitions[i].second << endl;
-        aspStrFile << "Accuracy: " << accuracies[i] << endl;
-        aspStrFile << preds[i] << endl;
+        aspStrFile << "Loss: " << loss[i] << endl;
+        aspStrFile << solution_preds[i] << endl;
     }
     aspStrFile.close();
 }
@@ -214,7 +210,7 @@ void setupLdips(){
         vector<HA> valid_ha = get_valid_ha(i, USE_SAFE_TRANSITIONS);
         for(uint j = 0; j < valid_ha.size(); j++){
             transitions.push_back(pair<string, string> (print(i), print(valid_ha[j])));
-            accuracies.push_back(numeric_limits<float>::max());
+            loss.push_back(numeric_limits<float>::max());
         }
     }
     
@@ -247,7 +243,7 @@ void setupLdips(){
     }
     
     // Read hard coded program structure
-    for (int t = 0; t < transitions.size(); t++) {
+    for (uint t = 0; t < transitions.size(); t++) {
         const auto &transition = transitions[t];
         const string input_name =
             GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
@@ -289,10 +285,9 @@ void update_point_accuracies(vector<Robot>& robots, vector<vector<Example>>& exa
 }
 
 
-void testExampleOnASP(vector<Example> examples, Robot r){
+void testExampleOnASP(vector<Example> examples){
     for(uint i=0; i<examples.size(); i++){
-        Example e = examples[i];
-        printExampleInfo(e);
+        printExampleInfo(examples[i]);
     }
 }
 

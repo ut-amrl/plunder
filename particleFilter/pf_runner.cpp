@@ -5,7 +5,7 @@ using namespace SETTINGS;
 
 // ----- Main ---------------------------------------------
 
-int main(int argc, char** argv){
+int main(){
     for(int i = 0; i < NUM_ROBOTS; i++){
         string in = SIM_DATA + to_string(i) + ".csv";
         string out = PF_TRAJ + to_string(i) + ".csv";

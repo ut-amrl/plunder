@@ -143,7 +143,7 @@ public:
     }
 
     // Retrieve high-level action sequences after running particle filter
-    vector<vector<HA>> retrieveTrajectories(vector<vector<HA>>& trajectories, int num_trajectories){        
+    vector<vector<HA>> retrieveTrajectories(vector<vector<HA>>& trajectories, uint num_trajectories){        
         if(particles.size() == 0){
             cout << "Run the particle filter first!" << endl;
             return vector<vector<HA>>();
@@ -151,23 +151,23 @@ public:
         assert(particles.size() == ancestors.size());
 
         int T = particles.size(); int N = particles[0].size();
-        num_trajectories = min(num_trajectories, (int) particles[0].size());
+        num_trajectories = min(num_trajectories, (uint) particles[0].size());
 
         while(trajectories.size() < num_trajectories){
             trajectories.push_back(vector<HA>(T));
         }
 
         vector<uint> activeParticles;
-        for(uint i = 0; (int) activeParticles.size() < num_trajectories; i += (N / num_trajectories)){
+        for(uint i = 0; activeParticles.size() < num_trajectories; i += (N / num_trajectories)){
             activeParticles.push_back(i);
         }
 
         for(int t = T - 1; t >= 0; t--){
-            for(int i = 0; i < num_trajectories; i++){
+            for(uint i = 0; i < num_trajectories; i++){
                 trajectories[i][t] = particles[t][activeParticles[i]];
             }
             if(t != 0){
-                for(int i = 0; i < num_trajectories; i++){
+                for(uint i = 0; i < num_trajectories; i++){
                     activeParticles[i] = ancestors[t][activeParticles[i]];
                 }
             }
@@ -178,7 +178,7 @@ public:
 
     vector<vector<HA>> smoothTrajectories(vector<vector<HA>>& trajectories){  
         for(vector<HA>& traj : trajectories){
-            for(int i = 1; i < traj.size() - 1; i++){
+            for(uint i = 1; i < traj.size() - 1; i++){
                 if(traj[i-1] == traj[i+1] && traj[i-1] != traj[i]){ // Apply smoothening
                     traj[i] = traj[i-1];
                 }
