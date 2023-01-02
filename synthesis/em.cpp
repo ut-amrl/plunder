@@ -305,13 +305,13 @@ void emLoop(){
     asp* curASP = initialASP;
     vector<Trajectory> state_traj;
 
+    // Read in demonstration
     for(int r = 0; r < NUM_ROBOTS; r++){
-        // Run ground truth ASP
         string inputFile = SIM_DATA + to_string(r) + ".csv";
         Trajectory traj;
         readData(inputFile, traj);
 
-        // Run ASPs for all robots
+        // Run and plot ground truth ASP
         if(GT_PRESENT){
             string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
             plot_pure(traj, ASP_model, plot);

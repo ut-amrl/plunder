@@ -36,17 +36,35 @@ void readData(string file, Trajectory& traj){
 
     // header line
     getline(infile, res);
+    istringstream iss_header (res);
+    string comma;
+
+    map<string, int> inds;
+    string cur_var;
+    int count = 0;
+    while(getline(iss_header, cur_var, ',')) {
+        trim(cur_var);
+        if(cur_var.substr(0, 3) == "LA.")
+            cur_var = cur_var.substr(3);
+
+        inds[cur_var] = count;
+        count++;
+    }
+
 
     // data lines
     while(getline(infile, res)){
         istringstream iss (res);
-        string comma;
 
-        float time; iss >> time >> comma;
+        vector<double> vals;
+        for(int i = 0; i < count; i++){
+            double d; iss >> d >> comma;
+            vals.push_back(d);
+        }
+
         State state;
         for(Var each: Obs_vars) {
-            double d; iss >> d >> comma;
-            state.put(each.name_, d);
+            state.put(each.name_, vals[inds[each.name_]]);
         }
 
         traj.append(state);

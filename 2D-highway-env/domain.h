@@ -35,13 +35,15 @@ vector<string> LA_vars = {
 
 // Obs: Defines the world state of a robot. 
 vector<Var> Obs_vars = {
-    Var ("l_x", Dimension(0, 0, 0), true),
-    Var ("l_vx", Dimension(0, 0, 0), true),
-    Var ("l_vy", Dimension(0, 0, 0), true),
-    Var ("f_x", Dimension(0, 0, 0), true),
-    Var ("f_vx", Dimension(0, 0, 0), true),
-    Var ("f_vy", Dimension(0, 0, 0), true),
-    Var ("r_x", Dimension(0, 0, 0), true),
-    Var ("r_vx", Dimension(0, 0, 0), true),
-    Var ("r_vy", Dimension(0, 0, 0), true),
+    Var ("l_x", Dimension(1, 0, 0), true),
+    Var ("l_vx", Dimension(1, -1, 0), true),
+    Var ("l_vy", Dimension(1, -1, 0), true),
+    Var ("f_x", Dimension(1, 0, 0), true),
+    Var ("f_vx", Dimension(1, -1, 0), true),
+    Var ("f_vy", Dimension(1, -1, 0), true),
+    Var ("r_x", Dimension(1, 0, 0), true),
+    Var ("r_vx", Dimension(1, -1, 0), true),
+    Var ("r_vy", Dimension(1, -1, 0), true),
+    Var ("steer", Dimension(0, -2, 1), false), // degrees / s^2 ?? idk
+    Var ("acc", Dimension(1, -2, 0), false)
 };

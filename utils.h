@@ -13,7 +13,7 @@ string print(HA ha){
 }
 
 HA to_label(string str){
-    for(int i = 0; i < numHA; i++){
+    for(uint i = 0; i < numHA; i++){
         if(HA_Labels[i] == str){
             return i;
         }
@@ -30,7 +30,7 @@ vector<HA> get_valid_ha(HA ha, bool use_safe_transitions){
     if(all.size() != 0)
         return all;
 
-    for(int i = 0; i < numHA; i++){
+    for(uint i = 0; i < numHA; i++){
         all.push_back(i);
     }
     return all;
@@ -84,4 +84,20 @@ double logsumexp(vector<double>& vals) {
 // Calculate pdf of N(mu, sigma) at x, then take the natural log
 double logpdf(double x, double mu, double sigma){
     return (-log(sigma)) - (0.5*log(2*M_PI)) - 0.5*pow((x - mu)/sigma, 2);
+}
+
+// Trimming a string
+inline void ltrim(string &s) {
+    s.erase(s.begin(), find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !isspace(ch);
+    }));
+}
+inline void rtrim(string &s) {
+    s.erase(find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !isspace(ch);
+    }).base(), s.end());
+}
+inline void trim(string &s) {
+    rtrim(s);
+    ltrim(s);
 }

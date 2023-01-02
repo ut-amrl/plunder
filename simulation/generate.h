@@ -107,7 +107,7 @@ void execute_pure(Trajectory& traj, asp* asp){
     bool point_error = USE_POINT_ERROR;
     USE_POINT_ERROR = false;
 
-    for(uint32_t t = 0; t < traj.size(); t++){
+    for(int t = 0; t < traj.size(); t++){
         State last = (t == 0) ? State () : traj.get(t-1);
         State cur = traj.get(t);
         for(string each: LA_vars) {

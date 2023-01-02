@@ -20,15 +20,17 @@ Obs motorModel(State state, bool error){
 
 HA ASP_model(State state){
     HA ha;
-    bool front_clear = flip(logistic(-50, -0.15, state.get("f_x")));
-    bool left_clear = flip(logistic(-50, -0.15, state.get("l_x")));
-    bool right_clear = flip(logistic(-50, -0.15, state.get("r_x")));
 
-    if(front_clear) ha=FASTER;
-    else if(left_clear) ha=LANE_LEFT;
-    else if(right_clear) ha=LANE_RIGHT;
-    else ha=SLOWER;
+    bool front_clear = flip(logistic(0.15, 50, state.get("f_x")));
+    bool left_clear = flip(logistic(0.15, 50, state.get("l_x")));
+    bool right_clear = flip(logistic(0.15, 50, state.get("r_x")));
+
+    if(front_clear) ha=FASTER; // No car in front: accelerate
+    else if(left_clear) ha=LANE_LEFT; // Merge left
+    else if(right_clear) ha=LANE_RIGHT; // Merge right
+    else ha=SLOWER; // Nowhere to go: slow down
 
     return ha;
 }
+
 Obs physicsModel(State state, double t_step){}

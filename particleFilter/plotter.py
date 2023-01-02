@@ -67,15 +67,19 @@ def readLA(gtPath):
 
     gtReader = csv.reader(open(gtPath, "r"))
     title_row = next(gtReader)
+    title_row = [var.strip() for var in title_row]
 
     la_indices = []
     la_names = []
     for i in range(0, len(title_row)):
-        if (title_row[i].strip())[0:3] == "LA.":
+        if (title_row[i])[0:3] == "LA.":
             la_indices.append(i)
             la_names.append((title_row[i].strip())[3:])
 
-    gtLA = [[] * len(la_indices)]
+    gtLA = []
+    for i in range(0, len(la_indices)):
+        gtLA.append([])
+
     for info in gtReader:
         for i in range(0, len(la_indices)):
             gtLA[i].append(float(info[la_indices[i]]))
@@ -215,7 +219,7 @@ def plotLA(outP, gtF, robot):
     gtFile = gtF + str(robot) + ".csv"
     la_names = readLA(gtFile)
     outPath = outP + "LA-" + str(robot) + "-"
-
+    
     maxTime = min(int(settings["PLOT_TIME"]), len(gtLA[0]))
     for arr in gtLA:
         del arr[maxTime:]
@@ -225,7 +229,6 @@ def plotLA(outP, gtF, robot):
         times.append(t)
 
     fig, axs = plt.subplots(len(gtLA))
-    axs.margins(0)
     fig.suptitle("Low-level actions")
     plt.xlabel('time')
 

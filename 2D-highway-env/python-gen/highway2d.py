@@ -10,7 +10,7 @@ from typing import List, Tuple, Union, Optional
 ######## Configuration ########
 lane_diff = 0.25 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
-use_absolute_lanes = True
+use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=20
@@ -34,28 +34,27 @@ ACTIONS_ALL = { # A mapping of action indexes to labels
     3: 'FASTER',
     4: 'SLOWER'
 }
-ACTION_REORDER = {
+
+ACTION_REORDER = { # highway-env uses a different order for actions (desired: FASTER, SLOWER, LANE_LEFT, LANE_RIGHT)
     0: 2,
     1: -1,
     2: 3,
-    3: 0,
+    3: 0, 
     4: 1
 }
 
-highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(20, 30, 5) # Speed bounds
+highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(20, 30, 5) # Speed interval (lower_bound, upper_bound, num_samples)
 highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 5 # Acceleration / Deceleration
 
 env.reset()
 
 ######## ASP ########
 # Probabilistic functions
-def logistic(slope, offset, x):
+def logistic(offset, slope, x):
     return 1.0/(1.0+np.exp(-slope*(x-offset)))
 
 def sample(p):
     return random.random()<p
-
-
 
 # Helper functions
 
@@ -94,34 +93,22 @@ def closestVehicles(obs):
     return (closestLeft, closestFront, closestRight)
 
 
-
-# ASP (deterministic)
-def det_asp(ego, closest):
-    car_in_front = closest[1][1] < 0.1
-    car_left = closest[0][1] < 0.1
-    car_right = closest[2][1] < 0.1
-
-    if not car_in_front: # No car in front: accelerate
-        return env.action_type.actions_indexes["FASTER"]
-    if not car_left: # No car on the left: merge left
-        return env.action_type.actions_indexes["LANE_LEFT"]
-    if not car_right: # No car on the right: merge right
-        return env.action_type.actions_indexes["LANE_RIGHT"]
-
-    # Nowhere to go: decelerate
-    return env.action_type.actions_indexes["SLOWER"]
-
 # ASP (probabilistic)
 def prob_asp(ego, closest):
-    car_in_front = sample(logistic(-50, 0.15, closest[1][1]))
-    car_left = sample(logistic(-50, 0.15, closest[0][1]))
-    car_right = sample(logistic(-50, 0.15, closest[2][1]))
+    front_clear = sample(logistic(0.15, 50, closest[1][1]))
+    left_clear = sample(logistic(0.15, 50, closest[0][1]))
+    right_clear = sample(logistic(0.15, 50, closest[2][1]))
 
-    if not car_in_front: # No car in front: accelerate
+    # Deterministic version
+    # front_clear = closest[1][1] > 0.15
+    # left_clear = closest[0][1] > 0.15
+    # right_clear = closest[2][1] > 0.15
+
+    if front_clear: # No car in front: accelerate
         return env.action_type.actions_indexes["FASTER"]
-    if not car_left: # No car on the left: merge left
+    if left_clear: # No car on the left: merge left
         return env.action_type.actions_indexes["LANE_LEFT"]
-    if not car_right: # No car on the right: merge right
+    if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]
 
     # Nowhere to go: decelerate
@@ -138,7 +125,7 @@ def get_la(self, action: Union[dict, str] = None) -> None:
 
 ######## Simulation ########
 ha = env.action_type.actions_indexes["FASTER"]
-obs_out = open("obs_out.csv", "w")
+obs_out = open("data0.csv", "w")
 obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA, target_lane\n")
 
 
@@ -151,19 +138,20 @@ for _ in range(1000):
     obs = classifyLane(obs)
     closest = closestVehicles(obs)
 
+    # Run ASP
+    ha = prob_asp(obs[0], closest)
+
     # Run motor model
     la = get_la(env.vehicle, ha)
 
     for v in closest:
         for prop in v:
-            obs_out.write(str(prop)+", ")
-    obs_out.write(str(la['steering'])+", ")
-    obs_out.write(str(la['acceleration'])+", ")
+            obs_out.write(str(round(prop, 3))+", ")
+    obs_out.write(str(round(la['steering'], 3))+", ")
+    obs_out.write(str(round(la['acceleration'], 3))+", ")
     obs_out.write(str(ACTION_REORDER[ha])+", ")
     obs_out.write(str(env.vehicle.target_lane_index[2]))
     obs_out.write("\n")
     
-    # Run ASP
-    ha = prob_asp(obs[0], closest)
 
 obs_out.close()
