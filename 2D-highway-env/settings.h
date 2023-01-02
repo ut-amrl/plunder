@@ -31,13 +31,13 @@ namespace SETTINGS {
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 10;                 // number of trajectories to process then pass into EMDIPS, per robot
     bool USE_POINT_ERROR = true;                // point error: random transitions to a new high-level action
-    const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
+    const double POINT_ACCURACY = 0.7;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
     const bool GT_PRESENT = true;
     const int PARTICLES_PLOTTED = 100;                                  // Number of particles plotted
-    const int PLOT_TIME = 150;                                          // Maximum time step plotted
+    const int PLOT_TIME = 350;                                          // Maximum time step plotted
     const int NUM_TRAJECTORIES = max(SAMPLE_SIZE, PARTICLES_PLOTTED);   // number of particle trajectories sampled to be fed into the maximization step
 
     // Optimization parameters
@@ -45,8 +45,8 @@ namespace SETTINGS {
 
     // EMDIPS parameters
     const int WINDOW_SIZE = -1;                       // Size of sampling window. -1 for n/a
-    const int FEATURE_DEPTH = 3;                      // Feature depth [using variables like v, vmax]
-    const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
+    const int FEATURE_DEPTH = 1;                      // Feature depth [using variables like v, vmax]
+    const int SKETCH_DEPTH = 1;                       // Number of conjunctions/disjunctions
     const float TARGET_LOSS = 0.3;                    // Target loss threshold to stop enumeration early
     const int BATCH_SIZE = 8;                         // Number of programs to optimize in parallel
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration

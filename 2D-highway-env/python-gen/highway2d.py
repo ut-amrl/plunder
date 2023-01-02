@@ -95,7 +95,7 @@ def closestVehicles(obs):
 
 # ASP (probabilistic)
 def prob_asp(ego, closest):
-    front_clear = sample(logistic(0.15, 50, closest[1][1]))
+    front_clear = sample(logistic(0.15, 75, closest[1][1]))
     left_clear = sample(logistic(0.15, 50, closest[0][1]))
     right_clear = sample(logistic(0.15, 50, closest[2][1]))
 
@@ -131,18 +131,16 @@ obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_
 
 
 for _ in range(1000):
+
     obs, reward, done, truncated, info = env.step(ha)
     env.render()
+
+    # Run motor model
+    la = get_la(env.vehicle, ha)
 
     # Pre-process observations
     obs = classifyLane(obs)
     closest = closestVehicles(obs)
-
-    # Run ASP
-    ha = prob_asp(obs[0], closest)
-
-    # Run motor model
-    la = get_la(env.vehicle, ha)
 
     for v in closest:
         for prop in v:
@@ -152,6 +150,10 @@ for _ in range(1000):
     obs_out.write(str(ACTION_REORDER[ha])+", ")
     obs_out.write(str(env.vehicle.target_lane_index[2]))
     obs_out.write("\n")
+
+    # Run ASP
+    ha = prob_asp(obs[0], closest)
+
     
 
 obs_out.close()
