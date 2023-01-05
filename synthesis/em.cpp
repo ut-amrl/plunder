@@ -154,7 +154,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
         cout << "---- Number of Features Enumerated ----" << endl;
         cout << ops.size() << endl << endl;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < min(5, (int) ops.size()); i++){
             cout << ops[i] << endl;
         }
         cout << "...\n\n\n";

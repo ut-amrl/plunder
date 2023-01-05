@@ -20,7 +20,7 @@ namespace SETTINGS {
     const bool DEBUG = false;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int NUM_ROBOTS = 1;              // number of robots (depends on robot test set)
+    const int NUM_ROBOTS = 5;              // number of robots (depends on robot test set)
 
     // Simulation parameters
     const double T_STEP = -1;               // time step (s)
@@ -56,7 +56,7 @@ namespace SETTINGS {
     // Particle filter parameters
     const int NUM_PARTICLES = 20000;                                 // number of particle trajectories created to represent the distribution
     const float RESAMPLE_THRESHOLD = 1.0;                            // higher = more resampling
-    const float OBS_LIKELIHOOD_STRENGTH = 2;                         // lower = stricter observation likelihood
+    const float OBS_LIKELIHOOD_STRENGTH = 1;                         // lower = stricter observation likelihood
     const int END_PF_ERROR = 0;                                      // ignores last n timesteps because they didn't have a chance to get resampled
     const bool SMOOTH_TRAJECTORIES = false;                          // "Smooth" trajectories by removing single outlier timesteps
 }

@@ -20,7 +20,8 @@ double KP_A = 1.6666666666666667;
 
 // https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control
 // state contains the current Obs and current LA but future HA
-// returns future Obs
+// returns future LA
+// TODO: motor model needs to be more complex - a left merge means a left turn followed by a right turn (to straighten back out)
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
     
@@ -47,9 +48,9 @@ Obs motorModel(State state, bool error){
 HA ASP_model(State state){
     HA ha;
 
-    bool front_clear = flip(logistic(0.15, 75, state.get("f_x")));
-    bool left_clear = flip(logistic(0.15, 50, state.get("l_x")));
-    bool right_clear = flip(logistic(0.15, 50, state.get("r_x")));
+    bool front_clear = flip(logistic(0.15, 90, state.get("f_x")));
+    bool left_clear = flip(logistic(0.15, 90, state.get("l_x")));
+    bool right_clear = flip(logistic(0.15, 90, state.get("r_x")));
 
     if(front_clear) ha=FASTER; // No car in front: accelerate
     else if(left_clear) ha=LANE_LEFT; // Merge left

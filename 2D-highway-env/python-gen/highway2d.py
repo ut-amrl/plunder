@@ -43,10 +43,8 @@ ACTION_REORDER = { # highway-env uses a different order for actions (desired: FA
     4: 1
 }
 
-highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(20, 30, 5) # Speed interval (lower_bound, upper_bound, num_samples)
-highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 5 # Acceleration / Deceleration
-
-env.reset()
+highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(18, 30, 5) # Speed interval (lower_bound, upper_bound, num_samples)
+highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 6 # Acceleration / Deceleration
 
 ######## ASP ########
 # Probabilistic functions
@@ -95,9 +93,9 @@ def closestVehicles(obs):
 
 # ASP (probabilistic)
 def prob_asp(ego, closest):
-    front_clear = sample(logistic(0.15, 75, closest[1][1]))
-    left_clear = sample(logistic(0.15, 50, closest[0][1]))
-    right_clear = sample(logistic(0.15, 50, closest[2][1]))
+    front_clear = sample(logistic(0.15, 90, closest[1][1]))
+    left_clear = sample(logistic(0.15, 90, closest[0][1]))
+    right_clear = sample(logistic(0.15, 90, closest[2][1]))
 
     # Deterministic version
     # front_clear = closest[1][1] > 0.15
@@ -116,44 +114,63 @@ def prob_asp(ego, closest):
 
 # copied from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # which also contains motor model
-def get_la(self, action: Union[dict, str] = None) -> None:
-    la = {"steering": self.steering_control(self.target_lane_index),
-            "acceleration": self.speed_control(self.target_speed)}
+def get_la(self, action):
+    # We copy these values to avoid running each action twice
+    speed = self.target_speed
+    lane_index = self.target_lane_index
+
+    if action == env.action_type.actions_indexes["FASTER"]:
+        speed += self.DELTA_SPEED
+    elif action == env.action_type.actions_indexes["SLOWER"]:
+        speed -= self.DELTA_SPEED
+    elif action == env.action_type.actions_indexes["LANE_RIGHT"]:
+        _from, _to, _id = self.target_lane_index
+        target_lane_index = _from, _to, np.clip(_id + 1, 0, len(self.road.network.graph[_from][_to]) - 1)
+        if self.road.network.get_lane(target_lane_index).is_reachable_from(self.position):
+            lane_index = target_lane_index
+    elif action == env.action_type.actions_indexes["LANE_LEFT"]:
+        _from, _to, _id = self.target_lane_index
+        target_lane_index = _from, _to, np.clip(_id - 1, 0, len(self.road.network.graph[_from][_to]) - 1)
+        if self.road.network.get_lane(target_lane_index).is_reachable_from(self.position):
+            lane_index = target_lane_index
+
+    la = {"steering": self.steering_control(lane_index),
+            "acceleration": self.speed_control(speed)}
+    la['steering'] = np.clip(la['steering'], -self.MAX_STEERING_ANGLE, self.MAX_STEERING_ANGLE)
+    
     return la
 
-
-
 ######## Simulation ########
-ha = env.action_type.actions_indexes["FASTER"]
-obs_out = open("data0.csv", "w")
-obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA, target_lane\n")
+for iter in range(5):
+
+    env.reset()
+    ha = env.action_type.actions_indexes["FASTER"]
+    obs_out = open("data" + str(iter) + ".csv", "w")
+    obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA, target_lane\n")
+
+    for _ in range(100):
+
+        obs, reward, done, truncated, info = env.step(ha)
+        env.render()
+
+        # Pre-process observations
+        obs = classifyLane(obs)
+        closest = closestVehicles(obs)
+
+        # Run ASP
+        ha = prob_asp(obs[0], closest)
+
+        # Run motor model
+        la = get_la(env.vehicle, ha)
+
+        for v in closest:
+            for prop in v:
+                obs_out.write(str(round(prop, 3))+", ")
+        obs_out.write(str(round(la['steering'], 3))+", ")
+        obs_out.write(str(round(la['acceleration'], 3))+", ")
+        obs_out.write(str(ACTION_REORDER[ha])+", ")
+        obs_out.write(str(env.vehicle.target_lane_index[2]))
+        obs_out.write("\n")
 
 
-
-for _ in range(1000):
-
-    obs, reward, done, truncated, info = env.step(ha)
-    env.render()
-
-    # Run motor model
-    la = get_la(env.vehicle, ha)
-
-    # Pre-process observations
-    obs = classifyLane(obs)
-    closest = closestVehicles(obs)
-
-    for v in closest:
-        for prop in v:
-            obs_out.write(str(round(prop, 3))+", ")
-    obs_out.write(str(round(la['steering'], 3))+", ")
-    obs_out.write(str(round(la['acceleration'], 3))+", ")
-    obs_out.write(str(ACTION_REORDER[ha])+", ")
-    obs_out.write(str(env.vehicle.target_lane_index[2]))
-    obs_out.write("\n")
-
-    # Run ASP
-    ha = prob_asp(obs[0], closest)
-
-    
-
-obs_out.close()
+    obs_out.close()
