@@ -135,7 +135,8 @@ def get_la(self, action):
             lane_index = target_lane_index
 
     la = {"steering": self.steering_control(lane_index),
-            "acceleration": self.speed_control(speed)}
+            "acceleration": self.speed_control(speed),
+            "target_lane": lane_index[2] }
     la['steering'] = np.clip(la['steering'], -self.MAX_STEERING_ANGLE, self.MAX_STEERING_ANGLE)
     
     return la
@@ -146,7 +147,7 @@ for iter in range(5):
     env.reset()
     ha = env.action_type.actions_indexes["FASTER"]
     obs_out = open("data" + str(iter) + ".csv", "w")
-    obs_out.write("left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, HA, target_lane\n")
+    obs_out.write("x, y, vx, vy, left_present, l_x, l_y, l_vx, l_vy, forward_present, f_x, f_y, f_vx, f_vy, right_present, r_x, r_y, r_vx, r_vy, LA.steer, LA.acc, target_lane, HA\n")
 
     for _ in range(100):
 
@@ -163,13 +164,18 @@ for iter in range(5):
         # Run motor model
         la = get_la(env.vehicle, ha)
 
+        # Ego vehicle
+        for i in range(1, len(obs[0])):
+            obs_out.write(str(round(obs[0][i], 3))+", ")
+        
+        # Nearby vehicles
         for v in closest:
             for prop in v:
                 obs_out.write(str(round(prop, 3))+", ")
         obs_out.write(str(round(la['steering'], 3))+", ")
         obs_out.write(str(round(la['acceleration'], 3))+", ")
-        obs_out.write(str(ACTION_REORDER[ha])+", ")
-        obs_out.write(str(env.vehicle.target_lane_index[2]))
+        obs_out.write(str(la['target_lane'])+", ")
+        obs_out.write(str(ACTION_REORDER[ha]))
         obs_out.write("\n")
 
 
