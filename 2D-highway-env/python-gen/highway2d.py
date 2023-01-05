@@ -12,6 +12,13 @@ lane_diff = 0.25 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 
+min_velocity = 18
+max_velocity = 30
+
+highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(min_velocity, max_velocity, 2) # Speed interval (lower_bound, upper_bound, num_samples = 2)
+highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = (max_velocity - min_velocity)
+highway_env.highway_env.envs.ControlledVehicle.KP_A = 0.3 # Jerk constant (higher = faster acceleration)
+
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=20
 env.config['policy_frequency']=2 # Runs once every 10 simulation steps
@@ -42,9 +49,6 @@ ACTION_REORDER = { # highway-env uses a different order for actions (desired: FA
     3: 0, 
     4: 1
 }
-
-highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(18, 30, 5) # Speed interval (lower_bound, upper_bound, num_samples)
-highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = 6 # Acceleration / Deceleration
 
 ######## ASP ########
 # Probabilistic functions
@@ -112,17 +116,17 @@ def prob_asp(ego, closest):
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
 
-# copied from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
-# which also contains motor model
+# modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
+# in this version, target_speed, which normally requires extra state, can only be max_velocity or min_velocity
 def get_la(self, action):
     # We copy these values to avoid running each action twice
     speed = self.target_speed
     lane_index = self.target_lane_index
 
     if action == env.action_type.actions_indexes["FASTER"]:
-        speed += self.DELTA_SPEED
+        speed = min(speed + self.DELTA_SPEED, max_velocity)
     elif action == env.action_type.actions_indexes["SLOWER"]:
-        speed -= self.DELTA_SPEED
+        speed = max(speed - self.DELTA_SPEED, min_velocity)
     elif action == env.action_type.actions_indexes["LANE_RIGHT"]:
         _from, _to, _id = self.target_lane_index
         target_lane_index = _from, _to, np.clip(_id + 1, 0, len(self.road.network.graph[_from][_to]) - 1)

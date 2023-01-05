@@ -9,36 +9,40 @@ using namespace SETTINGS;
 // TODO
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.01) },
-    { "acc", normal_distribution<double>(0.0, 0.01) }
+    { "steer", normal_distribution<double>(0.0, 0.05) },
+    { "acc", normal_distribution<double>(0.0, 1) }
 };
 
+// I have no idea why these don't use the same units as the simulation??
 // might create as variables
 double MAX_VEL = .375;
-double KP_A = 1.6666666666666667;
+double MIN_VEL = .225;
+double KP_A = 4;
+double STEER_ANGLE = 0.3;
 
 
 // https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control
-// state contains the current Obs and current LA but future HA
-// returns future LA
-// TODO: motor model needs to be more complex - a left merge means a left turn followed by a right turn (to straighten back out)
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
     
     if(ha == FASTER) {
         state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
     } else if (ha == SLOWER) {
-        state.put("acc", KP_A*(0-state.get("vx")));
+        state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
     } else if (ha == LANE_LEFT) {
-        if(state.get("acc")<0) state.put("acc", KP_A*(0-state.get("vx")));
+        // Maintain last action (FASTER or SLOWER)
+        if(state.get("acc") < 0) state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
         else state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
-        // more complicated than this, might implement later
-        state.put("steer", .03);
+
+        // more complicated than this, might implement later (left merge is followed by a slight right turn)
+        state.put("steer", -STEER_ANGLE);
     } else if (ha == LANE_RIGHT) {
-        if(state.get("acc")<0) state.put("acc", KP_A*(0-state.get("vx")));
+        // Maintain last action (FASTER or SLOWER)
+        if(state.get("acc") < 0) state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
         else state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
-        // more complicated than this, might implement later
-        state.put("steer", -.03);
+
+        // more complicated than this, might implement later (right merge is followed by a slight left turn)
+        state.put("steer", STEER_ANGLE);
     }
 
     return state.obs;
