@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 2D-highway-env
+target_dir ?= 1D-target
 
 # acceptable build_types: Release/Debug/Profile
 build_type := Release
@@ -64,6 +64,7 @@ $(EMNG):
 			mkdir -p out/pf_traj && \
 			mkdir -p out/pure_traj && \
 			touch out/em.txt && \
+			cp emdips_operations.json ../pips/ops/emdips_operations.json && \
 			bin/emloop | tee out/em.txt
 			
 $(EM):

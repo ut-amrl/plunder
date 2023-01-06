@@ -1,0 +1,31 @@
+[
+    {
+        "op": "Plus",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, 0, 0], [1, 0, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, 0, 0]
+    },
+    {
+        "op": "Minus",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, 0, 0], [1, 0, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, 0, 0]
+    },
+    {
+        "op": "Plus",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -1, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, -1, 0]
+    },
+    {
+        "op": "Minus",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -1, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, -1, 0]
+    }
+]
+  

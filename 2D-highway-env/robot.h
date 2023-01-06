@@ -15,10 +15,10 @@ map<string, normal_distribution<double>> la_error = {
 
 // I have no idea why these don't use the same units as the simulation??
 // might create as variables
-double MAX_VEL = .375;
-double MIN_VEL = .225;
-double KP_A = 4;
-double STEER_ANGLE = 0.3;
+const double MAX_VEL = .375;
+const double MIN_VEL = .225;
+const double KP_A = 4;
+const double STEER_ANGLE = 0.3;
 
 
 // https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control

@@ -32,11 +32,11 @@ See **pips/**. No further dependencies are required. (scipy?) TODO
 # How to run
 To get the project running, you will need to do the following:
 - Create a new folder to house your problem domain. 
-- In that directory, create the files **domain.h, robot.h,** and **settings.h**. 
+- In that directory, create the files **domain.h, robot.h, settings.h,** and **emdips_operations.json**. 
 - In **domain.h**, define your high-level action space, low-level action space, and state space.
 - In **robot.h**, define your motor model.
-- In **settings.h**, tune the desired parameters (including I/O paths).
-- In **pips/**, follow the instructions to define the desired operations (plus, minus, times, etc.)
+- In **settings.h**, tune the desired parameters and I/O paths.
+- In **emdips_operations**, define your desired operations (plus, minus, times, etc). See *pips/* for general tips and guidelines for defining operations and a list of existing operations.
 
 If you need to simulate your own demonstrations, you can also use our interface to:
 - Define the ground-truth ASP and the physics model in **robot.h**.

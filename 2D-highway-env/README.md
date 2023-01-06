@@ -4,6 +4,7 @@ This module is the setup for a vehicle performing lane-changing maneuvers. The g
 ## File Organization
 - **domain.h** - defines the problem domain, including the spaces $H$, $L$, and $O$
 - **robot.h** - defines motor model
+- **emdips_operations.json** - list of desired operations to be used during program synthesis. See *pips/* for further clarification.
 - **settings.h** - consolidated list of hyperparameters and settings
 
 Note that this setup differs from the 1D-target example in that the demonstrations are provided by the python programs in **python-gen** (try running **highway2d.py**). Demonstrations will be placed into that folder automatically. 
