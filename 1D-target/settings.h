@@ -46,7 +46,7 @@ namespace SETTINGS {
     const int NUM_CORES = 4;                   // Number of processes to run in parallel
     const double MIN_ALPHA = 1.0;              // lowest slope allowed
     const double INIT_ALPHA = 1.0;             // starting slope
-    const bool BOUND_ALPHA = true;             // whether to bound alpha (to ensure slope is not too low)
+    const bool BOUND_ALPHA = false;             // whether to bound alpha (to ensure slope is not too low)
     const double BOUNDS_EXTEND = 0.1;          // Amount to search above and below extrema
     const bool PRINT_WARNINGS = false;         // Debugging info
     const int PRINT_PADDING = 30;              // Print customization
@@ -54,9 +54,9 @@ namespace SETTINGS {
     const bool BOUND_LIKELIHOOD = false;       // Whether we bound the likelihood by tt
     const int MAX_ITER = 150;                  // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.1;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_LOWER = 0.2;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
-    const double ALPHA_LOSS_UPPER = 0.01;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double PROG_COMPLEXITY_LOSS = 0.0;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double ALPHA_LOSS_LOWER = 20.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
+    const double ALPHA_LOSS_UPPER = 0.001;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
     const double X_0_LOSS = 0;                    // adds L1 loss ( x_0 * X_0_LOSS )
 
     const int MAX_EX_YES = 50;         // Total number of examples to optimize over when transition is satisfied

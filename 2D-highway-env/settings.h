@@ -29,7 +29,7 @@ namespace SETTINGS {
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 10;                 // number of trajectories to process then pass into EMDIPS, per robot
     bool USE_POINT_ERROR = true;                // point error: random transitions to a new high-level action
-    const double POINT_ACCURACY = 0.7;          // probability of a correct (ASP-consistent) high-level transition
+    const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
@@ -44,9 +44,9 @@ namespace SETTINGS {
     const bool PRINT_DEBUG = false;            // Extra debugging info
     const int INITIAL_VALUES = 8;              // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
     const int NUM_CORES = 4;                   // Number of processes to run in parallel
-    const double MIN_ALPHA = 30.0;              // lowest slope allowed
-    const double INIT_ALPHA = 30.0;             // starting slope
-    const bool BOUND_ALPHA = true;             // whether to bound alpha (to ensure slope is not too low)
+    const double MIN_ALPHA = 1.0;              // lowest slope allowed
+    const double INIT_ALPHA = 1.0;             // starting slope
+    const bool BOUND_ALPHA = false;             // whether to bound alpha (to ensure slope is not too low)
     const double BOUNDS_EXTEND = 0.1;          // Amount to search above and below extrema
     const bool PRINT_WARNINGS = false;         // Debugging info
     const int PRINT_PADDING = 30;              // Print customization
@@ -55,8 +55,8 @@ namespace SETTINGS {
     const int MAX_ITER = 200;                  // Max number of iterations of a single optimization run
 
     const double PROG_COMPLEXITY_LOSS = 0.0;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_LOWER = 0.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
-    const double ALPHA_LOSS_UPPER = 0.0;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double ALPHA_LOSS_LOWER = 200.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
+    const double ALPHA_LOSS_UPPER = 0.001;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
     const double X_0_LOSS = 0;                    // adds L1 loss ( x_0 * X_0_LOSS )
 
     const int MAX_EX_YES = 50;         // Total number of examples to optimize over when transition is satisfied
