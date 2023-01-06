@@ -296,7 +296,7 @@ void emLoop(){
     // Initialization
     setupLdips();
 
-    library = ReadLibrary("../pips/ops/emdips_operations.json");
+    library = ReadLibrary(OPERATION_LIB);
     asp* curASP = initialASP;
     vector<Trajectory> state_traj;
 

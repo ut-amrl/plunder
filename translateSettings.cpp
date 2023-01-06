@@ -26,21 +26,19 @@ void assertConstraints() {
 // ----- Main -------------------------------
 
 // Reads in settings.h and prints it to settings.txt in standardized format
-int main(int argc, char** argv){
+int main(){
     assertConstraints();
 
-    string basePath = "settings";
-    if(argc >= 2) {
-        basePath = argv[1];
-    }
-
-    string hPath = basePath + ".h";
-    string txtPath = basePath + ".txt";
+    string hPath = "settings.h";
+    string txtPath = "settings.txt";
+    string pipsPath = OPTIMIZER_PATH + "/optimizer_settings.py";
 
     ifstream inFile;
     inFile.open(hPath);
     ofstream outFile;
     outFile.open(txtPath);
+    ofstream pipsFile;
+    pipsFile.open(pipsPath);
 
     string res;
     while(getline(inFile, res)){
@@ -53,10 +51,18 @@ int main(int argc, char** argv){
             if(valStr.back() != ';') continue;
             // Remove semicolon
             valStr = valStr.substr(0, valStr.size()-1);
-            // Remove quotation marks
-            if(typeStr == "string") valStr = valStr.substr(1, valStr.size()-2);
+            
             string spaces ((numSpaces - varName.size()), ' ');
+
+            // Remove quotation marks
+            string valStrOrig = valStr;
+            if(typeStr == "string") valStr = valStr.substr(1, valStr.size()-2);
             outFile << varName << spaces << valStr << endl;
+            valStr = valStrOrig;
+            
+            if(valStr == "true" || valStr == "false")
+                valStr[0] = toupper(valStr[0]);
+            pipsFile << varName << " = " << valStr << endl;
         }
     }
 

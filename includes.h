@@ -33,3 +33,6 @@
 #include "ast/synthesis.hpp"
 
 typedef int HA;
+
+const string OPTIMIZER_PATH = "../pips/src/optimizer";  // Path to optimizer (for Python support)
+const string OPERATION_LIB = "../pips/ops/emdips_operations.json"; // Path to operation library
