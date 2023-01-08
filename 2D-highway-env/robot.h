@@ -6,11 +6,10 @@
 using namespace std;
 using namespace SETTINGS;
 
-// TODO
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.05) },
-    { "acc", normal_distribution<double>(0.0, 1) }
+    { "steer", normal_distribution<double>(0.0, 0.1) },
+    { "acc", normal_distribution<double>(0.0, 0.5) }
 };
 
 // I have no idea why these don't use the same units as the simulation??
@@ -19,30 +18,37 @@ const double MAX_VEL = .375;
 const double MIN_VEL = .225;
 const double KP_A = 4;
 const double STEER_ANGLE = 0.3;
-
+const double STRAIGHTEN_ANGLE = 0.05;
 
 // https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
     
+    // Acceleration
+    double acc = state.get("acc");
     if(ha == FASTER) {
         state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
     } else if (ha == SLOWER) {
         state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
-    } else if (ha == LANE_LEFT) {
+    } else {
         // Maintain last action (FASTER or SLOWER)
-        if(state.get("acc") < 0) state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
+        if(acc < 0) state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
         else state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
+    }
 
-        // more complicated than this, might implement later (left merge is followed by a slight right turn)
+    // Steering
+    // More complicated than this, but this (very crude) approximation does not require knowledge of the target lane
+    double steer = state.get("steer");
+    if (ha == LANE_LEFT) {
         state.put("steer", -STEER_ANGLE);
     } else if (ha == LANE_RIGHT) {
-        // Maintain last action (FASTER or SLOWER)
-        if(state.get("acc") < 0) state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
-        else state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
-
-        // more complicated than this, might implement later (right merge is followed by a slight left turn)
         state.put("steer", STEER_ANGLE);
+    } else {
+        if(abs(steer) > STEER_ANGLE - 3 * STRAIGHTEN_ANGLE) {
+            state.put("steer", ((steer > 0) ? -1 : 1) * STRAIGHTEN_ANGLE);
+        } else {
+            state.put("steer", steer / 2);
+        }
     }
 
     return state.obs;

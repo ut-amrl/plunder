@@ -54,8 +54,9 @@ namespace SETTINGS {
     const bool BOUND_LIKELIHOOD = false;       // Whether we bound the likelihood by tt
     const int MAX_ITER = 200;                  // Max number of iterations of a single optimization run
 
+    // TODO: figure out how to adjust alpha_loss in a smart way
     const double PROG_COMPLEXITY_LOSS = 0.0;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_LOWER = 200.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
+    const double ALPHA_LOSS_LOWER = 1000.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
     const double ALPHA_LOSS_UPPER = 0.001;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
     const double X_0_LOSS = 0;                    // adds L1 loss ( x_0 * X_0_LOSS )
 
@@ -81,7 +82,7 @@ namespace SETTINGS {
 
     // Particle filter parameters
     const int NUM_PARTICLES = 20000;                                 // number of particle trajectories created to represent the distribution
-    const float RESAMPLE_THRESHOLD = 1.0;                            // higher = more resampling
+    const float RESAMPLE_THRESHOLD = 2.0;                            // higher = more resampling
     const float OBS_LIKELIHOOD_STRENGTH = 1;                         // lower = stricter observation likelihood
     const int END_PF_ERROR = 0;                                      // ignores last n timesteps because they didn't have a chance to get resampled
     const bool SMOOTH_TRAJECTORIES = false;                          // "Smooth" trajectories by removing single outlier timesteps

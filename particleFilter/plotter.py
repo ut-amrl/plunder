@@ -135,6 +135,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
         ax1.bar(times, actions[i], width=1, bottom=cum_sum, color=colors[i])
         cum_sum = np.add(cum_sum, actions[i])
 
+    # TODO: color map is just using whatever order it wants. I can't figure out how to force it to use our desired order
     ax1b.imshow(np.array(color_graph), cmap=ListedColormap(colors[0:len(actions)]), origin="lower", vmin=0, aspect='auto', interpolation='none')
 
     plt.xlabel('time')
