@@ -77,7 +77,6 @@ namespace SETTINGS {
     const int BATCH_SIZE = 8;                         // Number of programs to optimize in parallel
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const bool HARDCODE_PROG = false;                 // if true then only consider single hardcoded program structure
 
     // Particle filter parameters
     const int NUM_PARTICLES = 20000;                                 // number of particle trajectories created to represent the distribution

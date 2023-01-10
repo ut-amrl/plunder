@@ -146,7 +146,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         loss[i] = TARGET_LOSS;
     }
     
-    if(iteration % STRUCT_CHANGE_FREQ == 0 && !HARDCODE_PROG){
+    if(iteration % STRUCT_CHANGE_FREQ == 0){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
         vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
@@ -167,11 +167,14 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         
         cout << "---- Number of Total Programs ----" << endl;
         cout << all_sketches.size() << endl;
-        // for(ast_ptr each: all_sketches){
-        //     cout << each << endl;
-        // }
+        if(DEBUG) {
+            for(int i = 0; i < min(10, (int) all_sketches.size()); i++){
+                cout << all_sketches[i] << endl;
+            }
+            cout << "...\n\n";
+        }
 
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, false, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, false, PROG_COMPLEXITY_LOSS, pFunc);
 
     } else {
         
@@ -179,7 +182,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         string aspFilePath = GEN_ASP + to_string(iteration) + "/";
         filesystem::create_directory(aspFilePath);
         vector<ast_ptr> all_sketches;
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, true, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, true, PROG_COMPLEXITY_LOSS, pFunc);
 
     }
 
@@ -236,11 +239,7 @@ void setupLdips(){
     }
     cout << endl;
 
-    if(HARDCODE_PROG){
-        cout << "----Using fixed program----" << endl;
-    } else {
-        cout << "----Ground truth (target) program----" << endl;
-    }
+    cout << "----Ground truth (target) program----" << endl;
     
     // Read hard coded program structure
     for (uint t = 0; t < transitions.size(); t++) {

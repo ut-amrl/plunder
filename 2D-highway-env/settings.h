@@ -44,9 +44,9 @@ namespace SETTINGS {
     const bool PRINT_DEBUG = false;            // Extra debugging info
     const int INITIAL_VALUES = 8;              // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
     const int NUM_CORES = 4;                   // Number of processes to run in parallel
-    const double MIN_ALPHA = 1.0;              // lowest slope allowed
-    const double INIT_ALPHA = 1.0;             // starting slope
-    const bool BOUND_ALPHA = false;             // whether to bound alpha (to ensure slope is not too low)
+    const double MIN_ALPHA = 40.0;              // lowest slope allowed
+    const double INIT_ALPHA = 40.0;             // starting slope
+    const bool BOUND_ALPHA = true;             // whether to bound alpha (to ensure slope is not too low)
     const double BOUNDS_EXTEND = 0.1;          // Amount to search above and below extrema
     const bool PRINT_WARNINGS = false;         // Debugging info
     const int PRINT_PADDING = 30;              // Print customization
@@ -55,7 +55,7 @@ namespace SETTINGS {
     const int MAX_ITER = 200;                  // Max number of iterations of a single optimization run
 
     // TODO: figure out how to adjust alpha_loss in a smart way
-    const double PROG_COMPLEXITY_LOSS = 0.0;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.03;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_LOWER = 1000.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
     const double ALPHA_LOSS_UPPER = 0.001;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
     const double X_0_LOSS = 0;                    // adds L1 loss ( x_0 * X_0_LOSS )
@@ -72,13 +72,12 @@ namespace SETTINGS {
 
     // EMDIPS parameters
     const int WINDOW_SIZE = -1;                       // Size of sampling window. -1 for n/a
-    const int FEATURE_DEPTH = 1;                      // Feature depth [using variables like v, vmax]
-    const int SKETCH_DEPTH = 1;                       // Number of conjunctions/disjunctions
-    const float TARGET_LOSS = 0.3;                    // Target loss threshold to stop enumeration early
+    const int FEATURE_DEPTH = 2;                      // Feature depth [using variables like v, vmax]
+    const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
+    const float TARGET_LOSS = 0.01;                    // Target loss threshold to stop enumeration early
     const int BATCH_SIZE = 8;                         // Number of programs to optimize in parallel
-    const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 15;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const bool HARDCODE_PROG = false;                 // if true then only consider single hardcoded program structure
 
     // Particle filter parameters
     const int NUM_PARTICLES = 20000;                                 // number of particle trajectories created to represent the distribution
