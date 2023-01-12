@@ -23,17 +23,19 @@ const double STRAIGHTEN_ANGLE = 0.05;
 // https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
+    double acc_command = KP_A*(MAX_VEL-state.get("vx"));
+    double dec_command = KP_A*(MIN_VEL-state.get("vx"));
     
     // Acceleration
     double acc = state.get("acc");
     if(ha == FASTER) {
-        state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
+        state.put("acc", acc_command);
     } else if (ha == SLOWER) {
-        state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
+        state.put("acc", dec_command);
     } else {
         // Maintain last action (FASTER or SLOWER)
-        if(acc < 0) state.put("acc", KP_A*(MIN_VEL-state.get("vx")));
-        else state.put("acc", KP_A*(MAX_VEL-state.get("vx")));
+        if(acc < 0) state.put("acc", dec_command);
+        else state.put("acc", acc_command);
     }
 
     // Steering

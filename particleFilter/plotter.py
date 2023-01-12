@@ -15,9 +15,6 @@ useGT = True
 
 settings = {}
 
-settings_path=""
-settings_mod_time=0
-
 # Default colors
 colors = ["#F08080", "#9FE2BF", "#6495ED", "#FFBF00", "#CCCCFF", "#40E0D0", "#DE3163", "#DFFF00", "#34495E", "#FF7F50"]
 
@@ -27,8 +24,6 @@ colors = ["#F08080", "#9FE2BF", "#6495ED", "#FFBF00", "#CCCCFF", "#40E0D0", "#DE
 def readTrajectories(inPath):
     while not os.path.exists(inPath):
         time.sleep(1)
-        # if not os.path.exists(settings_path) or os.path.getmtime(settings_path)!=settings_mod_time:
-        #     raise Exception('Settings file changed... restarting plotter')
 
     inFile = open(inPath, "r")
     reader = csv.reader(inFile)
@@ -88,8 +83,6 @@ def readLA(gtPath):
 
 def readSettings(sgPath):
     with open(sgPath) as f:
-        settings_path = sgPath
-        settings_mod_time = os.path.getmtime(sgPath)
         lines = f.readlines()
         for line in lines:
             line = line.strip()
@@ -233,14 +226,9 @@ def plotLA(outP, gtF, robot):
     fig.suptitle("Low-level actions")
     plt.xlabel('time')
 
-    # axs has a different type depending on the number of LAs
-    if len(gtLA) == 1:
-        axs.bar(times, gtLA[0], color=colors[0], width=1)
-        axs.set_ylabel(la_names[0])
-    else:
-        for i in range(0, len(gtLA)):
-            axs[i].bar(times, gtLA[i], color=colors[i], width=1)
-            axs[i].set_ylabel(la_names[i])
+    for i in range(0, len(gtLA)):
+        axs[i].bar(times, gtLA[i], color=colors[i], width=1)
+        axs[i].set_ylabel(la_names[i])
 
     fig.tight_layout()  
     plt.show()

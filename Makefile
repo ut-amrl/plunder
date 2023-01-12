@@ -1,6 +1,8 @@
 # Set target directory here OR pass in through command line
 target_dir ?= 2D-highway-env
 
+fn ?= out
+
 # acceptable build_types: Release/Debug/Profile
 build_type := Release
 # build_type := Debug
@@ -80,7 +82,8 @@ clear_data:
 
 purge: clean clear_data
 
-snapshot:
-	echo $(D)-$(FN) && \
-	mkdir -p $(target_dir)/saved_outputs/$(D)-$(FN) && \
-	cp -r $(target_dir)/sim $(target_dir)/plots $(target_dir)/out settings.txt pips/src/optimizer/optimizer.py saved_outputs/$D-$(FN)
+snapshot :
+	echo $(D)-$(fn) && \
+	mkdir -p $(target_dir)/saved_outputs/$(D)-$(fn) && \
+	cd $(target_dir) && \
+	cp -r sim plots out settings.txt saved_outputs/$D-$(fn)

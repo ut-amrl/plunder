@@ -68,7 +68,7 @@ HA initialASP(State state) {
     return correct(state.ha, pointError(state.ha, state.ha, POINT_ACCURACY));
 }
 
-void plot_pure(Trajectory& traj, asp* asp, string output_path) {
+void save_pure(Trajectory& traj, asp* asp, string output_path) {
     ofstream outFile;
     outFile.open(output_path);
 
@@ -113,7 +113,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
         }
 
         string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
-        plot_pure(state_traj[i], asp, plot);
+        save_pure(state_traj[i], asp, plot);
 
         cout << "*";
         cout.flush();
@@ -226,7 +226,6 @@ void setupLdips(){
         return a.first < b.first;
     });
 
-    // Debug
     cout << "----Roots----" << endl;
     for (auto& node : roots) {
         cout << node << endl;
@@ -259,29 +258,6 @@ void setupLdips(){
     }
 }
 
-// TODO: this is deprecated
-void update_point_accuracies(vector<Robot>& robots, vector<vector<Example>>& examples){
-    // double satisfied = 0;
-    // double total = 0;
-    // for(uint r = 0; r < NUM_ROBOTS; r++){
-    //     // testExampleOnASP(examples[r], robots[r]);
-    //     robots[r].POINT_ACCURACY = 1; // make ASP deterministic
-    //     for(Example& ex: examples[r]){
-    //         total++;
-    //         Obs obs = { .pos = ex.symbol_table_["x"].GetFloat(), .vel = ex.symbol_table_["v"].GetFloat() };
-    //         if(curASP(to_label(ex.start_.GetString()), obs, robots[r]) == to_label(ex.result_.GetString())){
-    //             satisfied++;
-    //         }
-    //     }
-    // }
-
-    // // Update point accuracy
-    // double newPointAcc = min(satisfied / total, 0.95);
-    // cout << "New point accuracy: " << satisfied << " / " << total << " ~= " << newPointAcc << endl;
-    // for(Robot& r : robots){
-    //     r.POINT_ACCURACY = newPointAcc;
-    // }
-}
 
 
 void testExampleOnASP(vector<Example> examples){
@@ -289,6 +265,27 @@ void testExampleOnASP(vector<Example> examples){
         printExampleInfo(examples[i]);
     }
 }
+
+
+
+void read_demonstration(vector<Trajectory>& state_traj){
+
+    
+    for(int r = 0; r < NUM_ROBOTS; r++){
+        string inputFile = SIM_DATA + to_string(r) + ".csv";
+        Trajectory traj;
+        readData(inputFile, traj);
+
+        // Run and plot ground truth ASP
+        if(GT_PRESENT){
+            string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
+            save_pure(traj, ASP_model, plot);
+        }
+        state_traj.push_back(traj);
+    }
+}
+
+
 
 void emLoop(){
 
@@ -298,21 +295,7 @@ void emLoop(){
     library = ReadLibrary(OPERATION_LIB);
     asp* curASP = initialASP;
     vector<Trajectory> state_traj;
-
-    // Read in demonstration
-    for(int r = 0; r < NUM_ROBOTS; r++){
-        string inputFile = SIM_DATA + to_string(r) + ".csv";
-        Trajectory traj;
-        readData(inputFile, traj);
-
-        // Run and plot ground truth ASP
-        if(GT_PRESENT){
-            string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-            plot_pure(traj, ASP_model, plot);
-        }
-
-        state_traj.push_back(traj);
-    }
+    read_demonstration(state_traj);
 
     for(int i = 0; i < NUM_ITER; i++){
         
@@ -333,23 +316,19 @@ void emLoop(){
         maximization(examples, i);
 
         curASP = emdipsASP;
-
-        // update_point_accuracies(robots, examples);
     }
 }
 
-int main() {
-    // Set up Python
-    // Initialize python support
+
+
+pair<PyObject*, PyObject*> setup_python(){
+    
     Py_Initialize();
 
     string s = "import os, sys \nsys.path.append(os.getcwd() + '/"+OPTIMIZER_PATH+"') \n";
-
     PyRun_SimpleString(s.c_str());
 
-    // File name
     PyObject* pName = PyUnicode_FromString((char*)"optimizer");
-
     PyObject* pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
@@ -365,13 +344,26 @@ int main() {
         PyErr_Print();
         fprintf(stderr, "Failed to load optimization file\n");
     }
+    return pair(pFunc, pModule);
+}
 
-    emLoop();
 
-    // Clean up python
+
+void cleanup_python(pair<PyObject*, PyObject*> py_info){
+    auto pFunc = py_info.first;
+    auto pModule = py_info.second;
     Py_XDECREF(pFunc);
     Py_DECREF(pModule);
     Py_Finalize();
+}
+
+
+
+int main() {
+
+    auto py_info = setup_python();
+    emLoop();
+    cleanup_python(py_info);
 
     return 0;
 }
