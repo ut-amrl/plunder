@@ -60,12 +60,12 @@ HA emdipsASP(State state){
         }
     }
 
-    return pointError(prev_ha, state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS); // Introduce point errors - random transitions allow GT_ASP to escape local minima
+    return correct(prev_ha, pointError(prev_ha, state.ha, POINT_ACCURACY)); // Introduce point errors - random transitions allow GT_ASP to escape local minima
 }
 
 // Initial ASP: random transitions
 HA initialASP(State state) {
-    return pointError(state.ha, state.ha, POINT_ACCURACY, USE_SAFE_TRANSITIONS);
+    return correct(state.ha, pointError(state.ha, state.ha, POINT_ACCURACY));
 }
 
 void plot_pure(Trajectory& traj, asp* asp, string output_path) {
@@ -210,7 +210,7 @@ void setupLdips(){
 
     // Insert transitions
     for(uint i = 0; i < numHA; i++){
-        vector<HA> valid_ha = get_valid_ha(i, USE_SAFE_TRANSITIONS);
+        vector<HA> valid_ha = get_valid_ha(i);
         for(uint j = 0; j < valid_ha.size(); j++){
             transitions.push_back(pair<string, string> (print(i), print(valid_ha[j])));
             loss.push_back(numeric_limits<float>::max());

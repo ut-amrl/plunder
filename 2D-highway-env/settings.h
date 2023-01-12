@@ -76,7 +76,7 @@ namespace SETTINGS {
     const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
     const float TARGET_LOSS = 0.01;                    // Target loss threshold to stop enumeration early
     const int BATCH_SIZE = 8;                         // Number of programs to optimize in parallel
-    const int PROG_ENUM = 15;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 
     // Particle filter parameters

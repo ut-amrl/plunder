@@ -25,7 +25,12 @@ vector<string> HA_Labels = {
 };
 
 // Optional: create safe transitions. To turn this feature on, toggle USE_SAFE_TRANSITIONS in settings.
-map<HA, vector<HA>> valid_transitions = {};
+map<HA, vector<HA>> valid_transitions = {
+    { FASTER, {FASTER, SLOWER, LANE_LEFT, LANE_RIGHT} },
+    { SLOWER, {FASTER, SLOWER, LANE_LEFT, LANE_RIGHT} },
+    { LANE_LEFT, {FASTER, SLOWER} },
+    { LANE_RIGHT, {FASTER, SLOWER} }
+};
 
 // LA: Defines the low-level action of a robot. (Variables manipulated by the motor model)
 vector<string> LA_vars = {
