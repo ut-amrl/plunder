@@ -1,5 +1,5 @@
 import gym
-from highway_env.envs import MDPVehicle, ControlledVehicle
+import highway_env
 from matplotlib import pyplot as plt
 import os
 import numpy as np
@@ -18,9 +18,9 @@ max_velocity = 30
 steer_err = 0.03
 acc_err = 0.3
 
-MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(min_velocity, max_velocity, 2) # Speed interval (lower_bound, upper_bound, num_samples = 2)
-ControlledVehicle.DELTA_SPEED = (max_velocity - min_velocity)
-ControlledVehicle.KP_A = 0.4 # Jerk constant (higher = faster acceleration)
+highway_env.highway_env.envs.MDPVehicle.DEFAULT_TARGET_SPEEDS = np.linspace(min_velocity, max_velocity, 2) # Speed interval (lower_bound, upper_bound, num_samples = 2)
+highway_env.highway_env.envs.ControlledVehicle.DELTA_SPEED = (max_velocity - min_velocity)
+highway_env.highway_env.envs.ControlledVehicle.KP_A = 0.4 # Jerk constant (higher = faster acceleration)
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=20

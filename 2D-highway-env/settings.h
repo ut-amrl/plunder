@@ -83,7 +83,7 @@ namespace SETTINGS {
     // Particle filter parameters
     const int NUM_PARTICLES = 20000;                                 // number of particle trajectories created to represent the distribution
     const float RESAMPLE_THRESHOLD = 2.0;                            // higher = more resampling
-    const float OBS_LIKELIHOOD_STRENGTH = 1;                         // lower = stricter observation likelihood
+    const float OBS_LIKELIHOOD_STRENGTH = 3;                         // lower = stricter observation likelihood
     const int END_PF_ERROR = 0;                                      // ignores last n timesteps because they didn't have a chance to get resampled
     const bool SMOOTH_TRAJECTORIES = false;                          // "Smooth" trajectories by removing single outlier timesteps
 }

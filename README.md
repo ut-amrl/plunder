@@ -26,7 +26,7 @@ We would like to:
 
 ---
 ## Dependencies & Setup
-See **pips/**. No further dependencies are required. (scipy?) TODO
+See **pips/**. No further dependencies are required. (scipy?) (highway-env, if you want to run the game yourself) TODO
 
 ---
 # How to run

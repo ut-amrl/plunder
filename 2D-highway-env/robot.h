@@ -8,8 +8,8 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.1) },
-    { "acc", normal_distribution<double>(0.0, 0.5) }
+    { "steer", normal_distribution<double>(0.0, 0.03) },
+    { "acc", normal_distribution<double>(0.0, 0.3) }
 };
 
 // I have no idea why these don't use the same units as the simulation??
@@ -17,7 +17,7 @@ map<string, normal_distribution<double>> la_error = {
 const double MAX_VEL = .375;
 const double MIN_VEL = .225;
 const double KP_A = 4;
-const double STEER_ANGLE = 0.3;
+const double STEER_ANGLE = 0.35;
 const double STRAIGHTEN_ANGLE = 0.05;
 
 // https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control
