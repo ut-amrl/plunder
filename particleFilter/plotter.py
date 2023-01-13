@@ -226,9 +226,13 @@ def plotLA(outP, gtF, robot):
     fig.suptitle("Low-level actions")
     plt.xlabel('time')
 
-    for i in range(0, len(gtLA)):
-        axs[i].bar(times, gtLA[i], color=colors[i], width=1)
-        axs[i].set_ylabel(la_names[i])
+    if len(gtLA) == 1:
+        axs.bar(times, gtLA[0], color=colors[0], width=1)
+        axs.set_ylabel(la_names[0])
+    else:
+        for i in range(0, len(gtLA)):
+            axs[i].bar(times, gtLA[i], color=colors[i], width=1)
+            axs[i].set_ylabel(la_names[i])
 
     fig.tight_layout()  
     plt.show()
