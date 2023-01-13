@@ -121,6 +121,11 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
 
     cout << "\r";
     cout << "Cumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
+    
+    ofstream info_file;
+    info_file.open(INFO_FILE_PATH, ios::app);
+    info_file << cum_log_obs << endl;
+    info_file.close();
 
     return examples;
 }
@@ -239,7 +244,7 @@ void setupLdips(){
     cout << endl;
 
     cout << "----Ground truth (target) program----" << endl;
-    
+     
     // Read hard coded program structure
     for (uint t = 0; t < transitions.size(); t++) {
         const auto &transition = transitions[t];

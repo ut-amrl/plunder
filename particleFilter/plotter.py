@@ -239,6 +239,21 @@ def plotLA(outP, gtF, robot):
 
     plt.clf()
     plt.close('all')
+
+
+def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile):
+    vals = []
+    with open(likelihoodDataFile) as f:
+        lines = f.readlines()
+        for line in lines:
+            vals.append(float(line.strip()))
+
+    plt.plot(vals, 'go', linewidth=2, markersize=4)
+    plt.show()
+    plt.savefig(likelihoodPlotFile)
+    plt.clf()
+    plt.close('all')
+    pass
     
 # ----- Main ---------------------------------------------
 
@@ -257,6 +272,8 @@ def main():
     gtFile = settings["SIM_DATA"]
     pureOutPath = settings["PLOT_PATH"]+"pure/"
     pfOutPath = settings["PLOT_PATH"]+"pf/"
+    likelihoodDataFile = settings["INFO_FILE_PATH"]
+    likelihoodPlotFile = settings["PLOT_PATH"]+"likelihoods.png"
 
     try:
         print("Plotting ground truth...")
@@ -277,13 +294,17 @@ def main():
                         'gtF': gtFile,
                         'title': 'ASP Test Run'
                     }
-            
+
 
         for iter in range(0, int(settings["NUM_ITER"])):
+
+            print("Plotting likelihoods, iteration " + str(iter))
+            plotLikelihoods(likelihoodDataFile, likelihoodPlotFile)
             print("Plotting particle filter graphs, iteration " + str(iter))
             plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter)
             print("Plotting pure ASP graphs, iteration " + str(iter))
             plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter)
+
         
     except Exception as e:
         print(e)

@@ -13,6 +13,7 @@ namespace SETTINGS {
     const string PURE_TRAJ = "out/pure_traj/iter";       // Trajectories generated from ASPs
     const string PLOT_PATH = "plots/";                // Plots
     const string GT_ASP_PATH = "gt_asp/";             // Ground truth ASP
+    const string INFO_FILE_PATH = "out/info.txt";
     
     // General Configuration
     const bool DEBUG = false;
