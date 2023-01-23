@@ -72,15 +72,16 @@ namespace SETTINGS {
     const int WINDOW_SIZE = -1;                       // Size of sampling window. -1 for n/a
     const int FEATURE_DEPTH = 2;                      // Feature depth [using variables like v, vmax]
     const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
-    const float TARGET_LOSS = 0.0;                    // Target loss threshold to stop enumeration early
+    const double TARGET_LOSS = 0.0;                    // Target loss threshold to stop enumeration early
     const int BATCH_SIZE = 8;                         // Number of programs to optimize in parallel
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 
     // Particle filter parameters
-    const int NUM_PARTICLES = 20000;                                 // number of particle trajectories created to represent the distribution
-    const float RESAMPLE_THRESHOLD = 1;                            // higher = more resampling
-    const float OBS_LIKELIHOOD_STRENGTH = 1;                         // lower = stricter observation likelihood
-    const int END_PF_ERROR = 0;                                      // ignores last n timesteps because they didn't have a chance to get resampled
-    const bool SMOOTH_TRAJECTORIES = false;                          // "Smooth" trajectories by removing single outlier timesteps
+    const int NUM_PARTICLES = 20000;                          // number of particle trajectories created to represent the distribution
+    const double RESAMPLE_THRESHOLD = 1;                      // higher = more resampling
+    double TEMPERATURE = 1;                                   // Initial observation likelihood strength
+    const double TEMP_CHANGE = 0;                          // TEMPERATURE decreases linearly by this much each iteration
+    const int END_PF_ERROR = 0;                               // ignores last n timesteps because they didn't have a chance to get resampled
+    const bool SMOOTH_TRAJECTORIES = false;                   // "Smooth" trajectories by removing single outlier timesteps
 }

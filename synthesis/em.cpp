@@ -90,7 +90,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     vector<vector<Example>> examples;
 
     cout << "Running particle filter with " << NUM_PARTICLES << " particles\n";
-    cout << "Parameters: resample threshold=" << RESAMPLE_THRESHOLD << ", observation strength=" << OBS_LIKELIHOOD_STRENGTH << endl;
+    cout << "Parameters: resample threshold=" << RESAMPLE_THRESHOLD << ", observation strength=" << TEMPERATURE << endl;
 
     double cum_log_obs_pf = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
@@ -359,6 +359,7 @@ void emLoop(){
         maximization(examples, i);
 
         curASP = emdipsASP;
+        TEMPERATURE = max(TEMPERATURE + TEMP_CHANGE, 1.0);
     }
 }
 

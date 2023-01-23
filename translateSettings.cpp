@@ -12,7 +12,7 @@ const uint numSpaces = 30;
 void assertConstraints() {
     // TODO: asserts don't even work
     // assert(STDDEV_ERROR >= 0 && "Standard deviation must be positive");
-    // assert(OBS_LIKELIHOOD_STRENGTH >= 0 && "Observation likelihood strength must be greater than 0");
+    // assert(TEMPERATURE >= 0 && "Observation likelihood strength must be greater than 0");
 
     // assert(POINT_ACCURACY >= 0 && POINT_ACCURACY <= 1 && "HA probability must be between 0 and 1");
     // assert(GEN_ACCURACY >= 0 && GEN_ACCURACY <= 1 && "HA probability must be between 0 and 1");
