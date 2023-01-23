@@ -34,14 +34,14 @@ string getCsvRow(State state, double t){
 vector<Trajectory> gen_trajectories(asp* asp, double gen_accuracy) {
 
     cout << "--------------Simulation---------------" << endl;
-    cout << "Using " << NUM_ROBOTS << " robots" << endl;
+    cout << "Using " << VALIDATION_SET << " robots" << endl;
 
     // Initialization
     vector<State> robots = getInitStates();
     
     vector<Trajectory> trajectories;
 
-    for(uint i = 0; i < NUM_ROBOTS; i++){
+    for(uint i = 0; i < VALIDATION_SET; i++){
 
         Robot r (robots[i]);
         Trajectory traj;
@@ -101,11 +101,13 @@ void write_traj(vector<Trajectory>& traj, string outputPath){
     }
 }
 
-void execute_pure(Trajectory& traj, asp* asp){
+double execute_pure(Trajectory& traj, asp* asp){
 
     // Turn off point error
     bool point_error = USE_POINT_ERROR;
     USE_POINT_ERROR = false;
+
+    double log_obs = 0;
 
     for(int t = 0; t < traj.size(); t++){
         State last = (t == 0) ? State () : traj.get(t-1);
@@ -115,8 +117,13 @@ void execute_pure(Trajectory& traj, asp* asp){
         }
 
         traj.set(t, asp(State(last.ha, cur.obs)));
+        cur.ha = traj.get(t).ha;
+
+        log_obs += obs_likelihood_given_model(cur, traj.get(t).obs);
     }
 
     // Restore point error
     USE_POINT_ERROR = point_error;
+
+    return log_obs;
 }

@@ -8,61 +8,65 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.03) },
-    { "acc", normal_distribution<double>(0.0, 0.3) }
+    { "steer", normal_distribution<double>(0.0, 0.025) },
+    { "acc", normal_distribution<double>(0.0, 1) }
 };
 
-// I have no idea why these don't use the same units as the simulation??
-// might create as variables
-const double MAX_VEL = .375;
-const double MIN_VEL = .225;
-const double KP_A = 4;
-const double STEER_ANGLE = 0.35;
-const double STRAIGHTEN_ANGLE = 0.05;
+double KP_A = 0.4;
+double KP_H = 0.5;
+double TURN_HEADING = 0.2;
+double TURN_TARGET = 10;
 
-// https://highway-env.readthedocs.io/en/latest/_modules/highway_env/vehicle/controller.html#ControlledVehicle.speed_control
+double min_velocity = 16;
+double max_velocity = 30;
+double lane_diff = 4;
+
+double laneFinder(double y) {
+    return round(y / lane_diff);
+}
+
+// Motor model matches highway2d.py
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
-    double acc_command = KP_A*(MAX_VEL-state.get("vx"));
-    double dec_command = KP_A*(MIN_VEL-state.get("vx"));
+
+    double acc = 0.0;
+    double target_heading = 0.0;
     
-    // Acceleration
-    double acc = state.get("acc");
     if(ha == FASTER) {
-        state.put("acc", acc_command);
+        // Attain max speed
+        acc = KP_A * (max_velocity - state.get("vx"));
+
+        // Follow current lane
+        double target_y = laneFinder(state.get("y")) * lane_diff;
+        target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
     } else if (ha == SLOWER) {
-        state.put("acc", dec_command);
-    } else {
-        // Maintain last action (FASTER or SLOWER)
-        if(acc < 0) state.put("acc", dec_command);
-        else state.put("acc", acc_command);
+        // Attain min speed
+        acc = KP_A * (min_velocity - state.get("vx"));
+
+        // Follow current lane
+        double target_y = laneFinder(state.get("y")) * lane_diff;
+        target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
+    } else if (ha == LANE_LEFT) {
+        // Attain leftmost heading
+        target_heading = -TURN_HEADING;
+    } else if (ha == LANE_RIGHT) {
+        // Attain rightmost heading
+        target_heading = TURN_HEADING;
     }
 
-    // Steering
-    // More complicated than this, but this (very crude) approximation does not require knowledge of the target lane
-    double steer = state.get("steer");
-    if (ha == LANE_LEFT) {
-        state.put("steer", -STEER_ANGLE);
-    } else if (ha == LANE_RIGHT) {
-        state.put("steer", STEER_ANGLE);
-    } else {
-        if(abs(steer) > STEER_ANGLE - 3 * STRAIGHTEN_ANGLE) {
-            state.put("steer", ((steer > 0) ? -1 : 1) * STRAIGHTEN_ANGLE);
-        } else {
-            state.put("steer", steer / 2);
-        }
-    }
+    double steer = (target_heading - state.get("heading")) * KP_H;
+    state.put("steer", steer);
+    state.put("acc", acc);
 
     return state.obs;
 }
 
-
 HA ASP_model(State state){
     HA ha;
 
-    bool front_clear = flip(logistic(0.15, 90, state.get("f_x")));
-    bool left_clear = flip(logistic(0.15, 90, state.get("l_x")));
-    bool right_clear = flip(logistic(0.15, 90, state.get("r_x")));
+    bool front_clear = flip(logistic(30, 1, state.get("f_x")));
+    bool left_clear = flip(logistic(30, 1, state.get("l_x")));
+    bool right_clear = flip(logistic(30, 1, state.get("r_x")));
 
     if(front_clear) ha=FASTER; // No car in front: accelerate
     else if(left_clear) ha=LANE_LEFT; // Merge left

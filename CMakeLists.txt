@@ -98,16 +98,16 @@ set(CXX_PIPS_SRCS
     pips/src/ast/synthesis.hpp)
 add_library(c++-pips-core ${CXX_PIPS_SRCS})
 
-set(EMDIPS_SRCS 
+set(EMDIPS_SRCS
+    includes.h
+    utils.h
+    system.h
     simulation/generate.cpp
     simulation/generate.h
     particleFilter/pf_runner.cpp
     particleFilter/pf_runner.h
     particleFilter/pf.h
     synthesis/em.cpp
-    utils.h
-    system.h
-    includes.h
     translateSettings.cpp)
 add_library(emdips-core ${EMDIPS_SRCS})
 

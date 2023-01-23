@@ -5,7 +5,7 @@ Inputs:
 - **state_traj** - the observed state sequence, or demonstration
 - **asp_pf** - the desired ASP to use
 - **init_pf** - a desired initial high-level action distribution. Defaults to a uniformly random distribution.
-- **obs_likelihood_pf** - the desired function to convert low-level actions to their log-likelihood. Defaults to a normal distribution around the motor model output
+- **obs_likelihood_pf** - the desired function to convert low-level actions to their log-likelihood. Defaults to a normal distribution around the motor model output. Editable in *system.h* in the main project folder.
 
 Outputs:
 - set of high-level action sequences, an estimate for the high-level action distribution at each time step

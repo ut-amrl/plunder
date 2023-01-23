@@ -202,8 +202,8 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     return figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT)
 
 
-def plotSingleTimestep(inF, outP, gtF, title, iter):
-    for robot in range(0, int(settings["NUM_ROBOTS"])):
+def plotSingleTimestep(inF, outP, gtF, title, iter, numRobots):
+    for robot in range(0, numRobots):
         plotSingle(inF, outP, gtF, title, iter, robot)
 
 # Plots low-level actions
@@ -245,14 +245,20 @@ def plotLA(outP, gtF, robot):
     plt.close('all')
 
 
-def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile):
+def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title):
     vals = []
     with open(likelihoodDataFile) as f:
         lines = f.readlines()
-        for line in lines:
+        gt = float(lines[0].strip())
+        for line in lines[1:]:
             vals.append(float(line.strip()))
 
-    plt.plot(vals, 'go', linewidth=2, markersize=4)
+    plt.suptitle(title)
+    plt.xlabel('iteration')
+    plt.ylabel('cumulative_observation_likelihood (log scale)')
+    plt.plot(vals, linewidth=2, markersize=4, label="synthesized programs")
+    plt.axhline(y = gt, color = 'green', label="ground truth")
+    plt.legend(loc="lower right")
     plt.show()
     plt.savefig(likelihoodPlotFile)
     plt.clf()
@@ -276,16 +282,15 @@ def main():
     gtFile = settings["SIM_DATA"]
     pureOutPath = settings["PLOT_PATH"]+"pure/"
     pfOutPath = settings["PLOT_PATH"]+"pf/"
-    likelihoodDataFile = settings["INFO_FILE_PATH"]
-    likelihoodPlotFile = settings["PLOT_PATH"]+"likelihoods.png"
 
     try:
         print("Plotting ground truth...")
-        for robot in range(0, int(settings["NUM_ROBOTS"])):
-            plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
+        if settings["GT_PRESENT"] == "true":
+            for robot in range(0, int(settings["VALIDATION_SET"])):
+                plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
 
         print("Plotting low-level actions...")
-        for robot in range(0, int(settings["NUM_ROBOTS"])):
+        for robot in range(0, int(settings["VALIDATION_SET"])):
             plotLA(pureOutPath, gtFile, robot)
 
         graph1 =    {   'inF': pfInFile,
@@ -301,14 +306,13 @@ def main():
 
 
         for iter in range(0, int(settings["NUM_ITER"])):
-
-            print("Plotting likelihoods, iteration " + str(iter))
-            plotLikelihoods(likelihoodDataFile, likelihoodPlotFile)
             print("Plotting particle filter graphs, iteration " + str(iter))
-            plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter)
+            plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter, int(settings["TRAINING_SET"]))
             print("Plotting pure ASP graphs, iteration " + str(iter))
-            plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter)
-
+            plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["VALIDATION_SET"]))
+            print("Plotting likelihoods, iteration " + str(iter))
+            plotLikelihoods(settings["INFO_FILE_PATH"] + "-pf.txt", settings["PLOT_PATH"]+"pf-likelihoods.png", "Particle filter Likelihoods")
+            plotLikelihoods(settings["INFO_FILE_PATH"] + "-pure.txt", settings["PLOT_PATH"]+"pure-likelihoods.png", "Pure output Likelihoods")
         
     except Exception as e:
         print(e)

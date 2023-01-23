@@ -15,17 +15,6 @@ HA sampleInitialHA(){
     return rand() % numHA;
 }
 
-// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-double obs_likelihood_given_model(State state, Obs nextLA){
-    Obs mean = motorModel(state, false); // Use the previous state + current HA
-    double obs_log = 0;
-    for(string each: LA_vars) {
-        obs_log += logpdf(nextLA.get(each), mean.get(each), OBS_LIKELIHOOD_STRENGTH * la_error[each].stddev());
-    }
-    return obs_log;
-}
-
-
 // ----- I/O ---------------------------------------------
 
 // Read low-level action sequence and observed state sequence from file
@@ -116,7 +105,7 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, Trajectory& tra
 }
 
 // Read input, run filter, write output
-double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, string inputFile, string outputFile, Trajectory& traj, asp* asp){
+double filterFromFile(vector<vector<HA>>& trajectories, int N, int M, string inputFile, string outputFile, Trajectory traj, asp* asp){
     // Read input
     if(traj.size() == 0){
         readData(inputFile, traj);

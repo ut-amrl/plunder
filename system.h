@@ -36,6 +36,14 @@ struct Obs {
     void put(string s, double d){
         table[s] = d;
     }
+
+    string to_string() {
+        string s = "";
+        for(Var each: Obs_vars) {
+            s += each.name_ + " : " + std::to_string(get(each.name_)) + ", ";
+        }
+        return s.substr(0, s.size() - 2) + "\n";
+    }
 };
 
 struct State {
@@ -144,3 +152,17 @@ struct Trajectory {
         return s;
     }
 };
+
+
+Obs motorModel(State, bool);
+extern map<string, normal_distribution<double>> la_error;
+
+// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
+double obs_likelihood_given_model(State state, Obs nextLA){
+    Obs mean = motorModel(state, false); // Use the previous state + current HA
+    double obs_log = 0;
+    for(string each: LA_vars) {
+        obs_log += logpdf(nextLA.get(each), mean.get(each), OBS_LIKELIHOOD_STRENGTH * la_error[each].stddev());
+    }
+    return obs_log;
+}

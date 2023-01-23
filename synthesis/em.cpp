@@ -60,7 +60,8 @@ HA emdipsASP(State state){
         }
     }
 
-    return correct(prev_ha, pointError(prev_ha, state.ha, POINT_ACCURACY)); // Introduce point errors - random transitions allow GT_ASP to escape local minima
+    return state.ha;
+    // return correct(prev_ha, pointError(prev_ha, state.ha, POINT_ACCURACY)); // Introduce point errors - random transitions allow GT_ASP to escape local minima
 }
 
 // Initial ASP: random transitions
@@ -68,15 +69,19 @@ HA initialASP(State state) {
     return correct(state.ha, pointError(state.ha, state.ha, POINT_ACCURACY));
 }
 
-void save_pure(Trajectory& traj, asp* asp, string output_path) {
+double save_pure(Trajectory traj, asp* asp, string output_path) {
     ofstream outFile;
     outFile.open(output_path);
 
+    double log_obs_cum = 0;
+
     for(uint32_t n = 0; n < PARTICLES_PLOTTED; n++){
-        execute_pure(traj, asp);
+        log_obs_cum += execute_pure(traj, asp);
         outFile << traj.to_string();
     }
+
     outFile.close();
+    return log_obs_cum;
 }
 
 // Expectation step
@@ -87,15 +92,16 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     cout << "Running particle filter with " << NUM_PARTICLES << " particles\n";
     cout << "Parameters: resample threshold=" << RESAMPLE_THRESHOLD << ", observation strength=" << OBS_LIKELIHOOD_STRENGTH << endl;
 
-    double cum_log_obs = 0;
-    for(uint i = 0; i < NUM_ROBOTS; i++){
+    double cum_log_obs_pf = 0;
+    for(uint i = 0; i < TRAINING_SET; i++){
         string in = SIM_DATA + to_string(i) + ".csv";
         string out = PF_TRAJ + to_string(iteration) + "-" + to_string(i) + ".csv";
         examples.push_back(vector<Example>());
 
         // Run filter
         vector<vector<HA>> trajectories;
-        cum_log_obs += filterFromFile(trajectories, NUM_PARTICLES, NUM_TRAJECTORIES, in, out, state_traj[i], asp);
+        
+        cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, max(SAMPLE_SIZE, PARTICLES_PLOTTED), in, out, state_traj[i], asp);
 
 
         shuffle(begin(trajectories), end(trajectories), default_random_engine {});
@@ -112,20 +118,29 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
             }
         }
 
-        string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
-        save_pure(state_traj[i], asp, plot);
-
         cout << "*";
         cout.flush();
     }
 
+    double cum_log_obs_pure = 0;
+    for(uint i = 0; i < VALIDATION_SET; i++){
+        string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
+        cum_log_obs_pure += save_pure(state_traj[i], asp, plot);
+    }
+
     cout << "\r";
-    cout << "Cumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
+    cout << "Cumulative observation likelihood (particle filter): e^" << cum_log_obs_pf << " = " << exp(cum_log_obs_pf) << endl;
+    cout << "Cumulative observation likelihood (pure outputs): e^" << cum_log_obs_pure << " = " << exp(cum_log_obs_pure) << endl;
     
-    ofstream info_file;
-    info_file.open(INFO_FILE_PATH, ios::app);
-    info_file << cum_log_obs << endl;
-    info_file.close();
+    ofstream info_file_pf;
+    info_file_pf.open(INFO_FILE_PATH + "-pf.txt", ios::app);
+    info_file_pf << cum_log_obs_pf << endl;
+    info_file_pf.close();
+
+    ofstream info_file_pure;
+    info_file_pure.open(INFO_FILE_PATH + "-pure.txt", ios::app);
+    info_file_pure << cum_log_obs_pure << endl;
+    info_file_pure.close();
 
     return examples;
 }
@@ -151,6 +166,10 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         loss[i] = TARGET_LOSS;
     }
     
+    // Setup output for ASPs and accuracies
+    string aspFilePath = GEN_ASP + to_string(iteration) + "/";
+    filesystem::create_directory(aspFilePath);
+
     if(iteration % STRUCT_CHANGE_FREQ == 0){
 
         vector<ast_ptr> inputs; vector<Signature> sigs;
@@ -164,10 +183,6 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
         }
         cout << "...\n\n\n";
 
-        // Retrieve ASPs and accuracies    
-        string aspFilePath = GEN_ASP + to_string(iteration) + "/";
-        filesystem::create_directory(aspFilePath);
-
         vector<ast_ptr> all_sketches = EnumerateL3(ops, SKETCH_DEPTH);
         
         cout << "---- Number of Total Programs ----" << endl;
@@ -179,15 +194,13 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
             cout << "...\n\n";
         }
 
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, false, PROG_COMPLEXITY_LOSS, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, true, PROG_COMPLEXITY_LOSS, pFunc);
 
     } else {
         
-        // Retrieve ASPs and accuracies    
-        string aspFilePath = GEN_ASP + to_string(iteration) + "/";
-        filesystem::create_directory(aspFilePath);
+        // Retrieve ASPs and accuracies
         vector<ast_ptr> all_sketches;
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, true, PROG_COMPLEXITY_LOSS, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, false, PROG_COMPLEXITY_LOSS, pFunc);
 
     }
 
@@ -217,8 +230,10 @@ void setupLdips(){
     for(uint i = 0; i < numHA; i++){
         vector<HA> valid_ha = get_valid_ha(i);
         for(uint j = 0; j < valid_ha.size(); j++){
-            transitions.push_back(pair<string, string> (print(i), print(valid_ha[j])));
-            loss.push_back(numeric_limits<float>::max());
+            if(i != j){
+                transitions.push_back(pair<string, string> (print(i), print(valid_ha[j])));
+                loss.push_back(numeric_limits<float>::max());
+            }
         }
     }
     
@@ -243,27 +258,27 @@ void setupLdips(){
     }
     cout << endl;
 
-    cout << "----Ground truth (target) program----" << endl;
+    if(GT_PRESENT) {
+        cout << "----Ground truth (target) program----" << endl;
      
-    // Read hard coded program structure
-    for (uint t = 0; t < transitions.size(); t++) {
-        const auto &transition = transitions[t];
-        const string input_name =
-            GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
+        // Read hard coded program structure
+        for (uint t = 0; t < transitions.size(); t++) {
+            const auto &transition = transitions[t];
+            const string input_name =
+                GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
 
-        ifstream input_file;
-        input_file.open(input_name);
-        const json input = json::parse(input_file);
-        ast_ptr fixed = AstFromJson(input);
-        gt_truth.push_back(fixed);
+            ifstream input_file;
+            input_file.open(input_name);
+            const json input = json::parse(input_file);
+            ast_ptr fixed = AstFromJson(input);
+            gt_truth.push_back(fixed);
 
-        cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
-        
-        input_file.close();
+            cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
+            
+            input_file.close();
+        }
     }
 }
-
-
 
 void testExampleOnASP(vector<Example> examples){
     for(uint i=0; i<examples.size(); i++){
@@ -271,12 +286,13 @@ void testExampleOnASP(vector<Example> examples){
     }
 }
 
-
-
 void read_demonstration(vector<Trajectory>& state_traj){
 
-    
-    for(int r = 0; r < NUM_ROBOTS; r++){
+    cout << "\nReading demonstration and optionally running ground-truth ASP..." << endl;
+
+    double cum_log_obs_pf = 0;
+    double cum_log_obs_pure = 0;
+    for(int r = 0; r < VALIDATION_SET; r++){
         string inputFile = SIM_DATA + to_string(r) + ".csv";
         Trajectory traj;
         readData(inputFile, traj);
@@ -284,12 +300,34 @@ void read_demonstration(vector<Trajectory>& state_traj){
         // Run and plot ground truth ASP
         if(GT_PRESENT){
             string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-            save_pure(traj, ASP_model, plot);
+            cum_log_obs_pure += save_pure(traj, ASP_model, plot);
+
+            if(r < TRAINING_SET) {
+                string in = SIM_DATA + to_string(r) + ".csv";
+                string out = PF_TRAJ + "gt" + "-" + to_string(r) + ".csv";
+
+                // Run filter
+                vector<vector<HA>> trajectories;
+                cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, max(SAMPLE_SIZE, PARTICLES_PLOTTED), in, out, traj, ASP_model);
+            }
         }
+
         state_traj.push_back(traj);
     }
-}
 
+    cout << "Target cumulative observation likelihood (ground truth, particle filter): e^" << cum_log_obs_pf << " = " << exp(cum_log_obs_pf) << endl;
+    cout << "Target cumulative observation likelihood (ground truth, pure): e^" << cum_log_obs_pure << " = " << exp(cum_log_obs_pure) << endl;
+
+    ofstream info_file_pf;
+    info_file_pf.open(INFO_FILE_PATH + "-pf.txt", ios::app);
+    info_file_pf << cum_log_obs_pf << endl;
+    info_file_pf.close();
+
+    ofstream info_file_pure;
+    info_file_pure.open(INFO_FILE_PATH + "-pure.txt", ios::app);
+    info_file_pure << cum_log_obs_pure << endl;
+    info_file_pure.close();
+}
 
 
 void emLoop(){

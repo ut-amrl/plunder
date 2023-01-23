@@ -93,6 +93,11 @@ double logsumexp(vector<double>& vals) {
         [max_elem](double a, double b) { return a + exp(b - max_elem); });
     
     return max_elem + log(sum);
+}   
+
+double logsumexp(double d1, double d2) {
+    double max_elem = max(d1, d2);
+    return max_elem + log(exp(d1 - max_elem) + exp(d2 - max_elem));
 }
 
 // Calculate pdf of N(mu, sigma) at x, then take the natural log

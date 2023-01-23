@@ -28,8 +28,8 @@ vector<string> HA_Labels = {
 map<HA, vector<HA>> valid_transitions = {
     { FASTER, {FASTER, SLOWER, LANE_LEFT, LANE_RIGHT} },
     { SLOWER, {FASTER, SLOWER, LANE_LEFT, LANE_RIGHT} },
-    { LANE_LEFT, {FASTER, SLOWER} },
-    { LANE_RIGHT, {FASTER, SLOWER} }
+    { LANE_LEFT, {FASTER, SLOWER, LANE_LEFT} },
+    { LANE_RIGHT, {FASTER, SLOWER, LANE_RIGHT} }
 };
 
 // LA: Defines the low-level action of a robot. (Variables manipulated by the motor model)
@@ -38,19 +38,21 @@ vector<string> LA_vars = {
     "acc"
 };
 
-// Obs: Defines the world state of a robot. 
+// Obs: Defines the world state of a robot. Units: [m, s, radians]
 vector<Var> Obs_vars = {
+    Var ("x", Dimension(1, 0, 0), true),
+    Var ("y", Dimension(1, 0, 0), true),
+    Var ("vx", Dimension(1, -1, 0), true),
+    Var ("heading", Dimension(0, 0, 1), true),
     Var ("l_x", Dimension(1, 0, 0), true),
     Var ("l_vx", Dimension(1, -1, 0), true),
-    Var ("l_vy", Dimension(1, -1, 0), false),
+    Var ("l_heading", Dimension(0, 0, 1), true),
     Var ("f_x", Dimension(1, 0, 0), true),
     Var ("f_vx", Dimension(1, -1, 0), true),
-    Var ("f_vy", Dimension(1, -1, 0), false),
+    Var ("f_heading", Dimension(0, 0, 1), true),
     Var ("r_x", Dimension(1, 0, 0), true),
     Var ("r_vx", Dimension(1, -1, 0), true),
-    Var ("r_vy", Dimension(1, -1, 0), false),
-    Var ("vx", Dimension(1, -1, 0), true),
-    Var ("cur_lane", Dimension(0, 0, 0), false),
-    Var ("steer", Dimension(0, -2, 1), false), // degrees / s^2 ?? idk
+    Var ("r_heading", Dimension(0, 0, 1), true),
+    Var ("steer", Dimension(0, -2, 1), false),
     Var ("acc", Dimension(1, -2, 0), false)
 };
