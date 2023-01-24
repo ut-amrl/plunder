@@ -159,12 +159,6 @@ void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consol
 void maximization(vector<vector<Example>>& allExamples, uint iteration){
     vector<Example> samples;
     default_merge(allExamples, samples);
-
-    // Set each maximum error to speed up search
-    cout << "Setting error threshold to " << TARGET_LOSS << "\n\n";
-    for(uint i = 0; i < transitions.size(); i++){
-        loss[i] = TARGET_LOSS;
-    }
     
     // Setup output for ASPs and accuracies
     string aspFilePath = GEN_ASP + to_string(iteration) + "/";
@@ -194,13 +188,13 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
             cout << "...\n\n";
         }
 
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, true, PROG_COMPLEXITY_LOSS, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, aspFilePath, PROG_ENUM, true, PROG_COMPLEXITY_LOSS, pFunc);
 
     } else {
         
         // Retrieve ASPs and accuracies
         vector<ast_ptr> all_sketches;
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, loss, aspFilePath, BATCH_SIZE, PROG_ENUM, false, PROG_COMPLEXITY_LOSS, pFunc);
+        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, aspFilePath, PROG_ENUM, false, PROG_COMPLEXITY_LOSS, pFunc);
 
     }
 

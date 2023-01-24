@@ -46,24 +46,19 @@ namespace SETTINGS {
                                             // 2: basin hopping
                                             // 3: dual annealing
                                             // 4: DIRECT
-    const bool ENUMERATE_SIGNS = true;      // Equivalent to enumerating over > and <
+    const bool ENUMERATE_SIGNS = false;      // Equivalent to enumerating over > and <
     const bool PRINT_DEBUG = false;         // Extra debugging info
-    const int INITIAL_VALUES = 8;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
-    const int NUM_CORES = 4;                // Number of processes to run in parallel
-    const double MIN_ALPHA = 1.0;           // lowest slope allowed
-    const double INIT_ALPHA = 1.0;          // starting slope
-    const bool BOUND_ALPHA = false;         // whether to bound alpha (to ensure slope is not too low)
+    const int INITIAL_VALUES = 4;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
+    const int BATCH_SIZE = 4;               // Number of programs to optimize in parallel
+    const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
+    const double INIT_ALPHA = 0.0;          // starting slope
     const double BOUNDS_EXTEND = 0.1;       // Amount to search above and below extrema
-    const bool PRINT_WARNINGS = false;      // Debugging info
-    const int PRINT_PADDING = 30;           // Print customization
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const bool BOUND_LIKELIHOOD = false;    // Whether we bound the likelihood by tt
     const int MAX_ITER = 150;               // Max number of iterations of a single optimization run
 
     const double PROG_COMPLEXITY_LOSS = 0.0;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_LOWER = 0.0;          // adds L2 loss ( 1/alpha^2 * ALPHA_LOSS_LOWER )
     const double ALPHA_LOSS_UPPER = 0.0;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
-    const double X_0_LOSS = 0;                    // adds L1 loss ( x_0 * X_0_LOSS )
 
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
@@ -72,15 +67,14 @@ namespace SETTINGS {
     const int FEATURE_DEPTH = 3;                      // Feature depth [using variables like v, vmax]
     const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
     const double TARGET_LOSS = 0.0;                    // Target loss threshold to stop enumeration early
-    const int BATCH_SIZE = 8;                         // Number of programs to optimize in parallel
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 
     // Particle filter parameters
     const int NUM_PARTICLES = 20000;                                // number of particle trajectories created to represent the distribution
     const double RESAMPLE_THRESHOLD = 1.0;                           // higher = more resampling
-    double TEMPERATURE = 3;                                         // Initial observation likelihood strength
-    const double TEMP_CHANGE = -0.5;                                // TEMPERATURE decreases linearly by this much each iteration
+    double TEMPERATURE = 1;                                         // Initial observation likelihood strength
+    const double TEMP_CHANGE = 0;                                // TEMPERATURE decreases linearly by this much each iteration
     const int END_PF_ERROR = 0;                                     // ignores last n timesteps because they didn't have a chance to get resampled
     const bool SMOOTH_TRAJECTORIES = false;                         // "Smooth" trajectories by removing single outlier timesteps
 
