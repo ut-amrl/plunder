@@ -49,7 +49,7 @@ namespace SETTINGS {
     const bool ENUMERATE_SIGNS = false;      // Equivalent to enumerating over > and <
     const bool PRINT_DEBUG = false;         // Extra debugging info
     const int INITIAL_VALUES = 4;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
-    const int BATCH_SIZE = 4;               // Number of programs to optimize in parallel
+    const int BATCH_SIZE = 8;               // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
     const double BOUNDS_EXTEND = 0.1;       // Amount to search above and below extrema
