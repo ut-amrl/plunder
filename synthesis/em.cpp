@@ -164,39 +164,46 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     string aspFilePath = GEN_ASP + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
 
-    if(iteration % STRUCT_CHANGE_FREQ == 0){
+    int feat_depth = 0;
+    int sketch_depth = 0;
 
-        vector<ast_ptr> inputs; vector<Signature> sigs;
-        vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
-                                            FEATURE_DEPTH, &sigs);
-
-        cout << "---- Number of Features Enumerated ----" << endl;
-        cout << ops.size() << endl << endl;
-        for(int i = 0; i < min(5, (int) ops.size()); i++){
-            cout << ops[i] << endl;
-        }
-        cout << "...\n\n\n";
-
-        vector<ast_ptr> all_sketches = EnumerateL3(ops, SKETCH_DEPTH);
-        
-        cout << "---- Number of Total Programs ----" << endl;
-        cout << all_sketches.size() << endl;
-        if(DEBUG) {
-            for(int i = 0; i < min(10, (int) all_sketches.size()); i++){
-                cout << all_sketches[i] << endl;
-            }
-            cout << "...\n\n";
-        }
-
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, aspFilePath, PROG_ENUM, true, PROG_COMPLEXITY_LOSS, pFunc);
-
+    if(iteration == 0){
+        // Initial iteration: enumerate all simple programs
+        feat_depth = 2; sketch_depth = 1;
+    } else if (iteration % STRUCT_CHANGE_FREQ == 0) {
+        // Enumerate all programs (will optimize a subset that is similar to the current sketch)
+        feat_depth = FEATURE_DEPTH; sketch_depth = SKETCH_DEPTH;
     } else {
-        
-        // Retrieve ASPs and accuracies
-        vector<ast_ptr> all_sketches;
-        emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, gt_truth, aspFilePath, PROG_ENUM, false, PROG_COMPLEXITY_LOSS, pFunc);
-
+        // Don't enumerate over programs -- only optimize the current sketch
+        feat_depth = 0; sketch_depth = 0;
     }
+
+    // Enumerate features
+    vector<ast_ptr> inputs; vector<Signature> sigs;
+    vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
+                                        feat_depth, &sigs);
+
+    cout << "---- Number of Features Enumerated ----" << endl;
+    cout << ops.size() << endl << endl;
+    for(int i = 0; i < min(5, (int) ops.size()); i++){
+        cout << ops[i] << endl;
+    }
+    cout << "...\n\n\n";
+
+    // Enumerate complete sketches
+    vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
+    
+    cout << "---- Number of Total Programs ----" << endl;
+    cout << all_sketches.size() << endl;
+    if(DEBUG) {
+        for(int i = 0; i < min(10, (int) all_sketches.size()); i++){
+            cout << all_sketches[i] << endl;
+        }
+        cout << "...\n\n";
+    }
+
+    // Run synthesis algorithm to optimize sketches
+    emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, pFunc);
 
     // Write ASP info to file
     ofstream aspStrFile;
