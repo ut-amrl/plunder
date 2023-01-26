@@ -21,6 +21,7 @@
 #include <numeric>
 #include <math.h>
 #include <cstring>
+#include <optional>
 
 #include <dlfcn.h>
 #include <z3++.h>

@@ -72,12 +72,10 @@ HA correct(HA prev_ha=0, HA ha=0, bool use_safe_transitions=USE_SAFE_TRANSITIONS
 
 // randomly transition to another HA
 HA pointError(HA prev_ha=0, HA ha=0, double accuracy=POINT_ACCURACY, bool use_safe_transitions=USE_SAFE_TRANSITIONS){
-    if(USE_POINT_ERROR){
-        if(!flip(accuracy)){
-            vector<HA> all_possible_ha = get_valid_ha(prev_ha, use_safe_transitions);
-            int index = rand() % all_possible_ha.size();
-            ha = all_possible_ha[index];
-        }
+    if(!flip(accuracy)){
+        vector<HA> all_possible_ha = get_valid_ha(prev_ha, use_safe_transitions);
+        int index = rand() % all_possible_ha.size();
+        ha = all_possible_ha[index];
     }
     return ha;
 }

@@ -25,12 +25,11 @@ namespace SETTINGS {
     // Simulation parameters
     const double T_STEP = -1;               // time step (s)
     const double T_TOT = -1;                // total time (s) per simulated scenario
-    const double GEN_ACCURACY = -1;        // probability of a correct high-level transition
+    const double GEN_ACCURACY = -1;        // probability of a correct high-level transition in the simulation
 
     // EM Loop parameters
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 50;                 // number of trajectories to process then pass into EMDIPS, per robot
-    bool USE_POINT_ERROR = true;                // point error: random transitions to a new high-level action
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 3;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
@@ -54,7 +53,6 @@ namespace SETTINGS {
     const double INIT_ALPHA = 0.0;          // starting slope
     const double BOUNDS_EXTEND = 0.1;       // Amount to search above and below extrema
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
-    const bool BOUND_LIKELIHOOD = false;    // Whether we bound the likelihood by tt
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
     // TODO: figure out how to adjust alpha_loss in a smart way
@@ -64,10 +62,8 @@ namespace SETTINGS {
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int WINDOW_SIZE = -1;                       // Size of sampling window. -1 for n/a
     const int FEATURE_DEPTH = 2;                      // Feature depth [using variables like v, vmax]
     const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
-    const double TARGET_LOSS = 0.0;                    // Target loss threshold to stop enumeration early
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 

@@ -102,11 +102,6 @@ void write_traj(vector<Trajectory>& traj, string outputPath){
 }
 
 double execute_pure(Trajectory& traj, asp* asp){
-
-    // Turn off point error
-    bool point_error = USE_POINT_ERROR;
-    USE_POINT_ERROR = false;
-
     double log_obs = 0;
 
     for(int t = 0; t < traj.size(); t++){
@@ -121,9 +116,6 @@ double execute_pure(Trajectory& traj, asp* asp){
 
         log_obs += obs_likelihood_given_model(cur, traj.get(t).obs);
     }
-
-    // Restore point error
-    USE_POINT_ERROR = point_error;
 
     return log_obs;
 }

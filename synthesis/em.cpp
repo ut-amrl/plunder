@@ -146,10 +146,6 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
 }
 
 void default_merge(vector<vector<Example>>& allExamples, vector<Example>& consolidated){
-    for(uint i = 0; i < allExamples.size(); i++){
-        allExamples[i] = WindowExamples(allExamples[i], WINDOW_SIZE);
-    }
-
     for(vector<Example>& each : allExamples){
         consolidated.insert(end(consolidated), begin(each), end(each));
     }
@@ -164,24 +160,14 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     string aspFilePath = GEN_ASP + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
 
-    int feat_depth = 0;
-    int sketch_depth = 0;
-
-    if(iteration == 0){
-        // Initial iteration: enumerate all simple programs
-        feat_depth = 2; sketch_depth = 1;
-    } else if (iteration % STRUCT_CHANGE_FREQ == 0) {
-        // Enumerate all programs (will optimize a subset that is similar to the current sketch)
-        feat_depth = FEATURE_DEPTH; sketch_depth = SKETCH_DEPTH;
-    } else {
-        // Don't enumerate over programs -- only optimize the current sketch
-        feat_depth = 0; sketch_depth = 0;
-    }
-
-    // Enumerate features
+    // Enumerate features up to depth 2
     vector<ast_ptr> inputs; vector<Signature> sigs;
     vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
-                                        feat_depth, &sigs);
+                                        2, &sigs);
+    if (iteration % STRUCT_CHANGE_FREQ != 0) {
+        // Don't enumerate: only optimize current sketch
+        ops.clear();
+    }
 
     cout << "---- Number of Features Enumerated ----" << endl;
     cout << ops.size() << endl << endl;
@@ -190,20 +176,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     }
     cout << "...\n\n\n";
 
-    // Enumerate complete sketches
-    vector<ast_ptr> all_sketches = EnumerateL3(ops, sketch_depth);
-    
-    cout << "---- Number of Total Programs ----" << endl;
-    cout << all_sketches.size() << endl;
-    if(DEBUG) {
-        for(int i = 0; i < min(10, (int) all_sketches.size()); i++){
-            cout << all_sketches[i] << endl;
-        }
-        cout << "...\n\n";
-    }
-
     // Run synthesis algorithm to optimize sketches
-    emdipsL3(samples, transitions, solution_preds, loss, all_sketches, solution_preds, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, pFunc);
+    emdipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, pFunc);
 
     // Write ASP info to file
     ofstream aspStrFile;
