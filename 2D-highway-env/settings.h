@@ -55,15 +55,12 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    // TODO: figure out how to adjust alpha_loss in a smart way
     const double PROG_COMPLEXITY_LOSS = 0.03;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.000005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int FEATURE_DEPTH = 2;                      // Feature depth [using variables like v, vmax]
-    const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 

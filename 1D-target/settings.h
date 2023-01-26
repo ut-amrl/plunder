@@ -61,8 +61,6 @@ namespace SETTINGS {
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int FEATURE_DEPTH = 3;                      // Feature depth [using variables like v, vmax]
-    const int SKETCH_DEPTH = 2;                       // Number of conjunctions/disjunctions
     const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 
