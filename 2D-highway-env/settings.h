@@ -31,7 +31,7 @@ namespace SETTINGS {
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 50;                 // number of trajectories to process then pass into EMDIPS, per robot
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
-    const int STRUCT_CHANGE_FREQ = 3;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
+    const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
     const bool GT_PRESENT = true;
@@ -55,7 +55,7 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.03;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.02;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.000005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over

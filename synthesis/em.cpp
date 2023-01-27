@@ -205,7 +205,7 @@ void setupLdips(){
     for(uint i = 0; i < numHA; i++){
         vector<HA> valid_ha = get_valid_ha(i);
         for(uint j = 0; j < valid_ha.size(); j++){
-            if(i != j){
+            if(i != valid_ha[j]){
                 transitions.push_back(pair<string, string> (print(i), print(valid_ha[j])));
                 loss.push_back(numeric_limits<float>::max());
             }
