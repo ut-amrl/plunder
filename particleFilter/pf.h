@@ -132,7 +132,7 @@ public:
             // Forward-propagate particles using provided action-selection policy
             if(t < T-1){
                 for(int i = 0; i < N; i++){
-                    particles[t+1][i] = asp_pf(State ( particles[t][i], state_traj.get(t).obs ));
+                    particles[t+1][i] = asp_pf(State ( particles[t][i], state_traj.get(t+1).obs ));
                 }
             } else { 
                 // resample at last step to eliminate deviating particles
