@@ -14,7 +14,7 @@ lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.025
+steer_err = 0.02
 acc_err = 1
 
 env = gym.make('highway-v0')
@@ -89,7 +89,7 @@ def closestVehicles(obs, lane_class):
         closestLeft = obs[0].copy()
         closestLeft[1] = 0
         closestLeft[2] = -lane_diff
-    if lane_class[0] == lanes_count - 1: # In rightmost lane: pretend there is a vehicle to the right
+    if lane_class[0] == env.config['lanes_count'] - 1: # In rightmost lane: pretend there is a vehicle to the right
         closestRight = obs[0].copy()
         closestRight[1] = 0
         closestRight[2] = lane_diff
@@ -121,8 +121,8 @@ def prob_asp(ego, closest):
 # in this version, no extra latent state is stored (target_lane, target_speed)
 KP_A = 0.4 # Jerk constant (higher = faster acceleration)
 KP_H = 0.5 # Turning rate
-TURN_HEADING = 0.2 # Target heading when turning
-TURN_TARGET = 10 # How much to adjust when targeting a lane (higher = smoother)
+TURN_HEADING = 0.25 # Target heading when turning
+TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
 
 min_velocity = 16 # Minimum velocity
 max_velocity = 30 # Maximum velocity
@@ -172,8 +172,7 @@ def run_la(self, action: Union[dict, str] = None, step = True) -> None:
 ControlledVehicle.act = run_la
 
 ######## Simulation ########
-for iter in range(8):
-
+def runSim(iter):
     env.reset()
     ha = env.action_type.actions_indexes["FASTER"]
     obs_out = open("data" + str(iter) + ".csv", "w")
@@ -209,3 +208,54 @@ for iter in range(8):
 
 
     obs_out.close()
+
+for iter in range(8):
+    runSim(iter)
+
+# Run generalized simulations involving more vehicles, lanes, etc.
+
+env.config['lanes_count']=lanes_count+2
+env.config['observation']={
+    'type': 'Kinematics',
+    'vehicles_count': 50,
+    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
+    'absolute': False
+}
+runSim(8)
+
+env.config['observation']={
+    'type': 'Kinematics',
+    'vehicles_count': 5,
+    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
+    'absolute': False
+}
+runSim(9)
+
+env.config['lanes_count']=lanes_count-2
+env.config['observation']={
+    'type': 'Kinematics',
+    'vehicles_count': 50,
+    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
+    'absolute': False
+}
+runSim(10)
+
+env.config['lanes_count']=lanes_count*2
+env.config['observation']={
+    'type': 'Kinematics',
+    'vehicles_count': 30,
+    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
+    'absolute': False
+}
+runSim(11)
+
+env.config['lanes_count']=lanes_count+2
+env.config['observation']={
+    'type': 'Kinematics',
+    'vehicles_count': 15,
+    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
+    'absolute': False
+}
+min_velocity = 14 # Minimum velocity
+max_velocity = 32 # Maximum velocity
+runSim(12)

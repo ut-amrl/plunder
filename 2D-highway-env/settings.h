@@ -19,8 +19,8 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 5;
-    const int VALIDATION_SET = 8;
+    const int TRAINING_SET = 6;
+    const int VALIDATION_SET = 12;
 
     // Simulation parameters
     const double T_STEP = -1;               // time step (s)
@@ -30,8 +30,8 @@ namespace SETTINGS {
     // EM Loop parameters
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 50;                 // number of trajectories to process then pass into EMDIPS, per robot
-    const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
-    const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
+    const double POINT_ACCURACY = 0.0;          // probability of a correct (ASP-consistent) high-level transition
+    const int STRUCT_CHANGE_FREQ = 2;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
     const bool GT_PRESENT = true;
@@ -55,18 +55,18 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.02;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.008;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.000005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 50;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 
     // Particle filter parameters
-    const int NUM_PARTICLES = 200;                          // number of particle trajectories created to represent the distribution
-    const double RESAMPLE_THRESHOLD = 1;                      // higher = more resampling
+    const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution
+    const double RESAMPLE_THRESHOLD = 5.0;                      // higher = more resampling
     double TEMPERATURE = 1;                                   // Initial observation likelihood strength
     const double TEMP_CHANGE = 0;                          // TEMPERATURE decreases linearly by this much each iteration
     const int END_PF_ERROR = 0;                               // ignores last n timesteps because they didn't have a chance to get resampled

@@ -61,11 +61,11 @@ namespace SETTINGS {
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 7;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 100;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
 
     // Particle filter parameters
-    const int NUM_PARTICLES = 20000;                                // number of particle trajectories created to represent the distribution
+    const int NUM_PARTICLES = 2000;                                // number of particle trajectories created to represent the distribution
     const double RESAMPLE_THRESHOLD = 1.0;                           // higher = more resampling
     double TEMPERATURE = 1;                                         // Initial observation likelihood strength
     const double TEMP_CHANGE = 0;                                // TEMPERATURE decreases linearly by this much each iteration
