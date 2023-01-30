@@ -69,14 +69,43 @@ HA initialASP(State state) {
     return correct(state.ha, pointError(state.ha, state.ha, POINT_ACCURACY));
 }
 
-double save_pure(Trajectory traj, asp* asp, string output_path) {
+void save_metric(string output_path, double metric) {
+    ofstream info_file;
+    info_file.open(output_path, ios::app);
+    info_file << metric << endl;
+    info_file.close();
+}
+
+void print_metrics(double cum_log_obs_pf, double cum_log_obs_pure, double pct_accuracy_pf, double pct_accuracy_pure) {
+    cout << "\r";
+    cout << "Cumulative observation likelihood (particle filter): e^" << cum_log_obs_pf << " = " << exp(cum_log_obs_pf) << endl;
+    cout << "%% Accuracy: " << pct_accuracy_pf << "%%" << endl;
+    cout << "Cumulative observation likelihood (pure outputs): e^" << cum_log_obs_pure << " = " << exp(cum_log_obs_pure) << endl;
+    cout << "%% Accuracy: " << pct_accuracy_pure << "%%" << endl;
+
+    save_metric(LOG_OBS_PATH + "-pf.txt", cum_log_obs_pf);
+    save_metric(LOG_OBS_PATH + "-pure.txt", cum_log_obs_pure);
+    save_metric(PCT_ACCURACY + "-pf.txt", pct_accuracy_pf);
+    save_metric(PCT_ACCURACY + "-pure.txt", pct_accuracy_pure);
+}
+
+double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_correct, double& ha_total) {
     ofstream outFile;
     outFile.open(output_path);
 
+    Trajectory gt = traj;
     double log_obs_cum = 0;
 
-    for(uint32_t n = 0; n < PARTICLES_PLOTTED; n++){
+    for(uint32_t n = 0; n < SAMPLE_SIZE; n++){
         log_obs_cum += execute_pure(traj, asp);
+
+        for(int t = 0; t < traj.size() - 1; t++){
+            ha_total++;
+            if(traj.get(t+1).ha == gt.get(t+1).ha){
+                ha_correct++;
+            }
+        }
+
         outFile << traj.to_string();
     }
 
@@ -93,6 +122,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     cout << "Parameters: resample threshold=" << RESAMPLE_THRESHOLD << ", observation strength=" << TEMPERATURE << endl;
 
     double cum_log_obs_pf = 0;
+    double ha_total = 0, ha_correct = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
         string in = SIM_DATA + to_string(i) + ".csv";
         string out = PF_TRAJ + to_string(iteration) + "-" + to_string(i) + ".csv";
@@ -101,20 +131,24 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
         // Run filter
         vector<vector<HA>> trajectories;
         
-        cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, max(SAMPLE_SIZE, PARTICLES_PLOTTED), in, out, state_traj[i], asp);
-
+        cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, state_traj[i], asp);
 
         shuffle(begin(trajectories), end(trajectories), default_random_engine {});
         
         // Convert each particle trajectory point to EMDIPS-supported Example
-        for(uint n = 0; n < SAMPLE_SIZE; n++){
+        for(uint n = 0; n < trajectories.size(); n++){
             vector<HA> traj = trajectories[n];
-            for(int t = 0; t < state_traj[i].size() - 1 - END_PF_ERROR; t++){
+            for(int t = 0; t < state_traj[i].size() - 1; t++){
                 Example ex = dataToExample(traj[t], state_traj[i].get(t+1).obs);
 
                 // Provide next high-level action
                 ex.result_ = SymEntry(print(traj[t+1]));
                 examples[i].push_back(ex);
+
+                ha_total++;
+                if(traj[t+1] == state_traj[i].get(t+1).ha) {
+                    ha_correct++;
+                }
             }
         }
 
@@ -122,25 +156,18 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
         cout.flush();
     }
 
+    double pct_accuracy_pf = ha_correct / ha_total * 100;
+    ha_correct = ha_total = 0;
+
     double cum_log_obs_pure = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
         string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
-        cum_log_obs_pure += save_pure(state_traj[i], asp, plot);
+        cum_log_obs_pure += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
 
-    cout << "\r";
-    cout << "Cumulative observation likelihood (particle filter): e^" << cum_log_obs_pf << " = " << exp(cum_log_obs_pf) << endl;
-    cout << "Cumulative observation likelihood (pure outputs): e^" << cum_log_obs_pure << " = " << exp(cum_log_obs_pure) << endl;
-    
-    ofstream info_file_pf;
-    info_file_pf.open(INFO_FILE_PATH + "-pf.txt", ios::app);
-    info_file_pf << cum_log_obs_pf << endl;
-    info_file_pf.close();
+    double pct_accuracy_pure = ha_correct / ha_total * 100;
 
-    ofstream info_file_pure;
-    info_file_pure.open(INFO_FILE_PATH + "-pure.txt", ios::app);
-    info_file_pure << cum_log_obs_pure << endl;
-    info_file_pure.close();
+    print_metrics(cum_log_obs_pf, cum_log_obs_pure, pct_accuracy_pf, pct_accuracy_pure);
 
     return examples;
 }
@@ -267,6 +294,8 @@ void read_demonstration(vector<Trajectory>& state_traj){
 
     double cum_log_obs_pf = 0;
     double cum_log_obs_pure = 0;
+    double ha_total = 0, ha_correct = 0;
+    double ha_total_pure = 0, ha_correct_pure = 0;
     for(int r = 0; r < VALIDATION_SET; r++){
         string inputFile = SIM_DATA + to_string(r) + ".csv";
         Trajectory traj;
@@ -275,7 +304,7 @@ void read_demonstration(vector<Trajectory>& state_traj){
         // Run and plot ground truth ASP
         if(GT_PRESENT){
             string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-            cum_log_obs_pure += save_pure(traj, ASP_model, plot);
+            cum_log_obs_pure += save_pure(traj, ASP_model, plot, ha_correct_pure, ha_total_pure);
 
             if(r < TRAINING_SET) {
                 string in = SIM_DATA + to_string(r) + ".csv";
@@ -283,25 +312,26 @@ void read_demonstration(vector<Trajectory>& state_traj){
 
                 // Run filter
                 vector<vector<HA>> trajectories;
-                cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, max(SAMPLE_SIZE, PARTICLES_PLOTTED), in, out, traj, ASP_model);
+                cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, traj, ASP_model);
+
+                for(uint n = 0; n < trajectories.size(); n++){
+                    for(int t = 0; t < traj.size() - 1; t++){
+                        ha_total++;
+                        if(trajectories[n][t+1] == traj.get(t+1).ha) {
+                            ha_correct++;
+                        }
+                    }
+                }
             }
         }
 
         state_traj.push_back(traj);
     }
 
-    cout << "Target cumulative observation likelihood (ground truth, particle filter): e^" << cum_log_obs_pf << " = " << exp(cum_log_obs_pf) << endl;
-    cout << "Target cumulative observation likelihood (ground truth, pure): e^" << cum_log_obs_pure << " = " << exp(cum_log_obs_pure) << endl;
+    double pct_accuracy_pf = ha_correct / ha_total * 100;
+    double pct_accuracy_pure = ha_correct_pure / ha_total_pure * 100;
 
-    ofstream info_file_pf;
-    info_file_pf.open(INFO_FILE_PATH + "-pf.txt", ios::app);
-    info_file_pf << cum_log_obs_pf << endl;
-    info_file_pf.close();
-
-    ofstream info_file_pure;
-    info_file_pure.open(INFO_FILE_PATH + "-pure.txt", ios::app);
-    info_file_pure << cum_log_obs_pure << endl;
-    info_file_pure.close();
+    print_metrics(cum_log_obs_pf, cum_log_obs_pure, pct_accuracy_pf, pct_accuracy_pure);
 }
 
 

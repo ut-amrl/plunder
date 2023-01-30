@@ -13,7 +13,8 @@ namespace SETTINGS {
     const string PURE_TRAJ = "out/pure_traj/iter";       // Trajectories generated from ASPs
     const string PLOT_PATH = "plots/";                // Plots
     const string GT_ASP_PATH = "gt_asp/";             // Ground truth ASP
-    const string INFO_FILE_PATH = "out/info";
+    const string LOG_OBS_PATH = "out/log_obs";          // Cumulative log observation likelihood across all runs
+    const string PCT_ACCURACY = "out/pct_acc";          // Percent accuracy compared to the given trajectory
     
     // General Configuration
     const bool DEBUG = true;
@@ -29,13 +30,12 @@ namespace SETTINGS {
 
     // EM Loop parameters
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
-    const int SAMPLE_SIZE = 50;                 // number of trajectories to process then pass into EMDIPS, per robot
+    const int SAMPLE_SIZE = 100;                 // number of trajectories to process/plot
     const double POINT_ACCURACY = 0.0;          // probability of a correct (ASP-consistent) high-level transition
-    const int STRUCT_CHANGE_FREQ = 2;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
+    const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
     const bool GT_PRESENT = true;
-    const int PARTICLES_PLOTTED = 200;                                  // Number of particles plotted
     const int PLOT_TIME = 350;                                          // Maximum time step plotted
 
     // Optimization parameters
@@ -55,7 +55,7 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.008;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.003;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.000005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
@@ -66,9 +66,7 @@ namespace SETTINGS {
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution
-    const double RESAMPLE_THRESHOLD = 5.0;                      // higher = more resampling
+    const double RESAMPLE_THRESHOLD = 1.0;                      // higher = more resampling
     double TEMPERATURE = 1;                                   // Initial observation likelihood strength
     const double TEMP_CHANGE = 0;                          // TEMPERATURE decreases linearly by this much each iteration
-    const int END_PF_ERROR = 0;                               // ignores last n timesteps because they didn't have a chance to get resampled
-    const bool SMOOTH_TRAJECTORIES = false;                   // "Smooth" trajectories by removing single outlier timesteps
 }

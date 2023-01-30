@@ -12,7 +12,7 @@ int main(){
 
         Trajectory traj;
         vector<vector<HA>> trajectories;
-        filterFromFile(trajectories, NUM_PARTICLES, max(SAMPLE_SIZE, PARTICLES_PLOTTED), in, out, traj, ASP_model);
+        filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, traj, ASP_model);
         cout << "*";
     }
     cout << "\r";

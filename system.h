@@ -64,8 +64,12 @@ struct State {
         return obs.table[s];
     }
 
-    void put(string s, double d){
+    void put(string s, double d) {
         obs.table[s] = d;
+    }
+
+    void set_ha(HA action) {
+        ha = action;
     }
 
     string to_string() {

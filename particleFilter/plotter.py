@@ -99,7 +99,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     maxTime = min(int(settings["PLOT_TIME"]), len(trajectories[0]))
     if useGT:
         maxTime = min(maxTime, len(gtTrajectory))
-    PARTICLES_PLOTTED = min(int(settings["PARTICLES_PLOTTED"]), len(trajectories))
+    PARTICLES_PLOTTED = min(int(settings["SAMPLE_SIZE"]), len(trajectories))
 
     for traj in trajectories:
         traj = traj[0:maxTime]
@@ -169,7 +169,7 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     if useGT:
         maxTime = min(maxTime, len(gtTrajectory))
 
-    PARTICLES_PLOTTED = min(int(settings["PARTICLES_PLOTTED"]), len(trajectories))
+    PARTICLES_PLOTTED = min(int(settings["SAMPLE_SIZE"]), len(trajectories))
 
     max_action = 0
     for t in range(0, maxTime):
@@ -245,7 +245,7 @@ def plotLA(outP, gtF, robot):
     plt.close('all')
 
 
-def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title):
+def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title, ylabel):
     vals = []
     with open(likelihoodDataFile) as f:
         lines = f.readlines()
@@ -255,7 +255,7 @@ def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title):
 
     plt.suptitle(title)
     plt.xlabel('iteration')
-    plt.ylabel('cumulative_observation_likelihood (log scale)')
+    plt.ylabel(ylabel)
     plt.plot(vals, linewidth=2, markersize=4, label="synthesized programs")
     plt.axhline(y = gt, color = 'green', label="ground truth")
     plt.legend(loc="lower right")
@@ -311,8 +311,10 @@ def main():
             print("Plotting pure ASP graphs, iteration " + str(iter))
             plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["VALIDATION_SET"]))
             print("Plotting likelihoods, iteration " + str(iter))
-            plotLikelihoods(settings["INFO_FILE_PATH"] + "-pf.txt", settings["PLOT_PATH"]+"pf-likelihoods.png", "Particle filter Likelihoods")
-            plotLikelihoods(settings["INFO_FILE_PATH"] + "-pure.txt", settings["PLOT_PATH"]+"pure-likelihoods.png", "Pure output Likelihoods")
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-pf.txt", settings["PLOT_PATH"]+"pf-likelihoods.png", "Particle filter Likelihoods", 'cumulative_observation_likelihood (log scale)')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-pure.txt", settings["PLOT_PATH"]+"pure-likelihoods.png", "Pure output Likelihoods", 'cumulative_observation_likelihood (log scale)')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-pf.txt", settings["PLOT_PATH"]+"pf-accuracy.png", "Particle filter Accuracy", 'Percent Accuracy')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-pure.txt", settings["PLOT_PATH"]+"pure-accuracy.png", "Pure output Accuracy", 'Percent Accuracy')
         
     except Exception as e:
         print(e)

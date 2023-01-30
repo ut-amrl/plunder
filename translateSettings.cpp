@@ -18,7 +18,6 @@ void assertConstraints() {
     // assert(GEN_ACCURACY >= 0 && GEN_ACCURACY <= 1 && "HA probability must be between 0 and 1");
 
     // assert(SAMPLE_SIZE <= NUM_PARTICLES && "Sample size must be less than the number of particles");
-    // assert(PARTICLES_PLOTTED <= NUM_PARTICLES && "Particles plotted must be less than the number of particles");
     // assert(PLOT_TIME <= T_TOT / T_STEP);
 }
 

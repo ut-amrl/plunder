@@ -56,6 +56,10 @@ void readData(string file, Trajectory& traj){
             state.put(each.name_, vals[inds[each.name_]]);
         }
 
+        if(inds.count("HA") > 0) {
+            state.set_ha(vals[inds["HA"]]);
+        }
+
         traj.append(state);
     }
 }
@@ -96,10 +100,6 @@ double runFilter(vector<vector<HA>>& trajectories, int N, int M, Trajectory& tra
 
     if(DEBUG)
         cout << "resample count: " << resampCount << endl;
-    
-    if(SMOOTH_TRAJECTORIES){
-        trajectories = pf.smoothTrajectories(trajectories);
-    }
 
     return obs_likelihood;
 }
