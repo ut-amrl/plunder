@@ -162,11 +162,12 @@ Obs motorModel(State, bool);
 extern map<string, normal_distribution<double>> la_error;
 
 // Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
-double obs_likelihood_given_model(State state, Obs nextLA){
+double obs_likelihood_given_model(State state, Obs nextLA, double temp=TEMPERATURE){
+    // TODO: obs_likelihood of particle filter doesn't work right when temperature changes
     Obs mean = motorModel(state, false); // Use the previous state + current HA
     double obs_log = 0;
     for(string each: LA_vars) {
-        obs_log += logpdf(nextLA.get(each), mean.get(each), TEMPERATURE * la_error[each].stddev());
+        obs_log += logpdf(nextLA.get(each), mean.get(each), temp * la_error[each].stddev());
     }
     return obs_log;
 }

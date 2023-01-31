@@ -8,7 +8,7 @@ using namespace SETTINGS;
 static uint resampCount = 0; // Debug
 
 typedef HA init();
-typedef double obs_likelihood(State, Obs);
+typedef double obs_likelihood(State, Obs, double);
 
 // ----- Helper Functions ---------------------------------------------
 
@@ -96,7 +96,7 @@ public:
                 for(string each: LA_vars) {
                     obs.put(each, (t == 0) ? 0 : state_traj.get(t-1).get(each));
                 }
-                double log_LA_ti = obs_likelihood_pf(State (x_i, obs), state_traj.get(t).obs);
+                double log_LA_ti = obs_likelihood_pf(State (x_i, obs), state_traj.get(t).obs, TEMPERATURE);
                 log_weights[i] += log_LA_ti;
             }
 

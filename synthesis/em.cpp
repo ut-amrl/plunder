@@ -364,7 +364,7 @@ void emLoop(){
         maximization(examples, i);
 
         curASP = emdipsASP;
-        TEMPERATURE = max(TEMPERATURE + TEMP_CHANGE, 1.0);
+        TEMPERATURE = max(TEMPERATURE - TEMP_CHANGE, 1.0);
     }
 }
 

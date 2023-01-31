@@ -16,11 +16,9 @@ using namespace SETTINGS;
 HA ASP_model(State state){
     HA ha = state.ha;
 
-    double xToTarget = state.get("target") - state.get("pos");                            // distance to the target
-
     // Probabilistic
     bool cond1 = flip(logistic(0, 2.5, state.get("vel") - state.get("vMax")));
-    bool cond2 = flip(logistic(0, -1, xToTarget - DistTraveled(state.get("vel"), state.get("decMax"))));
+    bool cond2 = flip(logistic(state.get("target"), 1, state.get("pos") + DistTraveled(state.get("vel"), state.get("decMax"))));
 
     // Deterministic
     // bool cond1 = state.get("target") - state.get("vMax") >= 0;                                     // is at max velocity (can no longer accelerate)

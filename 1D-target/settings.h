@@ -54,7 +54,7 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 150;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.01;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.01;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.00005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
@@ -66,6 +66,6 @@ namespace SETTINGS {
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                                // number of particle trajectories created to represent the distribution
     const double RESAMPLE_THRESHOLD = 10.0;                           // higher = more resampling
-    double TEMPERATURE = 1;                                         // Initial observation likelihood strength
-    const double TEMP_CHANGE = 0;                                // TEMPERATURE decreases linearly by this much each iteration
+    double TEMPERATURE = 2;                                         // Initial observation likelihood strength
+    const double TEMP_CHANGE = 0.5;                                // TEMPERATURE decreases linearly by this much each iteration
 }

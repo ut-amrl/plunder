@@ -45,5 +45,5 @@ vector<Var> Obs_vars = {
     Var ("accMax", Dimension(1, -2, 0), false),
     Var ("vMax", Dimension(1, -1, 0), true),
     Var ("vel", Dimension(1, -1, 0), true),
-    Var ("target", Dimension(1, 0, 0), true)
+    Var ("target", Dimension(1, 0, 0), false)
 };

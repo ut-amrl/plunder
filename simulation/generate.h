@@ -113,7 +113,7 @@ double execute_pure(Trajectory& traj, asp* asp){
         traj.set(t, asp(State(last.ha, cur.obs)));
         cur.ha = traj.get(t).ha;
 
-        log_obs += obs_likelihood_given_model(cur, traj.get(t).obs);
+        log_obs += obs_likelihood_given_model(cur, traj.get(t).obs, 1);
     }
 
     return log_obs;
