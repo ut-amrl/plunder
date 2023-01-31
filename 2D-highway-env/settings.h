@@ -31,7 +31,7 @@ namespace SETTINGS {
     // EM Loop parameters
     const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 100;                 // number of trajectories to process/plot
-    const double POINT_ACCURACY = 0.0;          // probability of a correct (ASP-consistent) high-level transition
+    const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
     // Plot parameters
@@ -51,11 +51,10 @@ namespace SETTINGS {
     const int BATCH_SIZE = 8;               // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
-    const double BOUNDS_EXTEND = 0.1;       // Amount to search above and below extrema
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.003;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.01;      // adds L1 loss ( num_parameters * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.000005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
@@ -66,7 +65,7 @@ namespace SETTINGS {
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution
-    const double RESAMPLE_THRESHOLD = 1.0;                      // higher = more resampling
+    const double RESAMPLE_THRESHOLD = 10.0;                      // higher = more resampling
     double TEMPERATURE = 1;                                   // Initial observation likelihood strength
     const double TEMP_CHANGE = 0;                          // TEMPERATURE decreases linearly by this much each iteration
 }

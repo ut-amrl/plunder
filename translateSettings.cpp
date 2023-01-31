@@ -10,14 +10,10 @@ const uint numSpaces = 30;
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
-    // TODO: asserts don't even work
-    // assert(STDDEV_ERROR >= 0 && "Standard deviation must be positive");
+    // TODO: deprecated
     // assert(TEMPERATURE >= 0 && "Observation likelihood strength must be greater than 0");
-
     // assert(POINT_ACCURACY >= 0 && POINT_ACCURACY <= 1 && "HA probability must be between 0 and 1");
     // assert(GEN_ACCURACY >= 0 && GEN_ACCURACY <= 1 && "HA probability must be between 0 and 1");
-
-    // assert(SAMPLE_SIZE <= NUM_PARTICLES && "Sample size must be less than the number of particles");
     // assert(PLOT_TIME <= T_TOT / T_STEP);
 }
 

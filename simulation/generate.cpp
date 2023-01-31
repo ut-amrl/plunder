@@ -9,8 +9,9 @@ using namespace SETTINGS;
 int main() {
     vector<Trajectory> traj = gen_trajectories(ASP_model, GEN_ACCURACY);
 
-    if(DEBUG)
+    if(DEBUG) {
         print_traj(traj);
+    }
     write_traj(traj, SIM_DATA);
     
     return 0;

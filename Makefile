@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 2D-highway-env
+target_dir ?= 1D-target
 
 fn ?= out
 

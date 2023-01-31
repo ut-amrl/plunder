@@ -40,7 +40,6 @@ vector<Trajectory> gen_trajectories(asp* asp, double gen_accuracy) {
     vector<State> robots = getInitStates();
     
     vector<Trajectory> trajectories;
-
     for(uint i = 0; i < VALIDATION_SET; i++){
 
         Robot r (robots[i]);
@@ -64,18 +63,18 @@ vector<Trajectory> gen_trajectories(asp* asp, double gen_accuracy) {
 }
 
 void print_traj(Trajectory& traj) {
-    cout << "Printing trajectory with total time " << traj.size() * T_STEP << "...";
+    cout << "Printing trajectory with total time " << traj.size() * T_STEP << "...\n";
     for (int i = 1; i < traj.size(); i++) {
         if(traj.get(i).ha != traj.get(i-1).ha){
-            cout << print(traj.get(i-1).ha) << " --> " << print(traj.get(i).ha) << " at time " << i * T_STEP << "\n";
+            cout << print(traj.get(i-1).ha) << " --> " << print(traj.get(i).ha) << " at time " << i * T_STEP << endl;
         }
     }
-    cout << "\n";
+    cout << endl;
 }
 
 void print_traj(vector<Trajectory>& trajectories) {
     for(Trajectory traj : trajectories) {
-        print_traj(trajectories);
+        print_traj(traj);
     }
 }
 
