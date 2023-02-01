@@ -19,17 +19,20 @@ State make_state(double _accMax, double _decMax, double _vMax, double _target) {
 vector<State> getInitStates(){
     return {
         make_state(6, -5, 12, 100),
-        make_state(3, -4, 20, 100),
-        make_state(5, -3, 8, 100),
+        make_state(3, -4, 30, 100),
+        make_state(5, -3, 10, 100),
         make_state(8, -4, 20, 100),
-        make_state(5, -3, 12, 100),
+        make_state(4, -3, 30, 100),
         make_state(3, -3, 15, 100),
         make_state(9, -6, 12, 100),
-        make_state(4, -3, 30, 100),
-        make_state(7, -7, 200, 100),
-        make_state(5, -4, 15, 100),
-        make_state(10, -10, 20, 100),
-        make_state(30, -30, 50, 100),
+        make_state(10, -10, 25, 100),
+        make_state(4, -7, 30, 100),
+        make_state(3, -5, 25, 100),
+        make_state(5, -8, 12, 100),
+        make_state(5, -4, 20, 100),
+        make_state(3, -3, 10, 100),
+        make_state(10, -10, 50, 100),
+        make_state(30, -30, 200, 100),
     };
 
     // return {

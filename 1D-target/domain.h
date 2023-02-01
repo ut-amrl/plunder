@@ -42,7 +42,7 @@ vector<Var> Obs_vars = {
     Var ("acc", Dimension(1, -2, 0), false),
     Var ("pos", Dimension(1, 0, 0), true),
     Var ("decMax", Dimension(1, -2, 0), true),
-    Var ("accMax", Dimension(1, -2, 0), false),
+    Var ("accMax", Dimension(1, -2, 0), true),
     Var ("vMax", Dimension(1, -1, 0), true),
     Var ("vel", Dimension(1, -1, 0), true),
     Var ("target", Dimension(1, 0, 0), false)

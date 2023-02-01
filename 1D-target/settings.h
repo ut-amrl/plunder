@@ -20,16 +20,16 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 8;                 // number of robots (depends on robot test set)
-    const int VALIDATION_SET = 11;
+    const int TRAINING_SET = 10;                 // number of robots (depends on robot test set)
+    const int VALIDATION_SET = 15;
 
     // Simulation parameters
     const double T_STEP = .1;               // time step (s)
-    const double T_TOT = 15;                // total time (s) per simulated scenario
+    const double T_TOT = 12.5;                // total time (s) per simulated scenario
     const double GEN_ACCURACY = 1.0;        // probability of a correct high-level transition
 
     // EM Loop parameters
-    const int NUM_ITER = 10;                    // number of iterations in the expectation-maximization loop
+    const int NUM_ITER = 20;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 100;                 // number of trajectories to process then pass into EMDIPS, per robot
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
@@ -60,12 +60,13 @@ namespace SETTINGS {
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 25;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 80;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
+    const int BASE_FEAT_DEPTH = 3;
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                                // number of particle trajectories created to represent the distribution
     const double RESAMPLE_THRESHOLD = 10.0;                           // higher = more resampling
-    double TEMPERATURE = 2;                                         // Initial observation likelihood strength
-    const double TEMP_CHANGE = 0.5;                                // TEMPERATURE decreases linearly by this much each iteration
+    double TEMPERATURE = 1;                                         // Initial observation likelihood strength
+    const double TEMP_CHANGE = 0;                                // TEMPERATURE decreases linearly by this much each iteration
 }

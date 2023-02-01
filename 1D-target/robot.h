@@ -49,11 +49,11 @@ HA ASP_model(State state){
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 // Motor model parameters:
-const double JERK = 2;                  // rate of change of acceleration (jerk)
+const double JERK = 1;                  // rate of change of acceleration (jerk)
 const double JERK_ERROR = 0.3;          // additional low-level action error standard deviation while transitioning
 
 map<string, normal_distribution<double>> la_error = {
-    { "acc", normal_distribution<double>(0.0, 0.1) }
+    { "acc", normal_distribution<double>(0.0, 0.3) }
 };
 
 Obs motorModel(State state, bool error){
