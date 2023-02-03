@@ -54,7 +54,7 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 150;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.01;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.004;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.00005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
