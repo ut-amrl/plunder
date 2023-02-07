@@ -260,26 +260,26 @@ void setupLdips(){
     }
     cout << endl;
 
-    if(GT_PRESENT) {
-        cout << "----Ground truth (target) program----" << endl;
+    // if(GT_PRESENT) {
+    //     cout << "----Ground truth (target) program----" << endl;
      
-        // Read hard coded program structure
-        for (uint t = 0; t < transitions.size(); t++) {
-            const auto &transition = transitions[t];
-            const string input_name =
-                GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
+    //     // Read hard coded program structure
+    //     for (uint t = 0; t < transitions.size(); t++) {
+    //         const auto &transition = transitions[t];
+    //         const string input_name =
+    //             GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
 
-            ifstream input_file;
-            input_file.open(input_name);
-            const json input = json::parse(input_file);
-            ast_ptr fixed = AstFromJson(input);
-            gt_truth.push_back(fixed);
+    //         ifstream input_file;
+    //         input_file.open(input_name);
+    //         const json input = json::parse(input_file);
+    //         ast_ptr fixed = AstFromJson(input);
+    //         gt_truth.push_back(fixed);
 
-            cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
+    //         cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
             
-            input_file.close();
-        }
-    }
+    //         input_file.close();
+    //     }
+    // }
 }
 
 void testExampleOnASP(vector<Example> examples){

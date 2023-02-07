@@ -21,7 +21,7 @@ namespace SETTINGS {
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
     const int TRAINING_SET = 6;
-    const int VALIDATION_SET = 12;
+    const int VALIDATION_SET = 8;
 
     // Simulation parameters
     const double T_STEP = -1;               // time step (s)
@@ -30,7 +30,7 @@ namespace SETTINGS {
 
     // EM Loop parameters
     const int NUM_ITER = 20;                    // number of iterations in the expectation-maximization loop
-    const int SAMPLE_SIZE = 50;                 // number of trajectories to process/plot
+    const int SAMPLE_SIZE = 100;                 // number of trajectories to process/plot
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
 
