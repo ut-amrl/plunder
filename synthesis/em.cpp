@@ -189,7 +189,7 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     // Enumerate features up to depth 2
     vector<ast_ptr> inputs; vector<Signature> sigs;
-    vector<ast_ptr> ops = AST::RecEnumerateLogistic(roots, inputs, samples, library,
+    vector<ast_ptr> ops = AST::RecEnumerate(roots, inputs, samples, library,
                                         BASE_FEAT_DEPTH, &sigs);
     if (iteration % STRUCT_CHANGE_FREQ != 0) {
         // Don't enumerate: only optimize current sketch
