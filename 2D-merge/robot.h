@@ -8,7 +8,7 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.04) },
+    { "steer", normal_distribution<double>(0.0, 0.03) },
 };
 
 double KP_H = 0.3;
@@ -21,7 +21,7 @@ double laneFinder(double y) {
     return round(y / lane_diff);
 }
 
-// Motor model matches highway2d.py
+// Motor model matches merge.py
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
 

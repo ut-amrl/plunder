@@ -14,8 +14,8 @@ lane_diff = 4 # Distance lanes are apart from each other
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.04
-acc_err = 1.5
+steer_err = 0.03
+acc_err = 1
 
 env = gym.make("merge-v0")
 # Observations
