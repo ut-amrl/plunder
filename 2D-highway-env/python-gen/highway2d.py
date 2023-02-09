@@ -14,7 +14,7 @@ lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.04
+steer_err = 0.03
 acc_err = 2
 
 env = gym.make('highway-v0')
@@ -77,7 +77,7 @@ def closestInLane(obs, lane, lane_class):
         if lane_class[i] == lane: # in desired lane
             return obs[i]
     
-    return [0, 1000000000, lane * lane_diff, 0, 0, 0] # No car found
+    return [0, 100, lane * lane_diff, 0, 0, 0] # No car found
 
 def closestVehicles(obs, lane_class):
     closestLeft = closestInLane(obs[1:], -1, lane_class[1:])
@@ -120,8 +120,8 @@ def prob_asp(ego, closest):
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_lane, target_speed)
 KP_A = 0.4 # Jerk constant (higher = faster acceleration)
-KP_H = 0.5 # Turning rate
-TURN_HEADING = 0.25 # Target heading when turning
+KP_H = 0.4 # Turning rate
+TURN_HEADING = 0.2 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
 
 min_velocity = 16 # Minimum velocity

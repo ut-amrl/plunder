@@ -8,13 +8,13 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.04) },
+    { "steer", normal_distribution<double>(0.0, 0.03) },
     { "acc", normal_distribution<double>(0.0, 2) }
 };
 
 double KP_A = 0.4;
-double KP_H = 0.5;
-double TURN_HEADING = 0.25;
+double KP_H = 0.4;
+double TURN_HEADING = 0.2;
 double TURN_TARGET = 30;
 
 double min_velocity = 16;

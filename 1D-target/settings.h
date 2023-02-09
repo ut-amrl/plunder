@@ -48,7 +48,7 @@ namespace SETTINGS {
     const bool ENUMERATE_SIGNS = false;      // Equivalent to enumerating over > and <
     const bool PRINT_DEBUG = false;         // Extra debugging info
     const int INITIAL_VALUES = 4;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
-    const int BATCH_SIZE = 8;               // Number of programs to optimize in parallel
+    const int BATCH_SIZE = 16;               // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
@@ -60,7 +60,7 @@ namespace SETTINGS {
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 80;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 64;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
     const int BASE_FEAT_DEPTH = 3;
 

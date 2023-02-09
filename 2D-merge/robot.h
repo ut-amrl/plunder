@@ -11,7 +11,7 @@ map<string, normal_distribution<double>> la_error = {
     { "steer", normal_distribution<double>(0.0, 0.03) },
 };
 
-double KP_H = 0.3;
+double KP_H = 0.4;
 double TURN_HEADING = 0.2;
 double TURN_TARGET = 30;
 
@@ -49,7 +49,7 @@ HA ASP_model(State state){
     HA ha;
 
     bool in_left_lane = flip(logistic(2, -10, state.get("y")));
-    bool right_clear = flip(logistic(45, 1, state.get("r_x")));
+    bool right_clear = flip(logistic(45, 0.6, state.get("r_x")));
 
     if(in_left_lane) {
         if(right_clear) {

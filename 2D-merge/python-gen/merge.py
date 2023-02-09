@@ -15,7 +15,7 @@ use_absolute_lanes = True # Whether or not to label lanes as absolute or relativ
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
 steer_err = 0.03
-acc_err = 1
+acc_err = 1.5
 
 env = gym.make("merge-v0")
 # Observations
@@ -60,21 +60,21 @@ def laneFinder(y):
     return round(y / lane_diff)
 
 def closest_left(obs):
-    left = [0, 1000000000, -lane_diff, 0, 0, 0] # No car found
+    left = [0, 100, -lane_diff, 0, 0, 0] # No car found
     for vehicle in obs:
         if vehicle[0] == 1 and laneFinder(vehicle[2]) < 0 and vehicle[1] < left[1]:
             left = vehicle.copy()
     return left
 
 def closest_right(obs):
-    right = [0, 1000000000, lane_diff, 0, 0, 0] # No car found
+    right = [0, 100, lane_diff, 0, 0, 0] # No car found
     for vehicle in obs:
         if vehicle[0] == 1 and laneFinder(vehicle[2]) > 0 and vehicle[1] < right[1]:
             right = vehicle.copy()
     return right
 
 def closest_front(obs):
-    front = [0, 1000000000, 0, 0, 0, 0] # No car found
+    front = [0, 100, 0, 0, 0, 0] # No car found
     for vehicle in obs:
         if vehicle[0] == 1 and laneFinder(vehicle[2]) == 0 and vehicle[1] < front[1]:
             front = vehicle.copy()
@@ -84,7 +84,7 @@ def closest_front(obs):
 
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_speed)
-KP_H = 0.3 # Turning rate
+KP_H = 0.4 # Turning rate
 TURN_HEADING = 0.2 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
 
@@ -128,7 +128,7 @@ def prob_asp(ego, left, front, right):
 
     in_left_lane = sample(logistic(2, -10, ego[2])) # Probabilistic
     # in_left_lane = ego[2] < 2 # Deterministic
-    right_clear = sample(logistic(45, 1, right[1])) # Probabilistic
+    right_clear = sample(logistic(45, 0.6, right[1])) # Probabilistic
     # right_clear = right[1] > 45 # Deterministic
     
     if in_left_lane:
