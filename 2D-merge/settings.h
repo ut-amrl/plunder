@@ -20,7 +20,7 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 6;
+    const int TRAINING_SET = 5;
     const int VALIDATION_SET = 8;
 
     // Simulation parameters

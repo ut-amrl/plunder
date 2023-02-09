@@ -12,7 +12,9 @@ using namespace SETTINGS;
 // Initial distribution
 HA sampleInitialHA(){
     // Uniformly Randomly Distributed
-    return rand() % numHA;
+    // return rand() % numHA;
+    // Use default label
+    return 0;
 }
 
 // ----- I/O ---------------------------------------------
