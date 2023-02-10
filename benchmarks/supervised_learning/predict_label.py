@@ -60,6 +60,13 @@ def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
 
     return agg
 
+fig_test = Figure()
+fig_valid = Figure()
+
+figs = []  # fig_test, fig_valid
+results = []  # datetime, yhat_valid, y_validation
+toReturn = []
+
 def loadDataFrame():
 
     dataset_validation = DataFrame()
@@ -126,39 +133,26 @@ def loadDataFrame():
 def makePredictions(df_train, df_validation):
     scaler = MinMaxScaler(feature_range=(0, 1))
 
-    min_conduct = dataset['Conductance'].min()
-    mean_conduct = dataset['Conductance'].mean()
-    max_conduct = dataset['Conductance'].max()
+    min_la1 = df_validation[settings.pred_var1+'(t)'].min()
+    mean_la1 = df_validation[settings.pred_var1+'(t)'].mean()
+    max_la1 = df_validation[settings.pred_var1+'(t)'].max()
 
-    df_conductance_levels = pd.DataFrame(
-        {'Conductance': [min_conduct, mean_conduct, max_conduct]})
+    df_la1_levels = pd.DataFrame(
+        {settings.pred_var1: [min_la1, mean_la1, max_la1]})
 
-    conductance_scaled = scaler.fit_transform(df_conductance_levels.values)
-    conductance_scaled = conductance_scaled[1][0]
+    la1_scaled = scaler.fit_transform(df_la1_levels.values)
+    la1_scaled = la1_scaled[1][0]
 
-    conductance_levels_scaled = [(1.5 * conductance_scaled), (conductance_scaled), (
-        0.5 * conductance_scaled), (0.25 * conductance_scaled)]
-    conductance_colors = ['r', 'tab:orange', 'y', 'g']
-    conductance_labels = ['150% Mean', 'Mean Conductance', '50% Mean', '25% Mean']
-
-    df_validation.append(pd.Series(), ignore_index=True)
-
-    print("VALIDATION MIN AND MAX")
-    min_conduct_valid = df_validation['Conductance'].min()
-    print(min_conduct_valid)
-    mean_conduct_valid = df_validation['Conductance'].mean()
-    print(mean_conduct_valid)
-    max_conduct_valid = df_validation['Conductance'].max()
-    print(max_conduct_valid)
-
-    # Set last row to mean
-    # df_validation.iloc[-1, df_validation.columns.get_loc('Conductance')] = mean_conduct_valid
+    la1_levels_scaled = [(1.5 * la1_scaled), (la1_scaled), (
+        0.5 * la1_scaled), (0.25 * la1_scaled)]
+    la1_colors = ['r', 'tab:orange', 'y', 'g']
+    la1_labels = ['150% Mean', 'Mean LA 1', '50% Mean', '25% Mean']
 
     # Split into train and test sets
     print("REFRAMED COLUMNS:")
-    print(reframed.columns)
-    values = reframed.values
-    n_train_hours = math.floor(len(dataset.index) * 0.7)
+    print(df_train.columns)
+    values = df_train.values
+    n_train_hours = math.floor(len(df_train.index) * 0.5)
     train = values[n_train_hours:, :]
     test = values[:n_train_hours, :]
     print("TRAIN SIZE")
@@ -175,7 +169,7 @@ def makePredictions(df_train, df_validation):
     test_X = test_X.reshape((test_X.shape[0], 1, test_X.shape[1]))
 
     # Repeat for validation data
-    valid_vals = validation_reframed.values
+    valid_vals = df_validation.values
     X_validation, y_validation = valid_vals[:, :-1], valid_vals[:, -1]
     X_validation = X_validation.reshape((X_validation.shape[0], 1, X_validation.shape[1]))
 
@@ -185,7 +179,7 @@ def makePredictions(df_train, df_validation):
     model.add(Dense(1, activation=keras.activations.sigmoid))
     model.compile(loss='mae', optimizer='rmsprop', metrics=['mse', 'mae'])
     # Fit network
-    history = model.fit(train_X, train_y, epochs=100, batch_size=100, validation_data=(test_X, test_y), verbose=2,  shuffle=False)  # validation_split= 0.2)
+    history = model.fit(train_X, train_y, epochs=200, batch_size=100, validation_data=(test_X, test_y), verbose=2, shuffle=False)  # validation_split= 0.2)
 
     # Plot history
     pyplot.plot(history.history['loss'], label='train_loss')
@@ -214,16 +208,15 @@ def makePredictions(df_train, df_validation):
     axis_test = fig_test.add_subplot(1, 1, 1)
     axis_test.plot(test_y, label='Actual', linewidth=2)
     axis_test.plot(yhat_test, label='Predicted', linewidth=2.5, alpha=0.6, color='tab:pink')
-    for condLevelIndex in range(len(conductance_levels_scaled)):
-        axis_test.axhline(y=conductance_levels_scaled[condLevelIndex], color=conductance_colors[condLevelIndex], linestyle='-', label=conductance_labels[condLevelIndex])
-    leg_test = axis_test.legend()
+    for laInd in range(len(la1_levels_scaled)):
+        axis_test.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd])
 
     yhat_valid = model.predict(X_validation)
 
     pyplot.plot(y_validation, label='y_validation')
     pyplot.plot(yhat_valid, label='yhat_valid')
-    for condLevelIndex in range(len(conductance_levels_scaled)):
-        pyplot.axhline(y=conductance_levels_scaled[condLevelIndex], color=conductance_colors[condLevelIndex], linestyle='-', label=conductance_labels[condLevelIndex])
+    for laInd in range(len(la1_levels_scaled)):
+        pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd])
     pyplot.legend()
     pyplot.savefig("validation.png")
     pyplot.show()
@@ -232,12 +225,11 @@ def makePredictions(df_train, df_validation):
     axis_valid.plot(y_validation, label='Actual', linewidth=2)
     axis_valid.plot(yhat_valid, label='Predicted',
                     linewidth=3, alpha=0.7, color='tab:pink')
-    for condLevelIndex in range(len(conductance_levels_scaled)):
-        axis_valid.axhline(y=conductance_levels_scaled[condLevelIndex], color=conductance_colors[condLevelIndex], linestyle='-', label=conductance_labels[condLevelIndex], linewidth=1)
-    leg_valid = axis_valid.legend()
+    for laInd in range(len(la1_levels_scaled)):
+        axis_valid.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd], linewidth=1)
 
-    df_validation = df_validation[~df_validation.isin(
-        [np.nan, np.inf, -np.inf]).any(1)]
+    # df_validation = df_validation[~df_validation.isin(
+    #     [np.nan, np.inf, -np.inf]).any(1)]
 
     global figs
     global results
@@ -258,8 +250,8 @@ def makePredictions(df_train, df_validation):
 
             dates.append(
                 df_validation.iloc[i, df_validation.columns.get_loc('DateTime')])
-            resultsYhat.append(max_yhat_valid / conductance_levels_scaled[0])
-            resultsYvalid.append(max_y_validation / conductance_levels_scaled[0])
+            resultsYhat.append(max_yhat_valid / la1_levels_scaled[0])
+            resultsYvalid.append(max_y_validation / la1_levels_scaled[0])
 
             i += 4
         results.append(dates)
