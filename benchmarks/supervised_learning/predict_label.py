@@ -98,11 +98,19 @@ def loadDataFrame():
             else:
                 dataset[column] = pd.to_numeric(dataset[column])
         
+        if not settings.pred_var1 == None:
+            column_to_move = dataset.pop(settings.pred_var1)
+            dataset.insert(len(dataset.columns), settings.pred_var1, column_to_move)
+        
+        if not settings.pred_var2 == None:
+            column_to_move = dataset.pop(settings.pred_var2)
+            dataset.insert(len(dataset.columns), settings.pred_var2, column_to_move)
+        
         # print("Relevant Variables:")
         # print(dataset)
 
         # Convert from series to supervised learning problem
-        dataset = series_to_supervised(dataset, 1, 1)
+        dataset = series_to_supervised(dataset, 4, 1)
 
         dataset_validation = pd.concat([dataset_validation, dataset], ignore_index=True)
         if iter < settings.training_set:
@@ -153,6 +161,8 @@ def makePredictions(df_train, df_validation):
     n_train_hours = math.floor(len(df_train.index) * 0.1)
     train = values[n_train_hours:]
     test = values[:n_train_hours]
+
+    # print(df_train)
     print("Training set size")
     print(len(train))
     # print(train)
