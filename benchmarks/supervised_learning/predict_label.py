@@ -149,16 +149,19 @@ def makePredictions(df_train, df_validation):
     la1_labels = ['150% Mean', 'Mean LA 1', '50% Mean', '25% Mean']
 
     # Split into train and test sets
-    print("REFRAMED COLUMNS:")
-    print(df_train.columns)
     values = df_train.values
-    n_train_hours = math.floor(len(df_train.index) * 0.5)
-    train = values[n_train_hours:, :]
-    test = values[:n_train_hours, :]
-    print("TRAIN SIZE")
+    n_train_hours = math.floor(len(df_train.index) * 0.1)
+    train = values[n_train_hours:]
+    test = values[:n_train_hours]
+    print("Training set size")
     print(len(train))
-    print("TEST SIZE")
+    # print(train)
+    print("Test set size")
     print(len(test))
+    # print(test)
+    print("Validation set size")
+    print(len(df_validation.index))
+    # print(df_validation)
 
     # Split into input and outputs
     train_X, train_y = train[:, :-1], train[:, -1]
@@ -175,11 +178,15 @@ def makePredictions(df_train, df_validation):
 
     # Design network
     model = Sequential()
-    model.add(LSTM(100, input_shape=(train_X.shape[1], train_X.shape[2])))
+    model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2])))
+    model.add(Dense(64, activation=keras.activations.sigmoid))
+    model.add(Dense(16, activation=keras.activations.sigmoid))
     model.add(Dense(1, activation=keras.activations.sigmoid))
     model.compile(loss='mae', optimizer='rmsprop', metrics=['mse', 'mae'])
+
+    print(model.summary())
     # Fit network
-    history = model.fit(train_X, train_y, epochs=200, batch_size=100, validation_data=(test_X, test_y), verbose=2, shuffle=False)  # validation_split= 0.2)
+    history = model.fit(train_X, train_y, epochs=2000, batch_size=100, validation_data=(test_X, test_y), verbose=2, shuffle=False)  # validation_split= 0.2)
 
     # Plot history
     pyplot.plot(history.history['loss'], label='train_loss')
@@ -189,20 +196,20 @@ def makePredictions(df_train, df_validation):
     pyplot.show()
 
     # Make a prediction and plot results
+    yhat_test = model.predict(test_X)
     # print("TEST_X")
     # print(test_X.shape)
-    yhat_test = model.predict(test_X)
     # print("YHAT_TEST")
     # print(yhat_test)
 
-    # pyplot.plot(test_y, label='test_y')
-    # pyplot.plot(yhat_test, label='yhat_test')
-    # for condLevelIndex in range(len(conductance_levels_scaled)):
-    #     pyplot.axhline(y=conductance_levels_scaled[condLevelIndex], color=conductance_colors[condLevelIndex],
-    #                    linestyle='-', label=conductance_labels[condLevelIndex])
-    # pyplot.legend()
-    # # pyplot.savefig("test.png")
-    # pyplot.show()
+    pyplot.plot(test_y, label='test_y')
+    pyplot.plot(yhat_test, label='yhat_test')
+    for laInd in range(len(la1_levels_scaled)):
+        pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd],
+                       linestyle='-', label=la1_labels[laInd])
+    pyplot.legend()
+    # pyplot.savefig("test.png")
+    pyplot.show()
 
     # Plot and evaluate prediction results
     axis_test = fig_test.add_subplot(1, 1, 1)
