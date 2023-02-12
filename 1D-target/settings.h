@@ -20,8 +20,8 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 10;                 // number of robots (depends on robot test set)
-    const int VALIDATION_SET = 15;
+    const int TRAINING_SET = 10;                 // number of robots to train on
+    const int VALIDATION_SET = 30;              // number of total robots in the validation set
 
     // Simulation parameters
     const double T_STEP = .1;               // time step (s)
@@ -36,7 +36,7 @@ namespace SETTINGS {
 
     // Plot parameters
     const bool GT_PRESENT = true;
-    const int PLOT_TIME = 150;                                          // Maximum time step plotted
+    const int PLOT_TIME = 125;                                          // Maximum time step plotted
 
     // Optimization parameters
     const int OPT_METHOD = 1;               // Optimization method:
@@ -52,9 +52,9 @@ namespace SETTINGS {
     const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
-    const int MAX_ITER = 150;               // Max number of iterations of a single optimization run
+    const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.004;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.005;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.00005;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over

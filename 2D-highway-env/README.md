@@ -1,5 +1,5 @@
 # 2D Highway Env
-This module is the setup for a vehicle performing lane-changing maneuvers. The goal is to travel as far as possible without crashing. Higher weight is placed on faster speeds and left lanes.
+This module is the setup for a vehicle performing lane-changing maneuvers. The goal is to travel as far as possible without crashing. Higher weight is placed on faster speeds.
 
 ## File Organization
 - **domain.h** - defines the problem domain, including the spaces $H$, $L$, and $O$

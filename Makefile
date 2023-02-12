@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 2D-merge-rand
+target_dir ?= 1D-target
 
 fn ?= out
 

@@ -49,7 +49,8 @@ HA ASP_model(State state){
     HA ha;
 
     bool in_left_lane = flip(logistic(2, -10, state.get("y")));
-    bool right_clear = flip(logistic(45, 0.6, state.get("r_x")));
+    bool right_clear = flip(logistic(20, 0.7, state.get("r_x")));
+    bool left_clear = flip(logistic(20, 0.7, state.get("l_x")));
 
     if(in_left_lane) {
         if(right_clear) {
@@ -60,8 +61,10 @@ HA ASP_model(State state){
     } else {
         if(right_clear) {
             ha = IDLE;
-        } else {
+        } else if (left_clear) {
             ha = LANE_LEFT;
+        } else {
+            ha = IDLE;
         }
     }
 

@@ -37,7 +37,7 @@ vector<string> LA_vars = {
 // Obs: Defines the world state of a robot. 
 // Structure: 
 //      Var ( "pos", Dimension(1, 0, 0), true ) indicates a variable named "pos" with units (m), that will be used in the synthesis step.
-//      Var ( "acc", Dimension(1, -2, 0), false ) indicates a variable named "accMax" with units (m/s^2), that will not be used in the synthesis step.
+//      Var ( "acc", Dimension(1, -2, 0), false ) indicates a variable named "acc" with units (m/s^2), that will not be used in the synthesis step.
 vector<Var> Obs_vars = {
     Var ("acc", Dimension(1, -2, 0), false),
     Var ("pos", Dimension(1, 0, 0), true),

@@ -20,8 +20,8 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 5;
-    const int VALIDATION_SET = 8;
+    const int TRAINING_SET = 8;
+    const int VALIDATION_SET = 20;
 
     // Simulation parameters
     const double T_STEP = -1;               // time step (s)
@@ -47,22 +47,22 @@ namespace SETTINGS {
                                             // 4: DIRECT
     const bool ENUMERATE_SIGNS = false;      // Equivalent to enumerating over > and <
     const bool PRINT_DEBUG = false;         // Extra debugging info
-    const int INITIAL_VALUES = 4;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
+    const int INITIAL_VALUES = 8;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
     const int BATCH_SIZE = 16;               // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.002;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_UPPER = 0.00005;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double PROG_COMPLEXITY_LOSS = 0.0008;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double ALPHA_LOSS_UPPER = 0.005;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
     const int PROG_ENUM = 64;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const int BASE_FEAT_DEPTH = 2;
+    const int BASE_FEAT_DEPTH = 3;
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution

@@ -10,7 +10,7 @@ This module is the setup for a simple vehicle driving in a straight line. The go
 
 Try running the algorithm on the setup. The following outputs will be generated:
 - **sim/** - contains the simulated trajectories for each robot
-- **out/aspx/** - contains the generated program at each iteration
+- **out/aspx/** - contains the synthesized program at each iteration
 - **out/examples/** - contains the particle filter outputs at each iteration, in csv format
 - **out/states/** - contains pure ASP outputs, in csv format (i.e. the high-level actions acquired by running the given ASP at each time step)
 - **plots/** - contains plots of trajectories for particle filter outputs and pure outputs

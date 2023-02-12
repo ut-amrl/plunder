@@ -4,7 +4,7 @@ This module is used to estimate the sequence of high-level actions corresponding
 Inputs:
 - **state_traj** - the observed state sequence, or demonstration
 - **asp_pf** - the desired ASP to use
-- **init_pf** - a desired initial high-level action distribution. Defaults to a uniformly random distribution.
+- **init_pf** - a desired initial high-level action distribution. Defaults to the user-provided default label.
 - **obs_likelihood_pf** - the desired function to convert low-level actions to their log-likelihood. Defaults to a normal distribution around the motor model output. Editable in *system.h* in the main project folder.
 
 Outputs:

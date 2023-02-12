@@ -1,5 +1,6 @@
 import gym
-from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle
+from highway_env import utils
+from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle, MergeEnv
 from highway_env.envs.common.observation import KinematicObservation
 from matplotlib import pyplot as plt
 import os
@@ -8,6 +9,34 @@ import math
 import random
 import pprint
 from typing import List, Tuple, Union, Optional
+
+######## Env ########
+num_vehicles = 3
+def make_vehicles(self) -> None:
+        """
+        Populate a road with several vehicles on the highway and on the merging lane, as well as an ego-vehicle.
+
+        :return: the ego-vehicle
+        """
+        road = self.road
+        ego_vehicle = self.action_type.vehicle_class(road,
+                                                     road.network.get_lane(("a", "b", 1)).position(30, 0),
+                                                     speed=18)
+        road.vehicles.append(ego_vehicle)
+
+        other_vehicles_type = utils.class_from_path(self.config["other_vehicles_type"])
+        for _ in range(num_vehicles):
+            speed = random.randint(20, 22)
+            position = random.randint(0, 200)
+            road.vehicles.append(other_vehicles_type(road, road.network.get_lane(("a", "b", 0)).position(position, 0), speed=speed))
+
+        merging_v = other_vehicles_type(road, road.network.get_lane(("j", "k", 0)).position(100, 0), speed=0)
+        merging_v.target_speed = 15
+        road.vehicles.append(merging_v)
+        self.vehicle = ego_vehicle
+
+MergeEnv._make_vehicles = make_vehicles
+
 
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
@@ -126,11 +155,11 @@ ControlledVehicle.act = run_la
 # ASP
 def prob_asp(ego, left, front, right):
 
-    in_left_lane = sample(logistic(2, -10, ego[2])) # Probabilistic
-    # in_left_lane = ego[2] < 2 # Deterministic
-    right_clear = sample(logistic(45, 0.6, right[1])) # Probabilistic
-    # right_clear = right[1] > 45 # Deterministic
-    
+    # Probabilistic
+    in_left_lane = sample(logistic(2, -10, ego[2]))
+    right_clear = sample(logistic(20, 0.7, right[1]))
+    left_clear = sample(logistic(20, 0.7, left[1]))
+
     if in_left_lane:
         if right_clear:
             return env.action_type.actions_indexes["LANE_RIGHT"]
@@ -139,8 +168,9 @@ def prob_asp(ego, left, front, right):
     else:
         if right_clear:
             return env.action_type.actions_indexes["IDLE"]
-        else:
+        elif left_clear:
             return env.action_type.actions_indexes["LANE_LEFT"]
+    return env.action_type.actions_indexes["IDLE"]
 
 def runSim(iter):
     env.reset()
@@ -148,7 +178,7 @@ def runSim(iter):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, vx, vy, heading, l_x, l_y, l_vx, l_vy, l_heading, f_x, f_y, f_vx, f_vy, f_heading, r_x, r_y, r_vx, r_vy, r_heading, LA.steer, LA.acc, HA\n")
 
-    for _ in range(80):
+    for _ in range(120):
         obs, reward, done, truncated, info = env.step(ha)
         env.render()
 
@@ -178,5 +208,17 @@ def runSim(iter):
 
     obs_out.close()
 
-for iter in range(8):
+for iter in range(12):
+    runSim(iter)
+
+num_vehicles = 2
+for iter in range(12, 14):
+    runSim(iter)
+
+num_vehicles = 4
+for iter in range(14, 17):
+    runSim(iter)
+
+num_vehicles = 6
+for iter in range(17, 20):
     runSim(iter)
