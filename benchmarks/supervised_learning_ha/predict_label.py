@@ -102,6 +102,7 @@ def loadDataFrame():
         # print(dataset)
 
         # Convert from series to supervised learning problem
+        dataset = dataset.tail(-1) # Drop first row where motor model is undefined
         dataset = series_to_supervised(dataset, 4, 1)
 
         dataset_validation = pd.concat([dataset_validation, dataset], ignore_index=True)
@@ -120,9 +121,11 @@ def loadDataFrame():
         else: # Perform regular fit_transform
             scaler_validation.fit(np.transpose([dataset_validation[col]]))
         dataset_validation[col] = np.transpose(scaler_validation.transform(np.transpose([dataset_validation[col]])))[0]
-
+        
     print("\n\nRelevant data: Scaled and reframed as a supervised learning problem\n\n")
     print(dataset_validation)
+
+    assert dataset_validation.to_numpy().max() <= 1 and dataset_validation.to_numpy().min() >= 0
 
     # Pass in all data, to be split into validation & training sets
     makePredictions(dataset_validation, training_size)

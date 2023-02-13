@@ -4,7 +4,7 @@ import numpy as np
 # Setting: 1D-target
 training_set = 10
 validation_set = 10 # including training_set
-train_time = 10000
+train_time = 3000
 folder = "target-sim/"
 vars_used = [
     "pos",
