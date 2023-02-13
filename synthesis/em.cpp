@@ -76,17 +76,30 @@ void save_metric(string output_path, double metric) {
     info_file.close();
 }
 
-void print_metrics(double cum_log_obs_pf, double cum_log_obs_pure, double pct_accuracy_pf, double pct_accuracy_pure) {
-    cout << "\r";
-    cout << "Cumulative observation likelihood (particle filter): e^" << cum_log_obs_pf << " = " << exp(cum_log_obs_pf) << endl;
-    cout << "%% Accuracy: " << pct_accuracy_pf << "%%" << endl;
-    cout << "Cumulative observation likelihood (pure outputs): e^" << cum_log_obs_pure << " = " << exp(cum_log_obs_pure) << endl;
-    cout << "%% Accuracy: " << pct_accuracy_pure << "%%" << endl;
+void print_metrics(double cum_log_obs, double pct_accuracy, DATATYPE data) {
+    cout << "Metrics";
+    switch(data) {
+        case TRAINING:
+            cout << " (training):\n"; break;
+        case TESTING:
+            cout << " (testing):\n"; break;
+        case VALIDATION:
+            cout << " (validation):\n"; break;
+    }
+    cout << "\tCumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
+    cout << "\t%% Accuracy: " << pct_accuracy << "%%" << endl;
 
-    save_metric(LOG_OBS_PATH + "-pf.txt", cum_log_obs_pf);
-    save_metric(LOG_OBS_PATH + "-pure.txt", cum_log_obs_pure);
-    save_metric(PCT_ACCURACY + "-pf.txt", pct_accuracy_pf);
-    save_metric(PCT_ACCURACY + "-pure.txt", pct_accuracy_pure);
+    switch(data) {
+        case TRAINING:
+            save_metric(LOG_OBS_PATH + "-training.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-training.txt", pct_accuracy);
+            break;
+        case TESTING:
+            save_metric(LOG_OBS_PATH + "-testing.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-testing.txt", pct_accuracy);
+            break;
+        case VALIDATION:
+            save_metric(LOG_OBS_PATH + "-valid.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-valid.txt", pct_accuracy);
+            break;
+    }
 }
 
 double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_correct, double& ha_total) {
@@ -121,17 +134,17 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     cout << "Running particle filter with " << NUM_PARTICLES << " particles\n";
     cout << "Parameters: resample threshold=" << RESAMPLE_THRESHOLD << ", observation strength=" << TEMPERATURE << endl;
 
-    double cum_log_obs_pf = 0;
+    double cum_log_obs = 0;
     double ha_total = 0, ha_correct = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
         string in = SIM_DATA + to_string(i) + ".csv";
-        string out = PF_TRAJ + to_string(iteration) + "-" + to_string(i) + ".csv";
+        string out = TRAINING_TRAJ + to_string(iteration) + "-" + to_string(i) + ".csv";
         examples.push_back(vector<Example>());
 
         // Run filter
         vector<vector<HA>> trajectories;
         
-        cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, state_traj[i], asp);
+        cum_log_obs += filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, state_traj[i], asp);
 
         shuffle(begin(trajectories), end(trajectories), default_random_engine {});
         
@@ -155,19 +168,21 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
         cout << "*";
         cout.flush();
     }
-
-    double pct_accuracy_pf = ha_correct / ha_total * 100;
-    ha_correct = ha_total = 0;
-
-    double cum_log_obs_pure = 0;
-    for(uint i = 0; i < VALIDATION_SET; i++){
-        string plot = PURE_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
-        cum_log_obs_pure += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
+    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TRAINING);
+    
+    ha_correct = ha_total = cum_log_obs = 0;
+    for(uint i = 0; i < TRAINING_SET; i++){
+        string plot = TESTING_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
+        cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
+    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TESTING);
 
-    double pct_accuracy_pure = ha_correct / ha_total * 100;
-
-    print_metrics(cum_log_obs_pf, cum_log_obs_pure, pct_accuracy_pf, pct_accuracy_pure);
+    ha_correct = ha_total = cum_log_obs = 0;
+    for(uint i = 0; i < VALIDATION_SET; i++){
+        string plot = VALIDATION_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
+        cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
+    }
+    print_metrics(cum_log_obs, ha_correct / ha_total * 100, VALIDATION);
 
     return examples;
 }
@@ -292,46 +307,51 @@ void read_demonstration(vector<Trajectory>& state_traj){
 
     cout << "\nReading demonstration and optionally running ground-truth ASP..." << endl;
 
-    double cum_log_obs_pf = 0;
-    double cum_log_obs_pure = 0;
-    double ha_total = 0, ha_correct = 0;
-    double ha_total_pure = 0, ha_correct_pure = 0;
     for(int r = 0; r < VALIDATION_SET; r++){
         string inputFile = SIM_DATA + to_string(r) + ".csv";
         Trajectory traj;
         readData(inputFile, traj);
 
-        // Run and plot ground truth ASP
-        if(GT_PRESENT){
-            string plot = PURE_TRAJ+"gt-"+to_string(r)+".csv";
-            cum_log_obs_pure += save_pure(traj, ASP_model, plot, ha_correct_pure, ha_total_pure);
-
-            if(r < TRAINING_SET) {
-                string in = SIM_DATA + to_string(r) + ".csv";
-                string out = PF_TRAJ + "gt" + "-" + to_string(r) + ".csv";
-
-                // Run filter
-                vector<vector<HA>> trajectories;
-                cum_log_obs_pf += filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, traj, ASP_model);
-
-                for(uint n = 0; n < trajectories.size(); n++){
-                    for(int t = 0; t < traj.size() - 1; t++){
-                        ha_total++;
-                        if(trajectories[n][t+1] == traj.get(t+1).ha) {
-                            ha_correct++;
-                        }
-                    }
-                }
-            }
-        }
-
         state_traj.push_back(traj);
     }
 
-    double pct_accuracy_pf = ha_correct / ha_total * 100;
-    double pct_accuracy_pure = ha_correct_pure / ha_total_pure * 100;
+    if(!GT_PRESENT) {
+        return;
+    }
 
-    print_metrics(cum_log_obs_pf, cum_log_obs_pure, pct_accuracy_pf, pct_accuracy_pure);
+    double cum_log_obs = 0, ha_total = 0, ha_correct = 0;
+    for(uint i = 0; i < TRAINING_SET; i++){
+        string in = SIM_DATA + to_string(i) + ".csv";
+        string out = TRAINING_TRAJ + "gt-" + to_string(i) + ".csv";
+
+        // Run filter
+        vector<vector<HA>> trajectories;
+        cum_log_obs += filterFromFile(trajectories, NUM_PARTICLES, SAMPLE_SIZE, in, out, state_traj[i], ASP_model);
+
+        for(uint n = 0; n < trajectories.size(); n++){
+            for(int t = 0; t < state_traj[i].size() - 1; t++){
+                ha_total++;
+                if(trajectories[n][t+1] == state_traj[i].get(t+1).ha) {
+                    ha_correct++;
+                }
+            }
+        }
+    }
+    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TRAINING);
+    
+    ha_correct = ha_total = cum_log_obs = 0;
+    for(uint i = 0; i < TRAINING_SET; i++){
+        string plot = TESTING_TRAJ+"gt-"+to_string(i)+".csv";
+        cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
+    }
+    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TESTING);
+
+    ha_correct = ha_total = cum_log_obs = 0;
+    for(uint i = 0; i < VALIDATION_SET; i++){
+        string plot = VALIDATION_TRAJ+"gt-"+to_string(i)+".csv";
+        cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
+    }
+    print_metrics(cum_log_obs, ha_correct / ha_total * 100, VALIDATION);
 }
 
 

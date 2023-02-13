@@ -8,7 +8,7 @@ using namespace SETTINGS;
 int main(){
     for(int i = 0; i < TRAINING_SET; i++){
         string in = SIM_DATA + to_string(i) + ".csv";
-        string out = PF_TRAJ + to_string(i) + ".csv";
+        string out = TRAINING_TRAJ + to_string(i) + ".csv";
 
         Trajectory traj;
         vector<vector<HA>> trajectories;

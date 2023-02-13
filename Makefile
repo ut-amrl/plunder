@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 1D-target
+target_dir ?= 2D-merge
 
 fn ?= out
 
@@ -47,7 +47,7 @@ $(PF):
 			$(MAKE) $(SETTINGS) && \
 			cd $(target_dir) && \
 			mkdir -p out && \
-			mkdir -p out/pf_traj && \
+			mkdir -p out/training_traj && \
 			./bin/pf
 
 $(PLT):
@@ -55,16 +55,18 @@ $(PLT):
 			cd $(target_dir) && \
 			rm -rf plots && \
 			mkdir -p plots && \
-			mkdir -p plots/pure && \
-			mkdir -p plots/pf && \
+			mkdir -p plots/training && \
+			mkdir -p plots/testing && \
+			mkdir -p plots/validation && \
 			$(PY) ../particleFilter/plotter.py
 
 $(EMNG):
 			$(MAKE) $(SETTINGS) && \
 			cd $(target_dir) && \
 			rm -rf out && \
-			mkdir -p out/pf_traj && \
-			mkdir -p out/pure_traj && \
+			mkdir -p out/training_traj && \
+			mkdir -p out/testing_traj && \
+			mkdir -p out/validation_traj && \
 			touch out/em.txt && \
 			cp emdips_operations.json ../pips/ops/emdips_operations.json && \
 			bin/emloop | tee out/em.txt

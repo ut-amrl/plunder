@@ -26,9 +26,9 @@ vector<State> getInitStates(){
         make_state(4, -3, 30, 100),
         make_state(3, -3, 15, 100),
         make_state(9, -6, 12, 100),
-        make_state(10, -10, 25, 100),
+        make_state(5, -10, 25, 100),
         make_state(4, -7, 30, 100),
-        make_state(3, -5, 25, 100),
+        make_state(6, -5, 30, 100),
         
         // Validation set
         make_state(5, -8, 12, 100),

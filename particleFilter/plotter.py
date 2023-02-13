@@ -277,45 +277,49 @@ def main():
     readSettings("settings.txt")
     
     # I/O
-    pureInFile = settings["PURE_TRAJ"]
-    pfInFile = settings["PF_TRAJ"]
+    trainingInFile = settings["TRAINING_TRAJ"]
+    testingInFile = settings["TESTING_TRAJ"]
+    validationInFile = settings["VALIDATION_TRAJ"]
     gtFile = settings["SIM_DATA"]
-    pureOutPath = settings["PLOT_PATH"]+"pure/"
-    pfOutPath = settings["PLOT_PATH"]+"pf/"
+    trainingOutPath = settings["PLOT_PATH"]+"training/"
+    testingOutPath = settings["PLOT_PATH"]+"testing/"
+    validationOutPath = settings["PLOT_PATH"]+"validation/"
 
     try:
         print("Plotting ground truth...")
         if settings["GT_PRESENT"] == "true":
             for robot in range(0, int(settings["VALIDATION_SET"])):
-                plotSingle(pureInFile, pureOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
+                plotSingle(validationInFile, validationOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
 
         print("Plotting low-level actions...")
         for robot in range(0, int(settings["VALIDATION_SET"])):
-            plotLA(pureOutPath, gtFile, robot)
+            plotLA(validationOutPath, gtFile, robot)
 
-        graph1 =    {   'inF': pfInFile,
-                        'outP': pfOutPath,
+        graph1 =    {   'inF': trainingInFile,
+                        'outP': trainingOutPath,
                         'gtF': gtFile,
                         'title': 'Particle filter outputs'
                     }
-        graph2 =    {   'inF': pureInFile,
-                        'outP': pureOutPath,
+        graph2 =    {   'inF': testingInFile,
+                        'outP': testingOutPath,
                         'gtF': gtFile,
                         'title': 'ASP Test Run'
                     }
 
 
         for iter in range(0, int(settings["NUM_ITER"])):
-            print("Plotting particle filter graphs, iteration " + str(iter))
+            print("Plotting training graphs, iteration " + str(iter))
             plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter, int(settings["TRAINING_SET"]))
-            print("Plotting pure ASP graphs, iteration " + str(iter))
-            plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["VALIDATION_SET"]))
+            print("Plotting testing ASP graphs, iteration " + str(iter))
+            plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["TRAINING_SET"]))
             print("Plotting likelihoods, iteration " + str(iter))
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-pf.txt", settings["PLOT_PATH"]+"pf-likelihoods.png", "Particle filter Likelihoods", 'cumulative_observation_likelihood (log scale)')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-pure.txt", settings["PLOT_PATH"]+"pure-likelihoods.png", "Pure output Likelihoods", 'cumulative_observation_likelihood (log scale)')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-pf.txt", settings["PLOT_PATH"]+"pf-accuracy.png", "Particle filter Accuracy", 'Percent Accuracy')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-pure.txt", settings["PLOT_PATH"]+"pure-accuracy.png", "Pure output Accuracy", 'Percent Accuracy')
-        
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-training.txt", settings["PLOT_PATH"]+"training-likelihoods.png", "Training Set Likelihoods", 'cumulative_observation_likelihood (log scale)')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'cumulative_observation_likelihood (log scale)')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-valid.txt", settings["PLOT_PATH"]+"validation-likelihoods.png", "Validation Set Likelihoods", 'cumulative_observation_likelihood (log scale)')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-training.txt", settings["PLOT_PATH"]+"training-accuracy.png", "Training Set Accuracy", 'Percent Accuracy')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
+
     except Exception as e:
         print(e)
         pass
