@@ -60,13 +60,20 @@ HA emdipsASP(State state){
         }
     }
 
-    return state.ha;
-    // return correct(prev_ha, pointError(prev_ha, state.ha, POINT_ACCURACY)); // Introduce point errors - random transitions allow GT_ASP to escape local minima
+    if(synthesizer == EMDIPS) {
+        return state.ha;
+    }
+    // Allow a little error in LDIPS
+    return correct(prev_ha, pointError(prev_ha, state.ha, POINT_ACCURACY));
 }
 
 // Initial ASP: random transitions
 HA initialASP(State state) {
-    return correct(state.ha, pointError(state.ha, state.ha, POINT_ACCURACY));
+    if(labeler == GREEDY_HEURISTIC) {
+        return correct(state.ha, pointError(state.ha, state.ha, 0));
+    } else {
+        return correct(state.ha, pointError(state.ha, state.ha, POINT_ACCURACY));
+    }
 }
 
 void save_metric(string output_path, double metric) {
@@ -219,7 +226,11 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     cout << "...\n\n\n";
 
     // Run synthesis algorithm to optimize sketches
-    emdipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, pFunc);
+    if(synthesizer == EMDIPS) { // EMDIPS
+        emdipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, pFunc, synth_setting == INCREMENTAL);
+    } else { // LDIPS
+        ldipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, synth_setting == INCREMENTAL);
+    }
 
     // Write ASP info to file
     ofstream aspStrFile;

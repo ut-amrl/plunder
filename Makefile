@@ -1,5 +1,7 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 2D-merge
+target_dir ?= 1D-target
+
+# export OMP_NUM_THREADS := 64 # Turn this on when running LDIPS
 
 fn ?= out
 

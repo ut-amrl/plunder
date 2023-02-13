@@ -173,6 +173,14 @@ public:
             }
         }
 
+        if(labeler == PERFECT) {
+            for(uint i = 0; i < num_trajectories; i++){
+                for(int t = 0; t < T; t++){ 
+                    trajectories[i][t] = state_traj.get(t).ha;
+                }
+            }
+        }
+
         return trajectories;
     }
 

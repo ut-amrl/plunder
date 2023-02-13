@@ -10,6 +10,12 @@ const uint numSpaces = 30;
 // ----- Asserts -------------------------------
 
 void assertConstraints() {
+
+    if(synthesizer == LDIPS && synth_setting == INCREMENTAL) {
+        cout << "LDIPS with incremental synthesis is not supported :(";
+        exit(1);
+    }
+    
     // TODO: deprecated
     // assert(TEMPERATURE >= 0 && "Observation likelihood strength must be greater than 0");
     // assert(POINT_ACCURACY >= 0 && POINT_ACCURACY <= 1 && "HA probability must be between 0 and 1");
