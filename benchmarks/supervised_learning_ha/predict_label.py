@@ -103,7 +103,7 @@ def loadDataFrame():
 
         # Convert from series to supervised learning problem
         dataset = dataset.tail(-1) # Drop first row where motor model is undefined
-        dataset = series_to_supervised(dataset, 4, 1)
+        dataset = series_to_supervised(dataset, 1, 1)
 
         dataset_validation = pd.concat([dataset_validation, dataset], ignore_index=True)
         if iter < settings.training_set:
@@ -223,7 +223,8 @@ def makePredictions(df_validation, training_size):
     model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2])))
     model.add(Dense(64, activation=keras.activations.sigmoid))
     model.add(Dense(16, activation=keras.activations.sigmoid))
-    model.add(Dense(settings.numHA, activation=keras.activations.softmax)) # Output: one-hot encoding of each HA, softmax to convert to a vector of weights
+    model.add(Dense(settings.numHA, activation=keras.activations.sigmoid)) # Output: one-hot encoding of each HA
+    model.add(Dense(settings.numHA, activation=keras.activations.softmax)) # Softmax to convert to a vector of weights
     model.compile(loss=CustomAccuracy(), optimizer='adam')
 
     print(model.summary())

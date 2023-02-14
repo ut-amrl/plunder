@@ -14,8 +14,8 @@ lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.03
-acc_err = 2
+steer_err = 0.01
+acc_err = 0.5
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=20
@@ -98,9 +98,9 @@ def closestVehicles(obs, lane_class):
 
 # ASP (probabilistic)
 def prob_asp(ego, closest):
-    front_clear = sample(logistic(30, 1, closest[1][1]))
-    left_clear = sample(logistic(30, 1, closest[0][1]))
-    right_clear = sample(logistic(30, 1, closest[2][1]))
+    front_clear = sample(logistic(30, 2, closest[1][1]))
+    left_clear = sample(logistic(30, 2, closest[0][1]))
+    right_clear = sample(logistic(30, 2, closest[2][1]))
 
     # Deterministic version
     # front_clear = closest[1][1] > 30
@@ -209,9 +209,9 @@ def runSim(iter):
 
     obs_out.close()
 
-for iter in range(8):
+for iter in range(15):
     runSim(iter)
-
+iter = 16
 # Run generalized simulations involving more vehicles, lanes, etc.
 
 env.config['lanes_count']=lanes_count+2
@@ -221,7 +221,8 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(8)
+runSim(iter)
+iter += 1
 
 env.config['observation']={
     'type': 'Kinematics',
@@ -229,7 +230,8 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(9)
+runSim(iter)
+iter += 1
 
 env.config['lanes_count']=lanes_count-2
 env.config['observation']={
@@ -238,7 +240,8 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(10)
+runSim(iter)
+iter += 1
 
 env.config['lanes_count']=lanes_count*2
 env.config['observation']={
@@ -247,7 +250,8 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(11)
+runSim(iter)
+iter += 1
 
 env.config['lanes_count']=lanes_count+2
 env.config['observation']={
@@ -258,4 +262,5 @@ env.config['observation']={
 }
 min_velocity = 14 # Minimum velocity
 max_velocity = 32 # Maximum velocity
-runSim(12)
+runSim(iter)
+iter += 1
