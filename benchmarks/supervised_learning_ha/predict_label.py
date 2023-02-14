@@ -14,7 +14,7 @@ from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
 import settings
-
+import plotter
 
 column_names = []
 
@@ -367,6 +367,8 @@ def makePredictions(df_validation, training_size):
     # # Calculate RMSE
     # rmse = math.sqrt(mean_squared_error(inv_y, inv_yhat))
     # print('Test RMSE: %.3f' % rmse)
+
+    plotter.plot(yhat_valid)
 
 # Run neural network
 loadDataFrame()
