@@ -12,7 +12,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
-from sklearn.metrics import mean_squared_error
 
 import settings
 
@@ -74,10 +73,12 @@ def loadDataFrame():
         # print(dataset)
 
         # Compute outputs from discrete motor controllers
-        motor = np.empty((settings.numHA, len(dataset.index)))
+        motor1 = np.empty((settings.numHA, len(dataset.index)))
+        motor2 = np.empty((settings.numHA, len(dataset.index)))
         for ha in range(settings.numHA):
             for i in range(1, len(dataset.index)):
-                motor[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[0]
+                motor1[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[0]
+                motor2[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[1]
 
         # Drop irrelevant variables
         for column in dataset:
@@ -87,8 +88,12 @@ def loadDataFrame():
                 dataset[column] = pd.to_numeric(dataset[column])
         
         # Append motor controller outputs
-        for ha in range(settings.numHA):
-            dataset["controller-" + str(ha)] = motor[ha]
+        if not settings.pred_var1 == None:
+            for ha in range(settings.numHA):
+                dataset["controller-" + settings.pred_var1 + "-" + str(ha)] = motor1[ha]
+        if not settings.pred_var2 == None:
+            for ha in range(settings.numHA):
+                dataset["controller-" + settings.pred_var2 + "-" + str(ha)] = motor2[ha]
 
         # Move predicted variables to the end for readability
         if not settings.pred_var1 == None:
@@ -116,8 +121,10 @@ def loadDataFrame():
     scaler_validation = MinMaxScaler(feature_range=(0, 1))
     for col in dataset_validation.columns:
         # Normalize columns with the same metric using the same scaler
-        if col.startswith("controller-") or col.startswith(settings.pred_var1):
+        if not settings.pred_var1 == None and (col.startswith("controller-" + settings.pred_var1 + "-") or col.startswith(settings.pred_var1)):
             scaler_validation.fit(np.transpose([settings.pv1_range]))
+        elif not settings.pred_var2 == None and (col.startswith("controller-" + settings.pred_var2 + "-") or col.startswith(settings.pred_var2)):
+            scaler_validation.fit(np.transpose([settings.pv2_range]))
         else: # Perform regular fit_transform
             scaler_validation.fit(np.transpose([dataset_validation[col]]))
         dataset_validation[col] = np.transpose(scaler_validation.transform(np.transpose([dataset_validation[col]])))[0]
@@ -138,21 +145,6 @@ results = []  # datetime, yhat_valid, y_validation
 toReturn = []
 
 def makePredictions(df_validation, training_size):
-    scaler = MinMaxScaler(feature_range=(0, 1))
-
-    min_la1 = df_validation[settings.pred_var1+'(t)'].min()
-    mean_la1 = df_validation[settings.pred_var1+'(t)'].mean()
-    max_la1 = df_validation[settings.pred_var1+'(t)'].max()
-
-    df_la1_levels = pd.DataFrame({settings.pred_var1: [min_la1, mean_la1, max_la1]})
-
-    la1_scaled = scaler.fit_transform(df_la1_levels.values)
-    la1_scaled = la1_scaled[1][0]
-
-    la1_levels_scaled = [(1.5 * la1_scaled), (la1_scaled), (0.5 * la1_scaled), (0.25 * la1_scaled)]
-    la1_colors = ['r', 'tab:orange', 'y', 'g']
-    la1_labels = ['150% Mean', 'Mean LA 1', '50% Mean', '25% Mean']
-
     # Split into X (inputs) and Y (outputs)
     validation_X = DataFrame()
     validation_Y = DataFrame()
@@ -160,10 +152,12 @@ def makePredictions(df_validation, training_size):
     # Outputs: predicted variables and discrete motor controller outputs (for use in the loss function)
     if not settings.pred_var1 == None:
         validation_Y[settings.pred_var1 + "(t)"] = df_validation[settings.pred_var1 + "(t)"]
+        for ha in range(settings.numHA):
+            validation_Y["controller-" + settings.pred_var1 + "-" + str(ha) + "(t)"] = df_validation["controller-" + settings.pred_var1 + "-" + str(ha) + "(t)"]
     if not settings.pred_var2 == None:
         validation_Y[settings.pred_var2 + "(t)"] = df_validation[settings.pred_var2 + "(t)"]
-    for ha in range(settings.numHA):
-        validation_Y["controller-" + str(ha) + "(t)"] = df_validation["controller-" + str(ha) + "(t)"]
+        for ha in range(settings.numHA):
+            validation_Y["controller-" + settings.pred_var2 + "-" + str(ha) + "(t)"] = df_validation["controller-" + settings.pred_var2 + "-" + str(ha) + "(t)"]
     
     # Inputs: everything else
     for col in df_validation:
@@ -209,16 +203,22 @@ def makePredictions(df_validation, training_size):
         def __init__(self):
             super().__init__()
         def call(self, y_true, y_pred):
-            # offset = tensorflow.math.add(y_pred, 1E-8)
-
             # Perform a weighted sum of all controllers
-            sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, 1:]), 1)
+            error = 0
+
+            # Output 1
+            if not settings.pred_var1 == None:
+                sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, 1:settings.numHA + 1]), 1)
+                error += mse(sum, y_true[:, :1])                                # Calculate mean squared error from observed LA
+
+            # Output 2
+            if not settings.pred_var2 == None:
+                sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, settings.numHA+2:]), 1)
+                error += mse(sum, y_true[:, settings.numHA+1:settings.numHA+2]) # Calculate mean squared error from observed LA
             
-            # Calculate mean squared error from observed LA
-            return mse(sum, y_true[:, :1])
+            return error
 
     # Design network
-    
     model = Sequential()
     model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2])))
     model.add(Dense(64, activation=keras.activations.sigmoid))
@@ -245,25 +245,59 @@ def makePredictions(df_validation, training_size):
     # print("YHAT_TEST")
     # print(yhat_test)
 
-    pyplot.plot(test_Y, label='test_y')
+    # scaler = MinMaxScaler(feature_range=(0, 1))
+
+    # min_la1 = df_validation[settings.pred_var1+'(t)'].min()
+    # mean_la1 = df_validation[settings.pred_var1+'(t)'].mean()
+    # max_la1 = df_validation[settings.pred_var1+'(t)'].max()
+
+    # df_la1_levels = pd.DataFrame({settings.pred_var1: [min_la1, mean_la1, max_la1]})
+
+    # la1_scaled = scaler.fit_transform(df_la1_levels.values)
+    # la1_scaled = la1_scaled[1][0]
+
+    # la1_levels_scaled = [(1.5 * la1_scaled), (la1_scaled), (0.5 * la1_scaled), (0.25 * la1_scaled)]
+    # la1_colors = ['r', 'tab:orange', 'y', 'g']
+    # la1_labels = ['150% Mean', 'Mean LA 1', '50% Mean', '25% Mean']
+
+    # min_la2 = df_validation[settings.pred_var2+'(t)'].min()
+    # mean_la2 = df_validation[settings.pred_var2+'(t)'].mean()
+    # max_la2 = df_validation[settings.pred_var2+'(t)'].max()
+
+    # df_la2_levels = pd.DataFrame({settings.pred_var2: [min_la2, mean_la2, max_la2]})
+
+    # la2_scaled = scaler.fit_transform(df_la2_levels.values)
+    # la2_scaled = la2_scaled[1][0]
+
+    # la2_levels_scaled = [(1.5 * la2_scaled), (la2_scaled), (0.5 * la2_scaled), (0.25 * la2_scaled)]
+    # la2_colors = ['r', 'tab:orange', 'y', 'g']
+    # la2_labels = ['150% Mean', 'Mean LA 2', '50% Mean', '25% Mean']
+
+    if not settings.pred_var1 == None:
+        pyplot.plot(test_Y[:, 0], label=settings.pred_var1)
+    if not settings.pred_var2 == None:
+        pyplot.plot(test_Y[:, settings.numHA+1], label=settings.pred_var2)
     pyplot.plot(yhat_test, label='yhat_test')
-    for laInd in range(len(la1_levels_scaled)):
-        pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd],
-                       linestyle='-', label=la1_labels[laInd])
+    # for laInd in range(len(la1_levels_scaled)):
+    #     pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd],
+    #                    linestyle='-', label=la1_labels[laInd])
     pyplot.legend()
     pyplot.savefig("test.png")
     pyplot.show()
 
     # Plot and evaluate prediction results
-    axis_test = fig_test.add_subplot(1, 1, 1)
-    axis_test.plot(test_Y, label='Actual', linewidth=2)
-    axis_test.plot(yhat_test, label='Predicted', linewidth=2.5, alpha=0.6, color='tab:pink')
+    # axis_test = fig_test.add_subplot(1, 1, 1)
+    # axis_test.plot(test_Y[0], label='Actual', linewidth=2)
+    # axis_test.plot(yhat_test, label='Predicted', linewidth=2.5, alpha=0.6, color='tab:pink')
     # for laInd in range(len(la1_levels_scaled)):
     #     axis_test.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd])
 
     yhat_valid = model.predict(X_validation)
 
-    pyplot.plot(Y_validation, label='y_validation')
+    if not settings.pred_var1 == None:
+        pyplot.plot(Y_validation[:, 0], label=settings.pred_var1)
+    if not settings.pred_var2 == None:
+        pyplot.plot(Y_validation[:, settings.numHA+1], label=settings.pred_var2)
     pyplot.plot(yhat_valid, label='yhat_valid')
     # for laInd in range(len(la1_levels_scaled)):
     #     pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd])
@@ -271,69 +305,68 @@ def makePredictions(df_validation, training_size):
     pyplot.savefig("validation.png")
     pyplot.show()
 
-    axis_valid = fig_valid.add_subplot(1, 1, 1)
-    axis_valid.plot(Y_validation, label='Actual', linewidth=2)
-    axis_valid.plot(yhat_valid, label='Predicted',
-                    linewidth=3, alpha=0.7, color='tab:pink')
+    # axis_valid = fig_valid.add_subplot(1, 1, 1)
+    # axis_valid.plot(Y_validation[0], label='Actual', linewidth=2)
+    # axis_valid.plot(yhat_valid, label='Predicted', linewidth=3, alpha=0.7, color='tab:pink')
     # for laInd in range(len(la1_levels_scaled)):
     #     axis_valid.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd], linewidth=1)
 
     # df_validation = df_validation[~df_validation.isin(
     #     [np.nan, np.inf, -np.inf]).any(1)]
 
-    global figs
-    global results
-    global toReturn
+    # global figs
+    # global results
+    # global toReturn
 
-    figs.append(fig_test)
-    figs.append(fig_valid)
+    # figs.append(fig_test)
+    # figs.append(fig_valid)
 
-    try:
-        i = 0
-        dates = []
-        resultsYhat = []
-        resultsYvalid = []
+    # try:
+    #     i = 0
+    #     dates = []
+    #     resultsYhat = []
+    #     resultsYvalid = []
 
-        while (i < len(yhat_valid)-4):
-            max_yhat_valid = max(max(yhat_valid[i][0], yhat_valid[i+1][0]), max(yhat_valid[i+2][0], yhat_valid[i+3][0]))
-            max_y_validation = max(max(Y_validation[i], Y_validation[i+1]), max(Y_validation[i+2], Y_validation[i+3]))
+    #     while (i < len(yhat_valid)-4):
+    #         max_yhat_valid = max(max(yhat_valid[i][0], yhat_valid[i+1][0]), max(yhat_valid[i+2][0], yhat_valid[i+3][0]))
+    #         max_y_validation = max(max(Y_validation[i], Y_validation[i+1]), max(Y_validation[i+2], Y_validation[i+3]))
 
-            dates.append(
-                df_validation.iloc[i, df_validation.columns.get_loc('DateTime')])
-            resultsYhat.append(max_yhat_valid / la1_levels_scaled[0])
-            resultsYvalid.append(max_y_validation / la1_levels_scaled[0])
+    #         dates.append(
+    #             df_validation.iloc[i, df_validation.columns.get_loc('DateTime')])
+    #         resultsYhat.append(max_yhat_valid / la1_levels_scaled[0])
+    #         resultsYvalid.append(max_y_validation / la1_levels_scaled[0])
 
-            i += 4
-        results.append(dates)
-        results.append(resultsYhat)
-        results.append(resultsYvalid)
+    #         i += 4
+    #     results.append(dates)
+    #     results.append(resultsYhat)
+    #     results.append(resultsYvalid)
 
-        toReturn.append(figs)
-        toReturn.append(results)
+    #     toReturn.append(figs)
+    #     toReturn.append(results)
 
-    except:
-        print("ERROR OCCURRED IN PROCESSING OF VALIDATION RESULTS")
+    # except:
+    #     print("ERROR OCCURRED IN PROCESSING OF VALIDATION RESULTS")
 
-    X_validation = X_validation.reshape((X_validation.shape[0], X_validation.shape[2]))
+    # X_validation = X_validation.reshape((X_validation.shape[0], X_validation.shape[2]))
 
-    # Invert scaling for forecast
-    inv_yhat = np.concatenate((yhat_valid, X_validation[:, 1:]), axis=1)
+    # # Invert scaling for forecast
+    # inv_yhat = np.concatenate((yhat_valid, X_validation[:, 1:]), axis=1)
 
-    scaler = MinMaxScaler(feature_range=(0, 1)).fit(inv_yhat)
+    # scaler = MinMaxScaler(feature_range=(0, 1)).fit(inv_yhat)
 
-    inv_yhat = scaler.inverse_transform(inv_yhat)
-    inv_yhat = inv_yhat[:, 0]
+    # inv_yhat = scaler.inverse_transform(inv_yhat)
+    # inv_yhat = inv_yhat[:, 0]
 
-    # Invert scaling for actual
-    Y_validation = Y_validation.reshape((len(Y_validation), 1))
-    inv_y = np.concatenate((Y_validation, X_validation[:, 1:]), axis=1)
+    # # Invert scaling for actual
+    # Y_validation = Y_validation.reshape((len(Y_validation), 1))
+    # inv_y = np.concatenate((Y_validation, X_validation[:, 1:]), axis=1)
 
-    inv_y = scaler.inverse_transform(inv_y)
-    inv_y = inv_y[:, 0]
+    # inv_y = scaler.inverse_transform(inv_y)
+    # inv_y = inv_y[:, 0]
 
-    # Calculate RMSE
-    rmse = math.sqrt(mean_squared_error(inv_y, inv_yhat))
-    print('Test RMSE: %.3f' % rmse)
+    # # Calculate RMSE
+    # rmse = math.sqrt(mean_squared_error(inv_y, inv_yhat))
+    # print('Test RMSE: %.3f' % rmse)
 
 # Run neural network
 loadDataFrame()

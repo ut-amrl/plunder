@@ -82,7 +82,7 @@ vars_used = [
     "LA.acc"
 ]
 pred_var1 = "LA.steer"
-pv1_range = [-0.1, 0.1]
+pv1_range = [-0.2, 0.2]
 pred_var2 = "LA.acc"
 pv2_range = [-10, 10]
 
