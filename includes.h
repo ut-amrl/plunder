@@ -22,6 +22,7 @@
 #include <math.h>
 #include <cstring>
 #include <optional>
+#include <chrono>
 
 #include <dlfcn.h>
 #include <z3++.h>
@@ -61,5 +62,5 @@ enum SYNTHESIS_SETTING {
 };
 
 LABELER labeler = STABLE_HEURISTIC;
-SYNTHESIS_ALGO synthesizer = EMDIPS;
-SYNTHESIS_SETTING synth_setting = INCREMENTAL;
+SYNTHESIS_ALGO synthesizer = LDIPS;
+SYNTHESIS_SETTING synth_setting = FULL;

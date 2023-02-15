@@ -47,6 +47,7 @@ void printExampleInfo(Example e){
     cout << endl;
 }
 
+bool use_error = true;
 // Runs EMDIPS-generated ASP
 HA emdipsASP(State state){
     HA prev_ha = state.ha;
@@ -60,7 +61,7 @@ HA emdipsASP(State state){
         }
     }
 
-    if(synthesizer == EMDIPS) {
+    if(synthesizer == EMDIPS || !use_error) {
         return state.ha;
     }
     // Allow a little error in LDIPS
@@ -116,6 +117,8 @@ double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_corre
     Trajectory gt = traj;
     double log_obs_cum = 0;
 
+    use_error = false;
+
     for(uint32_t n = 0; n < SAMPLE_SIZE; n++){
         log_obs_cum += execute_pure(traj, asp);
 
@@ -125,11 +128,11 @@ double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_corre
                 ha_correct++;
             }
         }
-
         outFile << traj.to_string();
     }
-
     outFile.close();
+
+    use_error = true;
     return log_obs_cum;
 }
 
@@ -377,7 +380,8 @@ void emLoop(){
     read_demonstration(state_traj);
 
     for(int i = 0; i < NUM_ITER; i++){
-        
+        auto start = chrono::system_clock::now();
+
         // Expectation
         cout << "\n|-------------------------------------|\n";
         cout << "|                                     |\n";
@@ -396,6 +400,11 @@ void emLoop(){
 
         curASP = emdipsASP;
         TEMPERATURE = max(TEMPERATURE - TEMP_CHANGE, 1.0);
+
+        auto end = chrono::system_clock::now();
+        chrono::duration<double> diff = end - start;
+
+        cout << "--------------- Iteration " << i << " took " << diff.count() << " s ---------------" << endl;
     }
 }
 
