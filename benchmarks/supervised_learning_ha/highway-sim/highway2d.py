@@ -211,7 +211,7 @@ def runSim(iter):
 
 for iter in range(15):
     runSim(iter)
-iter = 16
+
 # Run generalized simulations involving more vehicles, lanes, etc.
 
 env.config['lanes_count']=lanes_count+2
@@ -221,8 +221,7 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(iter)
-iter += 1
+runSim(8)
 
 env.config['observation']={
     'type': 'Kinematics',
@@ -230,8 +229,7 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(iter)
-iter += 1
+runSim(9)
 
 env.config['lanes_count']=lanes_count-2
 env.config['observation']={
@@ -240,8 +238,7 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(iter)
-iter += 1
+runSim(10)
 
 env.config['lanes_count']=lanes_count*2
 env.config['observation']={
@@ -250,8 +247,7 @@ env.config['observation']={
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
     'absolute': False
 }
-runSim(iter)
-iter += 1
+runSim(11)
 
 env.config['lanes_count']=lanes_count+2
 env.config['observation']={
@@ -262,5 +258,4 @@ env.config['observation']={
 }
 min_velocity = 14 # Minimum velocity
 max_velocity = 32 # Maximum velocity
-runSim(iter)
-iter += 1
+runSim(12)
