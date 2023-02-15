@@ -319,7 +319,10 @@ def main():
             plotLikelihoods(settings["PCT_ACCURACY"] + "-training.txt", settings["PLOT_PATH"]+"training-accuracy.png", "Training Set Accuracy", 'Percent Accuracy')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
-
+        
+        for robot in range(0, int(settings["VALIDATION_SET"])):
+            plotSingle(validationInFile, validationOutPath, gtFile, 'Final Outputs', str(int(settings["NUM_ITER"]) - 1), robot)
+            
     except Exception as e:
         print(e)
         pass

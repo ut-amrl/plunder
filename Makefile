@@ -90,4 +90,4 @@ snapshot :
 	echo $(D)-$(fn) && \
 	mkdir -p $(target_dir)/saved_outputs/$(D)-$(fn) && \
 	cd $(target_dir) && \
-	cp -r sim plots out settings.txt saved_outputs/$D-$(fn)
+	cp -r sim plots out settings.txt robot.h robotSets.h domain.h saved_outputs/$D-$(fn)

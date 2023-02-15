@@ -30,7 +30,7 @@ namespace SETTINGS {
     const double GEN_ACCURACY = 1.0;        // probability of a correct high-level transition
 
     // EM Loop parameters
-    const int NUM_ITER = 15;                    // number of iterations in the expectation-maximization loop
+    const int NUM_ITER = 20;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 100;                 // number of trajectories to process then pass into EMDIPS, per robot
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
@@ -55,13 +55,13 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.005;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_UPPER = 0.0001;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double PROG_COMPLEXITY_LOSS = 0.003;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double ALPHA_LOSS_UPPER = 0.01;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 64;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 128;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
     const int BASE_FEAT_DEPTH = 3;
 
