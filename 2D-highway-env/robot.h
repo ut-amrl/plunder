@@ -64,9 +64,9 @@ Obs motorModel(State state, bool error){
 HA ASP_model(State state){
     HA ha;
 
-    bool front_clear = flip(logistic(30, 1, state.get("f_x")));
-    bool left_clear = flip(logistic(30, 1, state.get("l_x")));
-    bool right_clear = flip(logistic(30, 1, state.get("r_x")));
+    bool front_clear = flip(logistic(30, 0.5, state.get("f_x")));
+    bool left_clear = flip(logistic(30, 0.5, state.get("l_x")));
+    bool right_clear = flip(logistic(30, 0.5, state.get("r_x")));
 
     if(front_clear) ha=FASTER; // No car in front: accelerate
     else if(left_clear) ha=LANE_LEFT; // Merge left

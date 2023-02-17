@@ -21,8 +21,8 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 6;
-    const int VALIDATION_SET = 12;
+    const int TRAINING_SET = 8;
+    const int VALIDATION_SET = 20;
 
     // Simulation parameters
     const double T_STEP = -1;               // time step (s)
@@ -55,15 +55,15 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.002;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_UPPER = 0.00005;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double PROG_COMPLEXITY_LOSS = 0.003;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double ALPHA_LOSS_UPPER = 0.001;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
     const int PROG_ENUM = 64;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const int BASE_FEAT_DEPTH = 3;
+    const int BASE_FEAT_DEPTH = 2;
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution
