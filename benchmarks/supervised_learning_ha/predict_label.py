@@ -243,35 +243,32 @@ def makePredictions(full_set, training_size):
     pyplot.plot(history.history['val_loss'], label='validation_loss')
     pyplot.legend()
     pyplot.savefig("plots/loss.png")
-    pyplot.show()
 
     # Make a prediction and plot results
     yhat_test = model.predict(df_train_X)
 
-    if not settings.pred_var1 == None:
-        pyplot.plot(df_train_Y[:, 0], label=settings.pred_var1)
-    if not settings.pred_var2 == None:
-        pyplot.plot(df_train_Y[:, settings.numHA+1], label=settings.pred_var2)
-    pyplot.plot(yhat_test, label='yhat_test')
-    pyplot.legend()
-    pyplot.savefig("plots/test.png")
-    pyplot.show()
+    # if not settings.pred_var1 == None:
+    #     pyplot.plot(df_train_Y[:, 0], label=settings.pred_var1)
+    # if not settings.pred_var2 == None:
+    #     pyplot.plot(df_train_Y[:, settings.numHA+1], label=settings.pred_var2)
+    # pyplot.plot(yhat_test, label='yhat_test')
+    # pyplot.legend()
+    # pyplot.savefig("plots/test.png")
 
     yhat_valid = model.predict(X_validation)
 
-    if not settings.pred_var1 == None:
-        pyplot.plot(Y_validation[:, 0], label=settings.pred_var1)
-    if not settings.pred_var2 == None:
-        pyplot.plot(Y_validation[:, settings.numHA+1], label=settings.pred_var2)
-    pyplot.plot(yhat_valid, label='yhat_valid')
-    pyplot.legend()
-    pyplot.savefig("plots/validation.png")
-    pyplot.show()
+    # if not settings.pred_var1 == None:
+    #     pyplot.plot(Y_validation[:, 0], label=settings.pred_var1)
+    # if not settings.pred_var2 == None:
+    #     pyplot.plot(Y_validation[:, settings.numHA+1], label=settings.pred_var2)
+    # pyplot.plot(yhat_valid, label='yhat_valid')
+    # pyplot.legend()
+    # pyplot.savefig("plots/validation.png")
 
     #### Generate expected trajectories using softmax weights ####
-    (test_la1, test_la2) = gen_traj(yhat_test, df_train_Y)
-    (valid_la1, valid_la2) = gen_traj(yhat_valid, Y_validation)
-
+    (test_la1, test_la2) = util.gen_traj(yhat_test, df_train_Y)
+    (valid_la1, valid_la2) = util.gen_traj(yhat_valid, Y_validation)
+        
     #### METRICS: WEIGHTED BY SOFTMAX ####
     print("######## Metrics: Weighted by softmax ########")
 
@@ -314,7 +311,7 @@ def makePredictions(full_set, training_size):
 
     print("", flush=True)
     plotter.plot(yhat_valid)
-    plotter.plotLA(valid_la1, valid_la2, df_train_Y)
+    plotter.plotLA(valid_la1, valid_la2, Y_validation)
 
 # Run neural network
 loadDataFrame()

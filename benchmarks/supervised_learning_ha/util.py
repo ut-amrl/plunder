@@ -33,28 +33,30 @@ def obs_likelihood(ha, data, data_prev):
 
     return obs_log
 
-def gen_traj(y_pred, y_true):
-    la1 = []
-    la2 = []
-    for i in range(len(y_pred)):
-        # Perform a weighted sum of all controllers
-        # Output 1
-        if not settings.pred_var1 == None:
-            la1.append(tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, 1:settings.numHA+1]), 1))
+if not settings.pred_var1 == None:
+    scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
+    scaler1.fit(np.transpose([[0, 1]]))
 
-        # Output 2
-        if not settings.pred_var2 == None:
-            la2.append(tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, settings.numHA+2:]), 1))
+if not settings.pred_var2 == None:
+    scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
+    scaler2.fit(np.transpose([[0, 1]]))
+
+def gen_traj(y_pred, y_true):
+    la1, la2 = None, None
+
+    # Perform a weighted sum of all controllers
+    # Output 1
+    if not settings.pred_var1 == None:
+        la1 = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, 1:settings.numHA+1]), 1)
+
+    # Output 2
+    if not settings.pred_var2 == None:
+        la2 = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, settings.numHA+2:]), 1)
     
     return (la1, la2)
 
-scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
-scaler1.fit(np.transpose([[0, 1]]))
-
-scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
-scaler2.fit(np.transpose([[0, 1]]))
-
 def log_obs(expected, actual, var1):
+    obs_log = 0
     if var1:
         mean = scaler1.transform([[expected]])[0][0]
         test = scaler1.transform([[actual]])[0][0]
@@ -71,11 +73,11 @@ def cum_log_obs(expected1, expected2, actual):
     for i in range(len(actual)):
         # Output 1
         if not settings.pred_var1 == None:
-            error += log_obs(expected1[i], y_true[:, :1], True)  
+            error += log_obs(expected1[i], actual[i][0], True)  
 
         # Output 2
         if not settings.pred_var2 == None:
-            error += log_obs(expected2[i], y_true[:, settings.numHA+1:settings.numHA+2], False)
+            error += log_obs(expected2[i], actual[i][settings.numHA+1], False)
         
-    return error / len(expected)
+    return error / len(actual)
     
