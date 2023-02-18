@@ -70,19 +70,19 @@ def classifyLane(obs):
 
 # Find closest vehicles in lanes next to the ego vehicle
 # Assumption: vehicles are already sorted based on x distance (ignores vehicles behind the ego vehicle)
-def closestInLane(obs, lane, lane_class):
+def closestInLane(obs, lane, lane_class, ego):
     for i in range(0, len(obs)):
         if obs[i][0] == 0: # not present
             continue
         if lane_class[i] == lane: # in desired lane
             return obs[i]
     
-    return [0, 100, lane * lane_diff, 0, 0, 0] # No car found
+    return [0, 100, lane * lane_diff, ego[3], ego[4], ego[5]] # No car found
 
 def closestVehicles(obs, lane_class):
-    closestLeft = closestInLane(obs[1:], -1, lane_class[1:])
-    closestFront = closestInLane(obs[1:], 0, lane_class[1:])
-    closestRight = closestInLane(obs[1:], 1, lane_class[1:])
+    closestLeft = closestInLane(obs[1:], -1, lane_class[1:], obs[0])
+    closestFront = closestInLane(obs[1:], 0, lane_class[1:], obs[0])
+    closestRight = closestInLane(obs[1:], 1, lane_class[1:], obs[0])
 
     # Handle edges (in rightmost or leftmost lane)
     if lane_class[0] == 0: # In leftmost lane: pretend there is a vehicle to the left
@@ -99,17 +99,13 @@ def closestVehicles(obs, lane_class):
 # ASP (probabilistic)
 def prob_asp(ego, closest):
     front_clear = sample(logistic(30, 0.5, closest[1][1]))
-    left_clear = sample(logistic(30, 0.5, closest[0][1]))
-    right_clear = sample(logistic(30, 0.5, closest[2][1]))
-
-    # Deterministic version
-    # front_clear = closest[1][1] > 30
-    # left_clear = closest[0][1] > 30
-    # right_clear = closest[2][1] > 30
+    left_clear = sample(logistic(0, 0.5, closest[0][1] - closest[1][1]))
+    right_clear = sample(logistic(0, 0.5, closest[2][1] - closest[1][1]))
+    left_better = sample(logistic(0, 0.5, closest[0][1] - closest[2][1]))
 
     if front_clear: # No car in front: accelerate
         return env.action_type.actions_indexes["FASTER"]
-    if left_clear: # No car on the left: merge left
+    if left_clear and left_better: # No car on the left: merge left
         return env.action_type.actions_indexes["LANE_LEFT"]
     if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]
@@ -119,7 +115,6 @@ def prob_asp(ego, closest):
 
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_lane, target_speed)
-KP_A = 0.4 # Jerk constant (higher = faster acceleration)
 KP_H = 0.4 # Turning rate
 TURN_HEADING = 0.2 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
@@ -128,25 +123,35 @@ min_velocity = 16 # Minimum velocity
 max_velocity = 30 # Maximum velocity
 
 last_action = "FASTER"
-def run_la(self, action: Union[dict, str] = None, step = True) -> None:
+last_target = 0
+def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
+    acc = 0.0
+    target_heading = 0.0
+
     global last_action
+    global last_target
 
     if action == None:
         action = last_action
+        
     last_action = action
 
-    acc = 0.0
-    target_heading = 0.0
     if action == "FASTER":
         # Attain max speed
-        acc = KP_A * (max_velocity - self.speed)
+        acc = 0.4 * (max_velocity - self.speed)
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
         target_heading = np.arctan((target_y - self.position[1]) / TURN_TARGET)
     elif action == "SLOWER":
-        # Attain min speed
-        acc = KP_A * (min_velocity - self.speed)
+        # Attain speed of vehicle in front
+        if closest == None:
+            front_speed = last_target
+        else:
+            front_speed = closest[1][3]
+
+        last_target = front_speed
+        acc = last_target
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
@@ -191,7 +196,7 @@ def runSim(iter):
         ha = prob_asp(obs[0], closest)
 
         # Run motor model
-        la = run_la(env.vehicle, ACTIONS_ALL[ha], False)
+        la = run_la(env.vehicle, ACTIONS_ALL[ha], False, closest)
 
         # Ego vehicle
         for prop in obs[0][1:]:

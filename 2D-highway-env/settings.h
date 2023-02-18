@@ -21,7 +21,7 @@ namespace SETTINGS {
     const bool DEBUG = true;
     const double EPSILON = 10E-10;
     const int PRECISION = 10;
-    const int TRAINING_SET = 8;
+    const int TRAINING_SET = 6;
     const int VALIDATION_SET = 20;
 
     // Simulation parameters
@@ -37,7 +37,7 @@ namespace SETTINGS {
 
     // Plot parameters
     const bool GT_PRESENT = true;
-    const int PLOT_TIME = 350;                                          // Maximum time step plotted
+    const int PLOT_TIME = 200;                                          // Maximum time step plotted
 
     // Optimization parameters
     const int OPT_METHOD = 1;               // Optimization method:

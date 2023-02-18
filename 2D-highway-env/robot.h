@@ -12,7 +12,6 @@ map<string, normal_distribution<double>> la_error = {
     { "acc", normal_distribution<double>(0.0, 2) }
 };
 
-double KP_A = 0.4;
 double KP_H = 0.4;
 double TURN_HEADING = 0.2;
 double TURN_TARGET = 30;
@@ -34,14 +33,14 @@ Obs motorModel(State state, bool error){
     
     if(ha == FASTER) {
         // Attain max speed
-        acc = KP_A * (max_velocity - state.get("vx"));
+        acc = 0.4 * (max_velocity - state.get("vx"));
 
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
         target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
     } else if (ha == SLOWER) {
         // Attain min speed
-        acc = KP_A * (min_velocity - state.get("vx"));
+        acc = state.get("f_vx");
 
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
@@ -65,11 +64,12 @@ HA ASP_model(State state){
     HA ha;
 
     bool front_clear = flip(logistic(30, 0.5, state.get("f_x")));
-    bool left_clear = flip(logistic(30, 0.5, state.get("l_x")));
-    bool right_clear = flip(logistic(30, 0.5, state.get("r_x")));
+    bool left_clear = flip(logistic(0, 0.5, state.get("l_x") - state.get("f_x")));
+    bool right_clear = flip(logistic(0, 0.5, state.get("r_x") - state.get("f_x")));
+    bool left_better = flip(logistic(0, 0.5, state.get("l_x") - state.get("r_x")));
 
     if(front_clear) ha=FASTER; // No car in front: accelerate
-    else if(left_clear) ha=LANE_LEFT; // Merge left
+    else if(left_clear && left_better) ha=LANE_LEFT; // Merge left
     else if(right_clear) ha=LANE_RIGHT; // Merge right
     else ha=SLOWER; // Nowhere to go: slow down
 
