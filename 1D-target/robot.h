@@ -50,7 +50,7 @@ HA ASP_model(State state){
 // Motor model parameters:
 
 map<string, normal_distribution<double>> la_error = {
-    { "acc", normal_distribution<double>(0.0, 0.3) }
+    { "acc", normal_distribution<double>(0.0, 0.1) }
 };
 
 Obs motorModel(State state, bool error){
