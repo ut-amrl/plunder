@@ -56,14 +56,14 @@ namespace SETTINGS {
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
     const double PROG_COMPLEXITY_LOSS = 0.005;      // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_UPPER = 0.0002;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double ALPHA_LOSS_UPPER = 0.01;         // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 1000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
     const int PROG_ENUM = 128;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const int BASE_FEAT_DEPTH = 2;
+    const int BASE_FEAT_DEPTH = 3;
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                                // number of particle trajectories created to represent the distribution

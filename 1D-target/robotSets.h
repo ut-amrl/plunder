@@ -25,7 +25,7 @@ vector<State> getInitStates(){
         make_state(9, -6, 12, 100),
         make_state(7, -10, 25, 100),
         make_state(5, -7, 30, 100),
-        make_state(6, -5, 30, 100),
+        make_state(10, -15, 30, 100),
         make_state(12, -10, 25, 100),
         make_state(13, -20, 40, 100),
         make_state(5, -8, 15, 100),
