@@ -269,13 +269,13 @@ def makePredictions(full_set, training_size):
     # pyplot.legend()
     # pyplot.savefig("plots/validation.png")
 
-    b = np.zeros_like(yhat_valid)
-    b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
-    yhat_valid = b
+    # b = np.zeros_like(yhat_valid)
+    # b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
+    # yhat_valid = b
 
-    b = np.zeros_like(yhat_test)
-    b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
-    yhat_test = b
+    # b = np.zeros_like(yhat_test)
+    # b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
+    # yhat_test = b
 
     #### Generate expected trajectories using softmax weights ####
     (test_la1, test_la2) = util.gen_traj(yhat_test, df_train_Y)

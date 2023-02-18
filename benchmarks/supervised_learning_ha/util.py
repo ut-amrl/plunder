@@ -60,8 +60,10 @@ def log_obs(expected, actual, var1, scaler):
     return obs_log
 
 def cum_log_obs(expected1, expected2, actual):
-    actual1 = actual[:, 0]
-    actual2 = actual[:, settings.numHA+1]
+    if not settings.pred_var1 == None:
+        actual1 = actual[:, 0]
+    if not settings.pred_var2 == None:
+        actual2 = actual[:, settings.numHA+1]
 
     if not settings.pred_var1 == None:
         scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
