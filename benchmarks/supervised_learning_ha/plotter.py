@@ -59,15 +59,21 @@ def plotLA(expected1, expected2, actual):
             times.append(t)
 
         if not settings.pred_var1 == None:
-            pyplot.plot(actual[iter:iter+maxTime, 0], label=settings.pred_var1)
-            pyplot.plot(expected1[iter:iter+maxTime], label='model output')
-            pyplot.legend()
-            pyplot.savefig("plots/la1-" + str(robot_iter) + ".png")
+            plt.plot(actual[iter:iter+maxTime, 0], label=settings.pred_var1)
+            plt.plot(expected1[iter:iter+maxTime], label='model output')
+            plt.legend()
+            plt.savefig("plots/la1-" + str(robot_iter) + ".png")
+
+            plt.clf()
+            plt.close('all')
 
         if not settings.pred_var2 == None:
-            pyplot.plot(actual[iter:iter+maxTime, settings.numHA+1], label=settings.pred_var2)
-            pyplot.plot(expected2[iter:iter+maxTime], label='model output')
-            pyplot.legend()
-            pyplot.savefig("plots/la2-" + str(robot_iter) + ".png")
+            plt.plot(actual[iter:iter+maxTime, settings.numHA+1], label=settings.pred_var2)
+            plt.plot(expected2[iter:iter+maxTime], label='model output')
+            plt.legend()
+            plt.savefig("plots/la2-" + str(robot_iter) + ".png")
+
+            plt.clf()
+            plt.close('all')
 
         iter += maxTime
