@@ -99,17 +99,13 @@ def closestVehicles(obs, lane_class):
 # ASP (probabilistic)
 def prob_asp(ego, closest):
     front_clear = sample(logistic(30, 1, closest[1][1]))
-    left_clear = sample(logistic(30, 1, closest[0][1]))
-    right_clear = sample(logistic(30, 1, closest[2][1]))
-
-    # Deterministic version
-    # front_clear = closest[1][1] > 30
-    # left_clear = closest[0][1] > 30
-    # right_clear = closest[2][1] > 30
+    left_clear = sample(logistic(0, 1, closest[0][1] - closest[1][1]))
+    right_clear = sample(logistic(0, 1, closest[2][1] - closest[1][1]))
+    left_better = sample(logistic(0, 1, closest[0][1] - closest[2][1]))
 
     if front_clear: # No car in front: accelerate
         return env.action_type.actions_indexes["FASTER"]
-    if left_clear: # No car on the left: merge left
+    if left_clear and left_better: # No car on the left: merge left
         return env.action_type.actions_indexes["LANE_LEFT"]
     if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]

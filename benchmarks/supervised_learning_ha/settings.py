@@ -79,14 +79,14 @@ import numpy as np
 #     return ((target_heading - data["heading"]) * KP_H, None)
 
 # Setting: 2D-highway-env
-training_set = 8
+training_set = 6
 validation_set = 20 # including training_set
 train_time = 15000
 sim_time = 200
 samples = 50
 # folder = "highway-easy/"
-# folder = "highway-medium/"
-folder = "highway-hard/"
+folder = "highway-medium/"
+# folder = "highway-hard/"
 vars_used = [
     "HA",
     "x",
@@ -103,14 +103,14 @@ vars_used = [
 ]
 pred_var1 = "LA.steer"
 pv1_range = [-0.3, 0.3]
-# pv1_stddev = 0.005
-# pv1_stddev = 0.015
-pv1_stddev = 0.03
+# pv1_stddev = 0.001
+pv1_stddev = 0.015
+# pv1_stddev = 0.03
 pred_var2 = "LA.acc"
 pv2_range = [-12, 12]
-# pv2_stddev = 0.5
-# pv2_stddev = 1
-pv2_stddev = 2
+# pv2_stddev = 0.1
+pv2_stddev = 1
+# pv2_stddev = 2
 
 numHA = 4
 

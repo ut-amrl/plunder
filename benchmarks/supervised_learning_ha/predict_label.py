@@ -6,6 +6,7 @@ import tensorflow
 from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
+from keras.callbacks import EarlyStopping
 import math
 from matplotlib import pyplot
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -177,7 +178,7 @@ def makePredictions(full_set, training_size):
     df_train_Y = validation_Y.loc[0:training_size-1]
 
     # Split training set further into train and test sets and isolate values
-    n_train_hours = math.floor(len(df_train_X.index) * 0.1)
+    n_train_hours = math.floor(len(df_train_X.index) * 0.3)
     df_train_X, df_train_Y = df_train_X.values, df_train_Y.values
     train_X, train_Y = df_train_X[n_train_hours:], df_train_Y[n_train_hours:]
     test_X, test_Y = df_train_X[:n_train_hours], df_train_Y[:n_train_hours]
@@ -225,6 +226,9 @@ def makePredictions(full_set, training_size):
             
             return error
 
+    # Early stopping
+    es = EarlyStopping(monitor='val_loss', verbose=1, patience=500)
+
     # Design network
     model = Sequential()
     model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2])))
@@ -236,7 +240,7 @@ def makePredictions(full_set, training_size):
     print(model.summary())
 
     # Fit network
-    history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False)  # validation_split= 0.2)
+    history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
 
     # Plot history
     pyplot.plot(history.history['loss'], label='train_loss')
@@ -265,9 +269,18 @@ def makePredictions(full_set, training_size):
     # pyplot.legend()
     # pyplot.savefig("plots/validation.png")
 
+    b = np.zeros_like(yhat_valid)
+    b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
+    yhat_valid = b
+
+    b = np.zeros_like(yhat_test)
+    b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
+    yhat_test = b
+
     #### Generate expected trajectories using softmax weights ####
     (test_la1, test_la2) = util.gen_traj(yhat_test, df_train_Y)
     (valid_la1, valid_la2) = util.gen_traj(yhat_valid, Y_validation)
+
         
     #### METRICS: WEIGHTED BY SOFTMAX ####
     print("######## Metrics: Weighted by softmax ########")
@@ -276,18 +289,17 @@ def makePredictions(full_set, training_size):
     pct_accuracy = util.percent_accuracy(yhat_test, full_set)
     print("Testing set percent accuracy: " + str(pct_accuracy) + "%")
     log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y) * settings.training_set * settings.samples * settings.sim_time
-    print("Testing set cumulative log obs (normalized): " + str(log_obs))
+    print("Testing set cumulative log obs: " + str(log_obs))
 
     # Metrics for validation set
     pct_accuracy = util.percent_accuracy(yhat_valid, full_set)
     print("Validation set percent accuracy: " + str(pct_accuracy) + "%")
     log_obs = util.cum_log_obs(valid_la1, valid_la2, Y_validation) * settings.validation_set * settings.samples * settings.sim_time
-    print("Validation set cumulative log obs (normalized): " + str(log_obs))
+    print("Validation set cumulative log obs: " + str(log_obs))
 
 
     #### METRICS: JUST TAKING THE MAXIMUM ####
     # print("######## Metrics: Taking the Maximum ########")
-
     # b = np.zeros_like(yhat_valid)
     # b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
     # yhat_valid_flat = b
@@ -295,7 +307,6 @@ def makePredictions(full_set, training_size):
     # b = np.zeros_like(yhat_test)
     # b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
     # yhat_test_flat = b
-
 
     # # Metrics for testing set
     # pct_accuracy = util.percent_accuracy(yhat_test_flat, full_set)
