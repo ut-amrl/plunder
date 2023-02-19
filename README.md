@@ -8,7 +8,7 @@ Our system is a *discrete-time Markov process* defined by:
    - a **low-level action space** $L$ = a continuous domain of low-level actions $l \in L$: controlled joystick directives, motor inputs, etc.
      - Ex: $l = acc \in \mathbb{R}$, where $a$ is the acceleration
    - a **observed state space** $O$ = a continuous domain of observed or given variables $o \in O$.
-     - Ex: $o = (pos, vel, acc, accMax, decMax) \in \mathbb{R}^3$
+     - Ex: $o = (pos, vel, acc, accMax, decMax) \in \mathbb{R}^5$
    - an **action-selection policy (ASP)** $\pi: H \times O \rightarrow H$ that maps the current high-level action and the current observed variables to the next high-level action
    - a **motor model** $\phi: H \rightarrow L$ that maps discrete high-level actions to continuous low-level actions via discrete motor controllers
 
