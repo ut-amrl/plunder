@@ -173,7 +173,7 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
 
     gtFile = gtF + str(robot) + ".csv"
     la_names = readLA(gtFile)
-    outPath = outP + "LA-" + str(robot) + "-"
+    outPath = outP + "LA-" + str(iter) + "-" + str(robot) + "-"
 
     fig, axs = plt.subplots(len(gtLA))
     fig.suptitle("Low-level actions")
@@ -205,7 +205,7 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
             handles.append(Line2D([0], [0], label=la_names[0] + ' demo', color=colors[0]))
 
             for p in range(PARTICLES_PLOTTED):
-                axs.plot(times, trajectories[p], color=colors[1], alpha=(2/PARTICLES_PLOTTED))   
+                axs.plot(times, trajectories[p], color=colors[1], alpha=(1/PARTICLES_PLOTTED))   
         else:
             axs[name].set_ylabel(la_names[name])
             axs[name].plot(times, gtLA[name], color=colors[color_count])
@@ -213,7 +213,7 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
             color_count += 1
 
             for p in range(PARTICLES_PLOTTED):
-                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(2/PARTICLES_PLOTTED))
+                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(1/PARTICLES_PLOTTED))
             color_count += 1
 
     fig.tight_layout()
@@ -383,7 +383,6 @@ def main():
                         'gtF': gtFile,
                         'title': 'ASP Test Run'
                     }
-
 
         for iter in range(int(settings["NUM_ITER"])):
             print("Plotting training graphs, iteration " + str(iter))
