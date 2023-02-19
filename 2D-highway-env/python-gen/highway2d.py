@@ -12,6 +12,7 @@ from typing import List, Tuple, Union, Optional
 lane_diff = 4 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
+use_absolute_obs = True
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
 steer_err = 0.03
@@ -29,7 +30,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 10,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': False
+    'absolute': use_absolute_obs
 }
 
 ACTIONS_ALL = { # A mapping of action indexes to labels
@@ -80,25 +81,25 @@ def closestInLane(obs, lane, lane_class, ego):
     return [0, 100, lane * lane_diff, ego[3], ego[4], ego[5]] # No car found
 
 def closestVehicles(obs, lane_class):
-    closestLeft = closestInLane(obs[1:], -1, lane_class[1:], obs[0])
-    closestFront = closestInLane(obs[1:], 0, lane_class[1:], obs[0])
-    closestRight = closestInLane(obs[1:], 1, lane_class[1:], obs[0])
+    ego_lane = laneFinder(obs[0][2])
+
+    closestLeft = closestInLane(obs[1:], ego_lane - 1, lane_class[1:], obs[0])
+    closestFront = closestInLane(obs[1:], ego_lane, lane_class[1:], obs[0])
+    closestRight = closestInLane(obs[1:], ego_lane + 1, lane_class[1:], obs[0])
 
     # Handle edges (in rightmost or leftmost lane)
     if lane_class[0] == 0: # In leftmost lane: pretend there is a vehicle to the left
         closestLeft = obs[0].copy()
-        closestLeft[1] = 0
-        closestLeft[2] = -lane_diff
+        closestLeft[2] = obs[0][2] - lane_diff
     if lane_class[0] == env.config['lanes_count'] - 1: # In rightmost lane: pretend there is a vehicle to the right
         closestRight = obs[0].copy()
-        closestRight[1] = 0
-        closestRight[2] = lane_diff
+        closestRight[2] = obs[0][2] + lane_diff
     
     return (closestLeft, closestFront, closestRight)
 
 # ASP (probabilistic)
 def prob_asp(ego, closest):
-    front_clear = sample(logistic(30, 0.5, closest[1][1]))
+    front_clear = sample(logistic(30, 0.5, closest[1][1] - ego[1]))
     left_clear = sample(logistic(0, 0.5, closest[0][1] - closest[1][1]))
     right_clear = sample(logistic(0, 0.5, closest[2][1] - closest[1][1]))
     left_better = sample(logistic(0, 0.5, closest[0][1] - closest[2][1]))
@@ -151,7 +152,7 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
             front_speed = closest[1][3]
 
         last_target = front_speed
-        acc = last_target
+        acc = (last_target - self.speed)
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
@@ -224,7 +225,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 50,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': False
+    'absolute': use_absolute_obs
 }
 runSim(iter)
 iter += 1
@@ -233,7 +234,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 5,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': False
+    'absolute': use_absolute_obs
 }
 runSim(iter)
 iter += 1
@@ -243,7 +244,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 50,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': False
+    'absolute': use_absolute_obs
 }
 runSim(iter)
 iter += 1
@@ -253,7 +254,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 30,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': False
+    'absolute': use_absolute_obs
 }
 runSim(iter)
 iter += 1
@@ -263,7 +264,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 15,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': False
+    'absolute': use_absolute_obs
 }
 min_velocity = 14 # Minimum velocity
 max_velocity = 32 # Maximum velocity

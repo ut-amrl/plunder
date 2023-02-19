@@ -40,7 +40,7 @@ Obs motorModel(State state, bool error){
         target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
     } else if (ha == SLOWER) {
         // Attain min speed
-        acc = state.get("f_vx");
+        acc = state.get("f_vx") - state.get("vx");
 
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
@@ -63,7 +63,7 @@ Obs motorModel(State state, bool error){
 HA ASP_model(State state){
     HA ha;
 
-    bool front_clear = flip(logistic(30, 0.5, state.get("f_x")));
+    bool front_clear = flip(logistic(30, 0.5, state.get("f_x") - state.get("x")));
     bool left_clear = flip(logistic(0, 0.5, state.get("l_x") - state.get("f_x")));
     bool right_clear = flip(logistic(0, 0.5, state.get("r_x") - state.get("f_x")));
     bool left_better = flip(logistic(0, 0.5, state.get("l_x") - state.get("r_x")));
