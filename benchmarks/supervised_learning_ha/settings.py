@@ -79,11 +79,11 @@ import numpy as np
 #     return ((target_heading - data["heading"]) * KP_H, None)
 
 # Setting: 2D-highway-env
-training_set = 6
-validation_set = 20 # including training_set
+training_set = 10
+validation_set = 30 # including training_set
 train_time = 15000
 patience = 1000
-sim_time = 200
+sim_time = 100
 samples = 50
 # folder = "highway-easy/"
 # folder = "highway-medium/"
@@ -105,18 +105,18 @@ vars_used = [
 pred_var1 = "LA.steer"
 pv1_range = [-0.3, 0.3]
 # pv1_stddev = 0.001
-# pv1_stddev = 0.015
-pv1_stddev = 0.03
+# pv1_stddev = 0.01
+pv1_stddev = 0.02
 pred_var2 = "LA.acc"
-pv2_range = [-15, 15]
+pv2_range = [-20, 20]
 # pv2_stddev = 0.1
 # pv2_stddev = 1
 pv2_stddev = 2
 
 numHA = 4
 
-KP_H = 0.4 # Turning rate
-TURN_HEADING = 0.2 # Target heading when turning
+KP_H = 0.5 # Turning rate
+TURN_HEADING = 0.15 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
 min_velocity = 16 # Minimum velocity
 max_velocity = 30 # Maximum velocity

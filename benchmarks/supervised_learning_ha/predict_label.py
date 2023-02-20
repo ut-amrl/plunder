@@ -216,13 +216,13 @@ def makePredictions(full_set, training_size):
 
             # Output 1
             if not settings.pred_var1 == None:
-                sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, 1:settings.numHA + 1]), 1)
-                error += mse(sum, y_true[:, :1])                                # Calculate mean squared error from observed LA
+                sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, 1:settings.numHA+1]), 1)
+                error += mse(sum, y_true[:, 0])                                # Calculate mean squared error from observed LA
 
             # Output 2
             if not settings.pred_var2 == None:
                 sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, settings.numHA+2:]), 1)
-                error += mse(sum, y_true[:, settings.numHA+1:settings.numHA+2]) # Calculate mean squared error from observed LA
+                error += mse(sum, y_true[:, settings.numHA+1]) # Calculate mean squared error from observed LA
             
             return error
 
@@ -269,13 +269,13 @@ def makePredictions(full_set, training_size):
     # pyplot.legend()
     # pyplot.savefig("plots/validation.png")
 
-    b = np.zeros_like(yhat_valid)
-    b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
-    yhat_valid = b
+    # b = np.zeros_like(yhat_valid)
+    # b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
+    # yhat_valid = b
 
-    b = np.zeros_like(yhat_test)
-    b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
-    yhat_test = b
+    # b = np.zeros_like(yhat_test)
+    # b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
+    # yhat_test = b
 
     #### Generate expected trajectories using softmax weights ####
     (test_la1, test_la2) = util.gen_traj(yhat_test, df_train_Y)
