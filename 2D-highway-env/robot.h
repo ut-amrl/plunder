@@ -8,12 +8,12 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.03) },
+    { "steer", normal_distribution<double>(0.0, 0.02) },
     { "acc", normal_distribution<double>(0.0, 2) }
 };
 
-double KP_H = 0.4;
-double TURN_HEADING = 0.2;
+double KP_H = 0.5;
+double TURN_HEADING = 0.15;
 double TURN_TARGET = 30;
 
 double min_velocity = 16;
@@ -64,8 +64,8 @@ HA ASP_model(State state){
     HA ha;
 
     bool front_clear = flip(logistic(30, 0.5, state.get("f_x") - state.get("x")));
-    bool left_clear = flip(logistic(0, 0.5, state.get("l_x") - state.get("f_x")));
-    bool right_clear = flip(logistic(0, 0.5, state.get("r_x") - state.get("f_x")));
+    bool left_clear = flip(logistic(30, 0.5, state.get("l_x") - state.get("x")));
+    bool right_clear = flip(logistic(30, 0.5, state.get("r_x") - state.get("x")));
     bool left_better = flip(logistic(0, 0.5, state.get("l_x") - state.get("r_x")));
 
     if(front_clear) ha=FASTER; // No car in front: accelerate

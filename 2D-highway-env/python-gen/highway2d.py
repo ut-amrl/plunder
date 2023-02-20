@@ -15,12 +15,12 @@ use_absolute_lanes = True # Whether or not to label lanes as absolute or relativ
 use_absolute_obs = True
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.03
+steer_err = 0.02
 acc_err = 2
 
 env = gym.make('highway-v0')
-env.config['simulation_frequency']=20
-env.config['policy_frequency']=5 # Runs once every 4 simulation steps
+env.config['simulation_frequency']=16
+env.config['policy_frequency']=2 # Runs once every 8 simulation steps
 env.config['lanes_count']=lanes_count
 
 # Observations
@@ -100,8 +100,8 @@ def closestVehicles(obs, lane_class):
 # ASP (probabilistic)
 def prob_asp(ego, closest):
     front_clear = sample(logistic(30, 0.5, closest[1][1] - ego[1]))
-    left_clear = sample(logistic(0, 0.5, closest[0][1] - closest[1][1]))
-    right_clear = sample(logistic(0, 0.5, closest[2][1] - closest[1][1]))
+    left_clear = sample(logistic(30, 0.5, closest[0][1] - ego[1]))
+    right_clear = sample(logistic(30, 0.5, closest[2][1] - ego[1]))
     left_better = sample(logistic(0, 0.5, closest[0][1] - closest[2][1]))
 
     if front_clear: # No car in front: accelerate
@@ -116,8 +116,8 @@ def prob_asp(ego, closest):
 
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_lane, target_speed)
-KP_H = 0.4 # Turning rate
-TURN_HEADING = 0.2 # Target heading when turning
+KP_H = 0.5 # Turning rate
+TURN_HEADING = 0.15 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
 
 min_velocity = 16 # Minimum velocity
@@ -184,7 +184,7 @@ def runSim(iter):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, vx, vy, heading, l_x, l_y, l_vx, l_vy, l_heading, f_x, f_y, f_vx, f_vy, f_heading, r_x, r_y, r_vx, r_vy, r_heading, LA.steer, LA.acc, HA\n")
 
-    for _ in range(200):
+    for _ in range(100):
 
         obs, reward, done, truncated, info = env.step(ha)
         env.render()
@@ -215,9 +215,9 @@ def runSim(iter):
 
     obs_out.close()
 
-for iter in range(15):
+for iter in range(25):
     runSim(iter)
-iter = 15
+iter = 25
 # Run generalized simulations involving more vehicles, lanes, etc.
 
 env.config['lanes_count']=lanes_count+2
@@ -229,13 +229,6 @@ env.config['observation']={
 }
 runSim(iter)
 iter += 1
-
-env.config['observation']={
-    'type': 'Kinematics',
-    'vehicles_count': 5,
-    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': use_absolute_obs
-}
 runSim(iter)
 iter += 1
 
@@ -248,25 +241,7 @@ env.config['observation']={
 }
 runSim(iter)
 iter += 1
-
-env.config['lanes_count']=lanes_count*2
-env.config['observation']={
-    'type': 'Kinematics',
-    'vehicles_count': 30,
-    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': use_absolute_obs
-}
 runSim(iter)
 iter += 1
-
-env.config['lanes_count']=lanes_count+2
-env.config['observation']={
-    'type': 'Kinematics',
-    'vehicles_count': 15,
-    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': use_absolute_obs
-}
-min_velocity = 14 # Minimum velocity
-max_velocity = 32 # Maximum velocity
 runSim(iter)
 iter += 1
