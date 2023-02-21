@@ -4,6 +4,7 @@ import csv
 import sys
 import os
 from matplotlib.colors import ListedColormap
+from matplotlib.lines import Line2D
 import time
 
 # Initialization
@@ -20,7 +21,7 @@ colors = ["#F08080", "#9FE2BF", "#6495ED", "#FFBF00", "#CCCCFF", "#40E0D0", "#DE
 
 # ----- I/O ---------------------------------------------=
 
-# Reads in csv files
+# Reads in csv files (int)
 def readTrajectories(inPath):
     while not os.path.exists(inPath):
         time.sleep(1)
@@ -34,6 +35,20 @@ def readTrajectories(inPath):
         trajectories.append(traj)
     return
 
+# Reads in csv files (float)
+def readTrajectoriesFloat(inPath):
+    while not os.path.exists(inPath):
+        time.sleep(1)
+
+    inFile = open(inPath, "r")
+    reader = csv.reader(inFile)
+    for x in inFile:
+        traj = []
+        for elem in next(reader):
+            traj.append(float(elem))
+        trajectories.append(traj)
+    return
+
 def readGroundTruth(gtPath):
     global useGT
 
@@ -43,7 +58,7 @@ def readGroundTruth(gtPath):
     title_row = next(gtReader)
 
     ha_index = -1
-    for i in range(0, len(title_row)):
+    for i in range(len(title_row)):
         if title_row[i].strip() == "HA":
             ha_index = i
 
@@ -66,17 +81,17 @@ def readLA(gtPath):
 
     la_indices = []
     la_names = []
-    for i in range(0, len(title_row)):
+    for i in range(len(title_row)):
         if (title_row[i])[0:3] == "LA.":
             la_indices.append(i)
             la_names.append((title_row[i].strip())[3:])
 
     gtLA = []
-    for i in range(0, len(la_indices)):
+    for i in range(len(la_indices)):
         gtLA.append([])
 
     for info in gtReader:
-        for i in range(0, len(la_indices)):
+        for i in range(len(la_indices)):
             gtLA[i].append(float(info[la_indices[i]]))
 
     return la_names # Return names of low-level actions
@@ -106,7 +121,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     gtTrajectory = gtTrajectory[0:maxTime]
 
     times = []
-    for t in range(0, maxTime):
+    for t in range(maxTime):
         times.append(t)
 
     if useGT:
@@ -124,7 +139,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     actions = np.multiply(np.nan_to_num(np.divide(actions, np.sum(actions, axis=0))), 100)
 
     cum_sum = [0.0] * maxTime
-    for i in range(0, len(actions)):
+    for i in range(len(actions)):
         ax1.bar(times, actions[i], width=1, bottom=cum_sum, color=colors[i])
         cum_sum = np.add(cum_sum, actions[i])
 
@@ -136,7 +151,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     ax1b.set_ylabel('hi-level actions\n(unsorted)')
 
     if useGT:
-        for i in range(0, len(gt)):
+        for i in range(len(gt)):
             ax2.bar(times, gt[i], color=colors[i], width=1)
         ax2.set_ylabel('demo')
 
@@ -152,8 +167,71 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
 
     return (actions, color_graph)
 
+# Plots low-level actions
+def plotSingleLA(inF, outP, gtF, title, iter, robot):
+    global trajectories, gtTrajectory, gtLA
+
+    gtFile = gtF + str(robot) + ".csv"
+    la_names = readLA(gtFile)
+    outPath = outP + "LA-" + str(iter) + "-" + str(robot) + "-"
+
+    fig, axs = plt.subplots(len(gtLA))
+    fig.suptitle("Low-level actions")
+    plt.xlabel('time')
+
+    color_count = 0
+    handles = []
+    for name in range(len(la_names)):
+
+        inFile = inF + str(iter) + "-" + str(robot) + "-" + la_names[name] + ".csv"
+        trajectories = []
+        readTrajectoriesFloat(inFile)
+
+        PARTICLES_PLOTTED = min(int(settings["SAMPLE_SIZE"]), len(trajectories))    
+        
+        maxTime = min(int(settings["PLOT_TIME"]), len(gtLA[0]))
+        for arr in gtLA:
+            del arr[maxTime:]
+        for arr in trajectories:
+            del arr[maxTime:]
+
+        times = []
+        for t in range(maxTime):
+            times.append(t)
+
+        if len(gtLA) == 1:
+            axs.set_ylabel(la_names[0])
+            axs.plot(times, gtLA[0], color=colors[0])
+            handles.append(Line2D([0], [0], label=la_names[0] + ' demo', color=colors[0]))
+
+            for p in range(PARTICLES_PLOTTED):
+                axs.plot(times, trajectories[p], color=colors[1], alpha=(1/PARTICLES_PLOTTED))   
+        else:
+            axs[name].set_ylabel(la_names[name])
+            axs[name].plot(times, gtLA[name], color=colors[color_count])
+            handles.append(Line2D([0], [0], label=la_names[name] + ' demo', color=colors[color_count]))
+            color_count += 1
+
+            for p in range(PARTICLES_PLOTTED):
+                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(1/PARTICLES_PLOTTED))
+            color_count += 1
+
+    fig.tight_layout()
+    plt.legend(handles=handles)
+    plt.show()
+    if os.path.exists(outPath[:outPath.rfind('/')]):
+        plt.savefig(outPath + "graph.png")
+    else:
+        raise Exception('Plots folder deleted... restarting plotter')
+
+    plt.clf()
+    plt.close('all')
+
 # Processes input and passes to figureHandler
 def plotSingle(inF, outP, gtF, title, iter, robot):
+    if not title == 'Particle filter outputs':
+        plotSingleLA(inF, outP, gtF, title, iter, robot)
+
     global trajectories, gtTrajectory
 
     inFile = inF + str(iter) + "-" + str(robot) + ".csv"
@@ -172,20 +250,20 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
     PARTICLES_PLOTTED = min(int(settings["SAMPLE_SIZE"]), len(trajectories))
 
     max_action = 0
-    for t in range(0, maxTime):
-        for i in range(0, len(trajectories)):
+    for t in range(maxTime):
+        for i in range(len(trajectories)):
             max_action = max(max_action, trajectories[i][t])
         if useGT:
             max_action = max(max_action, gtTrajectory[t])
     
     actions = []
     gt = []
-    for i in range(0, max_action + 1):
+    for i in range(max_action + 1):
         actions.append([0] * maxTime)
         gt.append([0] * maxTime)
          
-    for t in range(0, maxTime):
-        for i in range(0, len(trajectories)):
+    for t in range(maxTime):
+        for i in range(len(trajectories)):
             a = trajectories[i][t]
             actions[a][t] += 1
         if useGT:
@@ -203,7 +281,7 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
 
 
 def plotSingleTimestep(inF, outP, gtF, title, iter, numRobots):
-    for robot in range(0, numRobots):
+    for robot in range(numRobots):
         plotSingle(inF, outP, gtF, title, iter, robot)
 
 # Plots low-level actions
@@ -219,7 +297,7 @@ def plotLA(outP, gtF, robot):
         del arr[maxTime:]
 
     times = []
-    for t in range(0, maxTime):
+    for t in range(maxTime):
         times.append(t)
 
     fig, axs = plt.subplots(len(gtLA))
@@ -227,11 +305,11 @@ def plotLA(outP, gtF, robot):
     plt.xlabel('time')
 
     if len(gtLA) == 1:
-        axs.bar(times, gtLA[0], color=colors[0], width=1)
+        axs.plot(times, gtLA[0], color=colors[0])
         axs.set_ylabel(la_names[0])
     else:
-        for i in range(0, len(gtLA)):
-            axs[i].bar(times, gtLA[i], color=colors[i], width=1)
+        for i in range(len(gtLA)):
+            axs[i].plot(times, gtLA[i], color=colors[i])
             axs[i].set_ylabel(la_names[i])
 
     fig.tight_layout()  
@@ -288,12 +366,12 @@ def main():
     try:
         print("Plotting ground truth...")
         if settings["GT_PRESENT"] == "true":
-            for robot in range(0, int(settings["VALIDATION_SET"])):
+            for robot in range(int(settings["VALIDATION_SET"])):
                 plotSingle(validationInFile, validationOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
 
-        print("Plotting low-level actions...")
-        for robot in range(0, int(settings["VALIDATION_SET"])):
-            plotLA(validationOutPath, gtFile, robot)
+        # print("Plotting low-level actions...")
+        # for robot in range(int(settings["VALIDATION_SET"])):
+        #     plotLA(validationOutPath, gtFile, robot)
 
         graph1 =    {   'inF': trainingInFile,
                         'outP': trainingOutPath,
@@ -306,8 +384,7 @@ def main():
                         'title': 'ASP Test Run'
                     }
 
-
-        for iter in range(0, int(settings["NUM_ITER"])):
+        for iter in range(int(settings["NUM_ITER"])):
             print("Plotting training graphs, iteration " + str(iter))
             plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter, int(settings["TRAINING_SET"]))
             print("Plotting testing ASP graphs, iteration " + str(iter))
@@ -320,7 +397,7 @@ def main():
             plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
         
-        for robot in range(0, int(settings["VALIDATION_SET"])):
+        for robot in range(int(settings["VALIDATION_SET"])):
             plotSingle(validationInFile, validationOutPath, gtFile, 'Final Outputs', str(int(settings["NUM_ITER"]) - 1), robot)
             
     except Exception as e:

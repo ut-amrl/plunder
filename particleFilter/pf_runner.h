@@ -13,6 +13,7 @@ using namespace SETTINGS;
 HA sampleInitialHA(){
     // Uniformly Randomly Distributed
     // return rand() % numHA;
+    
     // Use default label
     return 0;
 }

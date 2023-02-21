@@ -33,14 +33,6 @@ def obs_likelihood(ha, data, data_prev):
 
     return obs_log
 
-if not settings.pred_var1 == None:
-    scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
-    scaler1.fit(np.transpose([[0, 1]]))
-
-if not settings.pred_var2 == None:
-    scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
-    scaler2.fit(np.transpose([[0, 1]]))
-
 def gen_traj(y_pred, y_true):
     la1, la2 = None, None
 
@@ -55,29 +47,41 @@ def gen_traj(y_pred, y_true):
     
     return (la1, la2)
 
-def log_obs(expected, actual, var1):
+def log_obs(expected, actual, var1, scaler):
     obs_log = 0
+    mean = scaler.transform([[expected]])[0][0]
+    test = scaler.transform([[actual]])[0][0]
+
     if var1:
-        mean = scaler1.transform([[expected]])[0][0]
-        test = scaler1.transform([[actual]])[0][0]
         obs_log += norm(mean, settings.pv1_stddev).logpdf(test)
     else:
-        mean = scaler2.transform([[expected]])[0][0]
-        test = scaler2.transform([[actual]])[0][0]
         obs_log += norm(mean, settings.pv2_stddev).logpdf(test)
-
+    
     return obs_log
 
 def cum_log_obs(expected1, expected2, actual):
+    if not settings.pred_var1 == None:
+        actual1 = actual[:, 0]
+    if not settings.pred_var2 == None:
+        actual2 = actual[:, settings.numHA+1]
+
+    if not settings.pred_var1 == None:
+        scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
+        scaler1.fit(np.transpose([[0, 1]]))
+
+    if not settings.pred_var2 == None:
+        scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
+        scaler2.fit(np.transpose([[0, 1]]))
+    
     error = 0
     for i in range(len(actual)):
         # Output 1
         if not settings.pred_var1 == None:
-            error += log_obs(expected1[i], actual[i][0], True)  
+            error += log_obs(expected1[i], actual1[i], True, scaler1)  
 
         # Output 2
         if not settings.pred_var2 == None:
-            error += log_obs(expected2[i], actual[i][settings.numHA+1], False)
+            error += log_obs(expected2[i], actual2[i], False, scaler2)
         
     return error / len(actual)
     

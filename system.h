@@ -169,5 +169,6 @@ double obs_likelihood_given_model(State state, Obs nextLA, double temp=TEMPERATU
     for(string each: LA_vars) {
         obs_log += logpdf(nextLA.get(each), mean.get(each), temp * la_error[each].stddev());
     }
+    
     return obs_log;
 }

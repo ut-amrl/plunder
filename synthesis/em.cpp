@@ -112,7 +112,12 @@ void print_metrics(double cum_log_obs, double pct_accuracy, DATATYPE data) {
 
 double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_correct, double& ha_total) {
     ofstream outFile;
-    outFile.open(output_path);
+    outFile.open(output_path + ".csv");
+
+    map<string, shared_ptr<ofstream>> la_files;
+    for(string each: LA_vars) {
+        la_files[each] = make_shared<ofstream>(output_path + "-" + each + ".csv");
+    }
 
     Trajectory gt = traj;
     double log_obs_cum = 0;
@@ -127,10 +132,25 @@ double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_corre
             if(traj.get(t+1).ha == gt.get(t+1).ha){
                 ha_correct++;
             }
+
+            Obs la = motorModel(traj.get(t), false);
+            for(string each: LA_vars) {
+                (*la_files[each]) << la.get(each) << ",";
+            }
         }
+
+        Obs la = motorModel(traj.get(traj.size()-1), false);
+        for(string each: LA_vars) {
+            (*la_files[each]) << la.get(each) << endl;
+        }
+
         outFile << traj.to_string();
     }
+    
     outFile.close();
+    for(string each: LA_vars) {
+        la_files[each]->close();
+    }
 
     use_error = true;
     return log_obs_cum;
@@ -182,14 +202,14 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
-        string plot = TESTING_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
+        string plot = TESTING_TRAJ+to_string(iteration)+"-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
     print_metrics(cum_log_obs, ha_correct / ha_total * 100, TESTING);
 
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
-        string plot = VALIDATION_TRAJ+to_string(iteration)+"-"+to_string(i)+".csv";
+        string plot = VALIDATION_TRAJ+to_string(iteration)+"-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
     print_metrics(cum_log_obs, ha_correct / ha_total * 100, VALIDATION);
@@ -355,14 +375,14 @@ void read_demonstration(vector<Trajectory>& state_traj){
     
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
-        string plot = TESTING_TRAJ+"gt-"+to_string(i)+".csv";
+        string plot = TESTING_TRAJ+"gt-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
     }
     print_metrics(cum_log_obs, ha_correct / ha_total * 100, TESTING);
 
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
-        string plot = VALIDATION_TRAJ+"gt-"+to_string(i)+".csv";
+        string plot = VALIDATION_TRAJ+"gt-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
     }
     print_metrics(cum_log_obs, ha_correct / ha_total * 100, VALIDATION);
