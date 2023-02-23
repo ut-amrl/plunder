@@ -111,6 +111,37 @@ def prob_asp(ego, closest):
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
 
+    # Synthesized ASP
+    x, l_x, f_x, r_x = ego[1], closest[0][1], closest[1][1], closest[2][1]
+    if ha == env.action_type.actions_indexes["FASTER"]:
+        if sample(logistic(2.95, -1.67, r_x - l_x)) and sample(logistic(-4.92, -6.53, f_x - l_x)) and sample(logistic(-30.62, 1.78, x - f_x)):
+            return env.action_type.actions_indexes["LANE_LEFT"]
+        if sample(logistic(2.65, 5.98, r_x - f_x)) and sample(logistic(30.97, -1.43, f_x - x)):
+            return env.action_type.actions_indexes["LANE_RIGHT"]
+        if sample(logistic(29.04, -1.16, f_x - x)):
+            return env.action_type.actions_indexes["SLOWER"]
+    elif ha == env.action_type.actions_indexes["LANE_LEFT"]:
+        if sample(logistic(30.79, 8.5, f_x - x)):
+            return env.action_type.actions_indexes["FASTER"]
+        if False:
+            return env.action_type.actions_indexes["LANE_RIGHT"]
+        if sample(logistic(-31.16, 2.09, x - l_x)):
+            return env.action_type.actions_indexes["SLOWER"]
+    elif ha == env.action_type.actions_indexes["LANE_RIGHT"]:
+        if sample(logistic(52.85, 1.38, closest[0][3] + closest[0][3])) or sample(logistic(-30.75, -6.5, x - f_x)):
+            return env.action_type.actions_indexes["FASTER"]
+        if sample(logistic(-4.98, -0.97, r_x - l_x)):
+            return env.action_type.actions_indexes["LANE_LEFT"]
+        if sample(logistic(-30.8, 11.13, x - r_x)):
+            return env.action_type.actions_indexes["SLOWER"]
+    elif ha == env.action_type.actions_indexes["SLOWER"]:
+        if sample(logistic(-312.88, -0.006, r_x)):
+            return env.action_type.actions_indexes["FASTER"]
+        if sample(logistic(-42.61, -1.26, r_x - l_x)):
+            return env.action_type.actions_indexes["LANE_LEFT"]
+        if sample(logistic(1575.17, 0.03, r_x)) or sample(logistic(29.62, 10.37, r_x - x)):
+            return env.action_type.actions_indexes["LANE_RIGHT"]
+
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_lane, target_speed)
 KP_H = 0.5 # Turning rate

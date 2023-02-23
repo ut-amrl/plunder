@@ -28,32 +28,11 @@
         "outputDim": [1, -1, 0]
     },
     {
-        "op": "Plus",
+        "op": "DividedBy",
         "inputType": ["NUM", "NUM"],
-        "inputDim": [[0, 0, 1], [0, 0, 1]],
+        "inputDim": [[1, 0, 0], [1, -1, 0]],
         "outputType": "NUM",
-        "outputDim": [0, 0, 1]
-    },
-    {
-        "op": "Minus",
-        "inputType": ["NUM", "NUM"],
-        "inputDim": [[0, 0, 1], [0, 0, 1]],
-        "outputType": "NUM",
-        "outputDim": [0, 0, 1]
-    },
-    {
-        "op": "Abs",
-        "inputType": ["NUM"],
-        "inputDim": [[1, 0, 0]],
-        "outputType": "NUM",
-        "outputDim": [1, 0, 0]
-    },
-    {
-        "op": "Abs",
-        "inputType": ["NUM"],
-        "inputDim": [[1, -1, 0]],
-        "outputType": "NUM",
-        "outputDim": [1, -1, 0]
+        "outputDim": [0, 1, 0]
     }
 ]
   

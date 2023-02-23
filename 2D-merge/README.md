@@ -1,5 +1,5 @@
 # 2D Merge
-This module is the setup for a vehicle dealing with lane-merges. The goal is to make room for a vehicle merging onto the highway without crashing into other vehicles.
+This module is the setup for a vehicle dealing with lane-merges. The goal is to quickly move from the leftmost lane to the rightmost lane without crashing into other vehicles.
 
 ## File Organization
 - **domain.h** - defines the problem domain, including the spaces $H$, $L$, and $O$

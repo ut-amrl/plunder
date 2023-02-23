@@ -38,17 +38,17 @@ lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.01
-acc_err = 1
+steer_err = 0.005
+acc_err = 0.1
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=24
-env.config['policy_frequency']=12 # Runs once every 2 simulation steps
+env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
 env.config['initial_lane_id'] = 0
-env.configure({
-    "manual_control": True
-})
+# env.configure({
+    # "manual_control": True
+# })
 
 # Observations
 # ego vehicle:      presence, x, y, vx, vy, heading
@@ -125,18 +125,27 @@ def closestVehicles(obs, lane_class):
     return (closestLeft, closestFront, closestRight)
 
 # ASP (probabilistic)
-def prob_asp(ego, closest):
-    front_clear = sample(logistic(30, 1, closest[1][1] - ego[1]))
-    left_clear = sample(logistic(30, 1, closest[0][1] - ego[1]))
-    right_clear = sample(logistic(30, 1, closest[2][1] - ego[1]))
-    left_better = sample(logistic(0, 1, closest[0][1] - closest[2][1]))
+def prob_asp(ego, closest, ha):
+    x, l_x, f_x, r_x = ego[1], closest[0][1], closest[1][1], closest[2][1]
+    vx = ego[3]
 
-    if front_clear: # No car in front: accelerate
-        return env.action_type.actions_indexes["FASTER"]
-    if left_clear and left_better: # No car on the left: merge left
-        return env.action_type.actions_indexes["LANE_LEFT"]
+    front_clear = sample(logistic(1, 40, (f_x - x) / vx))
+
+    if ha == env.action_type.actions_indexes["LANE_RIGHT"]:
+        right_clear = sample(logistic(0.5, 40, (r_x - x) / vx)) # time to collision
+        if right_clear: # No car on the right: merge right
+            return env.action_type.actions_indexes["LANE_RIGHT"]
+        if front_clear: 
+            return env.action_type.actions_indexes["FASTER"]
+
+        # Nowhere to go: decelerate
+        return env.action_type.actions_indexes["SLOWER"]
+
+    right_clear = sample(logistic(1, 40, (r_x - x) / vx)) # time to collision
     if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]
+    if front_clear: 
+        return env.action_type.actions_indexes["FASTER"]
 
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
@@ -145,17 +154,20 @@ def prob_asp(ego, closest):
 # in this version, no extra latent state is stored (target_lane, target_speed)
 TURN_HEADING = 0.15 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-
-min_velocity = 16 # Minimum velocity
-max_velocity = 30 # Maximum velocity
+max_velocity = 45 # Maximum velocity
 
 last_action = "FASTER"
 last_target = 0
 last_la = {"steering": 0, "acceleration": 0 }
-def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
-    global last_action, last_target, last_la
 
-    acc = 0.0
+def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
+    global last_action, last_la, last_target
+
+    if step:
+        Vehicle.act(self, last_la)
+        return last_la
+
+    target_acc = 0.0
     target_heading = 0.0
 
     if action == None:
@@ -165,8 +177,7 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
 
     if action == "FASTER":
         # Attain max speed
-        speed_diff = max_velocity - self.speed
-        acc = min(speed_diff, last_la["acceleration"] + 0.5)
+        target_acc = max_velocity - self.speed
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
@@ -179,49 +190,55 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
             front_speed = closest[1][3]
 
         last_target = front_speed
-        speed_diff = (last_target - self.speed)
-        acc = max(speed_diff, last_la["acceleration"] - 0.5)
+        target_acc = (last_target - self.speed)
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
         target_heading = np.arctan((target_y - self.position[1]) / TURN_TARGET)
     elif action == "LANE_RIGHT":
+        target_acc = -0.5
+
         # Attain rightmost heading
         target_heading = TURN_HEADING
     elif action == "LANE_LEFT":
+        target_acc = -0.5
+
         # Attain leftmost heading
         target_heading = -TURN_HEADING
 
     target_steer = target_heading - self.heading
 
-    if target_steer > 0:
-        target_steer = min(target_steer, last_la["steering"] + 0.02)
+    if target_steer > last_la["steering"]:
+        target_steer = min(target_steer, last_la["steering"] + 0.08)
     else:
-        target_steer = max(target_steer, last_la["steering"] - 0.02)
+        target_steer = max(target_steer, last_la["steering"] - 0.08)
 
-    la = {"steering": target_steer, "acceleration": acc }
+    if target_acc > last_la["acceleration"]:
+        target_acc = min(target_acc, last_la["acceleration"] + 4)
+    else:
+        target_acc = max(target_acc, last_la["acceleration"] - 6)
+
+    la = {"steering": target_steer, "acceleration": target_acc }
 
     # Add error
     la['steering'] = np.random.normal(la['steering'], steer_err)
     la['acceleration'] = np.random.normal(la['acceleration'], acc_err)
 
-    if step: # Perform action
-        Vehicle.act(self, la)
-        last_la = la
+    last_la = la
     
-    return last_la
+    return la
 
 ControlledVehicle.act = run_la
 
 ######## Simulation ########
 def runSim(iter):
     env.reset()
-    graphics.LAST_HA = "LANE_RIGHT"
+    graphics.LAST_HA = "FASTER"
     ha = env.action_type.actions_indexes[graphics.LAST_HA]
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, vx, vy, heading, l_x, l_y, l_vx, l_vy, l_heading, f_x, f_y, f_vx, f_vy, f_heading, r_x, r_y, r_vx, r_vy, r_heading, LA.steer, LA.acc, HA\n")
 
-    for _ in range(100):
+    for _ in range(75):
 
         obs, reward, done, truncated, info = env.step(ha)
         env.render()
@@ -231,8 +248,8 @@ def runSim(iter):
         closest = closestVehicles(obs, lane_class)
 
         # # Run ASP
-        ha = env.action_type.actions_indexes[graphics.LAST_HA]
-        # ha = prob_asp(obs[0], closest)
+        # ha = env.action_type.actions_indexes[graphics.LAST_HA]
+        ha = prob_asp(obs[0], closest, ha)
 
         # Run motor model
         la = run_la(env.vehicle, ACTIONS_ALL[ha], False, closest)
