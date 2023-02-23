@@ -2,9 +2,7 @@ import gym
 from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle
 from highway_env.envs.common.observation import KinematicObservation
 from matplotlib import pyplot as plt
-import os
 import numpy as np
-import math
 import random
 from typing import List, Tuple, Union, Optional
 
@@ -12,11 +10,10 @@ from typing import List, Tuple, Union, Optional
 lane_diff = 4 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
-use_absolute_obs = True
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.02
-acc_err = 2
+steer_err = 0.01
+acc_err = 1
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=16
@@ -30,7 +27,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 10,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': use_absolute_obs
+    'absolute': True
 }
 
 ACTIONS_ALL = { # A mapping of action indexes to labels
@@ -72,7 +69,7 @@ def classifyLane(obs):
 # Find closest vehicles in lanes next to the ego vehicle
 # Assumption: vehicles are already sorted based on x distance (ignores vehicles behind the ego vehicle)
 def closestInLane(obs, lane, lane_class, ego):
-    for i in range(0, len(obs)):
+    for i in range(len(obs)):
         if obs[i][0] == 0: # not present
             continue
         if lane_class[i] == lane: # in desired lane
@@ -99,10 +96,10 @@ def closestVehicles(obs, lane_class):
 
 # ASP (probabilistic)
 def prob_asp(ego, closest):
-    front_clear = sample(logistic(30, 0.5, closest[1][1] - ego[1]))
-    left_clear = sample(logistic(30, 0.5, closest[0][1] - ego[1]))
-    right_clear = sample(logistic(30, 0.5, closest[2][1] - ego[1]))
-    left_better = sample(logistic(0, 0.5, closest[0][1] - closest[2][1]))
+    front_clear = sample(logistic(30, 1, closest[1][1] - ego[1]))
+    left_clear = sample(logistic(30, 1, closest[0][1] - ego[1]))
+    right_clear = sample(logistic(30, 1, closest[2][1] - ego[1]))
+    left_better = sample(logistic(0, 1, closest[0][1] - closest[2][1]))
 
     if front_clear: # No car in front: accelerate
         return env.action_type.actions_indexes["FASTER"]
@@ -187,7 +184,7 @@ def runSim(iter):
     for _ in range(100):
 
         obs, reward, done, truncated, info = env.step(ha)
-        env.render()
+        # env.render()
 
         # Pre-process observations
         lane_class = classifyLane(obs)
@@ -225,7 +222,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 50,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': use_absolute_obs
+    'absolute': True
 }
 runSim(iter)
 iter += 1
@@ -237,7 +234,7 @@ env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 50,
     'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': use_absolute_obs
+    'absolute': True
 }
 runSim(iter)
 iter += 1

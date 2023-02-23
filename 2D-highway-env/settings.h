@@ -37,7 +37,7 @@ namespace SETTINGS {
 
     // Plot parameters
     const bool GT_PRESENT = true;
-    const int PLOT_TIME = 200;                                          // Maximum time step plotted
+    const int PLOT_TIME = 100;                                          // Maximum time step plotted
 
     // Optimization parameters
     const int OPT_METHOD = 1;               // Optimization method:
@@ -55,7 +55,7 @@ namespace SETTINGS {
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.04;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.03;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
     const double ALPHA_LOSS_UPPER = 0.01;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over

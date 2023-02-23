@@ -8,8 +8,8 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.02) },
-    { "acc", normal_distribution<double>(0.0, 2) }
+    { "steer", normal_distribution<double>(0.0, 0.01) },
+    { "acc", normal_distribution<double>(0.0, 1) }
 };
 
 double KP_H = 0.5;
@@ -63,10 +63,10 @@ Obs motorModel(State state, bool error){
 HA ASP_model(State state){
     HA ha;
 
-    bool front_clear = flip(logistic(30, 0.5, state.get("f_x") - state.get("x")));
-    bool left_clear = flip(logistic(30, 0.5, state.get("l_x") - state.get("x")));
-    bool right_clear = flip(logistic(30, 0.5, state.get("r_x") - state.get("x")));
-    bool left_better = flip(logistic(0, 0.5, state.get("l_x") - state.get("r_x")));
+    bool front_clear = flip(logistic(30, 1, state.get("f_x") - state.get("x")));
+    bool left_clear = flip(logistic(30, 1, state.get("l_x") - state.get("x")));
+    bool right_clear = flip(logistic(30, 1, state.get("r_x") - state.get("x")));
+    bool left_better = flip(logistic(0, 1, state.get("l_x") - state.get("r_x")));
 
     if(front_clear) ha=FASTER; // No car in front: accelerate
     else if(left_clear && left_better) ha=LANE_LEFT; // Merge left
