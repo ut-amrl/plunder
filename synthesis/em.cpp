@@ -110,7 +110,7 @@ void print_metrics(double cum_log_obs, double pct_accuracy, DATATYPE data) {
     }
 }
 
-double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_correct, double& ha_total) {
+double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_correct, double& ha_total) {    
     ofstream outFile;
     outFile.open(output_path + ".csv");
 
@@ -133,7 +133,12 @@ double save_pure(Trajectory traj, asp* asp, string output_path, double& ha_corre
                 ha_correct++;
             }
 
-            Obs la = motorModel(traj.get(t), false);
+            State last = (t == 0) ? State () : traj.get(t-1);
+            State cur = traj.get(t);
+            for(string each: LA_vars) {
+                cur.put(each, last.get(each));
+            }
+            Obs la = motorModel(cur, false);
             for(string each: LA_vars) {
                 (*la_files[each]) << la.get(each) << ",";
             }
