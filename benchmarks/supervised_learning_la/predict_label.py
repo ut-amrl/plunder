@@ -1,41 +1,31 @@
 # https://machinelearningmastery.com/multivariate-time-series-forecasting-lstms-keras/
+# Credit to Justina Lam for providing a baseline for a good chunk of this code
 import numpy as np
 import pandas as pd
-# Requires all tensorflow dependencies
-try:
-    from tensorflow import keras
-    # import tensorflow.keras as keras
-except:
-    print("Error: Tensorflow import failed")
-    exit(0)
-
-# import datetime
-from datetime import *
-import math
-from math import sqrt
-from numpy import concatenate
-from matplotlib import pyplot
-from pandas import read_csv
-from pandas import DataFrame
-from pandas import concat
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import mean_squared_error
+import tensorflow
+from tensorflow import keras
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-
+from keras.layers import Dense, LSTM
+from keras.callbacks import EarlyStopping
+import math
+from matplotlib import pyplot
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+from pandas import DataFrame
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+from scipy.stats import norm
+
 import settings
+import plotter
+import util
 
 column_names = []
 
 # Convert series to supervised learning
 def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
-    n_vars = 1 if type(data) is list else data.shape[1]
     df = DataFrame(data)
     cols, names = list(), list()
+
     # Input sequence
     for i in range(n_in, 0, -1):
         cols.append(df.shift(i))
@@ -48,31 +38,24 @@ def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
             names += [(label + '(t)') for label in data.columns]
         else:
             names += [(label + '(t+%d)' % i) for label in data.columns]
+    
     # Combine
-    agg = concat(cols, axis=1)
+    agg = pd.concat(cols, axis=1)
     agg.columns = names
     # Drop rows with NaN values
     if dropnan:
         agg.dropna(inplace=True)
     
-    global column_names 
+    global column_names
     column_names = names
 
     return agg
 
-fig_test = Figure()
-fig_valid = Figure()
-
-figs = []  # fig_test, fig_valid
-results = []  # datetime, yhat_valid, y_validation
-toReturn = []
-
 def loadDataFrame():
-
+    pd.set_option('display.max_columns', None)
     dataset_validation = DataFrame()
 
     training_size = 0
-
     for iter in range(settings.validation_set):
         f = open(settings.folder + "data" + str(iter) + ".csv")
         Lines = f.readlines()
@@ -92,16 +75,33 @@ def loadDataFrame():
         # print("Original dataset:")
         # print(dataset)
 
+        # Compute outputs from discrete motor controllers
+        motor1 = np.empty((settings.numHA, len(dataset.index)))
+        motor2 = np.empty((settings.numHA, len(dataset.index)))
+        for ha in range(settings.numHA):
+            for i in range(1, len(dataset.index)):
+                motor1[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[0]
+                motor2[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[1]
+
+        # Drop irrelevant variables
         for column in dataset:
             if settings.vars_used.count(column) == 0:
                 dataset.drop(column, axis=1, inplace=True)
             else:
                 dataset[column] = pd.to_numeric(dataset[column])
         
+        # Append motor controller outputs
+        if not settings.pred_var1 == None:
+            for ha in range(settings.numHA):
+                dataset["controller-" + settings.pred_var1 + "-" + str(ha)] = motor1[ha]
+        if not settings.pred_var2 == None:
+            for ha in range(settings.numHA):
+                dataset["controller-" + settings.pred_var2 + "-" + str(ha)] = motor2[ha]
+
+        # Move predicted variables to the end for readability
         if not settings.pred_var1 == None:
             column_to_move = dataset.pop(settings.pred_var1)
             dataset.insert(len(dataset.columns), settings.pred_var1, column_to_move)
-        
         if not settings.pred_var2 == None:
             column_to_move = dataset.pop(settings.pred_var2)
             dataset.insert(len(dataset.columns), settings.pred_var2, column_to_move)
@@ -110,194 +110,152 @@ def loadDataFrame():
         # print(dataset)
 
         # Convert from series to supervised learning problem
-        dataset = series_to_supervised(dataset, 4, 1)
+        dataset = dataset.tail(-1) # Drop first row where motor model is undefined
+        dataset = series_to_supervised(dataset, 1, 1)
 
         dataset_validation = pd.concat([dataset_validation, dataset], ignore_index=True)
         if iter < settings.training_set:
             training_size = len(dataset_validation.index)
+
+        # print("Relevant Variables:")
+        # print(dataset)
     
-    # print("Relevant data:")
-    # print(dataset_validation)
+    print("Relevant data:")
+    print(dataset_validation)
 
     # Normalize features
-    values_validation = dataset_validation.values.astype('float32')
     scaler_validation = MinMaxScaler(feature_range=(0, 1))
-    validation_df = DataFrame(scaler_validation.fit_transform(values_validation))
-    validation_df.columns = column_names
-
-    training_df = validation_df.loc[0:training_size-1]
-    
+    for col in dataset_validation.columns:
+        # Normalize columns with the same metric using the same scaler
+        if not settings.pred_var1 == None and (col.startswith("controller-" + settings.pred_var1 + "-") or col.startswith(settings.pred_var1)):
+            scaler_validation.fit(np.transpose([settings.pv1_range]))
+        elif not settings.pred_var2 == None and (col.startswith("controller-" + settings.pred_var2 + "-") or col.startswith(settings.pred_var2)):
+            scaler_validation.fit(np.transpose([settings.pv2_range]))
+        else: # Perform regular fit_transform
+            scaler_validation.fit(np.transpose([dataset_validation[col]]))
+        
+        if not col.startswith("HA"):
+            dataset_validation[col] = np.transpose(scaler_validation.transform(np.transpose([dataset_validation[col]])))[0]
+        
     print("\n\nRelevant data: Scaled and reframed as a supervised learning problem\n\n")
-    print("Validation set:")
-    print(validation_df)
-    print("Training set:")
-    print(training_df)
+    print(dataset_validation)
 
-    # Split into training and validation sets
-    makePredictions(training_df, validation_df)
+    # Pass in all data, to be split into validation & training sets
+    makePredictions(dataset_validation, training_size)
 
 
-# TODO
-def makePredictions(df_train, df_validation):
-    scaler = MinMaxScaler(feature_range=(0, 1))
 
-    min_la1 = df_validation[settings.pred_var1+'(t)'].min()
-    mean_la1 = df_validation[settings.pred_var1+'(t)'].mean()
-    max_la1 = df_validation[settings.pred_var1+'(t)'].max()
 
-    df_la1_levels = pd.DataFrame(
-        {settings.pred_var1: [min_la1, mean_la1, max_la1]})
+def makePredictions(full_set, training_size):
+    df_validation = full_set.loc[:, ~full_set.columns.str.startswith('HA')]
 
-    la1_scaled = scaler.fit_transform(df_la1_levels.values)
-    la1_scaled = la1_scaled[1][0]
+    assert df_validation.to_numpy().max() <= 1.1 and df_validation.to_numpy().min() >= -0.1
 
-    la1_levels_scaled = [(1.5 * la1_scaled), (la1_scaled), (
-        0.5 * la1_scaled), (0.25 * la1_scaled)]
-    la1_colors = ['r', 'tab:orange', 'y', 'g']
-    la1_labels = ['150% Mean', 'Mean LA 1', '50% Mean', '25% Mean']
+    # Split into X (inputs) and Y (outputs)
+    validation_X = DataFrame()
+    validation_Y = DataFrame()
 
-    # Split into train and test sets
-    values = df_train.values
-    n_train_hours = math.floor(len(df_train.index) * 0.1)
-    train = values[n_train_hours:]
-    test = values[:n_train_hours]
+    # Outputs: predicted variables
+    if not settings.pred_var1 == None:
+        validation_Y[settings.pred_var1 + "(t)"] = df_validation[settings.pred_var1 + "(t)"]
+    if not settings.pred_var2 == None:
+        validation_Y[settings.pred_var2 + "(t)"] = df_validation[settings.pred_var2 + "(t)"]
+        
+    # Inputs: everything else
+    for col in df_validation:
+        if not col in validation_Y.columns:
+            validation_X[col] = df_validation[col]
 
-    # print(df_train)
+    print(validation_X)
+    print(validation_Y)
+    
+    # Take subset to use for training data
+    df_train_X = validation_X.loc[0:training_size-1]
+    df_train_Y = validation_Y.loc[0:training_size-1]
+
+    # Split training set further into train and test sets and isolate values
+    n_train_hours = math.floor(len(df_train_X.index) * 0.3)
+    df_train_X, df_train_Y = df_train_X.values, df_train_Y.values
+    train_X, train_Y = df_train_X[n_train_hours:], df_train_Y[n_train_hours:]
+    test_X, test_Y = df_train_X[:n_train_hours], df_train_Y[:n_train_hours]
+
+    X_validation = validation_X.values
+    Y_validation = validation_Y.values
+
     print("Training set size")
-    print(len(train))
-    # print(train)
+    print(len(train_X))
+    # print(train_X)
+    # print(train_Y)
     print("Test set size")
-    print(len(test))
-    # print(test)
+    print(len(test_X))
+    # print(test_X)
+    # print(test_Y)
     print("Validation set size")
-    print(len(df_validation.index))
-    # print(df_validation)
-
-    # Split into input and outputs
-    train_X, train_y = train[:, :-1], train[:, -1]
-    test_X, test_y = test[:, :-1], test[:, -1]
+    print(len(X_validation))
+    # print(X_validation)
+    # print(Y_validation)
 
     # Reshape input to be 3D [samples, timesteps, features]
+    df_train_X = df_train_X.reshape((df_train_X.shape[0], 1, df_train_X.shape[1]))
     train_X = train_X.reshape((train_X.shape[0], 1, train_X.shape[1]))
     test_X = test_X.reshape((test_X.shape[0], 1, test_X.shape[1]))
-
-    # Repeat for validation data
-    valid_vals = df_validation.values
-    X_validation, y_validation = valid_vals[:, :-1], valid_vals[:, -1]
     X_validation = X_validation.reshape((X_validation.shape[0], 1, X_validation.shape[1]))
 
+    # Early stopping
+    es = EarlyStopping(monitor='val_loss', verbose=1, patience=settings.patience)
+
+    numVar = 0
+    if not settings.pred_var1 == None:
+        numVar += 1
+    if not settings.pred_var2 == None:
+        numVar += 1 
+    
     # Design network
     model = Sequential()
     model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2])))
     model.add(Dense(64, activation=keras.activations.sigmoid))
-    model.add(Dense(16, activation=keras.activations.sigmoid))
-    model.add(Dense(1, activation=keras.activations.sigmoid))
-    model.compile(loss='mae', optimizer='rmsprop', metrics=['mse', 'mae'])
-
+    model.add(Dense(64, activation=keras.activations.sigmoid))
+    model.add(Dense(numVar, activation=keras.activations.sigmoid))
+    model.compile(loss="mae", optimizer='adam')
     print(model.summary())
+
     # Fit network
-    history = model.fit(train_X, train_y, epochs=600, batch_size=100, validation_data=(test_X, test_y), verbose=2, shuffle=False)  # validation_split= 0.2)
+    history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
 
     # Plot history
     pyplot.plot(history.history['loss'], label='train_loss')
     pyplot.plot(history.history['val_loss'], label='validation_loss')
     pyplot.legend()
-    # pyplot.savefig("loss.jpg")
-    pyplot.show()
+    pyplot.savefig("plots/loss.png")
+    pyplot.clf()
+    pyplot.close('all')
 
     # Make a prediction and plot results
-    yhat_test = model.predict(test_X)
-    # print("TEST_X")
-    # print(test_X.shape)
-    # print("YHAT_TEST")
-    # print(yhat_test)
-
-    pyplot.plot(test_y, label='test_y')
-    pyplot.plot(yhat_test, label='yhat_test')
-    for laInd in range(len(la1_levels_scaled)):
-        pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd],
-                       linestyle='-', label=la1_labels[laInd])
-    pyplot.legend()
-    # pyplot.savefig("test.png")
-    pyplot.show()
-
-    # Plot and evaluate prediction results
-    axis_test = fig_test.add_subplot(1, 1, 1)
-    axis_test.plot(test_y, label='Actual', linewidth=2)
-    axis_test.plot(yhat_test, label='Predicted', linewidth=2.5, alpha=0.6, color='tab:pink')
-    for laInd in range(len(la1_levels_scaled)):
-        axis_test.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd])
-
+    yhat_test = model.predict(df_train_X)
     yhat_valid = model.predict(X_validation)
 
-    pyplot.plot(y_validation, label='y_validation')
-    pyplot.plot(yhat_valid, label='yhat_valid')
-    for laInd in range(len(la1_levels_scaled)):
-        pyplot.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd])
-    pyplot.legend()
-    pyplot.savefig("validation.png")
-    pyplot.show()
+    #### Generate expected trajectories using softmax weights ####
+    test_la1, test_la2 = [], []
+    valid_la1, valid_la2 = [], []
 
-    axis_valid = fig_valid.add_subplot(1, 1, 1)
-    axis_valid.plot(y_validation, label='Actual', linewidth=2)
-    axis_valid.plot(yhat_valid, label='Predicted',
-                    linewidth=3, alpha=0.7, color='tab:pink')
-    for laInd in range(len(la1_levels_scaled)):
-        axis_valid.axhline(y=la1_levels_scaled[laInd], color=la1_colors[laInd], linestyle='-', label=la1_labels[laInd], linewidth=1)
+    if not settings.pred_var1 == None:
+        test_la1, valid_la1 = yhat_test[:, 0], yhat_valid[:, 0]
+    if not settings.pred_var2 == None:
+        test_la2, valid_la2 = yhat_test[:, 1], yhat_valid[:, 1]
 
-    # df_validation = df_validation[~df_validation.isin(
-    #     [np.nan, np.inf, -np.inf]).any(1)]
+    #### METRICS: WEIGHTED BY SOFTMAX ####
+    print("######## Metrics: Weighted by softmax ########")
 
-    global figs
-    global results
-    global toReturn
+    # Metrics for testing set
+    log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y)
+    print("Testing set cumulative log obs: " + str(log_obs))
 
-    figs.append(fig_test)
-    figs.append(fig_valid)
+    # Metrics for validation set
+    log_obs = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
+    print("Validation set cumulative log obs: " + str(log_obs))
 
-    try:
-        i = 0
-        dates = []
-        resultsYhat = []
-        resultsYvalid = []
+    print("", flush=True)
+    plotter.plotLA(valid_la1, valid_la2, Y_validation)
 
-        while (i < len(yhat_valid)-4):
-            max_yhat_valid = max(max(yhat_valid[i][0], yhat_valid[i+1][0]), max(yhat_valid[i+2][0], yhat_valid[i+3][0]))
-            max_y_validation = max(max(y_validation[i], y_validation[i+1]), max(y_validation[i+2], y_validation[i+3]))
-
-            dates.append(
-                df_validation.iloc[i, df_validation.columns.get_loc('DateTime')])
-            resultsYhat.append(max_yhat_valid / la1_levels_scaled[0])
-            resultsYvalid.append(max_y_validation / la1_levels_scaled[0])
-
-            i += 4
-        results.append(dates)
-        results.append(resultsYhat)
-        results.append(resultsYvalid)
-
-        toReturn.append(figs)
-        toReturn.append(results)
-
-    except:
-        print("ERROR OCCURRED IN PROCESSING OF VALIDATION RESULTS")
-
-    X_validation = X_validation.reshape((X_validation.shape[0], X_validation.shape[2]))
-
-    # Invert scaling for forecast
-    inv_yhat = concatenate((yhat_valid, X_validation[:, 1:]), axis=1)
-
-    scaler = MinMaxScaler(feature_range=(0, 1)).fit(inv_yhat)
-
-    inv_yhat = scaler.inverse_transform(inv_yhat)
-    inv_yhat = inv_yhat[:, 0]
-
-    # Invert scaling for actual
-    y_validation = y_validation.reshape((len(y_validation), 1))
-    inv_y = concatenate((y_validation, X_validation[:, 1:]), axis=1)
-
-    inv_y = scaler.inverse_transform(inv_y)
-    inv_y = inv_y[:, 0]
-
-    # Calculate RMSE
-    rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
-    print('Test RMSE: %.3f' % rmse)
+# Run neural network
+loadDataFrame()

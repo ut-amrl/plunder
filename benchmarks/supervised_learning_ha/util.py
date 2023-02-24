@@ -82,6 +82,6 @@ def cum_log_obs(expected1, expected2, actual):
         # Output 2
         if not settings.pred_var2 == None:
             error += log_obs(expected2[i], actual2[i], False, scaler2)
-        
+    
     return error / len(actual)
     

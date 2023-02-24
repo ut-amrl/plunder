@@ -288,13 +288,13 @@ def makePredictions(full_set, training_size):
     # Metrics for testing set
     pct_accuracy = util.percent_accuracy(yhat_test, full_set)
     print("Testing set percent accuracy: " + str(pct_accuracy) + "%")
-    log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y) * settings.training_set * settings.samples * settings.sim_time
+    log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y)
     print("Testing set cumulative log obs: " + str(log_obs))
 
     # Metrics for validation set
     pct_accuracy = util.percent_accuracy(yhat_valid, full_set)
     print("Validation set percent accuracy: " + str(pct_accuracy) + "%")
-    log_obs = util.cum_log_obs(valid_la1, valid_la2, Y_validation) * settings.validation_set * settings.samples * settings.sim_time
+    log_obs = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
     print("Validation set cumulative log obs: " + str(log_obs))
 
 
