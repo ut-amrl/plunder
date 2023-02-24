@@ -41,53 +41,84 @@ import numpy as np
 #     else:
 #         return (max(data_prev["LA.acc"] - 1, data["decMax"]), None)
 
-# Setting: 2D-merge
+# # Setting: 2D-highway-env
 # training_set = 10
-# validation_set = 20 # including training_set
-# train_time = 3000
-# folder = "merge-sim/"
+# validation_set = 30 # including training_set
+# train_time = 15000
+# patience = 5000
+# sim_time = 100
+# samples = 50
+# # folder = "highway-easy/"
+# folder = "highway-medium/"
+# # folder = "highway-hard/"
 # vars_used = [
+#     "HA",
+#     "x",
 #     "y",
+#     "l_x",
 #     "f_x",
 #     "r_x",
-#     "l_x",
-#     "LA.steer"
+#     "v_x",
+#     "l_vx",
+#     "f_vx",
+#     "r_vx",
+#     "LA.steer",
+#     "LA.acc"
 # ]
 # pred_var1 = "LA.steer"
-# pv1_range = [-0.1, 0.1]
-# pred_var2 = None
-# pv2_range = None
+# pv1_range = [-0.3, 0.3]
+# # pv1_stddev = 0.001
+# pv1_stddev = 0.01
+# # pv1_stddev = 0.02
+# pred_var2 = "LA.acc"
+# pv2_range = [-20, 20]
+# # pv2_stddev = 0.1
+# pv2_stddev = 1
+# # pv2_stddev = 2
 
-# numHA = 3
-# KP_H = 0.4 # Turning rate
-# TURN_HEADING = 0.2 # Target heading when turning
+# numHA = 4
+
+# KP_H = 0.5 # Turning rate
+# TURN_HEADING = 0.15 # Target heading when turning
 # TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
+# min_velocity = 16 # Minimum velocity
+# max_velocity = 30 # Maximum velocity
 
 # def laneFinder(y):
 #     return round(y / 4)
 
 # def motor_model(ha, data, data_prev):
+#     acc = 0.0
 #     target_heading = 0.0
 #     if ha == 0:
+#         acc = 0.4 * (max_velocity - data["vx"])
+
 #         target_y = laneFinder(data["y"]) * 4
 #         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
 #     elif ha == 1:
+#         acc = data["f_vx"] - data["vx"]
+
+#         target_y = laneFinder(data["y"]) * 4
+#         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+#     elif ha == 2:
 #         target_heading = -TURN_HEADING
 #     else:
 #         target_heading = TURN_HEADING
 
-#     return ((target_heading - data["heading"]) * KP_H, None)
+#     return ((target_heading - data["heading"]) * KP_H, acc)
 
-# Setting: 2D-highway-env
+
+# Setting: 2D-merge
 training_set = 10
 validation_set = 30 # including training_set
 train_time = 15000
-patience = 1000
-sim_time = 100
+patience = 200
+sim_time = 75
 samples = 50
-# folder = "highway-easy/"
-# folder = "highway-medium/"
-folder = "highway-hard/"
+folder = "merge-easy/"
+# folder = "merge-medium/"
+# folder = "merge-hard/"
+# folder = "merge-impossible"
 vars_used = [
     "HA",
     "x",
@@ -104,42 +135,51 @@ vars_used = [
 ]
 pred_var1 = "LA.steer"
 pv1_range = [-0.3, 0.3]
-# pv1_stddev = 0.001
-# pv1_stddev = 0.01
 pv1_stddev = 0.02
 pred_var2 = "LA.acc"
 pv2_range = [-20, 20]
-# pv2_stddev = 0.1
-# pv2_stddev = 1
 pv2_stddev = 2
 
 numHA = 4
 
-KP_H = 0.5 # Turning rate
 TURN_HEADING = 0.15 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-min_velocity = 16 # Minimum velocity
-max_velocity = 30 # Maximum velocity
+max_velocity = 45 # Maximum velocity
 
 def laneFinder(y):
     return round(y / 4)
 
 def motor_model(ha, data, data_prev):
-    acc = 0.0
+    target_acc = 0.0
     target_heading = 0.0
+
     if ha == 0:
-        acc = 0.4 * (max_velocity - data["vx"])
+        target_acc = max_velocity - data["vx"]
 
         target_y = laneFinder(data["y"]) * 4
         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
     elif ha == 1:
-        acc = data["f_vx"] - data["vx"]
+        target_acc = data["f_vx"] - data["vx"]
 
         target_y = laneFinder(data["y"]) * 4
         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
     elif ha == 2:
+        target_acc = -0.5
         target_heading = -TURN_HEADING
     else:
+        target_acc = -0.5
         target_heading = TURN_HEADING
 
-    return ((target_heading - data["heading"]) * KP_H, acc)
+    target_steer = target_heading - data["heading"]
+
+    if target_steer > data_prev["LA.steer"]:
+        target_steer = min(target_steer, data_prev["LA.steer"] + 0.08)
+    else:
+        target_steer = max(target_steer, data_prev["LA.steer"] - 0.08)
+
+    if target_acc > data_prev["LA.acc"]:
+        target_acc = min(target_acc, data_prev["LA.acc"] + 4)
+    else:
+        target_acc = max(target_acc, data_prev["LA.acc"] - 6)
+
+    return (target_steer, target_acc)
