@@ -17,11 +17,16 @@ from highway_env.vehicle.behavior import IDMVehicle, LinearVehicle
 from highway_env.vehicle.controller import MDPVehicle
 from highway_env.vehicle.kinematics import Vehicle
 
+np.set_printoptions(suppress=True)
 
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
-lanes_count = 4 # Number of lanes
 use_absolute_lanes = True
+KinematicObservation.normalize_obs = lambda self, df: df
+
+
+
+
 
 
 class CustomObservation(KinematicObservation):
@@ -231,7 +236,7 @@ class HighwayEnv(AbstractEnv):
         }
 
     def _is_terminated(self) -> bool:
-        return (self.time >= self.config["duration"])
+        return (self.vehicle.crashed or not self.vehicle.on_road) or (self.time >= self.config["duration"])
 
     def _is_truncated(self) -> bool:
         return False
