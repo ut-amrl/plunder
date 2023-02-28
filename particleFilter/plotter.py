@@ -6,6 +6,7 @@ import os
 from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
 import time
+plt.rcParams.update({'font.size': 14})
 
 # Initialization
 trajectories = []
@@ -146,9 +147,9 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     # TODO: color map is just using whatever order it wants. I can't figure out how to force it to use our desired order
     ax1b.imshow(np.array(color_graph), cmap=ListedColormap(colors[0:len(actions)]), origin="lower", vmin=0, aspect='auto', interpolation='none')
 
-    plt.xlabel('time')
-    ax1.set_ylabel('hi-level actions')
-    ax1b.set_ylabel('hi-level actions\n(unsorted)')
+    plt.xlabel('Time (s)')
+    ax1.set_ylabel('high-level\nactions')
+    ax1b.set_ylabel('high-level\nactions')
 
     if useGT:
         for i in range(len(gt)):
@@ -177,7 +178,7 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
 
     fig, axs = plt.subplots(len(gtLA))
     fig.suptitle("Low-level actions")
-    plt.xlabel('time')
+    plt.xlabel('Time (s)')
 
     color_count = 0
     handles = []
@@ -302,7 +303,7 @@ def plotLA(outP, gtF, robot):
 
     fig, axs = plt.subplots(len(gtLA))
     fig.suptitle("Low-level actions")
-    plt.xlabel('time')
+    plt.xlabel('Time (s)')
 
     if len(gtLA) == 1:
         axs.plot(times, gtLA[0], color=colors[0])
@@ -332,7 +333,7 @@ def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title, ylabel):
             vals.append(float(line.strip()))
 
     plt.suptitle(title)
-    plt.xlabel('iteration')
+    plt.xlabel('Iteration')
     plt.ylabel(ylabel)
     plt.plot(vals, linewidth=2, markersize=4, label="synthesized programs")
     plt.axhline(y = gt, color = 'green', label="ground truth")

@@ -49,25 +49,25 @@ namespace SETTINGS {
     const bool ENUMERATE_SIGNS = false;      // Equivalent to enumerating over > and <
     const bool PRINT_DEBUG = false;         // Extra debugging info
     const int INITIAL_VALUES = 4;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
-    const int BATCH_SIZE = 16;               // Number of programs to optimize in parallel
+    const int BATCH_SIZE = 32;               // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.02;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_UPPER = 0.01;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double PROG_COMPLEXITY_LOSS = 0.025;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double ALPHA_LOSS_UPPER = 0.000;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 128;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 2000;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const int BASE_FEAT_DEPTH = 2;
+    const int BASE_FEAT_DEPTH = 3;
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution
-    const double RESAMPLE_THRESHOLD = 10.0;                      // higher = more resampling
+    const double RESAMPLE_THRESHOLD = 5.0;                      // higher = more resampling
     double TEMPERATURE = 1;                                   // Initial observation likelihood strength
     const double TEMP_CHANGE = 0;                          // TEMPERATURE decreases linearly by this much each iteration
 }

@@ -17,8 +17,8 @@ HA ASP_model(State state){
     HA ha = state.ha;
 
     // Probabilistic
-    bool cond1 = flip(logistic(0, 0.5, state.get("vel") - state.get("vMax")));
-    bool cond2 = flip(logistic(state.get("target"), 0.25, state.get("pos") + DistTraveled(state.get("vel"), state.get("decMax"))));
+    bool cond1 = flip(logistic(0, 1, state.get("vel") - state.get("vMax")));
+    bool cond2 = flip(logistic(state.get("target"), 0.5, state.get("pos") + DistTraveled(state.get("vel"), state.get("decMax"))));
 
     // Deterministic
     // bool cond1 = state.get("target") - state.get("vMax") >= 0;                                     // is at max velocity (can no longer accelerate)
@@ -50,7 +50,7 @@ HA ASP_model(State state){
 // Motor model parameters:
 
 map<string, normal_distribution<double>> la_error = {
-    { "acc", normal_distribution<double>(0.0, 1) }
+    { "acc", normal_distribution<double>(0.0, 0.5) }
 };
 
 Obs motorModel(State state, bool error){
@@ -100,6 +100,7 @@ Obs physicsModel(State state, double t_step){
     }
 
     state.put("pos", xPrev + (state.get("vel") + vPrev) / 2 * t_step);
+    state.put("dns", state.get("target") - state.get("pos"));
 
     return state.obs;
 }

@@ -75,10 +75,10 @@ Obs motorModel(State state, bool error){
 }
 
 HA ASP_model(State state){
-    bool front_clear = flip(logistic(1, 40, (state.get("f_x") - state.get("x")) / state.get("vx")));
+    bool front_clear = flip(logistic(1, 80, (state.get("f_x") - state.get("x")) / state.get("vx")));
 
     if(state.ha == LANE_RIGHT) {
-        bool right_clear = flip(logistic(0.5, 40, (state.get("r_x") - state.get("x")) / state.get("vx")));
+        bool right_clear = flip(logistic(0.5, 80, (state.get("r_x") - state.get("x")) / state.get("vx")));
         if(right_clear)
             return LANE_RIGHT;
         if(front_clear) 
@@ -87,7 +87,7 @@ HA ASP_model(State state){
         return SLOWER;
     }
 
-    bool right_clear = flip(logistic(1, 40, (state.get("r_x") - state.get("x")) / state.get("vx")));
+    bool right_clear = flip(logistic(1, 80, (state.get("r_x") - state.get("x")) / state.get("vx")));
     if(right_clear)
         return LANE_RIGHT;
     if(front_clear) 

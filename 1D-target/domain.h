@@ -40,10 +40,11 @@ vector<string> LA_vars = {
 //      Var ( "acc", Dimension(1, -2, 0), false ) indicates a variable named "acc" with units (m/s^2), that will not be used in the synthesis step.
 vector<Var> Obs_vars = {
     Var ("acc", Dimension(1, -2, 0), false),
-    Var ("pos", Dimension(1, 0, 0), true),
+    Var ("pos", Dimension(1, 0, 0), false),
     Var ("decMax", Dimension(1, -2, 0), true),
     Var ("accMax", Dimension(1, -2, 0), true),
     Var ("vMax", Dimension(1, -1, 0), true),
     Var ("vel", Dimension(1, -1, 0), true),
-    Var ("target", Dimension(1, 0, 0), false)
+    Var ("target", Dimension(1, 0, 0), true),
+    Var ("dns", Dimension(1, 0, 0), true),
 };
