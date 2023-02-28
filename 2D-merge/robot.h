@@ -75,25 +75,65 @@ Obs motorModel(State state, bool error){
 }
 
 HA ASP_model(State state){
-    bool front_clear = flip(logistic(1, 80, (state.get("f_x") - state.get("x")) / state.get("vx")));
+    // bool front_clear = flip(logistic(1, 80, (state.get("f_x") - state.get("x")) / state.get("vx")));
 
-    if(state.ha == LANE_RIGHT) {
-        bool right_clear = flip(logistic(0.5, 80, (state.get("r_x") - state.get("x")) / state.get("vx")));
-        if(right_clear)
+    // if(state.ha == LANE_RIGHT) {
+    //     bool right_clear = flip(logistic(0.5, 80, (state.get("r_x") - state.get("x")) / state.get("vx")));
+    //     if(right_clear)
+    //         return LANE_RIGHT;
+    //     if(front_clear) 
+    //         return FASTER;
+
+    //     return SLOWER;
+    // }
+
+    // bool right_clear = flip(logistic(1, 80, (state.get("r_x") - state.get("x")) / state.get("vx")));
+    // if(right_clear)
+    //     return LANE_RIGHT;
+    // if(front_clear) 
+    //     return FASTER;
+
+    // return SLOWER;
+
+    if(state.ha == FASTER) {
+        // if(flip(logistic(40, 96, state.get("l_vx")))) {
+        //     return LANE_LEFT;
+        // }
+        if(flip(logistic(29.36, 2.64, state.get("r_x") - state.get("x")))) {
             return LANE_RIGHT;
-        if(front_clear) 
+        }
+        if(flip(logistic(0.987, -21.34, (state.get("f_x") - state.get("x")) / state.get("vx") ))) {
+            return SLOWER;
+        }
+        return FASTER;
+    } else if (state.ha == LANE_LEFT) {
+        if(flip(logistic(24.84, 14.665, state.get("r_vx")))) {
             return FASTER;
-
+        }
+        if(flip(logistic(417.2768, -3.05, state.get("r_x")))) {
+            return LANE_RIGHT;
+        }
+        return LANE_LEFT;
+    } else if (state.ha == LANE_RIGHT) {
+        if(flip(logistic(-17.2669, -1.214, state.get("x") - state.get("f_x"))) && flip(logistic(-0.5384, 43201.3125, (state.get("x") - state.get("r_x")) / state.get("vx")))) {
+            return FASTER;
+        }
+        if(flip(logistic(10.06, 153.83, state.get("y")))) {
+            return SLOWER;
+        }
+        return LANE_RIGHT;
+    } else {
+        if(flip(logistic(-1668.47, -0.003233, state.get("r_x")))) {
+            return FASTER;
+        }
+        // if(flip(logistic(629.19, 0.02975, state.get("f_x")))) {
+        //     return LANE_LEFT;
+        // }
+        if(flip(logistic(-28.716, -1, state.get("x") - state.get("r_x")))) {
+            return LANE_RIGHT;
+        }
         return SLOWER;
     }
-
-    bool right_clear = flip(logistic(1, 80, (state.get("r_x") - state.get("x")) / state.get("vx")));
-    if(right_clear)
-        return LANE_RIGHT;
-    if(front_clear) 
-        return FASTER;
-
-    return SLOWER;
 }
 
 Obs physicsModel(State state, double t_step){}

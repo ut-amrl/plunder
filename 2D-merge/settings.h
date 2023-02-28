@@ -61,9 +61,9 @@ namespace SETTINGS {
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 
     // EMDIPS parameters
-    const int PROG_ENUM = 2000;                          // Number of programs to enumerate and optimize per iteration
+    const int PROG_ENUM = 128;                          // Number of programs to enumerate and optimize per iteration
     const bool USE_SAFE_TRANSITIONS = false;          // "safe" transitions (only allow user-specified transitions)
-    const int BASE_FEAT_DEPTH = 3;
+    const int BASE_FEAT_DEPTH = 2;
 
     // Particle filter parameters
     const int NUM_PARTICLES = 2000;                          // number of particle trajectories created to represent the distribution

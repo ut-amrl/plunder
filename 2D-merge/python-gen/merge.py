@@ -38,8 +38,8 @@ lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0
-acc_err = 0
+steer_err = 0.03
+acc_err = 3
 
 env = gym.make('highway-v0')
 env.config['simulation_frequency']=24
@@ -129,10 +129,10 @@ def prob_asp(ego, closest, ha):
     x, l_x, f_x, r_x = ego[1], closest[0][1], closest[1][1], closest[2][1]
     vx = ego[3]
 
-    front_clear = sample(logistic(1, 80, (f_x - x) / vx))
+    front_clear = sample(logistic(1, 40, (f_x - x) / vx))
 
     if ha == env.action_type.actions_indexes["LANE_RIGHT"]:
-        right_clear = sample(logistic(0.5, 80, (r_x - x) / vx)) # time to collision
+        right_clear = sample(logistic(0.5, 40, (r_x - x) / vx)) # time to collision
         if right_clear: # No car on the right: merge right
             return env.action_type.actions_indexes["LANE_RIGHT"]
         if front_clear: 
@@ -141,7 +141,7 @@ def prob_asp(ego, closest, ha):
         # Nowhere to go: decelerate
         return env.action_type.actions_indexes["SLOWER"]
 
-    right_clear = sample(logistic(1, 80, (r_x - x) / vx)) # time to collision
+    right_clear = sample(logistic(1, 40, (r_x - x) / vx)) # time to collision
     if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]
     if front_clear: 
@@ -149,40 +149,6 @@ def prob_asp(ego, closest, ha):
 
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
-
-    # x, l_x, f_x, r_x = ego[1], closest[0][1], closest[1][1], closest[2][1]
-    # vx = ego[3]
-    # # Synthesized ASP
-    # if ha == env.action_type.actions_indexes["FASTER"]:
-    #     if sample(logistic(498.883820, 0.064791, l_x)):
-    #         return env.action_type.actions_indexes["LANE_LEFT"]
-    #     if sample(logistic(-31.419336, -1.002564, x - r_x)):
-    #         return env.action_type.actions_indexes["LANE_RIGHT"]
-    #     if sample(logistic(-0.985192, 34.153496, (x - f_x) / vx)):
-    #         return env.action_type.actions_indexes["SLOWER"]
-    # elif ha == env.action_type.actions_indexes["LANE_LEFT"]:
-    #     if sample(logistic(506.127289, -0.239597, l_x)):
-    #         return env.action_type.actions_indexes["FASTER"]
-    #     if False:
-    #         return env.action_type.actions_indexes["LANE_RIGHT"]
-    #     if sample(logistic(-26837.146484, 0.000882, closest[0][3])):
-    #         return env.action_type.actions_indexes["SLOWER"]
-    # elif ha == env.action_type.actions_indexes["LANE_RIGHT"]:
-    #     if sample(logistic(11.930955, -9.797117, r_x - x)) and sample(logistic(35.270016, 11.833671, f_x - (x - ego[2]))) and sample(logistic(0.469865, 12.105952, ego[2])):
-    #         return env.action_type.actions_indexes["FASTER"]
-    #     if False:
-    #         return env.action_type.actions_indexes["LANE_LEFT"]
-    #     if sample(logistic(6.716710, -1.751027, r_x - x)):
-    #         return env.action_type.actions_indexes["SLOWER"]
-    # elif ha == env.action_type.actions_indexes["SLOWER"]:
-    #     if sample(logistic(18.321583, -2.704980, closest[0][3])):
-    #         return env.action_type.actions_indexes["FASTER"]
-    #     if False:
-    #         return env.action_type.actions_indexes["LANE_LEFT"]
-    #     if sample(logistic(-1.010387, 0.376594, r_x - f_x)):
-    #         return env.action_type.actions_indexes["LANE_RIGHT"]
-
-    # return ha
 
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_lane, target_speed)
@@ -275,7 +241,7 @@ def runSim(iter):
     for _ in range(75):
 
         obs, reward, done, truncated, info = env.step(ha)
-        # env.render()
+        env.render()
 
         # Pre-process observations
         lane_class = classifyLane(obs)
