@@ -1,6 +1,6 @@
 # EM Synthesis Project
 
-Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels.
+Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels. Link to publication: https://arxiv.org/abs/2303.01440. 
 
 Our system is a *discrete-time Markov process* defined by:
    - a **high-level action space** $H$ = a set of discrete high-level actions $h \in H$
