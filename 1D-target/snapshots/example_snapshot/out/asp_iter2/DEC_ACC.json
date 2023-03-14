@@ -1,0 +1,77 @@
+{
+    "dim": [
+        0,
+        0,
+        0
+    ],
+    "name": "fX1",
+    "node": "Feature",
+    "symbolic": false,
+    "type": 2,
+    "value": {
+        "dim": [
+            0,
+            0,
+            0
+        ],
+        "left": {
+            "a": {
+                "dim": [
+                    0,
+                    0,
+                    0
+                ],
+                "node": "Num",
+                "symbolic": false,
+                "type": 2,
+                "value": 0.005938589107245207
+            },
+            "b": {
+                "dim": [
+                    0,
+                    0,
+                    0
+                ],
+                "node": "Num",
+                "symbolic": false,
+                "type": 2,
+                "value": -0.0760083943605423
+            },
+            "dim": [
+                0,
+                0,
+                0
+            ],
+            "node": "TernOp",
+            "op": "Logistic",
+            "symbolic": false,
+            "type": 4,
+            "x": {
+                "dim": [
+                    1,
+                    0,
+                    0
+                ],
+                "name": "target",
+                "node": "Var",
+                "symbolic": false,
+                "type": 2
+            }
+        },
+        "node": "BinOp",
+        "op": "Flip",
+        "right": {
+            "dim": [
+                0,
+                0,
+                0
+            ],
+            "node": "Bool",
+            "symbolic": false,
+            "type": 5,
+            "value": true
+        },
+        "symbolic": false,
+        "type": 4
+    }
+}

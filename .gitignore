@@ -43,6 +43,7 @@ lib/
 out
 plots
 sim
+# snapshots
 
 # Clang
 .clangd/
