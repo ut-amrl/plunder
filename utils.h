@@ -40,11 +40,6 @@ vector<HA> get_valid_ha(HA ha, bool use_safe_transitions=USE_SAFE_TRANSITIONS){
 random_device rd;
 default_random_engine gen(0);
 
-// Return the distance this robot would travel before stopping if it began decelerating immediately
-double DistTraveled(double v, double dec){
-    return - v * v / (2 * dec);
-}
-
 // Random generator for Bernoulli trial
 bool flip(double p){
     double rv = ((double) rand())/RAND_MAX;

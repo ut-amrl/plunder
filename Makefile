@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 2D-highway-env
+target_dir ?= 1D-target
 
 # export OMP_NUM_THREADS := 16 # Turn this on when running LDIPS
 
@@ -88,6 +88,6 @@ purge: clean clear_data
 
 snapshot :
 	echo $(D)-$(fn) && \
-	mkdir -p $(target_dir)/saved_outputs/$(D)-$(fn) && \
+	mkdir -p $(target_dir)/snapshots/$(D)-$(fn) && \
 	cd $(target_dir) && \
-	cp -r sim plots out settings.txt robot.h robotSets.h domain.h saved_outputs/$D-$(fn)
+	cp -r sim plots out settings.txt robot.h robotSets.h domain.h ../includes.h snapshots/$D-$(fn)

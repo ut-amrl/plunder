@@ -35,18 +35,6 @@ Example dataToExample(HA ha, Obs state){
     return ex;
 }
 
-void printExampleInfo(Example e){
-    string start = e.start_.GetString();
-    string res = e.result_.GetString();
-    cout << start << "->" << res;
-    for(Var each: Obs_vars) {
-        if(each.root_){
-            cout << ", " << each.name_ << " : " << e.symbol_table_[each.name_].GetFloat();
-        }
-    }
-    cout << endl;
-}
-
 bool use_error = true;
 // Runs EMDIPS-generated ASP
 HA emdipsASP(State state){
@@ -84,7 +72,10 @@ void save_metric(string output_path, double metric) {
     info_file.close();
 }
 
-void print_metrics(double cum_log_obs, double pct_accuracy, DATATYPE data) {
+void print_metrics(double cum_log_obs, double ha_correct, double t_total, DATATYPE data) {
+    cum_log_obs /= t_total; // Normalize
+    ha_correct /= t_total; ha_correct *= 100; // Convert to percentage
+
     cout << "Metrics";
     switch(data) {
         case TRAINING:
@@ -95,17 +86,17 @@ void print_metrics(double cum_log_obs, double pct_accuracy, DATATYPE data) {
             cout << " (validation):\n"; break;
     }
     cout << "\tCumulative observation likelihood: e^" << cum_log_obs << " = " << exp(cum_log_obs) << endl;
-    cout << "\t%% Accuracy: " << pct_accuracy << "%%" << endl;
+    cout << "\t%% Accuracy: " << ha_correct << "%%" << endl;
 
     switch(data) {
         case TRAINING:
-            save_metric(LOG_OBS_PATH + "-training.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-training.txt", pct_accuracy);
+            save_metric(LOG_OBS_PATH + "-training.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-training.txt", ha_correct);
             break;
         case TESTING:
-            save_metric(LOG_OBS_PATH + "-testing.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-testing.txt", pct_accuracy);
+            save_metric(LOG_OBS_PATH + "-testing.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-testing.txt", ha_correct);
             break;
         case VALIDATION:
-            save_metric(LOG_OBS_PATH + "-valid.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-valid.txt", pct_accuracy);
+            save_metric(LOG_OBS_PATH + "-valid.txt", cum_log_obs); save_metric(PCT_ACCURACY + "-valid.txt", ha_correct);
             break;
     }
 }
@@ -203,21 +194,21 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
         cout << "*";
         cout.flush();
     }
-    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TRAINING);
+    print_metrics(cum_log_obs, ha_correct, ha_total, TRAINING);
     
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
         string plot = TESTING_TRAJ+to_string(iteration)+"-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
-    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TESTING);
+    print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
 
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
         string plot = VALIDATION_TRAJ+to_string(iteration)+"-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
-    print_metrics(cum_log_obs, ha_correct / ha_total * 100, VALIDATION);
+    print_metrics(cum_log_obs, ha_correct, ha_total, VALIDATION);
 
     return examples;
 }
@@ -237,7 +228,6 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
     string aspFilePath = GEN_ASP + to_string(iteration) + "/";
     filesystem::create_directory(aspFilePath);
 
-    // Enumerate features up to depth 2
     vector<ast_ptr> inputs; vector<Signature> sigs;
     vector<ast_ptr> ops = AST::RecEnumerate(roots, inputs, samples, library,
                                         BASE_FEAT_DEPTH, &sigs);
@@ -255,9 +245,9 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 
     // Run synthesis algorithm to optimize sketches
     if(synthesizer == EMDIPS) { // EMDIPS
-        emdipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, pFunc, synth_setting == INCREMENTAL);
+        emdipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, pFunc);
     } else { // LDIPS
-        ldipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath, PROG_ENUM, PROG_COMPLEXITY_LOSS, synth_setting == INCREMENTAL);
+        ldipsL3(samples, transitions, solution_preds, loss, ops, aspFilePath);
     }
 
     // Write ASP info to file
@@ -275,6 +265,8 @@ void maximization(vector<vector<Example>>& allExamples, uint iteration){
 // Settings
 void setupLdips(){
     cout << "-------------Setup----------------" << endl;
+
+    passSettings(PROG_ENUM, PROG_COMPLEXITY_LOSS_BASE, PROG_COMPLEXITY_LOSS, synth_setting == INCREMENTAL);
 
     for(Var each: Obs_vars) {
         if(each.root_) {
@@ -313,33 +305,6 @@ void setupLdips(){
         cout << trans.first << "->" << trans.second << endl;
     }
     cout << endl;
-
-    // if(GT_PRESENT) {
-    //     cout << "----Ground truth (target) program----" << endl;
-     
-    //     // Read hard coded program structure
-    //     for (uint t = 0; t < transitions.size(); t++) {
-    //         const auto &transition = transitions[t];
-    //         const string input_name =
-    //             GT_ASP_PATH + transition.first + "_" + transition.second + ".json";
-
-    //         ifstream input_file;
-    //         input_file.open(input_name);
-    //         const json input = json::parse(input_file);
-    //         ast_ptr fixed = AstFromJson(input);
-    //         gt_truth.push_back(fixed);
-
-    //         cout << transition.first << " -> " << transition.second << ": " << fixed << endl;
-            
-    //         input_file.close();
-    //     }
-    // }
-}
-
-void testExampleOnASP(vector<Example> examples){
-    for(uint i=0; i<examples.size(); i++){
-        printExampleInfo(examples[i]);
-    }
 }
 
 void read_demonstration(vector<Trajectory>& state_traj){
@@ -352,10 +317,6 @@ void read_demonstration(vector<Trajectory>& state_traj){
         readData(inputFile, traj);
 
         state_traj.push_back(traj);
-    }
-
-    if(!GT_PRESENT) {
-        return;
     }
 
     double cum_log_obs = 0, ha_total = 0, ha_correct = 0;
@@ -376,21 +337,22 @@ void read_demonstration(vector<Trajectory>& state_traj){
             }
         }
     }
-    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TRAINING);
+
+    print_metrics(cum_log_obs, ha_correct, ha_total, TRAINING);
     
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < TRAINING_SET; i++){
         string plot = TESTING_TRAJ+"gt-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
     }
-    print_metrics(cum_log_obs, ha_correct / ha_total * 100, TESTING);
+    print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
 
     ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
         string plot = VALIDATION_TRAJ+"gt-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
     }
-    print_metrics(cum_log_obs, ha_correct / ha_total * 100, VALIDATION);
+    print_metrics(cum_log_obs, ha_correct, ha_total, VALIDATION);
 }
 
 
@@ -470,8 +432,6 @@ void cleanup_python(pair<PyObject*, PyObject*> py_info){
     Py_DECREF(pModule);
     Py_Finalize();
 }
-
-
 
 int main() {
 

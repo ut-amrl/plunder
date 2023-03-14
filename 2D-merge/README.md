@@ -1,4 +1,4 @@
-# 2D Merge
+# 2D Merge (Merge)
 This module is the setup for a vehicle dealing with lane-merges. The goal is to quickly move from the leftmost lane to the rightmost lane without crashing into other vehicles.
 
 ## File Organization

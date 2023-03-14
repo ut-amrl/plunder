@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np 
 import csv
-import sys
 import os
 from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
@@ -115,7 +114,6 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     maxTime = min(int(settings["PLOT_TIME"]), len(trajectories[0]))
     if useGT:
         maxTime = min(maxTime, len(gtTrajectory))
-    PARTICLES_PLOTTED = min(int(settings["SAMPLE_SIZE"]), len(trajectories))
 
     for traj in trajectories:
         traj = traj[0:maxTime]
@@ -169,7 +167,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     return (actions, color_graph)
 
 # Plots low-level actions
-def plotSingleLA(inF, outP, gtF, title, iter, robot):
+def plotSingleLA(inF, outP, gtF, iter, robot):
     global trajectories, gtTrajectory, gtLA
 
     gtFile = gtF + str(robot) + ".csv"
@@ -220,7 +218,7 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
             color_count += 1
 
             for p in range(PARTICLES_PLOTTED):
-                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(2/PARTICLES_PLOTTED), linewidth=2.5)
+                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(1/PARTICLES_PLOTTED), linewidth=2.5)
             color_count += 1
 
             axs[name].grid(linestyle='dotted')
@@ -240,7 +238,7 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
 # Processes input and passes to figureHandler
 def plotSingle(inF, outP, gtF, title, iter, robot):
     if not title == 'Particle filter outputs':
-        plotSingleLA(inF, outP, gtF, title, iter, robot)
+        plotSingleLA(inF, outP, gtF, iter, robot)
 
     global trajectories, gtTrajectory
 
@@ -294,45 +292,6 @@ def plotSingleTimestep(inF, outP, gtF, title, iter, numRobots):
     for robot in range(numRobots):
         plotSingle(inF, outP, gtF, title, iter, robot)
 
-# Plots low-level actions
-def plotLA(outP, gtF, robot):
-    global gtLA
-
-    gtFile = gtF + str(robot) + ".csv"
-    la_names = readLA(gtFile)
-    outPath = outP + "LA-" + str(robot) + "-"
-    
-    maxTime = min(int(settings["PLOT_TIME"]), len(gtLA[0]))
-    for arr in gtLA:
-        del arr[maxTime:]
-
-    times = []
-    for t in range(maxTime):
-        times.append(t)
-
-    fig, axs = plt.subplots(len(gtLA))
-    fig.suptitle("Low-level actions")
-    plt.xlabel('Time (s)')
-
-    if len(gtLA) == 1:
-        axs.plot(times, gtLA[0], color=colors[0])
-        axs.set_ylabel(la_names[0])
-    else:
-        for i in range(len(gtLA)):
-            axs[i].plot(times, gtLA[i], color=colors[i])
-            axs[i].set_ylabel(la_names[i])
-
-    fig.tight_layout()  
-    plt.show()
-    if os.path.exists(outPath[:outPath.rfind('/')]):
-        plt.savefig(outPath + "graph.png")
-    else:
-        raise Exception('Plots folder deleted... restarting plotter')
-
-    plt.clf()
-    plt.close('all')
-
-
 def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title, ylabel):
     vals = []
     with open(likelihoodDataFile) as f:
@@ -343,15 +302,16 @@ def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title, ylabel):
 
     plt.suptitle(title)
     plt.xlabel('Iteration')
+    plt.xticks(range(0,16,2))
     plt.ylabel(ylabel)
     plt.plot(vals, linewidth=2, markersize=4, label="synthesized programs")
     plt.axhline(y = gt, color = 'green', label="ground truth")
     plt.legend(loc="lower right")
+    plt.tight_layout()
     plt.show()
     plt.savefig(likelihoodPlotFile)
     plt.clf()
     plt.close('all')
-    pass
     
 # ----- Main ---------------------------------------------
 
@@ -375,13 +335,8 @@ def main():
 
     try:
         print("Plotting ground truth...")
-        if settings["GT_PRESENT"] == "true":
-            for robot in range(int(settings["VALIDATION_SET"])):
-                plotSingle(validationInFile, validationOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
-
-        print("Plotting low-level actions...")
         for robot in range(int(settings["VALIDATION_SET"])):
-            plotLA(validationOutPath, gtFile, robot)
+            plotSingle(validationInFile, validationOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
 
         graph1 =    {   'inF': trainingInFile,
                         'outP': trainingOutPath,
@@ -400,9 +355,9 @@ def main():
             print("Plotting testing ASP graphs, iteration " + str(iter))
             plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["TRAINING_SET"]))
             print("Plotting likelihoods, iteration " + str(iter))
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-training.txt", settings["PLOT_PATH"]+"training-likelihoods.png", "Training Set Likelihoods", 'cumulative_observation_likelihood (log scale)')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'cumulative_observation_likelihood (log scale)')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-valid.txt", settings["PLOT_PATH"]+"validation-likelihoods.png", "Validation Set Likelihoods", 'cumulative_observation_likelihood (log scale)')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-training.txt", settings["PLOT_PATH"]+"training-likelihoods.png", "Training Set Likelihoods", 'Log Obs. Likelihood')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'Log Obs. Likelihood')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-valid.txt", settings["PLOT_PATH"]+"validation-likelihoods.png", "Validation Set Likelihoods", 'Log Obs. Likelihood')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-training.txt", settings["PLOT_PATH"]+"training-accuracy.png", "Training Set Accuracy", 'Percent Accuracy')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')

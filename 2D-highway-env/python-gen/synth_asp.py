@@ -1,12 +1,6 @@
 import gym
-import highway_env
-from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle
-from highway_env.envs.common.observation import KinematicObservation
-from highway_env.envs.common.abstract import AbstractEnv
-from matplotlib import pyplot as plt
 import numpy as np
 import random
-from typing import List, Tuple, Union, Optional
 
 env = gym.make('highway-v0')
 

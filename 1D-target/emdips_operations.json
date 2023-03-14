@@ -54,6 +54,6 @@
         "inputDim": [[1, -1, 0], [1, -2, 0]],
         "outputType": "NUM",
         "outputDim": [0, 1, 0]
-    },
+    }
 ]
   

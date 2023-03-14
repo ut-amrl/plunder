@@ -1,4 +1,4 @@
-# 2D Highway Env
+# 2D Highway Env (Highway)
 This module is the setup for a vehicle performing lane-changing maneuvers. The goal is to travel as far as possible without crashing. Higher weight is placed on faster speeds.
 
 ## File Organization

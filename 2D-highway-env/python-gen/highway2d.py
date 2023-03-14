@@ -1,12 +1,8 @@
-import gym
-import highway_env
-from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle
+from highway_env.envs import ControlledVehicle, Vehicle
 from highway_env.envs.common.observation import KinematicObservation
-from highway_env.envs.common.abstract import AbstractEnv
-from matplotlib import pyplot as plt
 import numpy as np
 import random
-from typing import List, Tuple, Union, Optional
+from typing import Union
 from synth_asp import env, asp_1, asp_3, asp_8
 
 ######## Configuration ########
@@ -16,7 +12,7 @@ use_absolute_lanes = True # Whether or not to label lanes as absolute or relativ
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
 steer_err = 0.01
-acc_err = 2
+acc_err = 1
 
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=12 # Runs once every 3 simulation steps
@@ -184,9 +180,9 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
         target_steer = max(target_steer, last_la["steering"] - 0.04)
 
     if target_acc > last_la["acceleration"]:
-        target_acc = min(target_acc, last_la["acceleration"] + 3)
+        target_acc = min(target_acc, last_la["acceleration"] + 4)
     else:
-        target_acc = max(target_acc, last_la["acceleration"] - 6)
+        target_acc = max(target_acc, last_la["acceleration"] - 8)
 
     la = {"steering": target_steer, "acceleration": target_acc }
 

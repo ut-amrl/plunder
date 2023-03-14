@@ -7,21 +7,19 @@ Our system is a *discrete-time Markov process* defined by:
      - Ex: $h \in$ {ACC, DEC, CON}
    - a **low-level action space** $L$ = a continuous domain of low-level actions $l \in L$: controlled joystick directives, motor inputs, etc.
      - Ex: $l = acc \in \mathbb{R}$, where $a$ is the acceleration
-   - a **observed state space** $O$ = a continuous domain of observed or given variables $o \in O$.
-     - Ex: $o = (pos, vel, acc, accMax, decMax) \in \mathbb{R}^5$
-   - an **action-selection policy (ASP)** $\pi: H \times O \rightarrow H$ that maps the current high-level action and the current observed variables to the next high-level action
+   - a **observed state space** $S$ = a continuous domain of constants or variables $c, y \in S$.
+     - Ex: $c = accMax \in \mathbb{R}, y = pos \in \mathbb{R}$
+   - an **action-selection policy (ASP)** $\pi: H \times S \rightarrow H$ that maps the current high-level action and the current observed variables to the next high-level action
    - a **motor model** $\phi: H \rightarrow L$ that maps discrete high-level actions to continuous low-level actions via discrete motor controllers
 
 ---
 ## Overall problem formulation:
 ### Inputs
-We define a trajectory $\tau$ over a time period $T$ as a function $\tau : T \rightarrow H \times O$, which can be thought of as giving the value of the system's state $(h_t, o_t)$ at each time step $t=0...T$.
-
-We know the problem domain $H, L, O$, as well as the motor model $\phi$. We are given a set of **demonstrations**, which are defined simply as trajectories with the high-level labels missing, i.e. $o_t$ for $t = 0...T$.
+We know the problem domain $H, L, S$, as well as the motor model $\phi$. We are given a set of **demonstrations**, which are defined simply as trajectories with the high-level labels missing, i.e. $s_{1:t}$ and $l_{1:t}$.
 
 ### Outputs
 We would like to:
-1. Infer the values of the high-level actions in the demonstrations ($h_t$)
+1. Infer the values of the high-level actions in the demonstrations ($h_{1:t}$)
 2. Synthesize an ASP that is maximally consistent with the demonstrations ($\pi^*$)
 
 ---

@@ -6,6 +6,13 @@
 using namespace std;
 using namespace SETTINGS;
 
+// Data types
+enum DATATYPE {
+    TRAINING,
+    TESTING,
+    VALIDATION
+};
+
 // ----- Markov System Definitions --------------------------------
 struct Obs {
     map<string, double> table;
@@ -161,7 +168,7 @@ struct Trajectory {
 Obs motorModel(State, bool);
 extern map<string, normal_distribution<double>> la_error;
 
-// Calculate probability of observing given LA with a hypothesized high-level action, then take natural log
+// Calculate log probability of observing given LA with a hypothesized high-level action
 double obs_likelihood_given_model(State state, Obs nextLA, double temp=TEMPERATURE){
     // TODO: obs_likelihood of particle filter doesn't work right when temperature changes
     Obs mean = motorModel(state, false); // Use the previous state + current HA

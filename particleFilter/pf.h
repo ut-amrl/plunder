@@ -183,16 +183,4 @@ public:
 
         return trajectories;
     }
-
-    vector<vector<HA>> smoothTrajectories(vector<vector<HA>>& trajectories){  
-        for(vector<HA>& traj : trajectories){
-            for(uint i = 1; i < traj.size() - 1; i++){
-                if(traj[i-1] == traj[i+1] && traj[i-1] != traj[i]){ // Apply smoothening
-                    traj[i] = traj[i-1];
-                }
-            }
-        }
-
-        return trajectories;
-    }
 };
