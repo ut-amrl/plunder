@@ -96,9 +96,9 @@ HA ASP_model(State state){
     // return SLOWER;
 
     if(state.ha == FASTER) {
-        // if(flip(logistic(40, 96, state.get("l_vx")))) {
-        //     return LANE_LEFT;
-        // }
+        if(flip(logistic(40, 96, state.get("l_vx")))) {
+            return LANE_LEFT;
+        }
         if(flip(logistic(29.36, 2.64, state.get("r_x") - state.get("x")))) {
             return LANE_RIGHT;
         }
@@ -126,9 +126,9 @@ HA ASP_model(State state){
         if(flip(logistic(-1668.47, -0.003233, state.get("r_x")))) {
             return FASTER;
         }
-        // if(flip(logistic(629.19, 0.02975, state.get("f_x")))) {
-        //     return LANE_LEFT;
-        // }
+        if(flip(logistic(629.19, 0.02975, state.get("f_x")))) {
+            return LANE_LEFT;
+        }
         if(flip(logistic(-28.716, -1, state.get("x") - state.get("r_x")))) {
             return LANE_RIGHT;
         }

@@ -181,9 +181,11 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
     plt.xlabel('Time (s)')
 
     color_count = 0
-    handles = []
     for name in range(len(la_names)):
+        handles = []
 
+        label_name = la_names[name]
+        
         inFile = inF + str(iter) + "-" + str(robot) + "-" + la_names[name] + ".csv"
         trajectories = []
         readTrajectoriesFloat(inFile)
@@ -201,24 +203,31 @@ def plotSingleLA(inF, outP, gtF, title, iter, robot):
             times.append(t)
 
         if len(gtLA) == 1:
-            axs.set_ylabel(la_names[0])
-            axs.plot(times, gtLA[0], color=colors[0])
-            handles.append(Line2D([0], [0], label=la_names[0] + ' demo', color=colors[0]))
-
+            axs.set_ylabel(label_name)
+            axs.plot(times, gtLA[0], color=colors[0], linewidth=1.5)
+            handles.append(Line2D([0], [0], label='actual', color=colors[0]))
+            handles.append(Line2D([0], [0], label='predicted', color=colors[1]))
             for p in range(PARTICLES_PLOTTED):
-                axs.plot(times, trajectories[p], color=colors[1], alpha=(1/PARTICLES_PLOTTED))   
+                axs.plot(times, trajectories[p], color=colors[1], alpha=(1/PARTICLES_PLOTTED), linewidth=2.5) 
+
+            axs.grid(linestyle='dotted')  
+            axs.legend(handles=handles, loc='upper right')
         else:
-            axs[name].set_ylabel(la_names[name])
-            axs[name].plot(times, gtLA[name], color=colors[color_count])
-            handles.append(Line2D([0], [0], label=la_names[name] + ' demo', color=colors[color_count]))
+            axs[name].set_ylabel(label_name)
+            axs[name].plot(times, gtLA[name], color=colors[color_count], linewidth=1.5)
+            handles.append(Line2D([0], [0], label='actual', color=colors[color_count]))
+            handles.append(Line2D([0], [0], label='predicted', color=colors[color_count+1]))
             color_count += 1
 
             for p in range(PARTICLES_PLOTTED):
-                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(1/PARTICLES_PLOTTED))
+                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(2/PARTICLES_PLOTTED), linewidth=2.5)
             color_count += 1
+
+            axs[name].grid(linestyle='dotted')
+            axs[name].legend(handles=handles, loc='upper right')
 
     fig.tight_layout()
-    plt.legend(handles=handles)
+    plt.grid(linestyle='dotted')
     plt.show()
     if os.path.exists(outPath[:outPath.rfind('/')]):
         plt.savefig(outPath + "graph.png")
@@ -370,9 +379,9 @@ def main():
             for robot in range(int(settings["VALIDATION_SET"])):
                 plotSingle(validationInFile, validationOutPath, gtFile, 'Ground Truth Robots', 'gt', robot)
 
-        # print("Plotting low-level actions...")
-        # for robot in range(int(settings["VALIDATION_SET"])):
-        #     plotLA(validationOutPath, gtFile, robot)
+        print("Plotting low-level actions...")
+        for robot in range(int(settings["VALIDATION_SET"])):
+            plotLA(validationOutPath, gtFile, robot)
 
         graph1 =    {   'inF': trainingInFile,
                         'outP': trainingOutPath,

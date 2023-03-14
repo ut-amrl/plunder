@@ -28,11 +28,32 @@
         "outputDim": [1, 0, 0]
     },
     {
+        "op": "Times",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, 0, 0], [1, 0, 0]],
+        "outputType": "NUM",
+        "outputDim": [2, 0, 0]
+    },
+    {
+        "op": "Times",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, -1, 0], [1, -1, 0]],
+        "outputType": "NUM",
+        "outputDim": [2, -2, 0]
+    },
+    {
         "op": "DistTraveled",
         "inputType": ["NUM", "NUM"],
         "inputDim": [[1, -1, 0], [1, -2, 0]],
         "outputType": "NUM",
         "outputDim": [1, 0, 0]
-    }
+    },
+    {
+        "op": "TimeToStop",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -2, 0]],
+        "outputType": "NUM",
+        "outputDim": [0, 1, 0]
+    },
 ]
   

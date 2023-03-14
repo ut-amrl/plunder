@@ -30,7 +30,7 @@ namespace SETTINGS {
     const double GEN_ACCURACY = -1;        // probability of a correct high-level transition in the simulation
 
     // EM Loop parameters
-    const int NUM_ITER = 20;                    // number of iterations in the expectation-maximization loop
+    const int NUM_ITER = 30;                    // number of iterations in the expectation-maximization loop
     const int SAMPLE_SIZE = 50;                 // number of trajectories to process/plot
     const double POINT_ACCURACY = 0.9;          // probability of a correct (ASP-consistent) high-level transition
     const int STRUCT_CHANGE_FREQ = 1;           // only enumerate over new program structures every n iterations, else tune parameters for previous best structure
@@ -50,13 +50,13 @@ namespace SETTINGS {
     const bool PRINT_DEBUG = false;         // Extra debugging info
     const int INITIAL_VALUES = 4;           // Initial values for x_0: 0 = all zeros, 1 = average, >1 = do all of the above, then enumerate over random initial guesses (use this to specify how many)
     const int BATCH_SIZE = 16;               // Number of programs to optimize in parallel
-    const int NUM_CORES = 4;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
+    const int NUM_CORES = 8;                // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
     const double INIT_ALPHA = 0.0;          // starting slope
     const double OUTLIER_MAX = 20;          // Max negative log likelihood that an example can contribute to the total log likelihood
     const int MAX_ITER = 200;               // Max number of iterations of a single optimization run
 
-    const double PROG_COMPLEXITY_LOSS = 0.03;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double ALPHA_LOSS_UPPER = 0.01;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
+    const double PROG_COMPLEXITY_LOSS = 0.05;           // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double ALPHA_LOSS_UPPER = 0.001;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
     const int EX_SAMPLED = 2000;                // Number of examples to be optimized over
 

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size': 14})
 
-# # 1D-target
+# 1D-target
 training = [-148951, -129579, -127934, -110743, -103292, -101026, -98482, -97827.3, -96767.3, -97076.3, -97271.7, -97197.6, -96927.7, -97026.7, -97470.9, -96666.7]
 testing = [-428431, -361798, -358302, -365852, -308766, -302923, -296427, -295278, -293824, -294168, -294679, -293654, -293072, -293289, -295898, -293641]
 training = [each / (100*125*10) for each in training]
@@ -21,14 +21,16 @@ fig, ax = plt.subplots()
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 
-ax.plot(x, training, label = "training set")
-ax.plot(x, testing, label = "testing set")
+ax.plot(x, training, label = "training set", linewidth=2)
+ax.plot(x, testing, label = "testing set", linewidth=2)
 
 plt.xlabel("Iteration")
-plt.ylabel("Average Obs Likelihood (log scale)")
+plt.xticks(range(0,16,3))
+plt.ylabel("Log Obs. Likelihood")
 
 plt.legend(loc = 'lower right')
 plt.tight_layout()
+plt.grid(linestyle='dotted')
 plt.savefig("1D-target-emloop.png", dpi=1200)
 # plt.savefig("2D-highway-emloop.png", dpi=1200)
 plt.show()
@@ -55,6 +57,7 @@ plt.show()
 # plt.ylabel("Average Obs Likelihood\n(log scale)")
 
 # plt.legend(loc = 'lower right')
+# plt.grid()
 # plt.savefig("1D-target-ldips.png", dpi=1200)
 # plt.show()
 
@@ -63,7 +66,7 @@ plt.show()
 
 # 2D-merge
 # gt = [1.238937333, 0.8958613333, 0.1214428, -1.346808]
-# perfect = [0.9602453333, 0.2720666667, -0.2379098667, -2.088324]
+# # perfect = [0.9602453333, 0.2720666667, -0.2379098667, -2.088324]
 # emsynth = [1.062952, 0.2565986667, -0.493004533, -1.868958667]
 # stable = [0.7821733333, -0.653108, -0.993234666, -3.038394667]
 # greedy = [0.2356574667, -0.7432653333, -2.749946667, -6.557186667]
@@ -72,27 +75,30 @@ plt.show()
 
 # x = [0.25, 0.5, 0.75, 1]
 
-# perfect = np.subtract(gt, perfect)
-# emsynth = np.subtract(gt, emsynth)
-# stable = np.subtract(gt, stable)
-# greedy = np.subtract(gt, greedy)
-# nn_ha = np.subtract(gt, nn_ha)
-# nn_la = np.subtract(gt, nn_la)
+# # perfect = np.subtract(perfect, gt)
+# # emsynth = np.subtract(emsynth, gt)
+# # stable = np.subtract(stable, gt)
+# # greedy = np.subtract(greedy, gt)
+# # nn_ha = np.subtract(nn_ha, gt)
+# # nn_la = np.subtract(nn_la, gt)
 
 # fig, ax = plt.subplots()
 # ax.spines['top'].set_visible(False)
 # ax.spines['right'].set_visible(False)
 
-# ax.plot(x, perfect, ".", linestyle='solid', label = "EM-TRUTH")
-# ax.plot(x, emsynth, "*", linestyle='--', label = "EM-SYNTH")
-# ax.plot(x, greedy, "^", linestyle='dotted', label = "M-SYNTH")
-# ax.plot(x, stable, "v", linestyle='dotted', label = "M-SYNTH+")
-# ax.plot(x, nn_la, "x", linestyle='dotted', label = "Supervised")
-# ax.plot(x, nn_ha, "+", linestyle='dotted', label = "Supervised+")
+# # ax.plot(x, perfect, ".", linestyle='--', label = "FitTruth", linewidth=2)
+# ax.plot(x, emsynth, "*", linestyle='solid', label = "PLUNDER", linewidth=2)
+# ax.plot(x, greedy, "^", linestyle='dotted', label = "FitGreedy",linewidth=2)
+# ax.plot(x, stable, "v", linestyle='dotted', label = "FitSmooth", linewidth=2)
+# ax.plot(x, nn_la, "x", linestyle='dotted', label = "BC", linewidth=2)
+# ax.plot(x, nn_ha, "+", linestyle='dotted', label = "BC+", linewidth=2)
 
 # plt.xlabel("Noise Level")
-# plt.ylabel("Likelihood Difference\n(relative to ground truth)")
+# plt.ylabel("Log Obs. Likelihood")
+# plt.xticks([0.25, 0.5, 0.75, 1])
 
-# plt.legend(loc = 'upper left')
-# plt.savefig("noise_experiments.png", dpi=1200)
+# plt.legend(loc = 'lower left')
+# plt.tight_layout()
+# plt.grid(linestyle='dotted')
+# plt.savefig("noise.png", dpi=1200)
 # plt.show()
