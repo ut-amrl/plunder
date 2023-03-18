@@ -40,9 +40,9 @@ CMakeFiles/
 lib/
 
 # Generated data files
-# out
-# plots
-# sim
+out
+plots
+sim
 # snapshots
 
 # Clang
