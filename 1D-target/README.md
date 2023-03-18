@@ -21,19 +21,27 @@ The most useful/informative outputs will be:
     fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.686273, -2.200493), true)]
     ```
 - **plots/testing-accuracy.png** and **plots/testing-likelihoods.png**, which shows the progress of the EM loop across iterations. For example:
-![](snapshots/example_snapshot/plots/testing-likelihoods.png)
+
+    ![](snapshots/example_snapshot/plots/testing-likelihoods.png)
 - **plots/validation-accuracy.png** and **plots/validation-likelihoods.png**, which shows indicates performance on a dataset that was never seen in training. For example:
-![](snapshots/example_snapshot/plots/validation-likelihoods.png)
+
+    ![](snapshots/example_snapshot/plots/validation-likelihoods.png)
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the high-level labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
+
     ![](snapshots/example_snapshot/plots/testing/0-0-graph.png)
+
     Iteration 2:
+
     ![](snapshots/example_snapshot/plots/testing/1-0-graph.png)
+    
     Iteration 10:
+
     ![](snapshots/example_snapshot/plots/testing/9-0-graph.png)
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level actions predicted by the policy on the testing set. For example, here is iteration 10:
-![](snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
+
+    ![](snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
 
 Other outputs include:
 - **sim/** - contains the simulated trajectories for each robot
