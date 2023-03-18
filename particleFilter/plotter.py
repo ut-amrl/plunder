@@ -300,12 +300,14 @@ def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title, ylabel):
         for line in lines[1:]:
             vals.append(float(line.strip()))
 
+    vals = vals[1:]
+    
     plt.suptitle(title)
     plt.xlabel('Iteration')
     plt.xticks(range(0,16,2))
     plt.ylabel(ylabel)
     plt.plot(vals, linewidth=2, markersize=4, label="synthesized programs")
-    plt.axhline(y = gt, color = 'green', label="ground truth")
+    # plt.axhline(y = gt, color = 'green', label="ground truth")
     plt.legend(loc="lower right")
     plt.tight_layout()
     plt.show()
@@ -326,7 +328,6 @@ def main():
     
     # I/O
     trainingInFile = settings["TRAINING_TRAJ"]
-    testingInFile = settings["TESTING_TRAJ"]
     validationInFile = settings["VALIDATION_TRAJ"]
     gtFile = settings["SIM_DATA"]
     trainingOutPath = settings["PLOT_PATH"]+"training/"
@@ -343,7 +344,7 @@ def main():
                         'gtF': gtFile,
                         'title': 'Particle filter outputs'
                     }
-        graph2 =    {   'inF': testingInFile,
+        graph2 =    {   'inF': validationInFile,
                         'outP': testingOutPath,
                         'gtF': gtFile,
                         'title': 'ASP Test Run'

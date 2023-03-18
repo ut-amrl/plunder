@@ -49,7 +49,7 @@ namespace SETTINGS {
     /* 
         ### Alpha loss ###
         Penalizes overconfident programs, allowing greater exploration during the E-step. Higher = less confident
-        We find that the default value of 0.01 works well.
+        We find that a value between 0 and 0.01 works well.
     */
     const double ALPHA_LOSS_UPPER = 0.01;           // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 }

@@ -1,5 +1,7 @@
 # EM Synthesis Project
 
+![](2D-highway-env/snapshots/example_snapshot/asp_8.gif)
+
 Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels. Link to publication: https://arxiv.org/abs/2303.01440. 
 
 Our system is a *discrete-time Markov process* defined by:
@@ -52,12 +54,18 @@ Then, you can use *make* commands to run the project:
 - **make clean, make clear_data, make purge** to delete all build files, to clear all data/plots/trajectories, or both
 - **make snapshot** to archive current settings and output files to a given folder
 
-
 Other *make* commands which are not commonly used alone:
 - **make gen** to run only the simulation
 - **make pf** to run only the particle filter (E-step)
 - **make settings** to compile settings
 
+
+
+---
+# Example Usage
+We have provided three example settings: 1D-target, 2D-highway-env, and 2D-merge. Please see each of these folders for an extended usage guide and example results.
+
+---
 ## Project Organization
 This project is roughly split into the following components:
 
