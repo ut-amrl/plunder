@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": 3.486891269683838
+                "value": 1.1125609874725342
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -1.6267091035842896
+                "value": -0.4016827344894409
             },
             "dim": [
                 0,

@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": 4.190764427185059
+                "value": -4.088961124420166
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": 3.642474889755249
+                "value": -1.2686434984207153
             },
             "dim": [
                 0,
@@ -53,6 +53,19 @@
                     0
                 ],
                 "left": {
+                    "dim": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "name": "dns",
+                    "node": "Var",
+                    "symbolic": false,
+                    "type": 2
+                },
+                "node": "BinOp",
+                "op": "Minus",
+                "right": {
                     "dim": [
                         1,
                         0,
@@ -84,19 +97,6 @@
                     },
                     "symbolic": false,
                     "type": 4
-                },
-                "node": "BinOp",
-                "op": "Minus",
-                "right": {
-                    "dim": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "name": "dns",
-                    "node": "Var",
-                    "symbolic": false,
-                    "type": 2
                 },
                 "symbolic": false,
                 "type": 4

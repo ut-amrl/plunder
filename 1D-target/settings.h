@@ -43,8 +43,8 @@ namespace SETTINGS {
         If your programs are overfitting, it may help to increase PROG_COMPLEXITY_LOSS, and vice versa if they are underfitting.
         In general, we find that a value between 0.01 and 0.05 works well.
     */
-    const double PROG_COMPLEXITY_LOSS = 0.02;       // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
     const double PROG_COMPLEXITY_LOSS_BASE = 0.005; // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.03;       // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
 
     /* 
         ### Alpha loss ###

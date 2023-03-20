@@ -1,18 +1,18 @@
 ACC -> CON
-Loss: 0.0741004
-fX1=[Flip(Logistic(Minus(vMax, vel), 0.298991, -1.164296), true)]
+Loss: 0.0619487
+fX1=[Flip(Logistic(Minus(vMax, vel), 0.354289, -1.188416), true)]
 ACC -> DEC
-Loss: 0.0252479
-fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 3.965646, 3.422556), true)]
+Loss: 0.0228019
+fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.847392, -0.386025), true)]
 CON -> ACC
-Loss: 0.015
-fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
+Loss: 0.005
+fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
 CON -> DEC
-Loss: 0.0526435
-fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.630591, -2.008064), true)]
+Loss: 0.0709827
+fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 2.564207, -0.637461), true)]
 DEC -> ACC
-Loss: 0.015
-fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
+Loss: 0.005
+fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
 DEC -> CON
-Loss: 0.015
+Loss: 0.005
 fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]

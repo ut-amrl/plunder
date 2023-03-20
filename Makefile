@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 2D-highway-env
+target_dir ?= 1D-target
 
 # export OMP_NUM_THREADS := 16 # Turn this on when running LDIPS
 
@@ -67,7 +67,6 @@ $(EMNG):
 			cd $(target_dir) && \
 			rm -rf out && \
 			mkdir -p out/training_traj && \
-			mkdir -p out/testing_traj && \
 			mkdir -p out/validation_traj && \
 			touch out/em.txt && \
 			cp emdips_operations.json ../pips/ops/emdips_operations.json && \

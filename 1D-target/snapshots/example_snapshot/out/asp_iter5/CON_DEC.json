@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -5.079049587249756
+                "value": -2.9566397666931152
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -0.17104695737361908
+                "value": -0.08305186778306961
             },
             "dim": [
                 0,
@@ -52,54 +52,10 @@
                     0,
                     0
                 ],
-                "left": {
-                    "dim": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "name": "dns",
-                    "node": "Var",
-                    "symbolic": false,
-                    "type": 2
-                },
-                "node": "BinOp",
-                "op": "Minus",
-                "right": {
-                    "dim": [
-                        1,
-                        0,
-                        0
-                    ],
-                    "left": {
-                        "dim": [
-                            1,
-                            -1,
-                            0
-                        ],
-                        "name": "vel",
-                        "node": "Var",
-                        "symbolic": false,
-                        "type": 2
-                    },
-                    "node": "BinOp",
-                    "op": "DistTraveled",
-                    "right": {
-                        "dim": [
-                            1,
-                            -2,
-                            0
-                        ],
-                        "name": "decMax",
-                        "node": "Var",
-                        "symbolic": false,
-                        "type": 2
-                    },
-                    "symbolic": false,
-                    "type": 4
-                },
+                "name": "dns",
+                "node": "Var",
                 "symbolic": false,
-                "type": 4
+                "type": 2
             }
         },
         "node": "BinOp",

@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -5.4955925941467285
+                "value": 7.298069477081299
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -0.3075736463069916
+                "value": 0.25377386808395386
             },
             "dim": [
                 0,
@@ -58,7 +58,7 @@
                         -1,
                         0
                     ],
-                    "name": "vMax",
+                    "name": "vel",
                     "node": "Var",
                     "symbolic": false,
                     "type": 2
@@ -71,7 +71,7 @@
                         -1,
                         0
                     ],
-                    "name": "vel",
+                    "name": "vMax",
                     "node": "Var",
                     "symbolic": false,
                     "type": 2

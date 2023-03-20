@@ -2,7 +2,18 @@
 
 ![](2D-highway-env/snapshots/example_snapshot/asp_8.gif)
 
-Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels. Link to publication: https://arxiv.org/abs/2303.01440. 
+Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels. 
+
+---
+## Related Resources
+PLUNDER (codebase): [https://github.com/ut-amrl/plunder](https://github.com/ut-amrl/plunder)
+
+AMRL Google Drive (presentations and videos): [https://drive.google.com/drive/folders/1QaKtIvmKhZjxIwY9ANSPpjYl0teoNW5S?usp=share_link](https://drive.google.com/drive/folders/1QaKtIvmKhZjxIwY9ANSPpjYl0teoNW5S?usp=share_link)
+
+Publication: [https://arxiv.org/abs/2303.01440](https://arxiv.org/abs/2303.01440)
+
+---
+## Description
 
 Our system is a *discrete-time Markov process* defined by:
    - a **high-level action space** $H$ = a set of discrete high-level actions $h \in H$

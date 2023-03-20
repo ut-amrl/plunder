@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": 1000000000.0
+                "value": -198.80380249023438
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": 1.0
+                "value": -0.08606857806444168
             },
             "dim": [
                 0,
@@ -49,10 +49,10 @@
             "x": {
                 "dim": [
                     1,
-                    0,
+                    -2,
                     0
                 ],
-                "name": "target",
+                "name": "accMax",
                 "node": "Var",
                 "symbolic": false,
                 "type": 2

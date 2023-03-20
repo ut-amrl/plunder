@@ -197,14 +197,11 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     print_metrics(cum_log_obs, ha_correct, ha_total, TRAINING);
     
     ha_correct = ha_total = cum_log_obs = 0;
-    for(uint i = 0; i < TRAINING_SET; i++){
-        string plot = TESTING_TRAJ+to_string(iteration)+"-"+to_string(i);
-        cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
-    }
-    print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
-
-    ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
+        if(i == TRAINING_SET) {
+            print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
+        }
+
         string plot = VALIDATION_TRAJ+to_string(iteration)+"-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], asp, plot, ha_correct, ha_total);
     }
@@ -341,14 +338,11 @@ void read_demonstration(vector<Trajectory>& state_traj){
     print_metrics(cum_log_obs, ha_correct, ha_total, TRAINING);
     
     ha_correct = ha_total = cum_log_obs = 0;
-    for(uint i = 0; i < TRAINING_SET; i++){
-        string plot = TESTING_TRAJ+"gt-"+to_string(i);
-        cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
-    }
-    print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
-
-    ha_correct = ha_total = cum_log_obs = 0;
     for(uint i = 0; i < VALIDATION_SET; i++){
+        if(i == TRAINING_SET) {
+            print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
+        }
+        
         string plot = VALIDATION_TRAJ+"gt-"+to_string(i);
         cum_log_obs += save_pure(state_traj[i], ASP_model, plot, ha_correct, ha_total);
     }

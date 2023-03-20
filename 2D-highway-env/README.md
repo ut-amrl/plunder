@@ -38,12 +38,13 @@ The most useful/informative outputs will be:
     Iteration 2:
 
     ![](snapshots/example_snapshot/plots/testing/1-0-graph.png)
-    
+
     Iteration 10:
 
     ![](snapshots/example_snapshot/plots/testing/9-0-graph.png)
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level actions predicted by the policy on the testing set. For example, here is iteration 10:
-![](snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
+
+    ![](snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
 
 We also show the behavior of the synthesized policy directly in the simulator.
 

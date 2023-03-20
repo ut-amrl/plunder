@@ -24,8 +24,8 @@ Metrics (testing):
 	Cumulative observation likelihood: e^-0.815457 = 0.442437
 	%% Accuracy: 97.7%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.806883 = 0.446247
-	%% Accuracy: 98.1037%%
+	Cumulative observation likelihood: e^-0.806594 = 0.446376
+	%% Accuracy: 98.1216%%
 
 |-------------------------------------|
 |                                     |
@@ -41,8 +41,8 @@ Metrics (testing):
 	Cumulative observation likelihood: e^-2.74694 = 0.0641237
 	%% Accuracy: 37.2216%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-2.94324 = 0.0526946
-	%% Accuracy: 37.1496%%
+	Cumulative observation likelihood: e^-2.94396 = 0.052657
+	%% Accuracy: 37.1443%%
 
 |-------------------------------------|
 |                                     |
@@ -67,9 +67,9 @@ target [1, 0, 0]
 | 
 |---- Number of Total Programs ----
 | 31
-| Final loss: 0.103409
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), -5.495593, -0.307574), true)]
-| Time Elapsed: 10.186
+| Final loss: 0.0907588
+| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), 7.298069, 0.253774), true)]
+| Time Elapsed: 10.485
 |----------------------------
 
 
@@ -78,9 +78,9 @@ target [1, 0, 0]
 | 
 |---- Number of Total Programs ----
 | 31
-| Final loss: 0.107712
-| Final Solution: fX1=[Flip(Logistic(dns, 8.395448, -0.053251), true)]
-| Time Elapsed: 9.636
+| Final loss: 0.0944371
+| Final Solution: fX1=[Flip(Logistic(dns, 20.245123, -0.064146), true)]
+| Time Elapsed: 9.891
 |----------------------------
 
 
@@ -89,9 +89,9 @@ target [1, 0, 0]
 | 
 |---- Number of Total Programs ----
 | 31
-| Final loss: 0.0415145
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 27.590561, 0.222184), true)]
-| Time Elapsed: 10.582
+| Final loss: 0.0312728
+| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -26.937449, -0.214787), true)]
+| Time Elapsed: 12.507
 |----------------------------
 
 
@@ -100,9 +100,9 @@ target [1, 0, 0]
 | 
 |---- Number of Total Programs ----
 | 31
-| Final loss: 0.14419
-| Final Solution: fX1=[Flip(Logistic(dns, -7.399514, -0.073301), true)]
-| Time Elapsed: 10.192
+| Final loss: 0.130424
+| Final Solution: fX1=[Flip(Logistic(dns, -9.297072, -0.069131), true)]
+| Time Elapsed: 10.127
 |----------------------------
 
 
@@ -111,9 +111,9 @@ target [1, 0, 0]
 | 
 |---- Number of Total Programs ----
 | 31
-| Final loss: 0.0306244
-| Final Solution: fX1=[Flip(Logistic(dns, 137.305817, 0.050440), true)]
-| Time Elapsed: 12.985
+| Final loss: 0.0200181
+| Final Solution: fX1=[Flip(Logistic(dns, 185.638931, 0.032491), true)]
+| Time Elapsed: 14.285
 |----------------------------
 
 
@@ -122,11 +122,11 @@ target [1, 0, 0]
 | 
 |---- Number of Total Programs ----
 | 31
-| Final loss: 0.0349487
-| Final Solution: fX1=[Flip(Logistic(dns, 146.960281, 0.040619), true)]
-| Time Elapsed: 14.231
+| Final loss: 0.0245275
+| Final Solution: fX1=[Flip(Logistic(dns, 128.118332, 0.050293), true)]
+| Time Elapsed: 13.423
 |----------------------------
---------------- Iteration 0 took 80.3223 s ---------------
+--------------- Iteration 0 took 81.1958 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -136,14 +136,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00764234 = 0.992387
-	%% Accuracy: 97.4816%%
+	Cumulative observation likelihood: e^-0.00765408 = 0.992375
+	%% Accuracy: 97.6768%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-1.18227 = 0.306581
-	%% Accuracy: 87.3168%%
+	Cumulative observation likelihood: e^-1.19974 = 0.301272
+	%% Accuracy: 86.4448%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-1.1382 = 0.320395
-	%% Accuracy: 88.6928%%
+	Cumulative observation likelihood: e^-1.14237 = 0.319063
+	%% Accuracy: 88.528%%
 
 |-------------------------------------|
 |                                     |
@@ -164,76 +164,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 569|30006
+| Num transitions (pos|neg): 532|30122
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.070503
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), 0.669241, 0.888022), true)]
-| Time Elapsed: 74.959
+| Final loss: 0.0596861
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), -1.700861, -0.621066), true)]
+| Time Elapsed: 121.079
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 544|29462
+| Num transitions (pos|neg): 578|29544
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0921475
-| Final Solution: fX1=[Flip(Logistic(dns, 26.993227, -0.080394), true)]
-| Time Elapsed: 80.814
+| Final loss: 0.0741643
+| Final Solution: fX1=[Flip(Logistic(dns, 30.351686, -0.089533), true)]
+| Time Elapsed: 102.685
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 6|20614
+| Num transitions (pos|neg): 14|20489
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0171981
-| Final Solution: fX1=[Flip(Logistic(vel, -0.527951, -1.321269), true)]
-| Time Elapsed: 84.036
+| Final loss: 0.0107248
+| Final Solution: fX1=[Flip(Logistic(decMax, -62.880913, -0.136471), true)]
+| Time Elapsed: 123.346
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 645|19969
+| Num transitions (pos|neg): 577|19912
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.128645
-| Final Solution: fX1=[Flip(Logistic(dns, -3.019367, -0.080662), true)]
-| Time Elapsed: 58.028
+| Final loss: 0.108613
+| Final Solution: fX1=[Flip(Logistic(dns, 1.958034, -0.105686), true)]
+| Time Elapsed: 92.132
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 108|73697
+| Num transitions (pos|neg): 96|73747
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0266747
-| Final Solution: fX1=[Flip(Logistic(target, 0.003451, -0.065010), true)]
-| Time Elapsed: 90.802
+| Final loss: 0.0135263
+| Final Solution: fX1=[Flip(Logistic(dns, 165.954590, 0.040260), true)]
+| Time Elapsed: 151.913
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 82|73615
+| Num transitions (pos|neg): 59|73688
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0235125
-| Final Solution: fX1=[Flip(Logistic(dns, 123.035690, 0.062922), true)]
-| Time Elapsed: 107.939
+| Final loss: 0.0117219
+| Final Solution: fX1=[Flip(Logistic(target, 0.009303, -0.069074), true)]
+| Time Elapsed: 139.483
 |----------------------------
---------------- Iteration 1 took 519.707 s ---------------
+--------------- Iteration 1 took 751.762 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -243,14 +243,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.0076069 = 0.992422
-	%% Accuracy: 97.924%%
+	Cumulative observation likelihood: e^-0.00760862 = 0.99242
+	%% Accuracy: 97.6888%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-1.10323 = 0.331798
-	%% Accuracy: 89.1144%%
+	Cumulative observation likelihood: e^-1.09805 = 0.33352
+	%% Accuracy: 90.0808%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-1.0566 = 0.347636
-	%% Accuracy: 90.1304%%
+	Cumulative observation likelihood: e^-1.02816 = 0.357665
+	%% Accuracy: 91.5677%%
 
 |-------------------------------------|
 |                                     |
@@ -271,76 +271,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 581|30124
+| Num transitions (pos|neg): 537|30145
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0675124
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), -0.252651, -1.190755), true)]
-| Time Elapsed: 101.052
+| Final loss: 0.0572336
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.082005, -1.240789), true)]
+| Time Elapsed: 85.598
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 468|29656
+| Num transitions (pos|neg): 523|29622
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0702843
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 9.353266, 0.083242), true)]
-| Time Elapsed: 103.905
+| Final loss: 0.0692463
+| Final Solution: fX1=[Flip(Logistic(dns, 30.388887, -0.093746), true)]
+| Time Elapsed: 93.127
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|20647
+| Num transitions (pos|neg): 0|20262
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 11.639
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 14.675
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 605|20042
+| Num transitions (pos|neg): 574|19688
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.125932
-| Final Solution: fX1=[Flip(Logistic(dns, 0.826808, -0.095905), true)]
-| Time Elapsed: 64.041
+| Final loss: 0.101639
+| Final Solution: fX1=[Flip(Logistic(dns, -2.373170, -0.090693), true)]
+| Time Elapsed: 88.36
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 50|73598
+| Num transitions (pos|neg): 61|73995
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0209997
-| Final Solution: fX1=[Flip(Logistic(target, 0.005939, -0.076008), true)]
-| Time Elapsed: 78.973
+| Final loss: 0.0109049
+| Final Solution: fX1=[Flip(Logistic(dns, 124.843956, 0.062854), true)]
+| Time Elapsed: 111.436
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 24|73574
+| Num transitions (pos|neg): 37|73958
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0178734
-| Final Solution: fX1=[Flip(Logistic(dns, 624.939636, 0.011906), true)]
-| Time Elapsed: 109.026
+| Final loss: 0.0094216
+| Final Solution: fX1=[Flip(Logistic(accMax, -120.129822, -0.058732), true)]
+| Time Elapsed: 99.021
 |----------------------------
---------------- Iteration 2 took 491.456 s ---------------
+--------------- Iteration 2 took 511.738 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -350,14 +350,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00756346 = 0.992465
-	%% Accuracy: 98.1536%%
+	Cumulative observation likelihood: e^-0.0075979 = 0.992431
+	%% Accuracy: 97.9568%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-1.01631 = 0.361926
-	%% Accuracy: 92.1832%%
+	Cumulative observation likelihood: e^-1.08234 = 0.338803
+	%% Accuracy: 90.9704%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.951947 = 0.385989
-	%% Accuracy: 93.2517%%
+	Cumulative observation likelihood: e^-1.00375 = 0.366502
+	%% Accuracy: 92.3125%%
 
 |-------------------------------------|
 |                                     |
@@ -378,76 +378,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 607|30113
+| Num transitions (pos|neg): 596|30048
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0663966
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), -0.157334, -1.078769), true)]
-| Time Elapsed: 86.164
+| Final loss: 0.0540418
+| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), 0.177226, 1.221320), true)]
+| Time Elapsed: 110.888
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 408|29705
+| Num transitions (pos|neg): 470|29578
 | 
-| Extended Features Count: 97
+| Extended Features Count: 88
 |---- Number of Total Programs ----
-| 197
-| Final loss: 0.0649428
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 6.341626, 0.103939), true)]
-| Time Elapsed: 80.017
+| 162
+| Final loss: 0.0694115
+| Final Solution: fX1=[Flip(Logistic(dns, 24.594297, -0.080139), true)]
+| Time Elapsed: 112.825
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|20688
+| Num transitions (pos|neg): 0|20575
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 14.636
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 20.766
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 621|20067
+| Num transitions (pos|neg): 610|19965
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.126551
-| Final Solution: fX1=[Flip(Logistic(dns, 0.069374, -0.094180), true)]
-| Time Elapsed: 64.829
+| Final loss: 0.112665
+| Final Solution: fX1=[Flip(Logistic(dns, -4.127038, -0.084394), true)]
+| Time Elapsed: 92.93
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 15|73577
+| Num transitions (pos|neg): 66|73715
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.0188545
-| Final Solution: fX1=[Flip(Logistic(target, -0.000240, -0.178399), true)]
-| Time Elapsed: 73.98
+| Final loss: 0.0114581
+| Final Solution: fX1=[Flip(Logistic(dns, 618.299927, 0.010888), true)]
+| Time Elapsed: 139.518
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 14|73563
+| Num transitions (pos|neg): 14|73701
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.0185982
+| 108
+| Final loss: 0.00848984
 | Final Solution: fX1=[Flip(Logistic(target, -0.000240, -0.178399), true)]
-| Time Elapsed: 101.995
+| Time Elapsed: 98.156
 |----------------------------
---------------- Iteration 3 took 444.624 s ---------------
+--------------- Iteration 3 took 594.768 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -457,14 +457,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00755494 = 0.992474
-	%% Accuracy: 98.408%%
+	Cumulative observation likelihood: e^-0.00759949 = 0.992429
+	%% Accuracy: 97.9184%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-1.00122 = 0.36743
-	%% Accuracy: 92.7832%%
+	Cumulative observation likelihood: e^-1.11691 = 0.32729
+	%% Accuracy: 89.0648%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.948314 = 0.387394
-	%% Accuracy: 93.3555%%
+	Cumulative observation likelihood: e^-1.0498 = 0.350007
+	%% Accuracy: 90.5173%%
 
 |-------------------------------------|
 |                                     |
@@ -485,76 +485,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 675|30014
+| Num transitions (pos|neg): 610|30143
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0706152
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.024751, -0.985476), true)]
-| Time Elapsed: 95.07
+| Final loss: 0.0556763
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.181848, -1.231952), true)]
+| Time Elapsed: 120.952
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 325|29689
+| Num transitions (pos|neg): 436|29707
 | 
-| Extended Features Count: 97
+| Extended Features Count: 88
 |---- Number of Total Programs ----
-| 197
-| Final loss: 0.0542334
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 8.469694, 0.099936), true)]
-| Time Elapsed: 87.121
+| 162
+| Final loss: 0.0572596
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -8.721704, -0.101397), true)]
+| Time Elapsed: 108.697
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21303
+| Num transitions (pos|neg): 0|20659
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 17.643
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 24.442
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 675|20628
+| Num transitions (pos|neg): 610|20049
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.132791
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -25.406792, -0.078623), true)]
-| Time Elapsed: 76.781
+| Final loss: 0.113909
+| Final Solution: fX1=[Flip(Logistic(dns, -0.906896, -0.090681), true)]
+| Time Elapsed: 88.894
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|73008
+| Num transitions (pos|neg): 46|73542
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 30.016
+| Final loss: 0.0104087
+| Final Solution: fX1=[Flip(Logistic(target, 0.005939, -0.076008), true)]
+| Time Elapsed: 166.225
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|73008
+| Num transitions (pos|neg): 0|73542
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 31.041
+| Time Elapsed: 61.499
 |----------------------------
---------------- Iteration 4 took 360.987 s ---------------
+--------------- Iteration 4 took 591.05 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -564,14 +564,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00751378 = 0.992514
-	%% Accuracy: 98.7752%%
+	Cumulative observation likelihood: e^-0.00755736 = 0.992471
+	%% Accuracy: 98.4072%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.93154 = 0.393946
-	%% Accuracy: 93.7432%%
+	Cumulative observation likelihood: e^-1.00442 = 0.366258
+	%% Accuracy: 92.5672%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.904717 = 0.404657
-	%% Accuracy: 94.9048%%
+	Cumulative observation likelihood: e^-0.951301 = 0.386238
+	%% Accuracy: 93.2829%%
 
 |-------------------------------------|
 |                                     |
@@ -592,76 +592,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 738|29922
+| Num transitions (pos|neg): 699|30051
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0723923
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.253260, -1.010951), true)]
-| Time Elapsed: 88.218
+| Final loss: 0.0597853
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.254463, -1.516047), true)]
+| Time Elapsed: 111.877
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 262|29660
+| Num transitions (pos|neg): 319|29732
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0434407
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 5.882224, 0.136257), true)]
-| Time Elapsed: 97.126
+| Final loss: 0.0410353
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -8.460259, -0.104153), true)]
+| Time Elapsed: 121.573
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21463
+| Num transitions (pos|neg): 0|21389
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 20.51
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 29.435
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 738|20725
+| Num transitions (pos|neg): 699|20690
 | 
-| Extended Features Count: 97
+| Extended Features Count: 88
 |---- Number of Total Programs ----
-| 197
-| Final loss: 0.122131
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -5.079050, -0.171047), true)]
-| Time Elapsed: 71.242
+| 162
+| Final loss: 0.126112
+| Final Solution: fX1=[Flip(Logistic(dns, -2.956640, -0.083052), true)]
+| Time Elapsed: 94.986
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72877
+| Num transitions (pos|neg): 19|72842
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 33.156
+| Final loss: 0.00755655
+| Final Solution: fX1=[Flip(Logistic(target, 0.005939, -0.076008), true)]
+| Time Elapsed: 118.92
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72877
+| Num transitions (pos|neg): 0|72842
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 33.807
+| Time Elapsed: 64.81
 |----------------------------
---------------- Iteration 5 took 367.685 s ---------------
+--------------- Iteration 5 took 561.983 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -671,14 +671,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00747575 = 0.992552
-	%% Accuracy: 99.0608%%
+	Cumulative observation likelihood: e^-0.00755818 = 0.99247
+	%% Accuracy: 98.452%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.839254 = 0.432033
-	%% Accuracy: 96.3768%%
+	Cumulative observation likelihood: e^-1.00764 = 0.365081
+	%% Accuracy: 92.348%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.832795 = 0.434832
-	%% Accuracy: 97.0488%%
+	Cumulative observation likelihood: e^-0.954127 = 0.385148
+	%% Accuracy: 93.1283%%
 
 |-------------------------------------|
 |                                     |
@@ -699,76 +699,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 763|29926
+| Num transitions (pos|neg): 697|30016
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0722773
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.243192, 1.115599), true)]
-| Time Elapsed: 101.699
+| Final loss: 0.0585312
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.207224, -1.227510), true)]
+| Time Elapsed: 128.752
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 237|29689
+| Num transitions (pos|neg): 311|29705
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0371355
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 3.380537, 0.303058), true)]
-| Time Elapsed: 90.254
+| Final loss: 0.0403256
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -6.488163, -0.121649), true)]
+| Time Elapsed: 125.269
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21577
+| Num transitions (pos|neg): 0|21365
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 23.55
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 32.972
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 763|20814
+| Num transitions (pos|neg): 697|20668
 | 
-| Extended Features Count: 97
+| Extended Features Count: 88
 |---- Number of Total Programs ----
-| 197
-| Final loss: 0.104435
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 0.996887, -0.369894), true)]
-| Time Elapsed: 69.413
+| 162
+| Final loss: 0.126683
+| Final Solution: And(fX1=[Flip(Logistic(vel, 18.143866, 0.289439), true)], fX1=[Flip(Logistic(dns, 17.178205, -0.098302), true)])
+| Time Elapsed: 110.269
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72734
+| Num transitions (pos|neg): 8|72914
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 35.099
+| Final loss: 0.00701251
+| Final Solution: fX1=[Flip(Logistic(accMax, -198.803802, -0.086069), true)]
+| Time Elapsed: 124.342
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72734
+| Num transitions (pos|neg): 0|72914
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 35.553
+| Time Elapsed: 76.421
 |----------------------------
---------------- Iteration 6 took 379.241 s ---------------
+--------------- Iteration 6 took 618.179 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -778,14 +778,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00744482 = 0.992583
-	%% Accuracy: 99.2512%%
+	Cumulative observation likelihood: e^-0.00751103 = 0.992517
+	%% Accuracy: 98.7536%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.80089 = 0.448929
-	%% Accuracy: 97.5976%%
+	Cumulative observation likelihood: e^-0.914238 = 0.400822
+	%% Accuracy: 94.028%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.799649 = 0.449487
-	%% Accuracy: 98.0155%%
+	Cumulative observation likelihood: e^-0.900433 = 0.406394
+	%% Accuracy: 94.6168%%
 
 |-------------------------------------|
 |                                     |
@@ -806,76 +806,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 772|29933
+| Num transitions (pos|neg): 750|29960
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0723942
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.039354, 0.996594), true)]
-| Time Elapsed: 93.771
+| Final loss: 0.0605486
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.228955, -1.296719), true)]
+| Time Elapsed: 114.381
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 228|29705
+| Num transitions (pos|neg): 250|29710
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0335129
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 3.779215, 0.375514), true)]
-| Time Elapsed: 85.404
+| Final loss: 0.0301383
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -5.568855, -0.269845), true)]
+| Time Elapsed: 151.429
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21586
+| Num transitions (pos|neg): 0|21572
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 25.71
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 39.716
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 772|20814
+| Num transitions (pos|neg): 750|20822
 | 
-| Extended Features Count: 97
+| Extended Features Count: 127
 |---- Number of Total Programs ----
-| 197
-| Final loss: 0.083508
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 2.841715, -0.676628), true)]
-| Time Elapsed: 87.518
+| 211
+| Final loss: 0.118527
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -6.967251, -0.153601), true)]
+| Time Elapsed: 238.599
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72709
+| Num transitions (pos|neg): 0|72718
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 37.693
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 49.48
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72709
+| Num transitions (pos|neg): 0|72718
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 37.727
+| Time Elapsed: 72.944
 |----------------------------
---------------- Iteration 7 took 390.981 s ---------------
+--------------- Iteration 7 took 687.92 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -885,14 +885,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00742904 = 0.992598
-	%% Accuracy: 99.2776%%
+	Cumulative observation likelihood: e^-0.00747557 = 0.992552
+	%% Accuracy: 99.0496%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.790751 = 0.453504
-	%% Accuracy: 97.8672%%
+	Cumulative observation likelihood: e^-0.841366 = 0.431121
+	%% Accuracy: 96.3648%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.793328 = 0.452337
-	%% Accuracy: 98.2325%%
+	Cumulative observation likelihood: e^-0.832196 = 0.435093
+	%% Accuracy: 97.0784%%
 
 |-------------------------------------|
 |                                     |
@@ -913,76 +913,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 784|29903
+| Num transitions (pos|neg): 777|29971
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0739199
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.058999, 1.107237), true)]
-| Time Elapsed: 100.342
+| Final loss: 0.0608299
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.477693, -1.379141), true)]
+| Time Elapsed: 148.196
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 216|29687
+| Num transitions (pos|neg): 223|29748
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0318559
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.357887, 0.742339), true)]
-| Time Elapsed: 100.173
+| Final loss: 0.0255029
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -5.787242, -0.697659), true)]
+| Time Elapsed: 167.14
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21625
+| Num transitions (pos|neg): 0|21648
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 28.48
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 38.808
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 784|20841
+| Num transitions (pos|neg): 777|20871
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0681029
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.114621, -0.984861), true)]
-| Time Elapsed: 81.117
+| Final loss: 0.0973193
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -1.316147, -0.262351), true)]
+| Time Elapsed: 160.563
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72688
+| Num transitions (pos|neg): 0|72604
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 41.255
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 53.636
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72688
+| Num transitions (pos|neg): 0|72604
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 41.332
+| Time Elapsed: 79.31
 |----------------------------
---------------- Iteration 8 took 416.105 s ---------------
+--------------- Iteration 8 took 668.967 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -992,14 +992,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00742026 = 0.992607
-	%% Accuracy: 99.3184%%
+	Cumulative observation likelihood: e^-0.00745191 = 0.992576
+	%% Accuracy: 99.212%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.781325 = 0.457799
-	%% Accuracy: 98.1408%%
+	Cumulative observation likelihood: e^-0.807861 = 0.445811
+	%% Accuracy: 97.4544%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.789107 = 0.45425
-	%% Accuracy: 98.3709%%
+	Cumulative observation likelihood: e^-0.804581 = 0.447275
+	%% Accuracy: 97.8605%%
 
 |-------------------------------------|
 |                                     |
@@ -1020,76 +1020,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 798|29869
+| Num transitions (pos|neg): 799|29945
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0734779
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.242661, 1.026240), true)]
-| Time Elapsed: 106.186
+| Final loss: 0.060839
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.255878, -1.090441), true)]
+| Time Elapsed: 283.272
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 202|29667
+| Num transitions (pos|neg): 201|29744
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0288038
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 3.458350, 2.857454), true)]
-| Time Elapsed: 110.861
+| Final loss: 0.0217379
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -5.311073, -0.337768), true)]
+| Time Elapsed: 375.487
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21661
+| Num transitions (pos|neg): 0|21681
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 30.452
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 47.863
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 798|20863
+| Num transitions (pos|neg): 799|20882
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0599294
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.486891, -1.626709), true)]
-| Time Elapsed: 84.597
+| Final loss: 0.0810014
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 1.112561, -0.401683), true)]
+| Time Elapsed: 216.795
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72672
+| Num transitions (pos|neg): 0|72575
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 43.243
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 52.745
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72672
+| Num transitions (pos|neg): 0|72575
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 43.723
+| Time Elapsed: 80.01
 |----------------------------
---------------- Iteration 9 took 442.483 s ---------------
+--------------- Iteration 9 took 1077.98 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1099,14 +1099,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00741031 = 0.992617
-	%% Accuracy: 99.328%%
+	Cumulative observation likelihood: e^-0.00744148 = 0.992586
+	%% Accuracy: 99.208%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.776803 = 0.459874
-	%% Accuracy: 98.2144%%
+	Cumulative observation likelihood: e^-0.803745 = 0.447649
+	%% Accuracy: 97.568%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.788355 = 0.454592
-	%% Accuracy: 98.4155%%
+	Cumulative observation likelihood: e^-0.801861 = 0.448494
+	%% Accuracy: 98.0032%%
 
 |-------------------------------------|
 |                                     |
@@ -1127,76 +1127,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 795|29844
+| Num transitions (pos|neg): 783|29912
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0741004
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.298991, -1.164296), true)]
-| Time Elapsed: 98.697
+| Final loss: 0.0619487
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.354289, -1.188416), true)]
+| Time Elapsed: 147.025
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 205|29639
+| Num transitions (pos|neg): 217|29695
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0252479
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 3.965646, 3.422556), true)]
-| Time Elapsed: 102.256
+| Final loss: 0.0228019
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.847392, -0.386025), true)]
+| Time Elapsed: 152.531
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21677
+| Num transitions (pos|neg): 0|21640
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 34.732
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 44.849
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 795|20882
+| Num transitions (pos|neg): 783|20857
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0526435
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.630591, -2.008064), true)]
-| Time Elapsed: 72.359
+| Final loss: 0.0709827
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 2.564207, -0.637461), true)]
+| Time Elapsed: 145.954
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72684
+| Num transitions (pos|neg): 0|72665
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 47.684
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 59.846
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72684
+| Num transitions (pos|neg): 0|72665
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 47.848
+| Time Elapsed: 85.299
 |----------------------------
---------------- Iteration 10 took 426.945 s ---------------
+--------------- Iteration 10 took 657.123 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1206,14 +1206,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.0074094 = 0.992618
-	%% Accuracy: 99.3328%%
+	Cumulative observation likelihood: e^-0.0074287 = 0.992599
+	%% Accuracy: 99.2712%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.777672 = 0.459475
-	%% Accuracy: 98.2144%%
+	Cumulative observation likelihood: e^-0.787125 = 0.455151
+	%% Accuracy: 98.008%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.78427 = 0.456453
-	%% Accuracy: 98.5147%%
+	Cumulative observation likelihood: e^-0.792042 = 0.452919
+	%% Accuracy: 98.2699%%
 
 |-------------------------------------|
 |                                     |
@@ -1234,76 +1234,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 794|29873
+| Num transitions (pos|neg): 792|29921
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0729725
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.173391, -1.067474), true)]
-| Time Elapsed: 110.349
+| Final loss: 0.0617756
+| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.440826, 1.159274), true)]
+| Time Elapsed: 139.798
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 206|29667
+| Num transitions (pos|neg): 208|29713
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0252341
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.218533, 4.281458), true)]
-| Time Elapsed: 105.041
+| Final loss: 0.021861
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -5.302921, -0.378792), true)]
+| Time Elapsed: 155.943
 |----------------------------
 
 
 |--------- CON->ACC ---------
 | Num transitions (pos|neg): 0|21635
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 37.054
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 48.063
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 794|20841
+| Num transitions (pos|neg): 792|20843
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0508105
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.545396, -1.948943), true)]
-| Time Elapsed: 102.731
+| Final loss: 0.0579245
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.263742, -1.097739), true)]
+| Time Elapsed: 152.787
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72698
+| Num transitions (pos|neg): 0|72652
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 50.289
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 61.833
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72698
+| Num transitions (pos|neg): 0|72652
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 50.233
+| Time Elapsed: 90.737
 |----------------------------
---------------- Iteration 11 took 479.301 s ---------------
+--------------- Iteration 11 took 670.529 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1313,14 +1313,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740862 = 0.992619
-	%% Accuracy: 99.3344%%
+	Cumulative observation likelihood: e^-0.00741983 = 0.992608
+	%% Accuracy: 99.2648%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.778468 = 0.459109
-	%% Accuracy: 98.204%%
+	Cumulative observation likelihood: e^-0.782387 = 0.457313
+	%% Accuracy: 98.0744%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.783224 = 0.456931
-	%% Accuracy: 98.4987%%
+	Cumulative observation likelihood: e^-0.790651 = 0.45355
+	%% Accuracy: 98.3171%%
 
 |-------------------------------------|
 |                                     |
@@ -1341,76 +1341,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 798|29871
+| Num transitions (pos|neg): 792|29905
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0731893
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.271311, -1.121740), true)]
-| Time Elapsed: 144.344
+| Final loss: 0.0629355
+| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.302104, 1.320219), true)]
+| Time Elapsed: 155.733
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 202|29669
+| Num transitions (pos|neg): 208|29697
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250657
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.026845, 3.761860), true)]
-| Time Elapsed: 135.612
+| Final loss: 0.0219961
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.605731, -0.884229), true)]
+| Time Elapsed: 178.113
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21648
+| Num transitions (pos|neg): 0|21657
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 50.762
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 52.641
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 798|20850
+| Num transitions (pos|neg): 792|20865
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0530469
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.447624, -2.917761), true)]
-| Time Elapsed: 163.68
+| Final loss: 0.048749
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.245310, -1.447114), true)]
+| Time Elapsed: 154.448
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72683
+| Num transitions (pos|neg): 0|72646
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 61.63
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 64.217
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72683
+| Num transitions (pos|neg): 0|72646
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 62.319
+| Time Elapsed: 96.915
 |----------------------------
---------------- Iteration 12 took 641.735 s ---------------
+--------------- Iteration 12 took 723.875 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1420,14 +1420,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740866 = 0.992619
-	%% Accuracy: 99.3576%%
+	Cumulative observation likelihood: e^-0.00741516 = 0.992612
+	%% Accuracy: 99.348%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.77647 = 0.460027
-	%% Accuracy: 98.2216%%
+	Cumulative observation likelihood: e^-0.781499 = 0.457719
+	%% Accuracy: 98.156%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.783851 = 0.456644
-	%% Accuracy: 98.52%%
+	Cumulative observation likelihood: e^-0.785161 = 0.456046
+	%% Accuracy: 98.4931%%
 
 |-------------------------------------|
 |                                     |
@@ -1448,76 +1448,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 796|29866
+| Num transitions (pos|neg): 796|29937
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0740011
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.466735, 1.459235), true)]
-| Time Elapsed: 337
+| Final loss: 0.0611306
+| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.371052, 1.259576), true)]
+| Time Elapsed: 151.402
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 204|29662
+| Num transitions (pos|neg): 204|29733
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250377
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.172134, 4.022040), true)]
-| Time Elapsed: 343.741
+| Final loss: 0.0184165
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.962512, -1.242981), true)]
+| Time Elapsed: 183.101
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21683
+| Num transitions (pos|neg): 0|21630
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 57.286
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 56.811
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 796|20887
+| Num transitions (pos|neg): 796|20834
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0470164
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.309302, -2.576778), true)]
-| Time Elapsed: 116.474
+| Final loss: 0.0450832
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.416915, -1.946433), true)]
+| Time Elapsed: 157.804
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72655
+| Num transitions (pos|neg): 0|72637
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 65.662
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 73.229
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72655
+| Num transitions (pos|neg): 0|72637
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 66.566
+| Time Elapsed: 107.392
 |----------------------------
---------------- Iteration 13 took 1010.21 s ---------------
+--------------- Iteration 13 took 751.41 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1527,14 +1527,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00741019 = 0.992617
-	%% Accuracy: 99.3632%%
+	Cumulative observation likelihood: e^-0.00741055 = 0.992617
+	%% Accuracy: 99.3304%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.772753 = 0.46174
-	%% Accuracy: 98.4184%%
+	Cumulative observation likelihood: e^-0.774238 = 0.461055
+	%% Accuracy: 98.2928%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.780459 = 0.458195
-	%% Accuracy: 98.6168%%
+	Cumulative observation likelihood: e^-0.783458 = 0.456824
+	%% Accuracy: 98.5109%%
 
 |-------------------------------------|
 |                                     |
@@ -1555,76 +1555,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 799|29886
+| Num transitions (pos|neg): 798|29901
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0716661
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.516764, 1.164102), true)]
-| Time Elapsed: 120.458
+| Final loss: 0.0609167
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.472833, -1.272767), true)]
+| Time Elapsed: 165.203
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 201|29685
+| Num transitions (pos|neg): 202|29699
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250596
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.190764, 3.642475), true)]
-| Time Elapsed: 124.64
+| Final loss: 0.0175615
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.088961, -1.268643), true)]
+| Time Elapsed: 177.686
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21686
+| Num transitions (pos|neg): 0|21639
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 56.512
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 60.807
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 799|20887
+| Num transitions (pos|neg): 798|20841
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0476058
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.311670, -2.768016), true)]
-| Time Elapsed: 99.594
+| Final loss: 0.04082
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.502644, -2.345775), true)]
+| Time Elapsed: 172.136
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72629
+| Num transitions (pos|neg): 0|72662
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 68.968
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 72.057
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72629
+| Num transitions (pos|neg): 0|72662
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 68.438
+| Time Elapsed: 115.637
 |----------------------------
---------------- Iteration 14 took 562.849 s ---------------
+--------------- Iteration 14 took 785.352 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1634,14 +1634,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740874 = 0.992619
-	%% Accuracy: 99.3256%%
+	Cumulative observation likelihood: e^-0.00740939 = 0.992618
+	%% Accuracy: 99.3176%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.770743 = 0.462669
-	%% Accuracy: 98.3304%%
+	Cumulative observation likelihood: e^-0.774241 = 0.461054
+	%% Accuracy: 98.3016%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.784408 = 0.45639
-	%% Accuracy: 98.4963%%
+	Cumulative observation likelihood: e^-0.782985 = 0.45704
+	%% Accuracy: 98.5104%%
 
 |-------------------------------------|
 |                                     |
@@ -1662,76 +1662,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 797|29839
+| Num transitions (pos|neg): 796|29891
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0729804
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.372718, -1.115448), true)]
-| Time Elapsed: 122.978
+| Final loss: 0.0610532
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.243650, -1.101101), true)]
+| Time Elapsed: 159.845
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 203|29636
+| Num transitions (pos|neg): 204|29687
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.025235
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.230872, 4.247661), true)]
-| Time Elapsed: 129.29
+| Final loss: 0.0172758
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.837772, -1.404219), true)]
+| Time Elapsed: 191.646
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21722
+| Num transitions (pos|neg): 0|21623
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 61.121
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 66.42
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 797|20925
+| Num transitions (pos|neg): 796|20827
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0472303
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.486927, -2.872184), true)]
-| Time Elapsed: 109.507
+| Final loss: 0.0388916
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.420959, -2.619259), true)]
+| Time Elapsed: 226.033
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72642
+| Num transitions (pos|neg): 0|72690
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 74.499
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 80.671
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72642
+| Num transitions (pos|neg): 0|72690
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 75.44
+| Time Elapsed: 118.201
 |----------------------------
---------------- Iteration 15 took 596.326 s ---------------
+--------------- Iteration 15 took 864.546 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1741,14 +1741,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740787 = 0.99262
-	%% Accuracy: 99.3248%%
+	Cumulative observation likelihood: e^-0.00740985 = 0.992618
+	%% Accuracy: 99.3272%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.775649 = 0.460405
-	%% Accuracy: 98.2584%%
+	Cumulative observation likelihood: e^-0.776339 = 0.460088
+	%% Accuracy: 98.2%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.78317 = 0.456955
-	%% Accuracy: 98.4827%%
+	Cumulative observation likelihood: e^-0.785046 = 0.456099
+	%% Accuracy: 98.4229%%
 
 |-------------------------------------|
 |                                     |
@@ -1769,76 +1769,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 792|29862
+| Num transitions (pos|neg): 796|29876
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0735814
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.518110, -1.217232), true)]
-| Time Elapsed: 127.258
+| Final loss: 0.0624726
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.269629, -1.037935), true)]
+| Time Elapsed: 253.207
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 208|29654
+| Num transitions (pos|neg): 204|29672
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250319
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.195829, 4.167004), true)]
-| Time Elapsed: 127.93
+| Final loss: 0.0170836
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.865152, -2.891382), true)]
+| Time Elapsed: 299.982
 |----------------------------
 
 
 |--------- CON->ACC ---------
 | Num transitions (pos|neg): 0|21674
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 66.408
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 65.893
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 792|20882
+| Num transitions (pos|neg): 796|20878
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0470369
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.371491, -2.640334), true)]
-| Time Elapsed: 120.802
+| Final loss: 0.038946
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.374368, -2.698550), true)]
+| Time Elapsed: 617.087
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72672
+| Num transitions (pos|neg): 0|72654
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 77.83
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 88.519
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72672
+| Num transitions (pos|neg): 0|72654
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 77.823
+| Time Elapsed: 157.712
 |----------------------------
---------------- Iteration 16 took 622.068 s ---------------
+--------------- Iteration 16 took 1503.38 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1848,14 +1848,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740751 = 0.99262
-	%% Accuracy: 99.3664%%
+	Cumulative observation likelihood: e^-0.0074086 = 0.992619
+	%% Accuracy: 99.3368%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.773085 = 0.461587
-	%% Accuracy: 98.2888%%
+	Cumulative observation likelihood: e^-0.778248 = 0.45921
+	%% Accuracy: 98.1424%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.782333 = 0.457338
-	%% Accuracy: 98.528%%
+	Cumulative observation likelihood: e^-0.787862 = 0.454816
+	%% Accuracy: 98.3869%%
 
 |-------------------------------------|
 |                                     |
@@ -1876,76 +1876,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 797|29860
+| Num transitions (pos|neg): 796|29867
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0732642
-| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.581792, -1.360092), true)]
-| Time Elapsed: 131.103
+| Final loss: 0.062552
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.231914, -1.055405), true)]
+| Time Elapsed: 185.596
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 203|29657
+| Num transitions (pos|neg): 204|29663
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250332
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.280266, 4.118001), true)]
-| Time Elapsed: 137.02
+| Final loss: 0.0155559
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.384617, -3.931362), true)]
+| Time Elapsed: 217.725
 |----------------------------
 
 
 |--------- CON->ACC ---------
 | Num transitions (pos|neg): 0|21694
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 68.258
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 69.539
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 797|20897
+| Num transitions (pos|neg): 796|20898
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0478793
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.469035, -2.509372), true)]
-| Time Elapsed: 121.208
+| Final loss: 0.0364602
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.360388, -2.979607), true)]
+| Time Elapsed: 194.315
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72649
+| Num transitions (pos|neg): 0|72643
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 80.963
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 81.936
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72649
+| Num transitions (pos|neg): 0|72643
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 80.908
+| Time Elapsed: 122.666
 |----------------------------
---------------- Iteration 17 took 643.211 s ---------------
+--------------- Iteration 17 took 892.838 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -1955,14 +1955,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740786 = 0.99262
-	%% Accuracy: 99.3424%%
+	Cumulative observation likelihood: e^-0.00740775 = 0.99262
+	%% Accuracy: 99.3144%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.772434 = 0.461887
-	%% Accuracy: 98.3456%%
+	Cumulative observation likelihood: e^-0.77791 = 0.459365
+	%% Accuracy: 98.2432%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.780814 = 0.458033
-	%% Accuracy: 98.5803%%
+	Cumulative observation likelihood: e^-0.78572 = 0.455792
+	%% Accuracy: 98.4693%%
 
 |-------------------------------------|
 |                                     |
@@ -1983,76 +1983,76 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 798|29870
+| Num transitions (pos|neg): 796|29821
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0723916
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.619515, 1.274970), true)]
-| Time Elapsed: 135.569
+| Final loss: 0.0629731
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.197039, -0.969796), true)]
+| Time Elapsed: 203.125
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 202|29668
+| Num transitions (pos|neg): 204|29617
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250513
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.119099, 3.817429), true)]
-| Time Elapsed: 134.04
+| Final loss: 0.0150272
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.225697, -4.248790), true)]
+| Time Elapsed: 223.735
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21634
+| Num transitions (pos|neg): 0|21717
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 72.524
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 72.421
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 798|20836
+| Num transitions (pos|neg): 796|20921
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0488349
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.601304, -2.035315), true)]
-| Time Elapsed: 121.99
+| Final loss: 0.036726
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.339957, -3.178102), true)]
+| Time Elapsed: 211.777
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72698
+| Num transitions (pos|neg): 0|72666
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 85.028
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 84.295
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72698
+| Num transitions (pos|neg): 0|72666
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 84.196
+| Time Elapsed: 126.303
 |----------------------------
---------------- Iteration 18 took 657.419 s ---------------
+--------------- Iteration 18 took 942.499 s ---------------
 
 |-------------------------------------|
 |                                     |
@@ -2062,14 +2062,14 @@ target [1, 0, 0]
 Running particle filter with 2000 particles
 Parameters: resample threshold=10, observation strength=1
 **********Metrics (training):
-	Cumulative observation likelihood: e^-0.00740973 = 0.992618
-	%% Accuracy: 99.2984%%
+	Cumulative observation likelihood: e^-0.00740893 = 0.992618
+	%% Accuracy: 99.3288%%
 Metrics (testing):
-	Cumulative observation likelihood: e^-0.774829 = 0.460783
-	%% Accuracy: 98.268%%
+	Cumulative observation likelihood: e^-0.775686 = 0.460388
+	%% Accuracy: 98.224%%
 Metrics (validation):
-	Cumulative observation likelihood: e^-0.781905 = 0.457534
-	%% Accuracy: 98.5309%%
+	Cumulative observation likelihood: e^-0.78759 = 0.45494
+	%% Accuracy: 98.4192%%
 
 |-------------------------------------|
 |                                     |
@@ -2090,84 +2090,84 @@ target [1, 0, 0]
 
 
 |--------- ACC->CON ---------
-| Num transitions (pos|neg): 799|29873
+| Num transitions (pos|neg): 796|29858
 | 
 | Extended Features Count: 80
 |---- Number of Total Programs ----
 | 164
-| Final loss: 0.0722255
-| Final Solution: fX1=[Flip(Logistic(Minus(vel, vMax), -0.537073, 1.318983), true)]
-| Time Elapsed: 139.951
+| Final loss: 0.0626021
+| Final Solution: fX1=[Flip(Logistic(Minus(vMax, vel), 0.254044, -1.066688), true)]
+| Time Elapsed: 191.662
 |----------------------------
 
 
 |--------- ACC->DEC ---------
-| Num transitions (pos|neg): 201|29672
+| Num transitions (pos|neg): 204|29654
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0250374
-| Final Solution: fX1=[Flip(Logistic(Minus(DistTraveled(vel, decMax), dns), 4.230812, 3.988767), true)]
-| Time Elapsed: 138.904
+| Final loss: 0.0150333
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.124995, -4.151130), true)]
+| Time Elapsed: 218.027
 |----------------------------
 
 
 |--------- CON->ACC ---------
-| Num transitions (pos|neg): 0|21615
+| Num transitions (pos|neg): 0|21719
 | 
-| Extended Features Count: 70
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 141
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(vel, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 75.921
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(decMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 76.026
 |----------------------------
 
 
 |--------- CON->DEC ---------
-| Num transitions (pos|neg): 799|20816
+| Num transitions (pos|neg): 796|20923
 | 
 | Extended Features Count: 97
 |---- Number of Total Programs ----
 | 197
-| Final loss: 0.0512306
-| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.686273, -2.200493), true)]
-| Time Elapsed: 121.716
+| Final loss: 0.0362903
+| Final Solution: fX1=[Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.386174, -3.434230), true)]
+| Time Elapsed: 211.34
 |----------------------------
 
 
 |--------- DEC->ACC ---------
-| Num transitions (pos|neg): 0|72713
+| Num transitions (pos|neg): 0|72627
 | 
-| Extended Features Count: 88
+| Extended Features Count: 43
 |---- Number of Total Programs ----
-| 162
-| Final loss: 0.015
-| Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 88.461
+| 108
+| Final loss: 0.005
+| Final Solution: fX1=[Flip(Logistic(accMax, 1000000000.000000, 1.000000), true)]
+| Time Elapsed: 89.302
 |----------------------------
 
 
 |--------- DEC->CON ---------
-| Num transitions (pos|neg): 0|72713
+| Num transitions (pos|neg): 0|72627
 | 
 | Extended Features Count: 88
 |---- Number of Total Programs ----
 | 162
-| Final loss: 0.015
+| Final loss: 0.005
 | Final Solution: fX1=[Flip(Logistic(target, 1000000000.000000, 1.000000), true)]
-| Time Elapsed: 89.931
+| Time Elapsed: 133.022
 |----------------------------
---------------- Iteration 19 took 678.514 s ---------------
+--------------- Iteration 19 took 940.328 s ---------------
 Run-time stats for PredicateL2 : mean run time = -nan ms, invocations = 0
 Run-time stats for MakeSMTLIBProblem : mean run time = -nan ms, invocations = 0
 Run-time stats for SolveSMTLIBProblem : mean run time = -nan ms, invocations = 0
 Run-time stats for CheckModelAccuracy : mean run time = -nan ms, invocations = 0
-Run-time stats for GetLegalOperations : mean run time = 0.002322 ms, invocations = 240
-Run-time stats for EnumerateL3_Sim : mean run time = 0.436932 ms, invocations = 114
-Run-time stats for EnumerateL3 : mean run time = 0.115983 ms, invocations = 234
-Run-time stats for RecEnumerate : mean run time = 964.727779 ms, invocations = 20
-Run-time stats for UpdateList : mean run time = 0.000439 ms, invocations = 240
-Run-time stats for Enum : mean run time = 0.020296 ms, invocations = 40
-Run-time stats for CalcSigs : mean run time = 357.964275 ms, invocations = 40
+Run-time stats for GetLegalOperations : mean run time = 0.002528 ms, invocations = 240
+Run-time stats for EnumerateL3_Sim : mean run time = 0.400291 ms, invocations = 114
+Run-time stats for EnumerateL3 : mean run time = 0.104026 ms, invocations = 234
+Run-time stats for RecEnumerate : mean run time = 992.874995 ms, invocations = 20
+Run-time stats for UpdateList : mean run time = 0.000529 ms, invocations = 240
+Run-time stats for Enum : mean run time = 0.022629 ms, invocations = 40
+Run-time stats for CalcSigs : mean run time = 366.124286 ms, invocations = 40
