@@ -43,6 +43,7 @@ lib/
 # out
 # plots
 # sim
+# settings.txt
 # snapshots
 
 # Clang
@@ -52,5 +53,3 @@ compile_commands.json
 # VSCode
 .vscode/
 .DS_Store
-
-settings.txt
