@@ -6,6 +6,7 @@ from highway_env.utils import near_split, class_from_path
 import numpy as np
 import random
 from typing import Union
+from synth_asp import env, asp_1, asp_3, asp_8
 
 def _create_vehicles(self) -> None:
         """Create some new random vehicles of a given type, and add them on the road."""
@@ -40,7 +41,6 @@ KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize value
 steer_err = 0.01
 acc_err = 2
 
-env = gym.make('highway-v0')
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
