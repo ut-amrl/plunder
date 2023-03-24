@@ -30,11 +30,11 @@ The most useful/informative outputs will be:
 
     Iteration 1:
 
-    ![](snapshots/example_snapshot/plots/testing/0-0-graph.png)
+    ![](snapshots/example_snapshot/plots/testing/1-0-graph.png)
 
     Iteration 2:
 
-    ![](snapshots/example_snapshot/plots/testing/1-0-graph.png)
+    ![](snapshots/example_snapshot/plots/testing/2-0-graph.png)
     
     Iteration 10:
 
