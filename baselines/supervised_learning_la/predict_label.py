@@ -62,7 +62,7 @@ def loadDataFrame():
         for i in range(0, len(Lines)):
             Lines[i] = ''.join(Lines[i].split())
 
-        out = open("formatted_data.csv", "w")
+        out = open("out/formatted_data.csv", "w")
         for line in Lines:
             out.write(line + "\n")
 
@@ -70,7 +70,7 @@ def loadDataFrame():
         f.close() 
 
         # Load dataset
-        dataset = pd.read_csv("formatted_data.csv")
+        dataset = pd.read_csv("out/formatted_data.csv")
 
         # print("Original dataset:")
         # print(dataset)
@@ -251,8 +251,9 @@ def makePredictions(full_set, training_size):
     print("Testing set cumulative log obs: " + str(log_obs))
 
     # Metrics for validation set
-    log_obs = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
-    print("Validation set cumulative log obs: " + str(log_obs))
+    log_obs_valid = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
+    log_obs_valid = (log_obs_valid * settings.validation_set - log_obs * settings.training_set) / (settings.validation_set - settings.training_set)
+    print("Validation set cumulative log obs: " + str(log_obs_valid))
 
     print("", flush=True)
     plotter.plotLA(valid_la1, valid_la2, Y_validation)
