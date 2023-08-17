@@ -26,7 +26,7 @@ namespace SETTINGS {
 
     // ----- Parallelization Parameters -----
     const int BATCH_SIZE = 16;                  // Number of programs to optimize in parallel
-    const int NUM_CORES = 8;                    // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
+    const int NUM_CORES = 4;                    // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
 
     // ----- Important hyperparameters -----
     const double PROG_COMPLEXITY_LOSS_BASE = 0.003;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )

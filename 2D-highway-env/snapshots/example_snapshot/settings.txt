@@ -8,7 +8,7 @@ T_TOT                         -1
 GEN_ACCURACY                  -1
 NUM_ITER                      20
 BATCH_SIZE                    16
-NUM_CORES                     8
+NUM_CORES                     4
 PROG_COMPLEXITY_LOSS_BASE     0.003
 PROG_COMPLEXITY_LOSS          0.085
 ALPHA_LOSS_UPPER              0.0001
