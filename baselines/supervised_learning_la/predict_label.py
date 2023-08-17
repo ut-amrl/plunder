@@ -248,12 +248,12 @@ def makePredictions(full_set, training_size):
 
     # Metrics for testing set
     log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y)
-    print("Testing set cumulative log obs: " + str(log_obs))
+    print("Testing set average log obs: " + str(log_obs))
 
     # Metrics for validation set
     log_obs_valid = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
     log_obs_valid = (log_obs_valid * settings.validation_set - log_obs * settings.training_set) / (settings.validation_set - settings.training_set)
-    print("Validation set cumulative log obs: " + str(log_obs_valid))
+    print("Validation set average log obs: " + str(log_obs_valid))
 
     print("", flush=True)
     plotter.plotLA(valid_la1, valid_la2, Y_validation)
