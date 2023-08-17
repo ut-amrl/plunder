@@ -30,7 +30,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": 38.82421875
+                    "value": -42.336429595947266
                 },
                 "b": {
                     "dim": [
@@ -41,7 +41,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -0.4422852694988251
+                    "value": -10.884021759033203
                 },
                 "dim": [
                     0,
@@ -64,7 +64,7 @@
                             0,
                             0
                         ],
-                        "name": "f_x",
+                        "name": "r_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -77,7 +77,7 @@
                             0,
                             0
                         ],
-                        "name": "x",
+                        "name": "l_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -131,7 +131,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": 65.70782470703125
+                    "value": 39.553958892822266
                 },
                 "b": {
                     "dim": [
@@ -142,7 +142,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": 0.08948035538196564
+                    "value": -0.5307449698448181
                 },
                 "dim": [
                     0,
@@ -165,7 +165,7 @@
                             0,
                             0
                         ],
-                        "name": "l_x",
+                        "name": "f_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2

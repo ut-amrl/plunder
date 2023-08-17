@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": 0.8571629524230957
+                "value": 0.8511772155761719
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -11.291799545288086
+                "value": -11.380537033081055
             },
             "dim": [
                 0,
@@ -93,7 +93,7 @@
                         -1,
                         0
                     ],
-                    "name": "r_vx",
+                    "name": "vx",
                     "node": "Var",
                     "symbolic": false,
                     "type": 2

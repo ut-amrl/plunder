@@ -52,7 +52,7 @@
                     -1,
                     0
                 ],
-                "name": "l_vx",
+                "name": "r_vx",
                 "node": "Var",
                 "symbolic": false,
                 "type": 2

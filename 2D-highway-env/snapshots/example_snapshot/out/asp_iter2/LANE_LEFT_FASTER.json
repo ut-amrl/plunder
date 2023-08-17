@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -2.185483932495117
+                "value": -42.9239501953125
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -6.248566627502441
+                "value": -0.43048152327537537
             },
             "dim": [
                 0,
@@ -48,8 +48,8 @@
             "type": 4,
             "x": {
                 "dim": [
-                    0,
                     1,
+                    0,
                     0
                 ],
                 "left": {
@@ -58,42 +58,20 @@
                         0,
                         0
                     ],
-                    "left": {
-                        "dim": [
-                            1,
-                            0,
-                            0
-                        ],
-                        "name": "x",
-                        "node": "Var",
-                        "symbolic": false,
-                        "type": 2
-                    },
-                    "node": "BinOp",
-                    "op": "Minus",
-                    "right": {
-                        "dim": [
-                            1,
-                            0,
-                            0
-                        ],
-                        "name": "f_x",
-                        "node": "Var",
-                        "symbolic": false,
-                        "type": 2
-                    },
+                    "name": "x",
+                    "node": "Var",
                     "symbolic": false,
-                    "type": 4
+                    "type": 2
                 },
                 "node": "BinOp",
-                "op": "DividedBy",
+                "op": "Minus",
                 "right": {
                     "dim": [
                         1,
-                        -1,
+                        0,
                         0
                     ],
-                    "name": "r_vx",
+                    "name": "f_x",
                     "node": "Var",
                     "symbolic": false,
                     "type": 2

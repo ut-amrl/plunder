@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -34.57465744018555
+                "value": -4.892852306365967
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -0.7580322027206421
+                "value": -5.384375095367432
             },
             "dim": [
                 0,
@@ -58,7 +58,7 @@
                         0,
                         0
                     ],
-                    "name": "x",
+                    "name": "f_x",
                     "node": "Var",
                     "symbolic": false,
                     "type": 2

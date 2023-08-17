@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -2.103416681289673
+                "value": -1.0546647310256958
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -8.769607543945313
+                "value": -21.051647186279297
             },
             "dim": [
                 0,
@@ -93,10 +93,32 @@
                         -1,
                         0
                     ],
-                    "name": "r_vx",
-                    "node": "Var",
+                    "left": {
+                        "dim": [
+                            1,
+                            -1,
+                            0
+                        ],
+                        "name": "r_vx",
+                        "node": "Var",
+                        "symbolic": false,
+                        "type": 2
+                    },
+                    "node": "BinOp",
+                    "op": "Plus",
+                    "right": {
+                        "dim": [
+                            1,
+                            -1,
+                            0
+                        ],
+                        "name": "r_vx",
+                        "node": "Var",
+                        "symbolic": false,
+                        "type": 2
+                    },
                     "symbolic": false,
-                    "type": 2
+                    "type": 4
                 },
                 "symbolic": false,
                 "type": 4

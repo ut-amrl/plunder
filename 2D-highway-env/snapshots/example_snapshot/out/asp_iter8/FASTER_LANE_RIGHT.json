@@ -30,7 +30,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -39.4818000793457
+                    "value": 2.6282176971435547
                 },
                 "b": {
                     "dim": [
@@ -41,7 +41,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -0.1653897911310196
+                    "value": 1.533307671546936
                 },
                 "dim": [
                     0,
@@ -64,7 +64,7 @@
                             0,
                             0
                         ],
-                        "name": "x",
+                        "name": "r_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -77,7 +77,7 @@
                             0,
                             0
                         ],
-                        "name": "r_x",
+                        "name": "f_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -131,7 +131,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -38.307552337646484
+                    "value": -38.41242980957031
                 },
                 "b": {
                     "dim": [
@@ -142,7 +142,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": 0.6092663407325745
+                    "value": 0.6913076043128967
                 },
                 "dim": [
                     0,

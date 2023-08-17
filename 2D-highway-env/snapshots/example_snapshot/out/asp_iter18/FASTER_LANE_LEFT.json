@@ -30,7 +30,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": 39.54021453857422
+                    "value": -42.333412170410156
                 },
                 "b": {
                     "dim": [
@@ -41,7 +41,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -0.6523069739341736
+                    "value": -11.255940437316895
                 },
                 "dim": [
                     0,
@@ -64,7 +64,7 @@
                             0,
                             0
                         ],
-                        "name": "f_x",
+                        "name": "r_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -77,7 +77,7 @@
                             0,
                             0
                         ],
-                        "name": "x",
+                        "name": "l_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -131,7 +131,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -42.34248352050781
+                    "value": -40.18306350708008
                 },
                 "b": {
                     "dim": [
@@ -142,7 +142,7 @@
                     "node": "Num",
                     "symbolic": false,
                     "type": 2,
-                    "value": -10.489845275878906
+                    "value": 0.5424133539199829
                 },
                 "dim": [
                     0,
@@ -165,7 +165,7 @@
                             0,
                             0
                         ],
-                        "name": "r_x",
+                        "name": "x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -178,7 +178,7 @@
                             0,
                             0
                         ],
-                        "name": "l_x",
+                        "name": "f_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2

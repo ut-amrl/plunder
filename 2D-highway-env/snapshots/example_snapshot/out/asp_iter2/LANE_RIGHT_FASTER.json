@@ -24,7 +24,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -1.5749659538269043
+                "value": 0.797130823135376
             },
             "b": {
                 "dim": [
@@ -35,7 +35,7 @@
                 "node": "Num",
                 "symbolic": false,
                 "type": 2,
-                "value": -11.07059383392334
+                "value": 16.57193374633789
             },
             "dim": [
                 0,
@@ -64,7 +64,7 @@
                             0,
                             0
                         ],
-                        "name": "x",
+                        "name": "f_x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -77,7 +77,7 @@
                             0,
                             0
                         ],
-                        "name": "f_x",
+                        "name": "x",
                         "node": "Var",
                         "symbolic": false,
                         "type": 2
@@ -93,10 +93,32 @@
                         -1,
                         0
                     ],
-                    "name": "vx",
-                    "node": "Var",
+                    "left": {
+                        "dim": [
+                            1,
+                            -1,
+                            0
+                        ],
+                        "name": "vx",
+                        "node": "Var",
+                        "symbolic": false,
+                        "type": 2
+                    },
+                    "node": "BinOp",
+                    "op": "Plus",
+                    "right": {
+                        "dim": [
+                            1,
+                            -1,
+                            0
+                        ],
+                        "name": "vx",
+                        "node": "Var",
+                        "symbolic": false,
+                        "type": 2
+                    },
                     "symbolic": false,
-                    "type": 2
+                    "type": 4
                 },
                 "symbolic": false,
                 "type": 4
