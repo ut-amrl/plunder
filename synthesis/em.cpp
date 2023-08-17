@@ -73,6 +73,10 @@ void save_metric(string output_path, double metric) {
 }
 
 void print_metrics(double cum_log_obs, double ha_correct, double t_total, DATATYPE data) {
+    if(t_total == 0) {
+        return;
+    }
+
     cum_log_obs /= t_total; // Normalize
     ha_correct /= t_total; ha_correct *= 100; // Convert to percentage
 
@@ -200,6 +204,7 @@ vector<vector<Example>> expectation(uint iteration, vector<Trajectory>& state_tr
     for(uint i = 0; i < VALIDATION_SET; i++){
         if(i == TRAINING_SET) {
             print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
+            ha_correct = ha_total = cum_log_obs = 0;
         }
 
         string plot = VALIDATION_TRAJ+to_string(iteration)+"-"+to_string(i);
@@ -341,6 +346,7 @@ void read_demonstration(vector<Trajectory>& state_traj){
     for(uint i = 0; i < VALIDATION_SET; i++){
         if(i == TRAINING_SET) {
             print_metrics(cum_log_obs, ha_correct, ha_total, TESTING);
+            ha_correct = ha_total = cum_log_obs = 0;
         }
         
         string plot = VALIDATION_TRAJ+"gt-"+to_string(i);
