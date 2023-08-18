@@ -31,6 +31,9 @@
 *.out
 *.app
 
+# pycache
+*.pyc
+
 # Binaries and CMake
 bin/
 build/
@@ -45,6 +48,14 @@ plots
 sim
 settings.txt
 # snapshots
+
+# Baselines
+baselines/supervised_learning_la/__pycache__/
+baselines/supervised_learning_ha/__pycache__/
+baselines/supervised_learning_la/out
+baselines/supervised_learning_ha/out
+baselines/supervised_learning_la/plots
+baselines/supervised_learning_ha/plots
 
 # Clang
 .clangd/
