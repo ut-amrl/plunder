@@ -76,7 +76,27 @@ Obs motorModel(State state, bool error){
 }
 
 HA ASP_model(State state){
-    return 0;
+    double l_x = state.get("l_x") - state.get("x");
+    double f_x = state.get("f_x") - state.get("x");
+    double r_x = state.get("r_x") - state.get("x");
+
+    bool front_clear;
+    if(state.ha == FASTER) {
+        front_clear = flip(logistic(1, 30, f_x / state.get("vx")));
+    } else {
+        front_clear = flip(logistic(1.5, 30, f_x / state.get("vx")));
+    }
+    bool left_clear = flip(logistic(1, 30, l_x / state.get("vx")));
+    bool right_clear = flip(logistic(1, 30, r_x / state.get("vx")));
+    bool left_better = flip(logistic(0, 1, l_x - r_x));
+
+    if(front_clear)
+        return FASTER;
+    else if (state.ha != LANE_RIGHT && left_clear && left_better)
+        return LANE_LEFT;
+    else if (state.ha != LANE_LEFT && right_clear)
+        return LANE_RIGHT;
+    return SLOWER;
 }
 
 Obs physicsModel(State state, double t_step){}

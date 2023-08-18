@@ -26,6 +26,22 @@ double effectiveParticles(vector<double>& weights){
 vector<HA> systematicResample(vector<HA>& ha, vector<double>& weights, vector<int>& ancestor){
     resampCount++;
     int n = weights.size();
+
+    if (labeler == GREEDY_HEURISTIC) {
+        // Just take the particle with the highest weight
+        HA bestHA = ha[0];
+        double bestWeight = weights[0];
+        for(int i = 0; i < n; i++) {
+            if(weights[i] > bestWeight) {
+                bestWeight = weights[i];
+                bestHA = ha[i];
+            }
+        }
+
+        vector<HA> haResampled(n, bestHA);
+        return haResampled;
+    }
+
     vector<double> cumulativeWeights;
     vector<HA> haResampled;
     double runningSum = 0;
