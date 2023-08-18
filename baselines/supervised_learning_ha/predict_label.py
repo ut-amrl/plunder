@@ -250,32 +250,7 @@ def makePredictions(full_set, training_size):
 
     # Make a prediction and plot results
     yhat_test = model.predict(df_train_X)
-
-    # if not settings.pred_var1 == None:
-    #     pyplot.plot(df_train_Y[:, 0], label=settings.pred_var1)
-    # if not settings.pred_var2 == None:
-    #     pyplot.plot(df_train_Y[:, settings.numHA+1], label=settings.pred_var2)
-    # pyplot.plot(yhat_test, label='yhat_test')
-    # pyplot.legend()
-    # pyplot.savefig("plots/test.png")
-
     yhat_valid = model.predict(X_validation)
-
-    # if not settings.pred_var1 == None:
-    #     pyplot.plot(Y_validation[:, 0], label=settings.pred_var1)
-    # if not settings.pred_var2 == None:
-    #     pyplot.plot(Y_validation[:, settings.numHA+1], label=settings.pred_var2)
-    # pyplot.plot(yhat_valid, label='yhat_valid')
-    # pyplot.legend()
-    # pyplot.savefig("plots/validation.png")
-
-    # b = np.zeros_like(yhat_valid)
-    # b[np.arange(len(yhat_valid)), yhat_valid.argmax(1)] = 1
-    # yhat_valid = b
-
-    # b = np.zeros_like(yhat_test)
-    # b[np.arange(len(yhat_test)), yhat_test.argmax(1)] = 1
-    # yhat_test = b
 
     #### Generate expected trajectories using softmax weights ####
     (test_la1, test_la2) = util.gen_traj(yhat_test, df_train_Y)

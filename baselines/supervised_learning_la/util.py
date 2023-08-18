@@ -38,15 +38,13 @@ def gen_traj(y_pred, y_true):
     
     return (la1, la2)
 
-def log_obs(expected, actual, var1, scaler):
+def log_obs(expected, actual, var1):
     obs_log = 0
-    mean = scaler.transform([[expected]])[0][0]
-    test = scaler.transform([[actual]])[0][0]
     
     if var1:
-        obs_log += norm(mean, settings.pv1_stddev).logpdf(test)
+        obs_log += norm(expected, settings.pv1_stddev).logpdf(actual)
     else:
-        obs_log += norm(mean, settings.pv2_stddev).logpdf(test)
+        obs_log += norm(expected, settings.pv2_stddev).logpdf(actual)
     
     return obs_log
 
@@ -56,23 +54,15 @@ def cum_log_obs(expected1, expected2, actual):
     if not settings.pred_var2 == None:
         actual2 = actual[:, 1]
 
-    if not settings.pred_var1 == None:
-        scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
-        scaler1.fit(np.transpose([[0, 1]]))
-
-    if not settings.pred_var2 == None:
-        scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
-        scaler2.fit(np.transpose([[0, 1]]))
-    
     error = 0
     for i in range(len(actual)):
         # Output 1
         if not settings.pred_var1 == None:
-            error += log_obs(expected1[i], actual1[i], True, scaler1)  
+            error += log_obs(expected1[i], actual1[i], True)  
 
         # Output 2
         if not settings.pred_var2 == None:
-            error += log_obs(expected2[i], actual2[i], False, scaler2)
+            error += log_obs(expected2[i], actual2[i], False)
         
     return error / len(actual)
     
