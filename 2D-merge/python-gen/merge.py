@@ -3,10 +3,10 @@ from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle, highway_env
 from highway_env.envs.common.observation import KinematicObservation
 from highway_env.envs.common import graphics
 from highway_env.utils import near_split, class_from_path
+from matplotlib import pyplot as plt
 import numpy as np
 import random
-from typing import Union
-from synth_asp import env, asp_1, asp_3, asp_8
+from typing import List, Tuple, Union, Optional
 
 def _create_vehicles(self) -> None:
         """Create some new random vehicles of a given type, and add them on the road."""
@@ -38,9 +38,10 @@ lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-steer_err = 0.01
-acc_err = 2
+steer_err = 0.005
+acc_err = 0.05
 
+env = gym.make('highway-v0')
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
@@ -128,9 +129,10 @@ def prob_asp(ego, closest, ha):
     x, l_x, f_x, r_x = ego[1], closest[0][1], closest[1][1], closest[2][1]
     vx = ego[3]
 
+    front_clear = sample(logistic(1, 40, (f_x - x) / vx))
+
     if ha == env.action_type.actions_indexes["LANE_RIGHT"]:
-        front_clear = sample(logistic(1, 30, (f_x - x) / vx))
-        right_clear = sample(logistic(0.75, 30, (r_x - x) / vx)) # time to collision
+        right_clear = sample(logistic(0.5, 40, (r_x - x) / vx)) # time to collision
         if right_clear: # No car on the right: merge right
             return env.action_type.actions_indexes["LANE_RIGHT"]
         if front_clear: 
@@ -139,15 +141,9 @@ def prob_asp(ego, closest, ha):
         # Nowhere to go: decelerate
         return env.action_type.actions_indexes["SLOWER"]
 
-    right_clear = sample(logistic(1, 30, (r_x - x) / vx)) # time to collision
+    right_clear = sample(logistic(1, 40, (r_x - x) / vx)) # time to collision
     if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]
-    
-    if ha == env.action_type.actions_indexes["FASTER"]:
-        front_clear = sample(logistic(1, 30, (f_x - x) / vx))
-    else:
-        front_clear = sample(logistic(2, 30, (f_x - x) / vx))
-    
     if front_clear: 
         return env.action_type.actions_indexes["FASTER"]
 
@@ -158,7 +154,7 @@ def prob_asp(ego, closest, ha):
 # in this version, no extra latent state is stored (target_lane, target_speed)
 TURN_HEADING = 0.15 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 40 # Maximum velocity
+max_velocity = 45 # Maximum velocity
 
 last_action = "FASTER"
 last_target = 0
@@ -213,9 +209,9 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
     target_steer = target_heading - self.heading
 
     if target_steer > last_la["steering"]:
-        target_steer = min(target_steer, last_la["steering"] + 0.06)
+        target_steer = min(target_steer, last_la["steering"] + 0.08)
     else:
-        target_steer = max(target_steer, last_la["steering"] - 0.06)
+        target_steer = max(target_steer, last_la["steering"] - 0.08)
 
     if target_acc > last_la["acceleration"]:
         target_acc = min(target_acc, last_la["acceleration"] + 4)
@@ -230,7 +226,7 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
 
     if not closest == None:
         last_la = la
-    
+
     return la
 
 ControlledVehicle.act = run_la
