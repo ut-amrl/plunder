@@ -13,14 +13,14 @@ train_model = True
 rng = np.random.default_rng(0)
 dataPath = "data-1d"
 n_timesteps = 125
-n_train = 1
+n_train = 10
 n_test = 20
+env_id = "env-1d-v1"
+policy_saved_name = "gail-1d-policy"
+train_steps = 2048*10
+n_loop = 50
 
 
-
-def get_env():
-    register(id='env-1d-v1', entry_point='custom_envs.envs:Env_1d')
-    return gym.make("env-1d-v1")
 
 def read_demo(n):
     reader = csv.reader(open(dataPath+"/data"+str(n)+".csv", "r"))
@@ -28,19 +28,19 @@ def read_demo(n):
     traj_obs = []
     traj_acts = []
     traj_ha = []
-    line1 = next(reader)
-    prev_la = [line1[1]]
+    prev_la = [0]
     for line in reader:
-        traj_acts.append([line[1]])
-        traj_obs.append(line[2:7]+prev_la)
-        traj_ha.append(line[8])
-        prev_la = [line[1]]
+        traj_acts.append([float(line[1])])
+        traj_obs.append(list(map(float, line[2:7]+prev_la)))
+        traj_ha.append(int(line[8]))
+        prev_la = [float(line[1])]
     return (traj_obs, traj_acts, traj_ha)
 
 def get_expert_traj(n):
-    obs, acts, _ = read_demo(n)
-    next_obs = obs[1:]
-    next_obs.append(next_obs[-1])
+    obs_res, acts, _ = read_demo(n)
+    obs = obs_res[:-1]
+    acts = acts[:-1]
+    next_obs = obs_res[1:]
     dones = [False]*(len(obs))
     return {
         'obs': np.array(obs, dtype=float),
@@ -55,68 +55,24 @@ def get_expert_trajs(n_demos):
         rollouts.append(get_expert_traj(i))
     return rollouts
 
-
-
-env_base = get_env()
-
-
-
-
-
-
-
-
-rollouts = get_expert_trajs(n_train)
-venv = make_vec_env("env-1d-v1", n_envs=n_train, rng=rng)
-
 def setup_venv():
+    venv = make_vec_env(env_id, n_envs=n_train, rng=rng)
     for n in range(n_train):
         reader = csv.reader(open(dataPath+"/data"+str(n)+".csv", "r"))
         next(reader)
         info = next(reader)
         venv.env_method("config", info[3], info[4], info[5], info[7], indices=[n])
-setup_venv()
-
-learner = PPO(
-    env=venv,
-    policy=MlpPolicy,
-    batch_size=64,
-    ent_coef=0.0,
-    learning_rate=0.0002,
-    n_epochs=50,
-)
-
-reward_net = BasicRewardNet(
-    venv.observation_space,
-    venv.action_space,
-    normalize_input_layer=RunningNorm,
-)                                                  # discriminator
-
-gail_trainer = GAIL(
-    demonstrations=rollouts,                       # expert demos
-    demo_batch_size=n_timesteps,
-    gen_replay_buffer_capacity=n_timesteps*2,
-    n_disc_updates_per_round=3,
-    venv=venv,                                     # environment
-    gen_algo=learner,
-    reward_net=reward_net,
-)
+    return venv
 
 
-if train_model:
-    gail_trainer.train(200000)
-    learner.save("gail-1d-policy")
-else:
-    gail_trainer = MlpPolicy.load("gail-1d-policy")
-
-def runModel(env, iter):
+def print_trajs(env, learner):
     env.reset()
     next_la = [0]
     v_list = []
     x_list = []
     la_list = []
     for _ in range(n_timesteps):
-        obs, rew, _, info = env.step(next_la)
+        obs, _, _, _ = env.step(next_la)
         next_la = learner.predict(obs)[0]
         x_list.append(obs[0])
         v_list.append(obs[4])
@@ -126,19 +82,20 @@ def runModel(env, iter):
     print(la_list)
 
 
-for i in range(0, n_train):
-    print()
-    print()
-    print("iter "+str(i))
-    env_obs = read_demo(i)[0][0]
-    env_base.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
-    runModel(env_base, i)
+def debugger(env):
+    env.reset()
+    obs, acts, _ = read_demo(3)
+    env_obs = env.reset()
+    for i in range(n_timesteps):
+        print(env_obs)
+        print(obs[i])
+        print(acts[i])
+        next_la = acts[i]
+        env_obs, _, _, _ = env.step(next_la)
 
 
-
-
-def compareModelWithGt(n):
-    ll = 0
+def compareModelWithGt(n, learner):
+    # ll = 0
     obs, acts, ha = read_demo(n)
     obs = np.array(obs, dtype=float)
     acts = np.array(acts, dtype=float)
@@ -152,16 +109,87 @@ def compareModelWithGt(n):
     # return ll/len(acts)
     return 0
 
+def test_models(learner):
+    ll_tot = 0.
+    for i in range(0, n_train):
+        print("\n\niter "+str(i))
+        q = compareModelWithGt(i, learner)
+        print(q)
+        ll_tot += q
+    print("average ll " + str(ll_tot / n_train))
 
-ll_tot = 0.
-for i in range(0, n_train):
-    print()
-    print()
-    print("iter "+str(i))
-    q = compareModelWithGt(i)
-    print(q)
-    ll_tot += q
-print("average ll " + str(ll_tot / n_train))
+
+
+
+
+
+register(id=env_id, entry_point='custom_envs.envs:Env_1d')
+rollouts = get_expert_trajs(n_train)
+venv = setup_venv()
+
+
+learner = PPO(
+    env=venv,
+    policy=MlpPolicy,
+    batch_size=64,
+    ent_coef=0.0,
+    learning_rate=0.0003,
+    n_epochs=50,
+)
+
+reward_net = BasicRewardNet(
+    venv.observation_space,
+    venv.action_space,
+    normalize_input_layer=RunningNorm,
+)                                                  # discriminator
+
+gail_trainer = GAIL(
+    demonstrations=rollouts,                       # expert demos
+    demo_batch_size=n_timesteps,
+    gen_replay_buffer_capacity=n_timesteps*4,
+    n_disc_updates_per_round=2,
+    venv=venv,                                     # environment
+    gen_algo=learner,
+    reward_net=reward_net,
+)
+
+
+
+# env_obs = read_demo(3)[0][0]
+# test_env = gym.make(env_id)
+# test_env.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
+# # print_trajs(test_env, learner)
+# debugger(test_env)
+# debugger(test_env)
+
+# exit()
+
+
+if train_model:
+    for i in range(n_loop):
+        print("LOOP # "+str(i))
+        gail_trainer.train(train_steps)
+        test_models(learner)
+        learner.save(policy_saved_name)
+else:
+    learner = MlpPolicy.load(policy_saved_name)
+
+
+test_models(learner)
+
+
+# for i in range(0, n_train+n_test):
+#     print()
+#     print()
+#     print("iter "+str(i))
+#     env_obs = read_demo(i)[0][0]
+#     test_env.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
+#     print_trajs(test_env, learner)
+
+
+
+
+
 
 
 
