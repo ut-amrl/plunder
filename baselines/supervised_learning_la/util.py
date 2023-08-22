@@ -42,9 +42,11 @@ def log_obs(expected, actual, var1):
     obs_log = 0
     
     if var1:
-        obs_log += norm(expected, settings.pv1_stddev).logpdf(actual)
+        z_score = (expected - actual) / settings.pv1_stddev
+        obs_log += norm(0, 1).logpdf(z_score)
     else:
-        obs_log += norm(expected, settings.pv2_stddev).logpdf(actual)
+        z_score = (expected - actual) / settings.pv2_stddev
+        obs_log += norm(0, 1).logpdf(z_score)
     
     return obs_log
 
