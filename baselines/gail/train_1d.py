@@ -9,23 +9,18 @@ from imitation.util.util import make_vec_env
 from imitation.rewards.reward_nets import BasicRewardNet
 from imitation.util.networks import RunningNorm
 
-
+train_model = True
 rng = np.random.default_rng(0)
 dataPath = "data-1d"
-n_timesteps = 126
-register(id='env-1d-v1', entry_point='custom_envs.envs:Env_1d')
-env_base = gym.make("env-1d-v1")
-env_base.config(-5., 6., 12., 100.)
-def runSim(env, iter):
-    env.reset()
-    for _ in range(n_timesteps):
-        obs, rew, done, truncated, info = env.step(1)
-        print(obs)
-        if done:
-          break
+n_timesteps = 125
+n_train = 1
+n_test = 20
 
 
 
+def get_env():
+    register(id='env-1d-v1', entry_point='custom_envs.envs:Env_1d')
+    return gym.make("env-1d-v1")
 
 def read_demo(n):
     reader = csv.reader(open(dataPath+"/data"+str(n)+".csv", "r"))
@@ -33,13 +28,16 @@ def read_demo(n):
     traj_obs = []
     traj_acts = []
     traj_ha = []
+    line1 = next(reader)
+    prev_la = [line1[1]]
     for line in reader:
         traj_acts.append([line[1]])
-        traj_obs.append(line[2:7])
+        traj_obs.append(line[2:7]+prev_la)
         traj_ha.append(line[8])
+        prev_la = [line[1]]
     return (traj_obs, traj_acts, traj_ha)
 
-def gen_traj(n):
+def get_expert_traj(n):
     obs, acts, _ = read_demo(n)
     next_obs = obs[1:]
     next_obs.append(next_obs[-1])
@@ -51,17 +49,28 @@ def gen_traj(n):
         'dones': np.array(dones)
     }
 
-def gen_trajs(n_demos):
+def get_expert_trajs(n_demos):
     rollouts=[]
     for i in range(n_demos):
-        rollouts.append(gen_traj(i))
+        rollouts.append(get_expert_traj(i))
     return rollouts
 
-rollouts = gen_trajs(8)
-venv = make_vec_env("env-1d-v1", n_envs=8, rng=rng)
+
+
+env_base = get_env()
+
+
+
+
+
+
+
+
+rollouts = get_expert_trajs(n_train)
+venv = make_vec_env("env-1d-v1", n_envs=n_train, rng=rng)
 
 def setup_venv():
-    for n in range(8):
+    for n in range(n_train):
         reader = csv.reader(open(dataPath+"/data"+str(n)+".csv", "r"))
         next(reader)
         info = next(reader)
@@ -94,7 +103,11 @@ gail_trainer = GAIL(
 )
 
 
-gail_trainer.train(20000)
+if train_model:
+    gail_trainer.train(200000)
+    learner.save("gail-1d-policy")
+else:
+    gail_trainer = MlpPolicy.load("gail-1d-policy")
 
 def runModel(env, iter):
     env.reset()
@@ -113,10 +126,12 @@ def runModel(env, iter):
     print(la_list)
 
 
-for i in range(0, 8):
+for i in range(0, n_train):
     print()
     print()
     print("iter "+str(i))
+    env_obs = read_demo(i)[0][0]
+    env_base.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
     runModel(env_base, i)
 
 
@@ -138,16 +153,15 @@ def compareModelWithGt(n):
     return 0
 
 
-n_samples = 8
 ll_tot = 0.
-for i in range(0, n_samples):
+for i in range(0, n_train):
     print()
     print()
     print("iter "+str(i))
     q = compareModelWithGt(i)
     print(q)
     ll_tot += q
-print("average ll " + str(ll_tot / n_samples))
+print("average ll " + str(ll_tot / n_train))
 
 
 

@@ -1,93 +1,109 @@
-Package                 Version
------------------------ ---------
-absl-py                 1.4.0
-aiohttp                 3.8.5
-aiosignal               1.3.1
-async-timeout           4.0.3
-attrs                   23.1.0
-cachetools              5.3.1
-certifi                 2023.7.22
-charset-normalizer      3.2.0
-cloudpickle             2.2.1
-colorama                0.4.6
-contourpy               1.1.0
-cycler                  0.11.0
-datasets                2.14.4
-dill                    0.3.7
-docopt                  0.6.2
-Farama-Notifications    0.0.4
-filelock                3.12.2
-fonttools               4.42.1
-frozenlist              1.4.0
-fsspec                  2023.6.0
-gitdb                   4.0.10
-GitPython               3.1.32
-google-auth             2.22.0
-google-auth-oauthlib    1.0.0
-grpcio                  1.57.0
-gym                     0.21.0
-gym-notices             0.0.8
-gymnasium               0.29.1
-highway-env             1.8.2
-huggingface-hub         0.16.4
-huggingface-sb3         2.3
-idna                    3.4
-imitation               0.4.0
-importlib-metadata      4.13.0
-importlib-resources     6.0.1
-Jinja2                  3.1.2
-joblib                  1.3.2
-jsonpickle              3.0.2
-kiwisolver              1.4.4
-Markdown                3.4.4
-MarkupSafe              2.1.3
-matplotlib              3.7.2
-mpmath                  1.3.0
-multidict               6.0.4
-multiprocess            0.70.15
-munch                   2.5.0
-networkx                3.1
-numpy                   1.25.2
-oauthlib                3.2.2
-packaging               23.1
-pandas                  2.0.3
-Pillow                  10.0.0
-pip                     22.0.4
-protobuf                4.24.1
-py-cpuinfo              9.0.0
-pyarrow                 12.0.1
-pyasn1                  0.5.0
-pyasn1-modules          0.3.0
-pygame                  2.5.1
-pyglet                  1.5.27
-pyparsing               3.0.9
-python-dateutil         2.8.2
-pytz                    2023.3
-PyYAML                  6.0.1
-requests                2.31.0
-requests-oauthlib       1.3.1
-rsa                     4.9
-sacred                  0.8.4
-scikit-learn            1.3.0
-scipy                   1.11.2
-seals                   0.1.5
-setuptools              58.1.0
-six                     1.16.0
-smmap                   5.0.0
-stable-baselines3       1.8.0
-sympy                   1.12
-tensorboard             2.14.0
-tensorboard-data-server 0.7.1
-threadpoolctl           3.2.0
-torch                   2.0.1
-tqdm                    4.66.1
-typing_extensions       4.7.1
-tzdata                  2023.3
-urllib3                 1.26.16
-wasabi                  1.1.2
-Werkzeug                2.3.7
-wheel                   0.41.1
-wrapt                   1.15.0
-xxhash                  3.3.0
-yarl                    1.9.2
-zipp                    3.16.2
+absl-py==1.4.0
+aiohttp==3.8.5
+aiosignal==1.3.1
+async-timeout==4.0.3
+attrs==23.1.0
+boltons @ file:///home/conda/feedstock_root/build_artifacts/boltons_1677499911949/work
+brotlipy==0.7.0
+cachetools==5.3.1
+certifi==2023.5.7
+cffi @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/croot-2p6q7e2r/cffi_1642701115063/work
+charset-normalizer @ file:///tmp/build/80754af9/charset-normalizer_1630003229654/work
+cloudpickle==2.2.1
+colorama==0.4.6
+conda==23.3.1
+conda-package-handling @ file:///opt/concourse/worker/volumes/live/0cf65687-72c2-4e51-5322-1b3a8c3aa6f5/volume/conda-package-handling_1649105815927/work
+contourpy==1.1.0
+cryptography @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_b470f7cb-c8f1-42c9-b84f-23789ea77e7c9difcqh4/croots/recipe/cryptography_1652101134392/work
+cycler==0.11.0
+datasets==2.14.4
+dill==0.3.7
+docopt==0.6.2
+Farama-Notifications==0.0.4
+filelock==3.12.2
+fonttools==4.42.1
+frozenlist==1.4.0
+fsspec==2023.6.0
+gitdb==4.0.10
+GitPython==3.1.32
+google-auth==2.22.0
+google-auth-oauthlib==1.0.0
+grpcio==1.57.0
+gym==0.21.0
+gym-notices==0.0.8
+gymnasium==0.29.1
+highway-env==1.8.2
+huggingface-hub==0.16.4
+huggingface-sb3==2.3
+idna @ file:///tmp/build/80754af9/idna_1637925883363/work
+imitation==0.4.0
+importlib-metadata==4.13.0
+importlib-resources==6.0.1
+Jinja2==3.1.2
+joblib==1.3.2
+jsonpatch @ file:///home/conda/feedstock_root/build_artifacts/jsonpatch_1632759296524/work
+jsonpickle==3.0.2
+jsonpointer==2.0
+kiwisolver==1.4.4
+Markdown==3.4.4
+MarkupSafe==2.1.3
+matplotlib==3.7.2
+mpmath==1.3.0
+multidict==6.0.4
+multiprocess==0.70.15
+munch==2.5.0
+networkx==3.1
+numpy==1.25.2
+oauthlib==3.2.2
+opencv-python==3.4.17.63
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1681337016113/work
+pandas==2.0.3
+Pillow==10.0.0
+pluggy @ file:///home/conda/feedstock_root/build_artifacts/pluggy_1667232663820/work
+protobuf==4.24.1
+py-cpuinfo==9.0.0
+pyarrow==12.0.1
+pyasn1==0.5.0
+pyasn1-modules==0.3.0
+pycairo==1.23.0
+pycosat==0.6.3
+pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
+pygame==2.5.1
+pyglet==1.5.27
+pyOpenSSL @ file:///opt/conda/conda-bld/pyopenssl_1643788558760/work
+pyparsing==3.0.9
+PySimpleGUI==4.60.5
+PySocks @ file:///opt/concourse/worker/volumes/live/112288ac-9cb0-4e73-768b-13baf4ca6419/volume/pysocks_1605305820043/work
+python-dateutil==2.8.2
+pytz==2023.3
+PyYAML==6.0.1
+requests @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_798c8e80-3a12-459e-9763-91e91aec7e0btbjs6ic_/croots/recipe/requests_1656438155766/work
+requests-oauthlib==1.3.1
+requirements.py==1.0.1
+rsa==4.9
+ruamel-yaml-conda @ file:///opt/concourse/worker/volumes/live/e81cf0fe-611a-498e-6e69-a7320057c1ac/volume/ruamel_yaml_1616016689696/work
+ruamel.yaml @ file:///Users/runner/miniforge3/conda-bld/ruamel.yaml_1683392846478/work
+ruamel.yaml.clib @ file:///Users/runner/miniforge3/conda-bld/ruamel.yaml.clib_1670412931817/work
+sacred==0.8.4
+scikit-learn==1.3.0
+scipy==1.11.2
+seals==0.1.5
+six==1.16.0
+smmap==5.0.0
+stable-baselines3==1.8.0
+sympy==1.12
+tensorboard==2.14.0
+tensorboard-data-server==0.7.1
+threadpoolctl==3.2.0
+toolz @ file:///home/conda/feedstock_root/build_artifacts/toolz_1657485559105/work
+torch==2.0.1
+tqdm @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_6cb3db64-b7e1-4db2-ab0b-f944920e5367lekntvc5/croots/recipe/tqdm_1650891088614/work
+typing_extensions==4.7.1
+tzdata==2023.3
+urllib3 @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_92f3a881-8cf4-469b-8319-736ffa3c6d61ordl4zjw/croots/recipe/urllib3_1650639998913/work
+wasabi==1.1.2
+Werkzeug==2.3.7
+wrapt==1.15.0
+xxhash==3.3.0
+yarl==1.9.2
+zipp==3.16.2
