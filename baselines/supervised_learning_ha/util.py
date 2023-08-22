@@ -53,9 +53,11 @@ def log_obs(expected, actual, var1, scaler):
     test = scaler.transform([[actual]])[0][0]
 
     if var1:
-        obs_log += norm(mean, settings.pv1_stddev).logpdf(test)
+        z_score = (mean - test) / settings.pv1_stddev
+        obs_log += norm(0, 1).logpdf(z_score)
     else:
-        obs_log += norm(mean, settings.pv2_stddev).logpdf(test)
+        z_score = (mean - test) / settings.pv2_stddev
+        obs_log += norm(0, 1).logpdf(z_score)
     
     return obs_log
 
