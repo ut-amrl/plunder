@@ -8,9 +8,7 @@ import numpy as np
 # patience = 500
 # sim_time = 126
 # samples = 100
-# # folder = "target-easy/"
-# folder = "target-medium/"
-# # folder = "target-hard/"
+# folder = "target/"
 # vars_used = [
 #     "HA",
 #     "pos",
@@ -22,9 +20,7 @@ import numpy as np
 # ]
 # pred_var1 = "LA.acc"
 # pv1_range = [-50, 50]
-# # pv1_stddev = 0.1
 # pv1_stddev = 0.5
-# # pv1_stddev = 1
 # pred_var2 = None
 # pv2_range = None
 # pv2_stddev = None
@@ -41,16 +37,14 @@ import numpy as np
 #     else:
 #         return (max(data_prev["LA.acc"] - 1, data["decMax"]), None)
 
-# # Setting: 2D-highway-env
+# Setting: 2D-highway-env
 # training_set = 10
 # validation_set = 30 # including training_set
 # train_time = 15000
 # patience = 5000
-# sim_time = 100
+# sim_time = 150
 # samples = 50
-# # folder = "highway-easy/"
-# folder = "highway-medium/"
-# # folder = "highway-hard/"
+# folder = "highway/"
 # vars_used = [
 #     "HA",
 #     "x",
@@ -67,63 +61,69 @@ import numpy as np
 # ]
 # pred_var1 = "LA.steer"
 # pv1_range = [-0.3, 0.3]
-# # pv1_stddev = 0.001
 # pv1_stddev = 0.01
-# # pv1_stddev = 0.02
 # pred_var2 = "LA.acc"
-# pv2_range = [-20, 20]
-# # pv2_stddev = 0.1
-# pv2_stddev = 1
-# # pv2_stddev = 2
+# pv2_range = [-30, 30]
+# pv2_stddev = 2
 
 # numHA = 4
 
 # KP_H = 0.5 # Turning rate
 # TURN_HEADING = 0.15 # Target heading when turning
 # TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-# min_velocity = 16 # Minimum velocity
-# max_velocity = 30 # Maximum velocity
+# max_velocity = 40 # Maximum velocity
+# turn_velocity = 30 # Turning velocity
 
 # def laneFinder(y):
 #     return round(y / 4)
 
 # def motor_model(ha, data, data_prev):
-#     acc = 0.0
+#     target_acc = 0.0
 #     target_heading = 0.0
 #     if ha == 0:
-#         acc = 0.4 * (max_velocity - data["vx"])
+#         target_acc = max_velocity - data["vx"]
 
 #         target_y = laneFinder(data["y"]) * 4
 #         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
 #     elif ha == 1:
-#         acc = data["f_vx"] - data["vx"]
+#         target_acc = data["f_vx"] - data["vx"]
 
 #         target_y = laneFinder(data["y"]) * 4
 #         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
 #     elif ha == 2:
+#         target_acc = turn_velocity - data["vx"]
 #         target_heading = -TURN_HEADING
 #     else:
+#         target_acc = turn_velocity - data["vx"]
 #         target_heading = TURN_HEADING
 
-#     return ((target_heading - data["heading"]) * KP_H, acc)
+#     target_steer = target_heading - data["heading"]
+#     if(target_steer > data_prev["LA.steer"]):
+#         target_steer = min(target_steer, data_prev["LA.steer"] + 0.04)
+#     else:
+#         target_steer = max(target_steer, data_prev["LA.steer"] - 0.04)
 
+#     if(target_acc > data_prev["LA.acc"]):  
+#         target_acc = min(target_acc, data_prev["LA.acc"] + 4)
+#     else:
+#         target_acc = max(target_acc, data_prev["LA.acc"] - 6)
+
+#     return (target_steer, target_acc)
 
 # Setting: 2D-merge
 training_set = 10
 validation_set = 30 # including training_set
 train_time = 15000
-patience = 200
+patience = 500
 sim_time = 75
 samples = 50
-# folder = "merge-easy/"
+folder = "merge-easy-data/"
 # folder = "merge-medium/"
 # folder = "merge-hard/"
-folder = "merge-impossible/"
-# folder = "merge-medium-t/"
+# folder = "merge-impossible/"
 vars_used = [
     "HA",
     "x",
-    "y",
     "l_x",
     "f_x",
     "r_x",
@@ -136,10 +136,10 @@ vars_used = [
 ]
 pred_var1 = "LA.steer"
 pv1_range = [-0.3, 0.3]
-pv1_stddev = 0.02
+pv1_stddev = 0.005
 pred_var2 = "LA.acc"
-pv2_range = [-25, 25]
-pv2_stddev = 2
+pv2_range = [-30, 30]
+pv2_stddev = 0.5
 
 numHA = 4
 

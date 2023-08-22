@@ -8,13 +8,13 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.01) },
-    { "acc", normal_distribution<double>(0.0, 2) }
+    { "steer", normal_distribution<double>(0.0, 0.005) },
+    { "acc", normal_distribution<double>(0.0, 0.5) }
 };
 
 double TURN_HEADING = 0.15;
 double TURN_TARGET = 30;
-double max_velocity = 40;
+double max_velocity = 45;
 
 double lane_diff = 4;
 
@@ -57,9 +57,9 @@ Obs motorModel(State state, bool error){
 
     double target_steer = target_heading - state.get("heading");
     if(target_steer > state.get("steer")) {
-        target_steer = min(target_steer, state.get("steer") + 0.06);
+        target_steer = min(target_steer, state.get("steer") + 0.08);
     } else {
-        target_steer = max(target_steer, state.get("steer") - 0.06);
+        target_steer = max(target_steer, state.get("steer") - 0.08);
     }
 
     if(target_acc > state.get("acc")) {
@@ -75,7 +75,25 @@ Obs motorModel(State state, bool error){
 }
 
 HA ASP_model(State state){
-    return 0;
+    bool front_clear = flip(logistic(1, 40, (state.get("f_x") - state.get("x")) / state.get("vx")));
+
+    if(state.ha == LANE_RIGHT) {
+        bool right_clear = flip(logistic(0.5, 40, (state.get("r_x") - state.get("x")) / state.get("vx")));
+        if(right_clear)
+            return LANE_RIGHT;
+        if(front_clear) 
+            return FASTER;
+
+        return SLOWER;
+    }
+
+    bool right_clear = flip(logistic(1, 40, (state.get("r_x") - state.get("x")) / state.get("vx")));
+    if(right_clear)
+        return LANE_RIGHT;
+    if(front_clear) 
+        return FASTER;
+
+    return SLOWER;
 }
 
 Obs physicsModel(State state, double t_step){}

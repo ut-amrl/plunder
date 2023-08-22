@@ -62,7 +62,7 @@ def loadDataFrame():
         for i in range(0, len(Lines)):
             Lines[i] = ''.join(Lines[i].split())
 
-        out = open("formatted_data.csv", "w")
+        out = open("out/formatted_data.csv", "w")
         for line in Lines:
             out.write(line + "\n")
 
@@ -70,7 +70,7 @@ def loadDataFrame():
         f.close() 
 
         # Load dataset
-        dataset = pd.read_csv("formatted_data.csv")
+        dataset = pd.read_csv("out/formatted_data.csv")
 
         # print("Original dataset:")
         # print(dataset)
@@ -234,6 +234,37 @@ def makePredictions(full_set, training_size):
     yhat_test = model.predict(df_train_X)
     yhat_valid = model.predict(X_validation)
 
+    # Rescale to original
+    if not settings.pred_var1 == None:
+        scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
+        scaler1.fit(np.transpose([[0, 1]]))
+        for i in range(len(df_train_Y)):
+            df_train_Y[i, 0] = scaler1.transform([[df_train_Y[i, 0]]])[0][0]
+        for i in range(len(Y_validation)):
+            Y_validation[i, 0] = scaler1.transform([[Y_validation[i, 0]]])[0][0]
+        for i in range(len(yhat_test)):
+            yhat_test[i, 0] = scaler1.transform([[yhat_test[i, 0]]])[0][0]
+        for i in range(len(yhat_valid)):
+            yhat_valid[i, 0] = scaler1.transform([[yhat_valid[i, 0]]])[0][0]
+
+    if not settings.pred_var2 == None:
+        scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
+        scaler2.fit(np.transpose([[0, 1]]))
+        for i in range(len(df_train_Y)):
+            df_train_Y[i, 1] = scaler2.transform([[df_train_Y[i, 1]]])[0][0]
+        for i in range(len(Y_validation)):
+            Y_validation[i, 1] = scaler2.transform([[Y_validation[i, 1]]])[0][0]
+        for i in range(len(yhat_test)):
+            yhat_test[i, 1] = scaler2.transform([[yhat_test[i, 1]]])[0][0]
+        for i in range(len(yhat_valid)):
+            yhat_valid[i, 1] = scaler2.transform([[yhat_valid[i, 1]]])[0][0]
+
+    print("Predicted:")
+    print(yhat_valid)
+
+    print("Actual:")
+    print(Y_validation)
+
     #### Generate expected trajectories using softmax weights ####
     test_la1, test_la2 = [], []
     valid_la1, valid_la2 = [], []
@@ -248,11 +279,12 @@ def makePredictions(full_set, training_size):
 
     # Metrics for testing set
     log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y)
-    print("Testing set cumulative log obs: " + str(log_obs))
+    print("Testing set average log obs: " + str(log_obs))
 
     # Metrics for validation set
-    log_obs = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
-    print("Validation set cumulative log obs: " + str(log_obs))
+    log_obs_valid = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
+    log_obs_valid = (log_obs_valid * settings.validation_set - log_obs * settings.training_set) / (settings.validation_set - settings.training_set)
+    print("Validation set average log obs: " + str(log_obs_valid))
 
     print("", flush=True)
     plotter.plotLA(valid_la1, valid_la2, Y_validation)
