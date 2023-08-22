@@ -31,20 +31,17 @@ class Env_1d(gym.Env):
       return np.array([self.pos, self.decMax, self.accMax, self.vMax, self.vel], dtype=np.float64)
 
     def reset(self, seed=None, options=None):
-      super().reset(seed=seed)
+      # super().reset(seed=seed)
       self.pos = 0.
       self.vel = 0.
       self.acc = 0.
-      return self._get_obs(), self._get_info()
+      return self._get_obs()
 
     def step(self, action):
       prev_vel = self.vel
       self.acc = action[0]
-      # self.vel = min(self.vel+self.acc*self.dt, self.vMax)
       self.vel = self.vel+self.acc*self.dt
       self.pos += (prev_vel + self.vel)*.5*self.dt
       rew = 0
-      # terminated = (self.pos >= self.target)
-      terminated = False
-      return self._get_obs(), rew, terminated, False, self._get_info()
+      return self._get_obs(), rew, False, self._get_info()
 

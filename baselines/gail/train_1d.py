@@ -11,13 +11,14 @@ from imitation.util.networks import RunningNorm
 
 
 rng = np.random.default_rng(0)
-dataPath = "highway-easy"
-register(id='env-1d', entry_point='custom_envs.envs:Env_1d')
-env_base = gym.make("env-1d")
+dataPath = "data-1d"
+n_timesteps = 126
+register(id='env-1d-v1', entry_point='custom_envs.envs:Env_1d')
+env_base = gym.make("env-1d-v1")
 env_base.config(-5., 6., 12., 100.)
 def runSim(env, iter):
     env.reset()
-    for _ in range(200):
+    for _ in range(n_timesteps):
         obs, rew, done, truncated, info = env.step(1)
         print(obs)
         if done:
@@ -57,7 +58,7 @@ def gen_trajs(n_demos):
     return rollouts
 
 rollouts = gen_trajs(8)
-venv = make_vec_env("env-1d", n_envs=8, rng=rng)
+venv = make_vec_env("env-1d-v1", n_envs=8, rng=rng)
 
 def setup_venv():
     for n in range(8):
@@ -80,12 +81,12 @@ reward_net = BasicRewardNet(
     venv.observation_space,
     venv.action_space,
     normalize_input_layer=RunningNorm,
-)                                                 # discriminator
+)                                                  # discriminator
 
 gail_trainer = GAIL(
     demonstrations=rollouts,                       # expert demos
-    demo_batch_size=200,
-    gen_replay_buffer_capacity=400,
+    demo_batch_size=n_timesteps,
+    gen_replay_buffer_capacity=n_timesteps*2,
     n_disc_updates_per_round=3,
     venv=venv,                                     # environment
     gen_algo=learner,
@@ -93,7 +94,7 @@ gail_trainer = GAIL(
 )
 
 
-gail_trainer.train(2000000)
+gail_trainer.train(20000)
 
 def runModel(env, iter):
     env.reset()
@@ -101,10 +102,8 @@ def runModel(env, iter):
     v_list = []
     x_list = []
     la_list = []
-    for _ in range(200):
-        obs, rew, done, truncated, info = env.step(next_la)
-        if done:
-          break
+    for _ in range(n_timesteps):
+        obs, rew, _, info = env.step(next_la)
         next_la = learner.predict(obs)[0]
         x_list.append(obs[0])
         v_list.append(obs[4])
@@ -120,25 +119,7 @@ for i in range(0, 8):
     print("iter "+str(i))
     runModel(env_base, i)
 
-# for i in range(0, 2000, 1):
-#     a = learner.predict([i/10., -5, 6, 12, 0])[0][0]
-#     a = learner.predict([i/10., -5, 6, 12, 11])[0][0]
-#     b = learner.predict([i/10., -5, 6, 12, 12])[0][0]
-#     c = learner.predict([i/10., -5, 6, 12, 13])[0][0]
-#     print(str(a)+" "+str(b)+" "+str(c))
 
-# print()
-# print()
-
-# for i in range(0, 200, 1):
-#     a = learner.predict([0, -5, 6, 12, i/10.])[0][0]
-#     a = learner.predict([50, -5, 6, 12, i/10.])[0][0]
-#     b = learner.predict([100, -5, 6, 12, i/10.])[0][0]
-#     c = learner.predict([120, -5, 6, 12, i/10.])[0][0]
-#     print(str(a)+" "+str(b)+" "+str(c))
-
-print()
-print()
 
 
 def compareModelWithGt(n):
