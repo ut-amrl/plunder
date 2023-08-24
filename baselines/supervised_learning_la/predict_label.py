@@ -235,29 +235,29 @@ def makePredictions(full_set, training_size):
     yhat_valid = model.predict(X_validation)
 
     # Rescale to original
-    if not settings.pred_var1 == None:
-        scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
-        scaler1.fit(np.transpose([[0, 1]]))
-        for i in range(len(df_train_Y)):
-            df_train_Y[i, 0] = scaler1.transform([[df_train_Y[i, 0]]])[0][0]
-        for i in range(len(Y_validation)):
-            Y_validation[i, 0] = scaler1.transform([[Y_validation[i, 0]]])[0][0]
-        for i in range(len(yhat_test)):
-            yhat_test[i, 0] = scaler1.transform([[yhat_test[i, 0]]])[0][0]
-        for i in range(len(yhat_valid)):
-            yhat_valid[i, 0] = scaler1.transform([[yhat_valid[i, 0]]])[0][0]
+    # if not settings.pred_var1 == None:
+    #     scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
+    #     scaler1.fit(np.transpose([[0, 1]]))
+    #     for i in range(len(df_train_Y)):
+    #         df_train_Y[i, 0] = scaler1.transform([[df_train_Y[i, 0]]])[0][0]
+    #     for i in range(len(Y_validation)):
+    #         Y_validation[i, 0] = scaler1.transform([[Y_validation[i, 0]]])[0][0]
+    #     for i in range(len(yhat_test)):
+    #         yhat_test[i, 0] = scaler1.transform([[yhat_test[i, 0]]])[0][0]
+    #     for i in range(len(yhat_valid)):
+    #         yhat_valid[i, 0] = scaler1.transform([[yhat_valid[i, 0]]])[0][0]
 
-    if not settings.pred_var2 == None:
-        scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
-        scaler2.fit(np.transpose([[0, 1]]))
-        for i in range(len(df_train_Y)):
-            df_train_Y[i, 1] = scaler2.transform([[df_train_Y[i, 1]]])[0][0]
-        for i in range(len(Y_validation)):
-            Y_validation[i, 1] = scaler2.transform([[Y_validation[i, 1]]])[0][0]
-        for i in range(len(yhat_test)):
-            yhat_test[i, 1] = scaler2.transform([[yhat_test[i, 1]]])[0][0]
-        for i in range(len(yhat_valid)):
-            yhat_valid[i, 1] = scaler2.transform([[yhat_valid[i, 1]]])[0][0]
+    # if not settings.pred_var2 == None:
+    #     scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
+    #     scaler2.fit(np.transpose([[0, 1]]))
+    #     for i in range(len(df_train_Y)):
+    #         df_train_Y[i, 1] = scaler2.transform([[df_train_Y[i, 1]]])[0][0]
+    #     for i in range(len(Y_validation)):
+    #         Y_validation[i, 1] = scaler2.transform([[Y_validation[i, 1]]])[0][0]
+    #     for i in range(len(yhat_test)):
+    #         yhat_test[i, 1] = scaler2.transform([[yhat_test[i, 1]]])[0][0]
+    #     for i in range(len(yhat_valid)):
+    #         yhat_valid[i, 1] = scaler2.transform([[yhat_valid[i, 1]]])[0][0]
 
     print("Predicted:")
     print(yhat_valid)
