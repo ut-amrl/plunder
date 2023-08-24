@@ -10,15 +10,15 @@ from imitation.rewards.reward_nets import BasicRewardNet
 from imitation.util.networks import RunningNorm
 
 train_model = True
-rng = np.random.default_rng(0)
+rng = np.random.default_rng(3256)
 dataPath = "data-1d"
 n_timesteps = 125
 n_train = 10
 n_test = 20
 env_id = "env-1d-v1"
-policy_saved_name = "gail-1d-policy"
-train_steps = 2048*10
-n_loop = 50
+policy_saved_name = "gail-1d-policy-v2"
+train_steps = 2048*100
+n_loop = 1000
 
 
 
@@ -74,9 +74,9 @@ def print_trajs(env, learner):
     for _ in range(n_timesteps):
         obs, _, _, _ = env.step(next_la)
         next_la = learner.predict(obs)[0]
-        x_list.append(obs[0])
-        v_list.append(obs[4])
-        la_list.append(next_la[0])
+        x_list.append(float('{0:.2f}'.format(obs[0])))
+        v_list.append(float('{0:.2f}'.format(obs[4])))
+        la_list.append(float('{0:.2f}'.format(next_la[0])))
     print(x_list)
     print(v_list)
     print(la_list)
@@ -101,17 +101,16 @@ def compareModelWithGt(n, learner):
     acts = np.array(acts, dtype=float)
     ha = np.array(ha, dtype=int)
     action_vals = [obs[0][2], 0, obs[0][1]]
-    gt_acts = [action_vals[a] for a in ha]
     model_acts = [learner.predict(o)[0][0] for o in obs]
     for i in range(len(acts)):
-        print(str(model_acts[i])+" "+str(gt_acts[i])+" "+str(model_acts[i]-gt_acts[i]))
+        print('{0:.2f}'.format(model_acts[i])+" "+'{0:.2f}'.format(acts[i][0])+" "+'{0:.2f}'.format(model_acts[i]-acts[i][0]))
         # ll += log(norm_pdf(gt_acts[i], stdev, model_acts[i]))
     # return ll/len(acts)
     return 0
 
 def test_models(learner):
     ll_tot = 0.
-    for i in range(0, n_train):
+    for i in range(0, n_train+n_test):
         print("\n\niter "+str(i))
         q = compareModelWithGt(i, learner)
         print(q)
@@ -131,10 +130,10 @@ venv = setup_venv()
 learner = PPO(
     env=venv,
     policy=MlpPolicy,
-    batch_size=64,
-    ent_coef=0.0,
-    learning_rate=0.0003,
-    n_epochs=50,
+    batch_size=512,
+    ent_coef=0.1,
+    learning_rate=0.0004,
+    n_epochs=3,
 )
 
 reward_net = BasicRewardNet(
@@ -146,8 +145,8 @@ reward_net = BasicRewardNet(
 gail_trainer = GAIL(
     demonstrations=rollouts,                       # expert demos
     demo_batch_size=n_timesteps,
-    gen_replay_buffer_capacity=n_timesteps*4,
-    n_disc_updates_per_round=2,
+    gen_replay_buffer_capacity=n_timesteps*2,
+    n_disc_updates_per_round=3,
     venv=venv,                                     # environment
     gen_algo=learner,
     reward_net=reward_net,
@@ -156,7 +155,7 @@ gail_trainer = GAIL(
 
 
 # env_obs = read_demo(3)[0][0]
-# test_env = gym.make(env_id)
+test_env = gym.make(env_id)
 # test_env.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
 # # print_trajs(test_env, learner)
 # debugger(test_env)
@@ -170,6 +169,13 @@ if train_model:
         print("LOOP # "+str(i))
         gail_trainer.train(train_steps)
         test_models(learner)
+        for i in range(0, n_train+n_test):
+            print()
+            print()
+            print("iter "+str(i))
+            env_obs = read_demo(i)[0][0]
+            test_env.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
+            print_trajs(test_env, learner)
         learner.save(policy_saved_name)
 else:
     learner = MlpPolicy.load(policy_saved_name)
@@ -177,14 +183,6 @@ else:
 
 test_models(learner)
 
-
-# for i in range(0, n_train+n_test):
-#     print()
-#     print()
-#     print("iter "+str(i))
-#     env_obs = read_demo(i)[0][0]
-#     test_env.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
-#     print_trajs(test_env, learner)
 
 
 

@@ -3,6 +3,7 @@ import gym
 from gym import spaces
 
 EPSILON = 10E-10
+MAX_T = 125
 
 class Env_1d(gym.Env):
 
@@ -17,7 +18,8 @@ class Env_1d(gym.Env):
       self.vMax = 10.
       self.target = 100.
       self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float64)
-      self.action_space = spaces.Box(low=-40, high=40, shape=(1,), dtype=np.float64)
+      self.action_space = spaces.Box(low=-100, high=100, shape=(1,), dtype=np.float64)
+      self.t = 0
 
     def config(self, decMax, accMax, vMax, target):
       self.decMax = float(decMax)
@@ -39,6 +41,7 @@ class Env_1d(gym.Env):
       self.vel = 0.
       self.prev_acc = 0.
       self.acc = 0.
+      self.t = 0
       return self._get_obs()
 
     def step(self, action):
@@ -52,6 +55,6 @@ class Env_1d(gym.Env):
       # if abs(self.pos - self.target) < EPSILON:
       #   self.pos = self.target
       self.pos += (prev_vel + self.vel)*.5*self.dt
-      rew = 0
-      return self._get_obs(), rew, False, self._get_info()
+      self.t += 1
+      return self._get_obs(), 0, self.t > MAX_T, self._get_info()
 
