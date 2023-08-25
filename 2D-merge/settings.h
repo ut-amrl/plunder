@@ -29,7 +29,7 @@ namespace SETTINGS {
     const int NUM_CORES = 8;                    // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
 
     // ----- Important hyperparameters -----
-    const double PROG_COMPLEXITY_LOSS_BASE = 0.006;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS_BASE = 0.01;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
     const double PROG_COMPLEXITY_LOSS = 0.06;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
     const double ALPHA_LOSS_UPPER = 0.0001;             // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
