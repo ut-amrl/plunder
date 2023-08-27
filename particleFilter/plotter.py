@@ -68,7 +68,7 @@ def readGroundTruth(gtPath):
     
     for info in gtReader:
         if len(info)>0:
-            gtTrajectory.append(int(info[ha_index].strip()))
+            gtTrajectory.append(int(float(info[ha_index].strip())))
 
     return
 
