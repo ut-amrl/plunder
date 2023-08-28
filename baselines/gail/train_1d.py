@@ -20,6 +20,15 @@ policy_saved_name = "gail-1d-policy-v2"
 train_steps = 2048*100
 n_loop = 1000
 
+configs = []
+
+def motor_model_possibilities(decMax, accMax, prev_la):
+    acc0 = min(prev_la+1, accMax)
+    acc2 = max(prev_la-1, decMax)
+    acc1 = acc0 if prev_la<=0 else acc2
+    return [acc0, acc1, acc2]
+
+
 
 
 def read_demo(n):
@@ -31,10 +40,14 @@ def read_demo(n):
     prev_la = [0]
     for line in reader:
         traj_acts.append([float(line[1])])
-        traj_obs.append(list(map(float, line[2:7]+prev_la)))
+        cur_obs = list(map(float, line[2:7]+prev_la))
+        cur_obs += motor_model_possibilities(cur_obs[1], cur_obs[2], prev_la[0])
+        traj_obs.append(cur_obs)
         traj_ha.append(int(line[8]))
         prev_la = [float(line[1])]
     return (traj_obs, traj_acts, traj_ha)
+
+
 
 def get_expert_traj(n):
     obs_res, acts, _ = read_demo(n)
@@ -86,6 +99,7 @@ def debugger(env):
     env.reset()
     obs, acts, _ = read_demo(3)
     env_obs = env.reset()
+    env.config(obs[0][1], obs[0][2], obs[0][3], obs[0][5])
     for i in range(n_timesteps):
         print(env_obs)
         print(obs[i])
@@ -122,6 +136,7 @@ def test_models(learner):
 
 
 
+
 register(id=env_id, entry_point='custom_envs.envs:Env_1d')
 rollouts = get_expert_trajs(n_train)
 venv = setup_venv()
@@ -130,8 +145,8 @@ venv = setup_venv()
 learner = PPO(
     env=venv,
     policy=MlpPolicy,
-    batch_size=512,
-    ent_coef=0.1,
+    batch_size=1024,
+    ent_coef=0.01,
     learning_rate=0.0004,
     n_epochs=3,
 )
@@ -158,7 +173,7 @@ gail_trainer = GAIL(
 test_env = gym.make(env_id)
 # test_env.config(float(env_obs[1]), float(env_obs[2]), float(env_obs[3]), float(env_obs[5]))
 # # print_trajs(test_env, learner)
-# debugger(test_env)
+debugger(test_env)
 # debugger(test_env)
 
 # exit()
