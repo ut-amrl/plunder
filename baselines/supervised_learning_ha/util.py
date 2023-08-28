@@ -23,16 +23,6 @@ def percent_accuracy(yhat_test, data):
     
     return correct_ha / total_ha * 100
 
-def obs_likelihood(ha, data, data_prev):
-    mean = settings.motor_model(ha, data, data_prev)
-    obs_log = 0
-    if not settings.pred_var1 == None:
-        obs_log += norm(mean[0], settings.pv1_stddev).logpdf(data[settings.pred_var1])
-    if not settings.pred_var2 == None:
-        obs_log += norm(mean[1], settings.pv2_stddev).logpdf(data[settings.pred_var2])
-
-    return obs_log
-
 def gen_traj(y_pred, y_true):
     la1, la2 = None, None
 
@@ -47,17 +37,29 @@ def gen_traj(y_pred, y_true):
     
     return (la1, la2)
 
+# def log_obs(expected, actual, var1, scaler):
+#     obs_log = 0
+#     mean = scaler.transform([[expected]])[0][0]
+#     test = scaler.transform([[actual]])[0][0]
+
+#     if var1:
+#         z_score = (mean - test) / settings.pv1_stddev
+#         obs_log += norm(0, 1).logpdf(z_score)
+#     else:
+#         z_score = (mean - test) / settings.pv2_stddev
+#         obs_log += norm(0, 1).logpdf(z_score)
+    
+#     return obs_log
+
 def log_obs(expected, actual, var1, scaler):
     obs_log = 0
     mean = scaler.transform([[expected]])[0][0]
     test = scaler.transform([[actual]])[0][0]
 
     if var1:
-        z_score = (mean - test) / settings.pv1_stddev
-        obs_log += norm(0, 1).logpdf(z_score)
+        obs_log += norm(mean, settings.pv1_stddev).logpdf(test)
     else:
-        z_score = (mean - test) / settings.pv2_stddev
-        obs_log += norm(0, 1).logpdf(z_score)
+        obs_log += norm(mean, settings.pv2_stddev).logpdf(test)
     
     return obs_log
 

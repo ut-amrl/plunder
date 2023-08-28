@@ -30,9 +30,9 @@ import numpy as np
 #     if ha == 0:
 #         return (min(data_prev["LA.acc"] + 1, data["accMax"]), None)
 #     elif ha == 1:
-#         if data["LA.acc"] < 0:
+#         if data_prev["LA.acc"] < 0:
 #             return (min(data_prev["LA.acc"] + 1, data["accMax"]), None)
-#         elif data["LA.acc"] > 0:
+#         elif data_prev["LA.acc"] > 0:
 #             return (max(data_prev["LA.acc"] - 1, data["decMax"]), None)
 #     else:
 #         return (max(data_prev["LA.acc"] - 1, data["decMax"]), None)
@@ -118,9 +118,7 @@ patience = 500
 sim_time = 75
 samples = 50
 folder = "merge-easy-data/"
-# folder = "merge-medium/"
-# folder = "merge-hard/"
-# folder = "merge-impossible/"
+# folder = "merge-medium-data/"
 vars_used = [
     "HA",
     "x",
@@ -136,10 +134,10 @@ vars_used = [
 ]
 pred_var1 = "LA.steer"
 pv1_range = [-0.3, 0.3]
-pv1_stddev = 0.005
+pv1_stddev = 0.03
 pred_var2 = "LA.acc"
 pv2_range = [-30, 30]
-pv2_stddev = 0.5
+pv2_stddev = 3
 
 numHA = 4
 

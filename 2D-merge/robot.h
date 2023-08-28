@@ -8,9 +8,10 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "steer", normal_distribution<double>(0.0, 0.005) },
-    { "acc", normal_distribution<double>(0.0, 0.5) }
+    { "steer", normal_distribution<double>(0.0, 0.01) },
+    { "acc", normal_distribution<double>(0.0, 1) }
 };
+double la_error_scaler = 3.0 / la_error["acc"].stddev();
 
 double TURN_HEADING = 0.15;
 double TURN_TARGET = 30;

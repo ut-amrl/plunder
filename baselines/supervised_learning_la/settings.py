@@ -5,7 +5,7 @@ import numpy as np
 # training_set = 10
 # validation_set = 30 # including training_set
 # train_time = 10000
-# patience = 1000
+# patience = 500
 # sim_time = 126
 # samples = 100
 # folder = "target/"
@@ -30,9 +30,9 @@ import numpy as np
 #     if ha == 0:
 #         return (min(data_prev["LA.acc"] + 1, data["accMax"]), None)
 #     elif ha == 1:
-#         if data["LA.acc"] < 0:
+#         if data_prev["LA.acc"] < 0:
 #             return (min(data_prev["LA.acc"] + 1, data["accMax"]), None)
-#         elif data["LA.acc"] > 0:
+#         elif data_prev["LA.acc"] > 0:
 #             return (max(data_prev["LA.acc"] - 1, data["decMax"]), None)
 #     else:
 #         return (max(data_prev["LA.acc"] - 1, data["decMax"]), None)
@@ -135,10 +135,10 @@ vars_used = [
 ]
 pred_var1 = "LA.steer"
 pv1_range = [-0.3, 0.3]
-pv1_stddev = 0.005
+pv1_stddev = 0.03
 pred_var2 = "LA.acc"
-pv2_range = [-25, 25]
-pv2_stddev = 0.5
+pv2_range = [-30, 30]
+pv2_stddev = 3
 
 numHA = 4
 

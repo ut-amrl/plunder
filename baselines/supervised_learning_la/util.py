@@ -14,16 +14,6 @@ from scipy.stats import norm
 
 import settings
 
-def obs_likelihood(ha, data, data_prev):
-    mean = settings.motor_model(ha, data, data_prev)
-    obs_log = 0
-    if not settings.pred_var1 == None:
-        obs_log += norm(mean[0], settings.pv1_stddev).logpdf(data[settings.pred_var1])
-    if not settings.pred_var2 == None:
-        obs_log += norm(mean[1], settings.pv2_stddev).logpdf(data[settings.pred_var2])
-
-    return obs_log
-
 def gen_traj(y_pred, y_true):
     la1, la2 = None, None
 
@@ -38,33 +28,69 @@ def gen_traj(y_pred, y_true):
     
     return (la1, la2)
 
-def log_obs(expected, actual, var1):
+# def log_obs(expected, actual, var1):
+#     obs_log = 0
+    
+#     if var1:
+#         z_score = (expected - actual) / settings.pv1_stddev
+#         obs_log += norm(0, 1).logpdf(z_score)
+#     else:
+#         z_score = (expected - actual) / settings.pv2_stddev
+#         obs_log += norm(0, 1).logpdf(z_score)
+    
+#     return obs_log
+
+def log_obs(expected, actual, var1, scaler):
     obs_log = 0
+    mean = scaler.transform([[expected]])[0][0]
+    test = scaler.transform([[actual]])[0][0]
     
     if var1:
-        z_score = (expected - actual) / settings.pv1_stddev
-        obs_log += norm(0, 1).logpdf(z_score)
+        obs_log += norm(mean, settings.pv1_stddev).logpdf(test)
     else:
-        z_score = (expected - actual) / settings.pv2_stddev
-        obs_log += norm(0, 1).logpdf(z_score)
+        obs_log += norm(mean, settings.pv2_stddev).logpdf(test)
     
     return obs_log
 
+# def cum_log_obs(expected1, expected2, actual):
+#     if not settings.pred_var1 == None:
+#         actual1 = actual[:, 0]
+#     if not settings.pred_var2 == None:
+#         actual2 = actual[:, 1]
+
+#     error = 0
+#     for i in range(len(actual)):
+#         # Output 1
+#         if not settings.pred_var1 == None:
+#             error += log_obs(expected1[i], actual1[i], True)  
+
+#         # Output 2
+#         if not settings.pred_var2 == None:
+#             error += log_obs(expected2[i], actual2[i], False)
+        
+#     return error / len(actual)
 def cum_log_obs(expected1, expected2, actual):
     if not settings.pred_var1 == None:
         actual1 = actual[:, 0]
     if not settings.pred_var2 == None:
         actual2 = actual[:, 1]
 
+    if not settings.pred_var1 == None:
+        scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
+        scaler1.fit(np.transpose([[0, 1]]))
+
+    if not settings.pred_var2 == None:
+        scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
+        scaler2.fit(np.transpose([[0, 1]]))
+    
     error = 0
     for i in range(len(actual)):
         # Output 1
         if not settings.pred_var1 == None:
-            error += log_obs(expected1[i], actual1[i], True)  
+            error += log_obs(expected1[i], actual1[i], True, scaler1)  
 
         # Output 2
         if not settings.pred_var2 == None:
-            error += log_obs(expected2[i], actual2[i], False)
+            error += log_obs(expected2[i], actual2[i], False, scaler2)
         
     return error / len(actual)
-    

@@ -11,6 +11,7 @@ map<string, normal_distribution<double>> la_error = {
     { "steer", normal_distribution<double>(0.0, 0.01) },
     { "acc", normal_distribution<double>(0.0, 2) }
 };
+double la_error_scaler = 1.0;
 
 double TURN_HEADING = 0.15;
 double TURN_TARGET = 30;
