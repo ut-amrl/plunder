@@ -1,0 +1,6 @@
+Generator updates per round: 3
+Discriminator updates per round: 3
+Learning rate: .0004
+Entropy coefficient: .1
+Batch size: 512
+Number of steps of training: 2048 * 100 * 248 = 50,790,400
