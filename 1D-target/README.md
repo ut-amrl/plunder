@@ -30,18 +30,18 @@ The most useful/informative outputs will be:
 
     Iteration 1:
 
-    ![](snapshots/example_snapshot/plots/testing/1-0-graph.png)
+    ![](snapshots/example_snapshot/plots/1-0-graph.png)
 
     Iteration 2:
 
-    ![](snapshots/example_snapshot/plots/testing/2-0-graph.png)
+    ![](snapshots/example_snapshot/plots/2-0-graph.png)
     
     Iteration 10:
 
-    ![](snapshots/example_snapshot/plots/testing/9-0-graph.png)
+    ![](snapshots/example_snapshot/plots/9-0-graph.png)
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level actions predicted by the policy on the testing set. For example, here is iteration 10:
 
-    ![](snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
+    ![](snapshots/example_snapshot/plots/LA-9-0-graph.png)
 
 Other outputs include:
 - **sim/** - contains the simulated trajectories for each robot
