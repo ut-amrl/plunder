@@ -115,11 +115,13 @@ import numpy as np
 training_set = 10
 validation_set = 30 # including training_set
 train_time = 15000
-patience = 500
+patience = 100
 sim_time = 75
 samples = 50
-folder = "merge-easy-data/"
+# folder = "merge-easy-data/"
 # folder = "merge-medium-data/"
+# folder = "merge-hard-data/"
+folder = "merge-impossible-data/"
 vars_used = [
     "HA",
     "x",
