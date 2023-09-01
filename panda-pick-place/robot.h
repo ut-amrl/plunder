@@ -35,7 +35,7 @@ Obs motorModel(State state, bool error){
         state.put("vz", 5 * state.get("tz"));
         state.put("end", -1);
     } else {
-        throw new IllegalArgumentException();
+        throw invalid_argument("Invalid high-level action label");
     }
 
     return state.obs;
