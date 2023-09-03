@@ -1,12 +1,31 @@
 import gymnasium as gym
 import panda_gym
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, DDPG, A2C
+from sb3_contrib import TQC
 import time
+from stable_baselines3.common.evaluation import evaluate_policy
+
+algo = "A2C"
 
 env = gym.make("PandaPickAndPlaceDense-v3", render_mode="human")
-model = PPO.load("ddpg-pick-and-place", env=env)
 
-for iter in range(50):
+if algo == "DDPG":
+    model = DDPG.load("ddpg-pick-and-place", env=env)
+
+elif algo == "A2C":
+    model = A2C.load("a2c-pick-and-place", env=env)
+
+elif algo == "PPO":
+    model = PPO.load("ppo-pick-and-place", env=env)
+
+elif algo == "TQC":
+    model = TQC.load("tqc-PandaPickAndPlace-v1", env=env)
+
+mean_reward, std_reward = evaluate_policy(model, env, deterministic=True, render=True)
+
+print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
+
+for iter in range(30):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
@@ -16,7 +35,7 @@ for iter in range(50):
 
     for _ in range(50):
         observation, reward, terminated, truncated, info = env.step(action)
-        action, _states = model.predict(observation, deterministic=True)
+        action, _states = model.predict(observation, deterministic=False)
         
         world_state = observation["observation"]
         target_pos = observation["desired_goal"][0:3]
