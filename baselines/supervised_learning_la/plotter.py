@@ -48,7 +48,7 @@ def plot(yhat):
         plt.close('all')
 
 # ----- Handles the main plotting logic for LA ---------------------------------------------
-def plotLA(expected1, expected2, actual):
+def plotLA(expected, actual):
     outPath = "plots/LA"
     
     iter = 0
@@ -58,22 +58,13 @@ def plotLA(expected1, expected2, actual):
         for t in range(maxTime):
             times.append(t)
 
-        if not settings.pred_var1 == None:
-            plt.plot(actual[iter:iter+maxTime, 0], label=settings.pred_var1)
-            plt.plot(expected1[iter:iter+maxTime], label='model output')
+        for var in range(len(settings.pred_var)):
+            plt.plot(actual[iter:iter+maxTime, var], label=settings.pred_var[var])
+            plt.plot(expected[var][iter:iter+maxTime], label='model output')
             plt.legend()
-            plt.savefig("plots/la1-" + str(robot_iter) + ".png")
+            plt.savefig("plots/la" + str(var) + "-" + str(robot_iter) + ".png")
 
             plt.clf()
-            plt.close('all')
-
-        if not settings.pred_var2 == None:
-            plt.plot(actual[iter:iter+maxTime, 1], label=settings.pred_var2)
-            plt.plot(expected2[iter:iter+maxTime], label='model output')
-            plt.legend()
-            plt.savefig("plots/la2-" + str(robot_iter) + ".png")
-
-            plt.clf()
-            plt.close('all')
+            plt.close("all")
 
         iter += maxTime
