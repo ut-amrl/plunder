@@ -354,7 +354,7 @@ def main():
             print("Plotting training graphs, iteration " + str(iter))
             plotSingleTimestep(graph1['inF'], graph1['outP'], graph1['gtF'], graph1['title'], iter, int(settings["TRAINING_SET"]))
             print("Plotting testing ASP graphs, iteration " + str(iter))
-            plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["TRAINING_SET"]))
+            plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["VALIDATION_SET"]))
             print("Plotting likelihoods, iteration " + str(iter))
             plotLikelihoods(settings["LOG_OBS_PATH"] + "-training.txt", settings["PLOT_PATH"]+"training-likelihoods.png", "Training Set Likelihoods", 'Log Obs. Likelihood')
             plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'Log Obs. Likelihood')
@@ -363,8 +363,8 @@ def main():
             plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
         
-        for robot in range(int(settings["VALIDATION_SET"])):
-            plotSingle(validationInFile, validationOutPath, gtFile, 'Final Outputs', str(int(settings["NUM_ITER"]) - 1), robot)
+        # for robot in range(int(settings["VALIDATION_SET"])):
+        #     plotSingle(validationInFile, validationOutPath, gtFile, 'Final Outputs', str(int(settings["NUM_ITER"]) - 1), robot)
             
     except Exception as e:
         print(e)

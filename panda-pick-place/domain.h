@@ -13,12 +13,10 @@ using namespace AST;
 // HA: High-level action labels. Make sure the *first* label is the desired initial high-level action!
 enum HA_enum {
     MOVE_TO_CUBE,
-    GRASP,
     MOVE_TO_TARGET
 };
 vector<string> HA_Labels = {
     "MOVE_TO_CUBE",
-    "GRASP",
     "MOVE_TO_TARGET"
 };
 
@@ -44,7 +42,7 @@ vector<Var> Obs_vars = {
     Var ("tx", Dimension(1, 0, 0), true),
     Var ("ty", Dimension(1, 0, 0), true),
     Var ("tz", Dimension(1, 0, 0), true),
-    Var ("end_width", Dimension(1, 0, 0), true),
+    Var ("end_width", Dimension(1, 0, 0), false),
     Var ("vx", Dimension(1, -2, 0), false),
     Var ("vy", Dimension(1, -2, 0), false),
     Var ("vz", Dimension(1, -2, 0), false),
