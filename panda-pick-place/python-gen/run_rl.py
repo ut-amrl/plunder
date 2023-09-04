@@ -5,7 +5,7 @@ from sb3_contrib import TQC
 import time
 from stable_baselines3.common.evaluation import evaluate_policy
 
-algo = "A2C"
+algo = "TQC"
 
 env = gym.make("PandaPickAndPlaceDense-v3", render_mode="human")
 
@@ -19,7 +19,7 @@ elif algo == "PPO":
     model = PPO.load("ppo-pick-and-place", env=env)
 
 elif algo == "TQC":
-    model = TQC.load("tqc-PandaPickAndPlace-v1", env=env)
+    model = TQC.load("tqc-pick-and-place", env=env)
 
 mean_reward, std_reward = evaluate_policy(model, env, deterministic=True, render=True)
 
@@ -32,10 +32,13 @@ for iter in range(30):
     observation, info = env.reset()
 
     action = [0, 0, 0, 0]
+    solved = False
 
-    for _ in range(50):
+    for _ in range(30):
         observation, reward, terminated, truncated, info = env.step(action)
         action, _states = model.predict(observation, deterministic=False)
+        if solved:
+            action = [0, 0, 0, -1]
         
         world_state = observation["observation"]
         target_pos = observation["desired_goal"][0:3]
@@ -55,7 +58,7 @@ for iter in range(30):
         
         time.sleep(0.1)
         if terminated or truncated:
-            break
+            solved = True
     
     obs_out.close()
     
