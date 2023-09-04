@@ -33,9 +33,9 @@ vector<string> LA_vars = {
 
 // Obs: Defines the world state of a robot. Units: [m, s, radians]
 vector<Var> Obs_vars = {
-    Var ("x", Dimension(1, 0, 0), false),
-    Var ("y", Dimension(1, 0, 0), false),
-    Var ("z", Dimension(1, 0, 0), false),
+    Var ("x", Dimension(1, 0, 0), true),
+    Var ("y", Dimension(1, 0, 0), true),
+    Var ("z", Dimension(1, 0, 0), true),
     Var ("bx", Dimension(1, 0, 0), true),
     Var ("by", Dimension(1, 0, 0), true),
     Var ("bz", Dimension(1, 0, 0), true),

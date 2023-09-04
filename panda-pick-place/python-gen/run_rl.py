@@ -26,8 +26,6 @@ mean_reward, std_reward = evaluate_policy(model, env, deterministic=True, render
 
 print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
 
-obs_stddev = 0.01
-
 for iter in range(30):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
@@ -39,7 +37,7 @@ for iter in range(30):
 
     for _ in range(30):
         observation, reward, terminated, truncated, info = env.step(action)
-        action, _states = model.predict(observation, deterministic=True)
+        action, _states = model.predict(observation, deterministic=False)
         if solved:
             action = [0, 0, 0, -1]
         
@@ -50,14 +48,12 @@ for iter in range(30):
         obs_pruned = [x, y, z, bx, by, bz, tx, ty, tz, end_width]
 
         for each in obs_pruned:
-            with_err = np.random.normal(each, obs_stddev)
             obs_out.write(str(each)+", ")
         for each in action:
             obs_out.write(str(each)+", ")
 
         obs_out.write("0\n")
         
-        time.sleep(0.08)
         if terminated or truncated:
             solved = True
     
