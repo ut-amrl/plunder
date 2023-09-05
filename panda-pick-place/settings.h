@@ -12,7 +12,7 @@ namespace SETTINGS {
     
     // ----- General configuration -----
     const bool DEBUG = false;
-    const int TRAINING_SET = 10;                // Number of robots to train on
+    const int TRAINING_SET = 5;                // Number of robots to train on
     const int VALIDATION_SET = 30;              // Number of total robots in the full set (including the training set)
     const bool USE_SAFE_TRANSITIONS = false;    // "Safe" transitions (only allow user-specified transitions). 
                                                 // Optional modification to improve performance on policies with sparse transitions
@@ -22,7 +22,7 @@ namespace SETTINGS {
     const double GEN_ACCURACY = -1;             // Probability of a correct high-level transition in the simulation
 
     // ----- EM Loop parameters -----
-    const int NUM_ITER = 5;                    // Number of iterations in the expectation-maximization loop
+    const int NUM_ITER = 15;                    // Number of iterations in the expectation-maximization loop
 
     // ----- Parallelization Parameters -----
     const int BATCH_SIZE = 16;                  // Number of programs to optimize in parallel
