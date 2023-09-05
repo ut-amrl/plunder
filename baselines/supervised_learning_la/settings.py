@@ -187,7 +187,7 @@ import numpy as np
 training_set = 5
 validation_set = 30 # including training_set
 train_time = 15000
-patience = 1000
+patience = 0
 sim_time = 30
 samples = 50
 folder = "panda-pick-place/"
