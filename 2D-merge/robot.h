@@ -23,7 +23,7 @@ double laneFinder(double y) {
     return round(y / lane_diff);
 }
 
-// Motor model matches highway2d.py
+// Motor model matches merge.py
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
 

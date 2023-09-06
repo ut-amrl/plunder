@@ -76,12 +76,11 @@ def loadDataFrame():
         # print(dataset)
 
         # Compute outputs from discrete motor controllers
-        motor1 = np.empty((settings.numHA, len(dataset.index)))
-        motor2 = np.empty((settings.numHA, len(dataset.index)))
+        motor = np.empty((len(settings.pred_var), settings.numHA, len(dataset.index)))
         for ha in range(settings.numHA):
             for i in range(1, len(dataset.index)):
-                motor1[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[0]
-                motor2[ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[1]
+                for var in range(len(settings.pred_var)):
+                    motor[var][ha][i] = settings.motor_model(ha, dataset.iloc[i], dataset.iloc[i-1])[var]
 
         # Drop irrelevant variables
         for column in dataset:
@@ -91,20 +90,14 @@ def loadDataFrame():
                 dataset[column] = pd.to_numeric(dataset[column])
         
         # Append motor controller outputs
-        if not settings.pred_var1 == None:
+        for var in range(len(settings.pred_var)):
             for ha in range(settings.numHA):
-                dataset["controller-" + settings.pred_var1 + "-" + str(ha)] = motor1[ha]
-        if not settings.pred_var2 == None:
-            for ha in range(settings.numHA):
-                dataset["controller-" + settings.pred_var2 + "-" + str(ha)] = motor2[ha]
+                dataset["controller-" + settings.pred_var[var] + "-" + str(ha)] = motor[var][ha]
 
         # Move predicted variables to the end for readability
-        if not settings.pred_var1 == None:
-            column_to_move = dataset.pop(settings.pred_var1)
-            dataset.insert(len(dataset.columns), settings.pred_var1, column_to_move)
-        if not settings.pred_var2 == None:
-            column_to_move = dataset.pop(settings.pred_var2)
-            dataset.insert(len(dataset.columns), settings.pred_var2, column_to_move)
+        for var in range(len(settings.pred_var)):
+            column_to_move = dataset.pop(settings.pred_var[var])
+            dataset.insert(len(dataset.columns), settings.pred_var[var], column_to_move)
         
         # print("Relevant Variables:")
         # print(dataset)
@@ -127,11 +120,13 @@ def loadDataFrame():
     scaler_validation = MinMaxScaler(feature_range=(0, 1))
     for col in dataset_validation.columns:
         # Normalize columns with the same metric using the same scaler
-        if not settings.pred_var1 == None and (col.startswith("controller-" + settings.pred_var1 + "-") or col.startswith(settings.pred_var1)):
-            scaler_validation.fit(np.transpose([settings.pv1_range]))
-        elif not settings.pred_var2 == None and (col.startswith("controller-" + settings.pred_var2 + "-") or col.startswith(settings.pred_var2)):
-            scaler_validation.fit(np.transpose([settings.pv2_range]))
-        else: # Perform regular fit_transform
+        is_la = False
+        for var in range(len(settings.pred_var)):
+            if col.startswith("controller-" + settings.pred_var[var] + "-") or col.startswith(settings.pred_var[var]):
+                scaler_validation.fit(np.transpose([settings.pv_range[var]]))
+                is_la = True
+        
+        if not is_la:
             scaler_validation.fit(np.transpose([dataset_validation[col]]))
         
         if not col.startswith("HA"):
@@ -156,10 +151,8 @@ def makePredictions(full_set, training_size):
     validation_Y = DataFrame()
 
     # Outputs: predicted variables
-    if not settings.pred_var1 == None:
-        validation_Y[settings.pred_var1 + "(t)"] = df_validation[settings.pred_var1 + "(t)"]
-    if not settings.pred_var2 == None:
-        validation_Y[settings.pred_var2 + "(t)"] = df_validation[settings.pred_var2 + "(t)"]
+    for var in range(len(settings.pred_var)):
+        validation_Y[settings.pred_var[var] + "(t)"] = df_validation[settings.pred_var[var] + "(t)"]
         
     # Inputs: everything else
     for col in df_validation:
@@ -204,11 +197,7 @@ def makePredictions(full_set, training_size):
     # Early stopping
     es = EarlyStopping(monitor='val_loss', verbose=1, patience=settings.patience)
 
-    numVar = 0
-    if not settings.pred_var1 == None:
-        numVar += 1
-    if not settings.pred_var2 == None:
-        numVar += 1 
+    numVar = len(settings.pred_var)
     
     # Design network
     model = Sequential()
@@ -234,31 +223,6 @@ def makePredictions(full_set, training_size):
     yhat_test = model.predict(df_train_X)
     yhat_valid = model.predict(X_validation)
 
-    # Rescale to original
-    # if not settings.pred_var1 == None:
-    #     scaler1 = MinMaxScaler(feature_range=(settings.pv1_range[0], settings.pv1_range[1]))
-    #     scaler1.fit(np.transpose([[0, 1]]))
-    #     for i in range(len(df_train_Y)):
-    #         df_train_Y[i, 0] = scaler1.transform([[df_train_Y[i, 0]]])[0][0]
-    #     for i in range(len(Y_validation)):
-    #         Y_validation[i, 0] = scaler1.transform([[Y_validation[i, 0]]])[0][0]
-    #     for i in range(len(yhat_test)):
-    #         yhat_test[i, 0] = scaler1.transform([[yhat_test[i, 0]]])[0][0]
-    #     for i in range(len(yhat_valid)):
-    #         yhat_valid[i, 0] = scaler1.transform([[yhat_valid[i, 0]]])[0][0]
-
-    # if not settings.pred_var2 == None:
-    #     scaler2 = MinMaxScaler(feature_range=(settings.pv2_range[0], settings.pv2_range[1]))
-    #     scaler2.fit(np.transpose([[0, 1]]))
-    #     for i in range(len(df_train_Y)):
-    #         df_train_Y[i, 1] = scaler2.transform([[df_train_Y[i, 1]]])[0][0]
-    #     for i in range(len(Y_validation)):
-    #         Y_validation[i, 1] = scaler2.transform([[Y_validation[i, 1]]])[0][0]
-    #     for i in range(len(yhat_test)):
-    #         yhat_test[i, 1] = scaler2.transform([[yhat_test[i, 1]]])[0][0]
-    #     for i in range(len(yhat_valid)):
-    #         yhat_valid[i, 1] = scaler2.transform([[yhat_valid[i, 1]]])[0][0]
-
     print("Predicted:")
     print(yhat_valid)
 
@@ -266,28 +230,25 @@ def makePredictions(full_set, training_size):
     print(Y_validation)
 
     #### Generate expected trajectories using softmax weights ####
-    test_la1, test_la2 = [], []
-    valid_la1, valid_la2 = [], []
-
-    if not settings.pred_var1 == None:
-        test_la1, valid_la1 = yhat_test[:, 0], yhat_valid[:, 0]
-    if not settings.pred_var2 == None:
-        test_la2, valid_la2 = yhat_test[:, 1], yhat_valid[:, 1]
+    test_la, valid_la = [], []
+    for var in range(len(settings.pred_var)):
+        test_la.append(yhat_test[:, var])
+        valid_la.append(yhat_valid[:, var])
 
     #### METRICS: WEIGHTED BY SOFTMAX ####
     print("######## Metrics: Weighted by softmax ########")
 
     # Metrics for testing set
-    log_obs = util.cum_log_obs(test_la1, test_la2, df_train_Y)
+    log_obs = util.cum_log_obs(test_la, df_train_Y)
     print("Testing set average log obs: " + str(log_obs))
 
     # Metrics for validation set
-    log_obs_valid = util.cum_log_obs(valid_la1, valid_la2, Y_validation)
+    log_obs_valid = util.cum_log_obs(valid_la, Y_validation)
     log_obs_valid = (log_obs_valid * settings.validation_set - log_obs * settings.training_set) / (settings.validation_set - settings.training_set)
     print("Validation set average log obs: " + str(log_obs_valid))
 
     print("", flush=True)
-    plotter.plotLA(valid_la1, valid_la2, Y_validation)
+    # plotter.plotLA(valid_la, Y_validation)
 
 # Run neural network
 loadDataFrame()

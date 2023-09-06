@@ -1,0 +1,73 @@
+[
+    {
+        "op": "Plus",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, 0, 0], [1, 0, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, 0, 0]
+    },
+    {
+        "op": "Minus",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, 0, 0], [1, 0, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, 0, 0]
+    },
+    {
+        "op": "Plus",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -1, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, -1, 0]
+    },
+    {
+        "op": "Plus",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[0, 0, 1], [0, 0, 1]],
+        "outputType": "NUM",
+        "outputDim": [0, 0, 1]
+    },
+    {
+        "op": "Minus",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[0, 0, 1], [0, 0, 1]],
+        "outputType": "NUM",
+        "outputDim": [0, 0, 1]
+    },
+    {
+        "op": "DividedBy",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, 0, 0], [1, -1, 0]],
+        "outputType": "NUM",
+        "outputDim": [0, 1, 0]
+    },
+    {
+        "op": "Times",
+        "inputType": ["NUM","NUM"],
+        "inputDim": [[1, -1, 0], [1, -1, 0]],
+        "outputType": "NUM",
+        "outputDim": [2, -2, 0]
+    },
+    {
+        "op": "DistTraveled",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -2, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, 0, 0]
+    },
+    {
+        "op": "TimeToStop",
+        "inputType": ["NUM", "NUM"],
+        "inputDim": [[1, -1, 0], [1, -2, 0]],
+        "outputType": "NUM",
+        "outputDim": [0, 1, 0]
+    },
+    {
+        "op": "Abs",
+        "inputType": ["NUM"],
+        "inputDim": [[1, 0, 0]],
+        "outputType": "NUM",
+        "outputDim": [1, 0, 0]
+    }
+]
+  
