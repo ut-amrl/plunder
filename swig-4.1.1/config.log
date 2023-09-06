@@ -1,0 +1,358 @@
+PATH: /robodata/home/robodata/linusjz/.vscode-server/bin/6c3e3dba23e8fadc360aed75ce363ba185c49794/bin/remote-cli/
+PATH: /home/linusjz/.local/bin/
+PATH: /home/linusjz/.local/bin/
+PATH: /usr/local/sbin/
+PATH: /usr/local/bin/
+PATH: /usr/sbin/
+PATH: /usr/bin/
+PATH: /sbin/
+PATH: /bin/
+PATH: /usr/games/
+PATH: /usr/local/games/
+PATH: /snap/bin/
+configure:2941: looking for aux files: compile missing install-sh config.guess config.sub
+configure:2954:  trying ./Tools/config/
+configure:2983:   ./Tools/config/compile found
+configure:2983:   ./Tools/config/missing found
+configure:2965:   ./Tools/config/install-sh found
+configure:2983:   ./Tools/config/config.guess found
+configure:2983:   ./Tools/config/config.sub found
+configure:3105: error: cannot run /bin/bash ./Tools/config/config.sub
+
+## ---------------- ##
+## Cache variables. ##
+## ---------------- ##
+
+ac_cv_env_CCC_set=
+ac_cv_env_CCC_value=
+ac_cv_env_CC_set=
+ac_cv_env_CC_value=
+ac_cv_env_CFLAGS_set=
+ac_cv_env_CFLAGS_value=
+ac_cv_env_CPPFLAGS_set=
+ac_cv_env_CPPFLAGS_value=
+ac_cv_env_CPP_set=
+ac_cv_env_CPP_value=
+ac_cv_env_CXXFLAGS_set=
+ac_cv_env_CXXFLAGS_value=
+ac_cv_env_CXX_set=
+ac_cv_env_CXX_value=
+ac_cv_env_LDFLAGS_set=
+ac_cv_env_LDFLAGS_value=
+ac_cv_env_LIBS_set=
+ac_cv_env_LIBS_value=
+ac_cv_env_PCRE2_CFLAGS_set=
+ac_cv_env_PCRE2_CFLAGS_value=
+ac_cv_env_PCRE2_CONFIG_set=
+ac_cv_env_PCRE2_CONFIG_value=
+ac_cv_env_PCRE2_LIBS_set=
+ac_cv_env_PCRE2_LIBS_value=
+ac_cv_env_YACC_set=
+ac_cv_env_YACC_value=
+ac_cv_env_YFLAGS_set=
+ac_cv_env_YFLAGS_value=
+ac_cv_env_build_alias_set=
+ac_cv_env_build_alias_value=
+ac_cv_env_host_alias_set=
+ac_cv_env_host_alias_value=
+ac_cv_env_target_alias_set=
+ac_cv_env_target_alias_value=
+
+## ----------------- ##
+## Output variables. ##
+## ----------------- ##
+
+ACLOCAL=''
+ADB=''
+AMDEPBACKSLASH=''
+AMDEP_FALSE=''
+AMDEP_TRUE=''
+AMTAR=''
+AM_BACKSLASH=''
+AM_DEFAULT_V=''
+AM_DEFAULT_VERBOSITY=''
+AM_V=''
+ANDROID=''
+ANT=''
+AUTOCONF=''
+AUTOHEADER=''
+AUTOMAKE=''
+AWK=''
+BOOST_CPPFLAGS=''
+BOOST_LDFLAGS=''
+CAMLP4=''
+CC=''
+CCDEPMODE=''
+CCSHARED=''
+CFLAGS=''
+CPP=''
+CPPFLAGS=''
+CSCOPE=''
+CSHARPCFLAGS=''
+CSHARPCILINTERPRETER=''
+CSHARPCILINTERPRETER_FLAGS=''
+CSHARPCOMPILER=''
+CSHARPCONVERTPATH=''
+CSHARPDYNAMICLINKING=''
+CSHARPLIBRARYPREFIX=''
+CSHARPSO=''
+CTAGS=''
+CXX=''
+CXXDEPMODE=''
+CXXFLAGS=''
+CXXSHARED=''
+CYGPATH_W=''
+D1COMPILER=''
+D2COMPILER=''
+DDEFAULTVERSION=''
+DEFS=''
+DEPDIR=''
+DLIBPREFIX=''
+ECHO_C=''
+ECHO_N='-n'
+ECHO_T=''
+EGREP=''
+ENABLE_CCACHE=''
+ETAGS=''
+EXEEXT=''
+EXTRA_CLEAN=''
+GCCGO=''
+GCCGOOPT=''
+GO12=''
+GO13=''
+GO15=''
+GO1=''
+GO=''
+GOC=''
+GOGCC=''
+GOOPT=''
+GOVERSIONOPTION=''
+GREP=''
+GUILE=''
+GUILE_CFLAGS=''
+GUILE_CONFIG=''
+GUILE_LIBS=''
+GUILE_SO=''
+HAVE_CXX11=''
+HAVE_CXX14=''
+HAVE_CXX17=''
+HAVE_CXX20=''
+INSTALL_DATA=''
+INSTALL_PROGRAM=''
+INSTALL_SCRIPT=''
+INSTALL_STRIP_PROGRAM=''
+JAVA=''
+JAVAC=''
+JAVACFLAGS=''
+JAVACXXSHARED=''
+JAVADYNAMICLINKING=''
+JAVAFLAGS=''
+JAVAINC=''
+JAVALDSHARED=''
+JAVALIBRARYPREFIX=''
+JAVASO=''
+JAVA_CLASSPATH_SEP=''
+JAVA_SKIP_DOXYGEN_TEST_CASES=''
+JSCENABLED=''
+JSCOREDYNAMICLINKING=''
+JSCOREINC=''
+JSCOREVERSION=''
+JSINTERPRETERCXX=''
+JSINTERPRETERLINKFLAGS=''
+JSV8DYNAMICLINKING=''
+JSV8ENABLED=''
+JSV8INC=''
+LDFLAGS=''
+LDSHARED=''
+LIBC=''
+LIBCRYPT=''
+LIBM=''
+LIBOBJS=''
+LIBS=''
+LINKFORSHARED=''
+LTLIBOBJS=''
+LUABIN=''
+LUADYNAMICLINKING=''
+LUAFLAGS=''
+LUALINK=''
+LUA_SO=''
+MAKEINFO=''
+MKDIR_P=''
+MZC=''
+MZDYNOBJ=''
+MZSCHEME=''
+MZSCHEME_SO=''
+NDKBUILD=''
+NODEGYP=''
+NODEJS=''
+OBJEXT=''
+OCAMLC=''
+OCAMLDLGEN=''
+OCAMLFIND=''
+OCAMLMKTOP=''
+OCTAVE=''
+OCTAVE_CPPFLAGS=''
+OCTAVE_CXXFLAGS=''
+OCTAVE_LDFLAGS=''
+OCTAVE_SO=''
+PACKAGE=''
+PACKAGE_BUGREPORT='https://www.swig.org'
+PACKAGE_NAME='swig'
+PACKAGE_STRING='swig 4.1.1'
+PACKAGE_TARNAME='swig'
+PACKAGE_URL=''
+PACKAGE_VERSION='4.1.1'
+PATH_SEPARATOR=':'
+PCHINCLUDEARG=''
+PCHINCLUDEEXT=''
+PCHSUPPORT=''
+PCRE2_CFLAGS=''
+PCRE2_CONFIG=''
+PCRE2_LIBS=''
+PERL5CCCDLFLAGS=''
+PERL5CCDLFLAGS=''
+PERL5CCFLAGS=''
+PERL5DYNAMICLINKING=''
+PERL5EXT=''
+PERL5LDFLAGS=''
+PERL5LIB=''
+PERL=''
+PHP=''
+PHPINC=''
+PHP_SO=''
+PKG_CONFIG=''
+PLATCFLAGS=''
+PLATCXXFLAGS=''
+PY3CONFIG=''
+PY3INCLUDE=''
+PY3LIB=''
+PY3LINK=''
+PYCODESTYLE=''
+PYINCLUDE=''
+PYLIB=''
+PYLINK=''
+PYTHON3=''
+PYTHON3DYNAMICLINKING=''
+PYTHON=''
+PYTHONDYNAMICLINKING=''
+PYTHON_SO=''
+RBIN=''
+ROOT_DIR=''
+RPATH=''
+RUBY=''
+RUBYCCDLFLAGS=''
+RUBYDYNAMICLINKING=''
+RUBYINCLUDE=''
+RUBYLIB=''
+RUBYLINK=''
+RUBYSO=''
+SCILAB=''
+SCILABINCLUDE=''
+SCILABOPT=''
+SCILAB_VERSION=''
+SED=''
+SET_MAKE=''
+SHELL='/bin/bash'
+SKIP_ANDROID=''
+SKIP_CSHARP=''
+SKIP_D=''
+SKIP_GO=''
+SKIP_GUILE=''
+SKIP_JAVA=''
+SKIP_JAVASCRIPT=''
+SKIP_LUA=''
+SKIP_MZSCHEME=''
+SKIP_OCAML=''
+SKIP_OCTAVE=''
+SKIP_PERL5=''
+SKIP_PHP=''
+SKIP_PYTHON3=''
+SKIP_PYTHON=''
+SKIP_R=''
+SKIP_RUBY=''
+SKIP_SCILAB=''
+SKIP_TCL=''
+SO=''
+STRIP=''
+SWIG_LIB=''
+SWIG_LIB_INSTALL=''
+SWIG_LIB_PREINST=''
+SWIG_LIB_SET=''
+TCLCXXSHARED=''
+TCLDYNAMICLINKING=''
+TCLINCLUDE=''
+TCLLDSHARED=''
+TCLLIB=''
+TCLLINK=''
+TCL_SO=''
+TRYLINKINGWITHCXX=''
+VERSION=''
+YACC=''
+YFLAGS=''
+ac_aux_dir='./Tools/config/'
+ac_ct_CC=''
+ac_ct_CXX=''
+am__EXEEXT_FALSE=''
+am__EXEEXT_TRUE=''
+am__fastdepCC_FALSE=''
+am__fastdepCC_TRUE=''
+am__fastdepCXX_FALSE=''
+am__fastdepCXX_TRUE=''
+am__include=''
+am__isrc=''
+am__leading_dot=''
+am__nodep=''
+am__quote=''
+am__tar=''
+am__untar=''
+bindir='${exec_prefix}/bin'
+build=''
+build_alias=''
+build_cpu=''
+build_os=''
+build_vendor=''
+datadir='${datarootdir}'
+datarootdir='${prefix}/share'
+docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+dvidir='${docdir}'
+exec_prefix='NONE'
+host=''
+host_alias=''
+host_cpu=''
+host_os=''
+host_vendor=''
+htmldir='${docdir}'
+includedir='${prefix}/include'
+infodir='${datarootdir}/info'
+install_sh=''
+libdir='${exec_prefix}/lib'
+libexecdir='${exec_prefix}/libexec'
+localedir='${datarootdir}/locale'
+localstatedir='${prefix}/var'
+mandir='${datarootdir}/man'
+mkdir_p=''
+oldincludedir='/usr/include'
+pdfdir='${docdir}'
+prefix='NONE'
+program_transform_name='s,x,x,'
+psdir='${docdir}'
+runstatedir='${localstatedir}/run'
+sbindir='${exec_prefix}/sbin'
+sharedstatedir='${prefix}/com'
+subdirs=''
+sysconfdir='${prefix}/etc'
+target_alias=''
+
+## ----------- ##
+## confdefs.h. ##
+## ----------- ##
+
+/* confdefs.h */
+#define PACKAGE_NAME "swig"
+#define PACKAGE_TARNAME "swig"
+#define PACKAGE_VERSION "4.1.1"
+#define PACKAGE_STRING "swig 4.1.1"
+#define PACKAGE_BUGREPORT "https://www.swig.org"
+#define PACKAGE_URL ""
+
+configure: exit 1
