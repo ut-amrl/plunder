@@ -42,7 +42,10 @@ def get_action(observation, ha) -> str:
     elif ha == 'GRASP':
         return [0, 0, 0.5, -1]
 
-env = gym.make("PandaStack-v3", render_mode="human")
+env = gym.make("PandaStackDense-v3", render_mode="human")
+
+def bound(x):
+    return max(min(x, 1), -1)
 
 for iter in range(15):
     obs_out = open("data" + str(iter) + ".csv", "w")
@@ -72,7 +75,7 @@ for iter in range(15):
             with_err = np.random.normal(each, 0.0001)
             obs_out.write(str(with_err)+", ")
         for each in action:
-            with_err = np.random.normal(each, 0.3)
+            with_err = bound(np.random.normal(each, 0.3))
             obs_out.write(str(with_err)+", ")
 
         if ha == 'MOVE_TO_CUBE_BOTTOM':
