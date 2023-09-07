@@ -83,7 +83,7 @@ for iter in range(15):
         elif ha == 'MOVE_TO_TARGET':
             obs_out.write("1\n")
         elif ha == 'LIFT':
-            obs_out.write("2")
+            obs_out.write("2\n")
         elif ha == 'MOVE_TO_CUBE_TOP':
             obs_out.write("3\n")
         elif ha == 'GRASP':
