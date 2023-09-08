@@ -15,6 +15,10 @@ map<string, normal_distribution<double>> la_error = {
 };
 double la_error_scaler = 1.0;
 
+double bound(double input) {
+    return min(max(x, -1), 1);
+}
+
 // Custom-defined motor models
 Obs motorModel(State state, bool error){
     HA ha = state.ha;
@@ -48,6 +52,11 @@ Obs motorModel(State state, bool error){
         throw invalid_argument("Invalid high-level action label");
     }
 
+    state.put("vx", bound(state.get("vx")));
+    state.put("vy", bound(state.get("vy")));
+    state.put("vz", bound(state.get("vz")));
+    state.put("end", bound(state.get("end")));
+    
     return state.obs;
 }
 

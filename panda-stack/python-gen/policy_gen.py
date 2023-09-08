@@ -72,7 +72,7 @@ for iter in range(15):
         action = get_action(obs_pruned, ha)
         
         for each in obs_pruned:
-            with_err = np.random.normal(each, 0.01)
+            with_err = np.random.normal(each, 0.0005)
             obs_out.write(str(with_err)+", ")
         for each in action:
             with_err = bound(np.random.normal(each, 0.5))
