@@ -72,10 +72,10 @@ for iter in range(15):
         action = get_action(obs_pruned, ha)
         
         for each in obs_pruned:
-            with_err = np.random.normal(each, 0.0001)
+            with_err = np.random.normal(each, 0.01)
             obs_out.write(str(with_err)+", ")
         for each in action:
-            with_err = bound(np.random.normal(each, 0.3))
+            with_err = bound(np.random.normal(each, 0.5))
             obs_out.write(str(with_err)+", ")
 
         if ha == 'MOVE_TO_CUBE_BOTTOM':
