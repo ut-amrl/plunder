@@ -6,18 +6,18 @@ import numpy as np
 def asp(observation, ha) -> str:
     x, y, z, end_width = observation[0], observation[1], observation[2], observation[3]
     bx1, by1, bz1, bx2, by2, bz2 = observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
-    tx2, ty2, tz2 = observation[10], observation[11], observation[12], observation[13], observation[14], observation[15]
+    tx2, ty2, tz2 = observation[13], observation[14], observation[15]
 
     bx1, by1, bz1, bx2, by2, bz2 = bx1 - x, by1 - y, bz1 - z, bx2 - x, by2 - y, bz2 - z
-    tx2, ty2, tz2 = tx2 - x, ty2 - y, tz2 - z + 0.02
+    tx2, ty2, tz2 = tx2 - x, ty2 - y, tz2 - z + 0.01
 
-    if ha == 'MOVE_TO_CUBE_BOTTOM' and abs(bx1) < 0.003 and abs(by1) < 0.003 and abs(bz1) < 0.005:
+    if ha == 'MOVE_TO_CUBE_BOTTOM' and abs(bx1) < 0.002 and abs(by1) < 0.002 and abs(bz1) < 0.006:
         return 'MOVE_TO_TARGET'
-    elif ha == 'MOVE_TO_TARGET' and abs(tx2) < 0.002 and abs(ty2) < 0.002:
+    elif ha == 'MOVE_TO_TARGET' and abs(tx2) < 0.002 and abs(ty2) < 0.002 and abs(tz2) < 0.002:
         return 'LIFT'
     elif ha == 'LIFT' and z > 0.1 and observation[9] < 0.03:
         return 'MOVE_TO_CUBE_TOP'
-    elif ha == 'MOVE_TO_CUBE_TOP' and abs(bx2) < 0.003 and abs(by2) < 0.003 and abs(bz2) < 0.005:
+    elif ha == 'MOVE_TO_CUBE_TOP' and abs(bx2) < 0.002 and abs(by2) < 0.002 and abs(bz2) < 0.006:
         return 'GRASP'
     elif ha == 'GRASP' and z > 0.1:
         return 'MOVE_TO_TARGET'
@@ -26,10 +26,10 @@ def asp(observation, ha) -> str:
 def get_action(observation, past_action, ha) -> str:
     x, y, z, end_width = observation[0], observation[1], observation[2], observation[3]
     bx1, by1, bz1, bx2, by2, bz2 = observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
-    tx2, ty2, tz2 = observation[10], observation[11], observation[12], observation[13], observation[14], observation[15]
+    tx2, ty2, tz2 = observation[13], observation[14], observation[15]
 
     bx1, by1, bz1, bx2, by2, bz2 = bx1 - x, by1 - y, bz1 - z, bx2 - x, by2 - y, bz2 - z
-    tx2, ty2, tz2 = tx2 - x, ty2 - y, tz2 - z + 0.02
+    tx2, ty2, tz2 = tx2 - x, ty2 - y, tz2 - z + 0.01
 
     if ha == 'MOVE_TO_CUBE_BOTTOM':
         action = [bx1 * 4.0, by1 * 4.0, bz1 * 4.0, 1]
@@ -44,7 +44,8 @@ def get_action(observation, past_action, ha) -> str:
 
     # Make actions continuous
     for i in range(len(action) - 1):
-        action[i] = min(max(action[i], past_action[i] - 0.02), past_action[i] + 0.02)
+        d_action = min(0.03, abs(action[i] / 4))
+        action[i] = min(max(action[i], past_action[i] - d_action), past_action[i] + d_action)
     return action
 
 env = gym.make("PandaStackDense-v3", render_mode="human")
@@ -61,7 +62,7 @@ for iter in range(15):
     ha = 'MOVE_TO_CUBE_BOTTOM'
     action = [0, 0, 0, 0]
 
-    for _ in range(200):
+    for _ in range(250):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
