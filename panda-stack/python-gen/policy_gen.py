@@ -6,14 +6,14 @@ import numpy as np
 def asp(observation, ha) -> str:
     x, y, z, end_width = observation[0], observation[1], observation[2], observation[3]
     bx1, by1, bz1, bx2, by2, bz2 = observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
-    tx1, ty1, tz1, tx2, ty2, tz2 = observation[10], observation[11], observation[12], observation[13], observation[14], observation[15]
+    tx2, ty2, tz2 = observation[10], observation[11], observation[12], observation[13], observation[14], observation[15]
 
     bx1, by1, bz1, bx2, by2, bz2 = bx1 - x, by1 - y, bz1 - z, bx2 - x, by2 - y, bz2 - z
-    tx1, ty1, tz1, tx2, ty2, tz2 = tx1 - x, ty1 - y, tz1 - z + 0.02, tx2 - x, ty2 - y, tz2 - z + 0.02
+    tx2, ty2, tz2 = tx2 - x, ty2 - y, tz2 - z + 0.02
 
     if ha == 'MOVE_TO_CUBE_BOTTOM' and abs(bx1) < 0.003 and abs(by1) < 0.003 and abs(bz1) < 0.005:
         return 'MOVE_TO_TARGET'
-    elif ha == 'MOVE_TO_TARGET' and abs(tx1) < 0.002 and abs(ty1) < 0.002:
+    elif ha == 'MOVE_TO_TARGET' and abs(tx2) < 0.002 and abs(ty2) < 0.002:
         return 'LIFT'
     elif ha == 'LIFT' and z > 0.1 and observation[9] < 0.03:
         return 'MOVE_TO_CUBE_TOP'
@@ -26,10 +26,10 @@ def asp(observation, ha) -> str:
 def get_action(observation, past_action, ha) -> str:
     x, y, z, end_width = observation[0], observation[1], observation[2], observation[3]
     bx1, by1, bz1, bx2, by2, bz2 = observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
-    tx1, ty1, tz1, tx2, ty2, tz2 = observation[10], observation[11], observation[12], observation[13], observation[14], observation[15]
+    tx2, ty2, tz2 = observation[10], observation[11], observation[12], observation[13], observation[14], observation[15]
 
     bx1, by1, bz1, bx2, by2, bz2 = bx1 - x, by1 - y, bz1 - z, bx2 - x, by2 - y, bz2 - z
-    tx1, ty1, tz1, tx2, ty2, tz2 = tx1 - x, ty1 - y, tz1 - z + 0.02, tx2 - x, ty2 - y, tz2 - z + 0.02
+    tx2, ty2, tz2 = tx2 - x, ty2 - y, tz2 - z + 0.02
 
     if ha == 'MOVE_TO_CUBE_BOTTOM':
         action = [bx1 * 4.0, by1 * 4.0, bz1 * 4.0, 1]
@@ -80,7 +80,7 @@ for iter in range(15):
             with_err = np.random.normal(each, 0.0005)
             obs_out.write(str(with_err)+", ")
         for each in action:
-            with_err = bound(np.random.normal(each, 0.4))
+            with_err = bound(np.random.normal(each, 0.01))
             obs_out.write(str(with_err)+", ")
 
         if ha == 'MOVE_TO_CUBE_BOTTOM':
