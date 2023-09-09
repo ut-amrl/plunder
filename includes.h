@@ -77,14 +77,14 @@ const int STRUCT_CHANGE_FREQ = 1;       // Only enumerate over new program struc
 const int PLOT_TIME = 300;              // Maximum time step plotted
 
 // EMDIPS parameters
-const int PROG_ENUM = 256;              // Number of programs to enumerate and optimize per iteration. For more complex program spaces, this may need to be higher
+const int PROG_ENUM = 320;              // Number of programs to enumerate and optimize per iteration. For more complex program spaces, this may need to be higher
 const int BASE_FEAT_DEPTH = 2;          // Feature (expression) depth in the first iteration. If your expressions are particularly complex, it may help to increase this. We suggest between 2 and 3
 
 // Particle filter parameters
 const int NUM_PARTICLES = 2000;         // Number of particle trajectories used in the particle filter
 const double RESAMPLE_THRESHOLD = 10.0; // Resampling rate in the particle filter. Higher = more resampling. Default: resample at every timestep
-double TEMPERATURE = 2.5;                 // Initial observation likelihood strength. Used to encourage exploration to avoid local minima. Default: off
-const double TEMP_CHANGE = 0.5;           // TEMPERATURE decreases linearly by this much each iteration. Encourages exploration in earlier iterations, then convergence in later iterations.
+double TEMPERATURE = 1;                 // Initial observation likelihood strength. Used to encourage exploration to avoid local minima. Default: off
+const double TEMP_CHANGE = 0.0;           // TEMPERATURE decreases linearly by this much each iteration. Encourages exploration in earlier iterations, then convergence in later iterations.
 
 
 
@@ -107,6 +107,6 @@ enum SYNTHESIS_SETTING {
     INCREMENTAL         // Incremental synthesis that builds off the previous best program
 };
 
-LABELER labeler = STABLE_HEURISTIC;
+LABELER labeler = PERFECT;
 SYNTHESIS_ALGO synthesizer = EMDIPS;
 SYNTHESIS_SETTING synth_setting = INCREMENTAL;
