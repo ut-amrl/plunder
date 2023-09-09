@@ -174,8 +174,8 @@ def makePredictions(full_set, training_size):
     train_X, train_Y = df_train_X[n_train_hours:], df_train_Y[n_train_hours:]
     test_X, test_Y = df_train_X[:n_train_hours], df_train_Y[:n_train_hours]
 
-    X_validation = validation_X.values
-    Y_validation = validation_Y.values
+    X_validation = validation_X.to_numpy()
+    Y_validation = validation_Y.to_numpy()
 
     print("Training set size")
     print(len(train_X))
@@ -263,6 +263,7 @@ def makePredictions(full_set, training_size):
 
     print("", flush=True)
     plotter.plot(yhat_valid)
+
     plotter.plotLA(valid_la, Y_validation)
 
 # Run neural network

@@ -58,13 +58,16 @@ def plotLA(expected, actual):
         for t in range(maxTime):
             times.append(t)
 
+        idx = 0
         for var in range(len(settings.pred_var)):
-            plt.plot(actual[iter:iter+maxTime, var], label=settings.pred_var[var])
+            plt.plot(actual[iter:iter+maxTime, idx], label=settings.pred_var[var])
             plt.plot(expected[var][iter:iter+maxTime], label='model output')
             plt.legend()
             plt.savefig("plots/la" + str(var) + "-" + str(robot_iter) + ".png")
 
             plt.clf()
             plt.close("all")
+
+            idx += settings.numHA + 1
 
         iter += maxTime

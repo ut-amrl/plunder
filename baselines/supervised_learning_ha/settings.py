@@ -184,24 +184,78 @@ import numpy as np
 #     return [target_steer, target_acc]
 
 # Setting: panda-pick-place
+# training_set = 5
+# validation_set = 30 # including training_set
+# train_time = 15000
+# patience = 2000
+# sim_time = 30
+# samples = 50
+# folder = "panda-pick-place/"
+# vars_used = [
+#     "HA",
+#     "x",
+#     "y",
+#     "z",
+#     "bx",
+#     "by",
+#     "bz",
+#     "tx",
+#     "ty",
+#     "tz",
+#     "LA.vx",
+#     "LA.vy",
+#     "LA.vz",
+#     "LA.end"
+# ]
+# pred_var = ["LA.vx", "LA.vy", "LA.vz", "LA.end"]
+# pv_range = [
+#     [-1.1, 1.1],
+#     [-1.1, 1.1],
+#     [-1.1, 1.1],
+#     [-1.1, 1.1]
+# ]
+# pv_stddev = [0.5, 0.5, 0.5, 0.5]
+
+# numHA = 2
+
+# def motor_model(ha, data, data_prev):
+#     if ha == 0:
+#         vx = 5 * (data["bx"] - data["x"])
+#         vy = 5 * (data["by"] - data["y"])
+#         vz = 5 * (data["bz"] - data["z"])
+#         end = 1
+#     else:
+#         vx = 5 * (data["tx"] - data["x"])
+#         vy = 5 * (data["ty"] - data["y"])
+#         vz = 5 * (data["tz"] - data["z"])
+#         end = -1
+    
+#     return [vx, vy, vz, end]
+
+
+
+# Setting: panda-stack
 training_set = 5
-validation_set = 30 # including training_set
-train_time = 15000
-patience = 2000
-sim_time = 30
+validation_set = 15 # including training_set
+train_time = 100
+patience = 0
+sim_time = 150
 samples = 50
-folder = "panda-pick-place/"
+folder = "panda-stack/"
 vars_used = [
     "HA",
     "x",
     "y",
     "z",
-    "bx",
-    "by",
-    "bz",
-    "tx",
-    "ty",
-    "tz",
+    "bx1",
+    "by1",
+    "bz1",
+    "bx2",
+    "by2"
+    "bz2",
+    "tx1",
+    "ty1",
+    "tz1",
     "LA.vx",
     "LA.vy",
     "LA.vz",
@@ -216,18 +270,36 @@ pv_range = [
 ]
 pv_stddev = [0.5, 0.5, 0.5, 0.5]
 
-numHA = 2
+numHA = 5
+
+def bound(x):
+    return min(max(x, -1), 1)
 
 def motor_model(ha, data, data_prev):
     if ha == 0:
-        vx = 5 * (data["bx"] - data["x"])
-        vy = 5 * (data["by"] - data["y"])
-        vz = 5 * (data["bz"] - data["z"])
+        vx = 5 * (data["bx1"] - data["x"])
+        vy = 5 * (data["by1"] - data["y"])
+        vz = 5 * (data["bz1"] - data["z"])
         end = 1
-    else:
-        vx = 5 * (data["tx"] - data["x"])
-        vy = 5 * (data["ty"] - data["y"])
-        vz = 5 * (data["tz"] - data["z"])
+    elif ha == 1:
+        vx = 5 * (data["tx2"] - data["x"])
+        vy = 5 * (data["ty2"] - data["y"])
+        vz = 5 * (data["tz2"] - data["z"])
+        end = -1
+    elif ha == 2:
+        vx = 0
+        vy = 0
+        vz = 0.5
+        end = 1
+    elif ha == 3:
+        vx = 5 * (data["bx2"] - data["x"])
+        vy = 5 * (data["by2"] - data["y"])
+        vz = 5 * (data["bz2"] - data["z"])
+        end = 1
+    elif ha == 4:
+        vx = 0
+        vy = 0
+        vz = 0.5
         end = -1
     
-    return [vx, vy, vz, end]
+    return [bound(vx), bound(vy), bound(vz), bound(end)]
