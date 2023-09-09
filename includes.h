@@ -83,8 +83,8 @@ const int BASE_FEAT_DEPTH = 2;          // Feature (expression) depth in the fir
 // Particle filter parameters
 const int NUM_PARTICLES = 2000;         // Number of particle trajectories used in the particle filter
 const double RESAMPLE_THRESHOLD = 10.0; // Resampling rate in the particle filter. Higher = more resampling. Default: resample at every timestep
-double TEMPERATURE = 1;                 // Initial observation likelihood strength. Used to encourage exploration to avoid local minima. Default: off
-const double TEMP_CHANGE = 0.0;           // TEMPERATURE decreases linearly by this much each iteration. Encourages exploration in earlier iterations, then convergence in later iterations.
+double TEMPERATURE = 2;                 // Initial observation likelihood strength. Used to encourage exploration to avoid local minima. Default: off
+const double TEMP_CHANGE = 0.3;           // TEMPERATURE decreases linearly by this much each iteration. Encourages exploration in earlier iterations, then convergence in later iterations.
 
 
 
@@ -107,6 +107,6 @@ enum SYNTHESIS_SETTING {
     INCREMENTAL         // Incremental synthesis that builds off the previous best program
 };
 
-LABELER labeler = PERFECT;
+LABELER labeler = STABLE_HEURISTIC;
 SYNTHESIS_ALGO synthesizer = EMDIPS;
 SYNTHESIS_SETTING synth_setting = INCREMENTAL;
