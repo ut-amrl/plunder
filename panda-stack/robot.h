@@ -30,7 +30,7 @@ Obs motorModel(State state, bool error){
         bz2 = state.get("bz2") - state.get("z"),
         tx2 = state.get("tx2") - state.get("x"),
         ty2 = state.get("ty2") - state.get("y"), 
-        tz2 = state.get("tz2") - state.get("z") + 0.02;
+        tz2 = state.get("tz2") - state.get("z") + 0.01;
 
     double vx, vy, vz, end;
     if(ha == MOVE_TO_CUBE_BOTTOM) {
@@ -48,10 +48,14 @@ Obs motorModel(State state, bool error){
     }
 
     // Make actions continuous
-    vx = min(max(vx, state.get("vx") - 0.02), state.get("vx") + 0.02);
-    vy = min(max(vy, state.get("vy") - 0.02), state.get("vy") + 0.02);
-    vz = min(max(vz, state.get("vz") - 0.02), state.get("vz") + 0.02);
-    end = min(max(end, state.get("end") - 0.02), state.get("end") + 0.02);
+    double dx = min(0.03, abs(vx / 4));
+    vx = min(max(vx, state.get("vx") - dx), state.get("vx") + dx);
+    double dy = min(0.03, abs(vy / 4));
+    vy = min(max(vy, state.get("vy") - dy), state.get("vy") + dy);
+    double dz = min(0.03, abs(vz / 4));
+    vz = min(max(vz, state.get("vz") - dz), state.get("vz") + dz);
+    double dend = min(0.03, abs(end / 4));
+    end = min(max(end, state.get("end") - dend), state.get("end") + dend);
     
     return state.obs;
 }
@@ -66,18 +70,18 @@ HA ASP_model(State state){
         bz2 = state.get("bz2") - state.get("z"),
         tx2 = state.get("tx2") - state.get("x"),
         ty2 = state.get("ty2") - state.get("y"), 
-        tz2 = state.get("tz2") - state.get("z") + 0.02;
+        tz2 = state.get("tz2") - state.get("z") + 0.01;
     
-    if(ha == MOVE_TO_CUBE_BOTTOM && abs(bx1) < 0.003 && abs(by1) < 0.003 && abs(bz1) < 0.005) {
+    if(ha == MOVE_TO_CUBE_BOTTOM && abs(bx1) < 0.002 && abs(by1) < 0.002 && abs(bz1) < 0.006) {
         return MOVE_TO_TARGET;
     }
-    if(ha == MOVE_TO_TARGET && abs(tx2) < 0.002 && abs(ty2) < 0.002) {
+    if(ha == MOVE_TO_TARGET && abs(tx2) < 0.002 && abs(ty2) < 0.002 && abs(tz2) < 0.002) {
         return LIFT;
     }
     if(ha == LIFT && state.get("z") > 0.1 && state.get("bz2") < 0.03) {
         return MOVE_TO_CUBE_TOP;
     }
-    if(ha == MOVE_TO_CUBE_TOP && abs(bx2) < 0.003 && abs(by2) < 0.003 && abs(bz2) < 0.005) {
+    if(ha == MOVE_TO_CUBE_TOP && abs(bx2) < 0.002 && abs(by2) < 0.002 && abs(bz2) < 0.006) {
         return GRASP;
     }
     if(ha == GRASP && state.get("z") > 0.1) {
