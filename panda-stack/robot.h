@@ -41,7 +41,7 @@ Obs motorModel(State state, bool error){
             vz = max(state.get("vz") - 0.05, vz);
         }
     } else if (ha == LIFT) {
-        vx = 0, vy = 0, vz = 0.5;, end = 1;
+        vx = 0, vy = 0, vz = 0.5, end = 1;
     } else if (ha == MOVE_TO_CUBE_TOP) {
         vx = 4 * bx2, vy = 4 * by2, vz = 4 * bz2, end = 1;
         if (vz < 0) {
@@ -52,6 +52,11 @@ Obs motorModel(State state, bool error){
     } else {
         throw invalid_argument("Invalid high-level action label");
     }
+    
+    state.put("vx", vx);
+    state.put("vy", vy);
+    state.put("vz", vz);
+    state.put("end", end);
 
     return state.obs;
 }
