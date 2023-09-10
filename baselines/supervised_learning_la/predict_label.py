@@ -248,7 +248,7 @@ def makePredictions(full_set, training_size):
     print("Validation set average log obs: " + str(log_obs_valid))
 
     print("", flush=True)
-    # plotter.plotLA(valid_la, Y_validation)
+    plotter.plotLA(valid_la, Y_validation)
 
 # Run neural network
 loadDataFrame()

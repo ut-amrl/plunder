@@ -236,10 +236,10 @@ import numpy as np
 
 # Setting: panda-stack
 training_set = 5
-validation_set = 15 # including training_set
-train_time = 100
-patience = 0
-sim_time = 150
+validation_set = 10 # including training_set
+train_time = 15000
+patience = 5000
+sim_time = 175
 samples = 50
 folder = "panda-stack/"
 vars_used = [
@@ -263,43 +263,38 @@ vars_used = [
 ]
 pred_var = ["LA.vx", "LA.vy", "LA.vz", "LA.end"]
 pv_range = [
-    [-1.1, 1.1],
-    [-1.1, 1.1],
-    [-1.1, 1.1],
-    [-1.1, 1.1]
+    [-2, 2],
+    [-2, 2],
+    [-2, 2],
+    [-2, 2]
 ]
-pv_stddev = [0.5, 0.5, 0.5, 0.5]
+pv_stddev = [0.3, 0.3, 0.3, 0.3]
 
 numHA = 5
 
 def bound(x):
-    return min(max(x, -1), 1)
+    return min(max(x, -2), 2)
 
 def motor_model(ha, data, data_prev):
+    bx1, by1, bz1, bx2, by2, bz2 = data["bx1"], data["by1"], data["bz1"], data["bx2"], data["by2"], data["bz2"]
+    tx2, ty2, tz2 = data["tx2"], data["ty2"], data["tz2"]
+
+    tz2 += 0.01
+
     if ha == 0:
-        vx = 5 * (data["bx1"] - data["x"])
-        vy = 5 * (data["by1"] - data["y"])
-        vz = 5 * (data["bz1"] - data["z"])
-        end = 1
+        action = [bx1 * 4.0, by1 * 4.0, bz1 * 4.0, 1]
     elif ha == 1:
-        vx = 5 * (data["tx2"] - data["x"])
-        vy = 5 * (data["ty2"] - data["y"])
-        vz = 5 * (data["tz2"] - data["z"])
-        end = -1
+        action = [tx2 * 4.0, ty2 * 4.0, tz2 * 4.0, -1]
+        if action[2] < 0:
+            action[2] = max(data_prev["LA.vz"] - 0.05, action[2])
     elif ha == 2:
-        vx = 0
-        vy = 0
-        vz = 0.5
-        end = 1
+        action = [0, 0, 0.5, 1]
     elif ha == 3:
-        vx = 5 * (data["bx2"] - data["x"])
-        vy = 5 * (data["by2"] - data["y"])
-        vz = 5 * (data["bz2"] - data["z"])
-        end = 1
+        action = [bx2 * 4.0, by2 * 4.0, bz2 * 4.0, 1]
+        if action[2] < 0:
+            action[2] = max(data_prev["LA.vz"] - 0.05, action[2])
     elif ha == 4:
-        vx = 0
-        vy = 0
-        vz = 0.5
-        end = -1
-    
-    return [bound(vx), bound(vy), bound(vz), bound(end)]
+        action = [0, 0, 0.5, -1]
+
+    action = [bound(i) for i in action]
+    return action
