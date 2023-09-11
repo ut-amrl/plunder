@@ -38,14 +38,14 @@ Obs motorModel(State state, bool error){
     } else if (ha == MOVE_TO_TARGET) {
         vx = 4 * tx2, vy = 4 * ty2, vz = 4 * tz2, end = -1;
         if (vz < 0) {
-            vz = max(state.get("vz") - 0.05, vz);
+            vz = max(state.get("vz") - 0.15, vz);
         }
     } else if (ha == LIFT) {
         vx = 0, vy = 0, vz = 0.5, end = 1;
     } else if (ha == MOVE_TO_CUBE_TOP) {
         vx = 4 * bx2, vy = 4 * by2, vz = 4 * bz2, end = 1;
         if (vz < 0) {
-            vz = max(state.get("vz") - 0.05, vz);
+            vz = max(state.get("vz") - 0.15, vz);
         }
     } else if (ha == GRASP) {
         vx = 0, vy = 0, vz = 0.5, end = -1;
@@ -79,13 +79,13 @@ HA ASP_model(State state){
     if(ha == MOVE_TO_TARGET && abs(tx2) < 0.002 && abs(ty2) < 0.002) {
         return LIFT;
     }
-    if(ha == LIFT && flip(logistic(0.1, 100, state.get("z"))) && bz2 - bz1 < 0.03) {
+    if(ha == LIFT && flip(logistic(0.15, 100, state.get("z"))) && bz2 - bz1 < 0.03) {
         return MOVE_TO_CUBE_TOP;
     }
     if(ha == MOVE_TO_CUBE_TOP && bz2 > -0.002) {
         return GRASP;
     }
-    if(ha == GRASP && flip(logistic(0.1, 100, state.get("z")))) {
+    if(ha == GRASP && flip(logistic(0.15, 100, state.get("z")))) {
         return MOVE_TO_TARGET;
     }
     return ha;

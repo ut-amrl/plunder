@@ -21,11 +21,11 @@ def asp(observation, ha) -> str:
         return 'MOVE_TO_TARGET'
     elif ha == 'MOVE_TO_TARGET' and abs(tx2) < 0.002 and abs(ty2) < 0.002:
         return 'LIFT'
-    elif ha == 'LIFT' and sample(logistic(0.1, 100, z)) and bz2 - bz1 < 0.03:
+    elif ha == 'LIFT' and sample(logistic(0.15, 100, z)) and bz2 - bz1 < 0.03:
         return 'MOVE_TO_CUBE_TOP'
     elif ha == 'MOVE_TO_CUBE_TOP' and bz2 > -0.002:
         return 'GRASP'
-    elif ha == 'GRASP' and sample(logistic(0.1, 100, z)):
+    elif ha == 'GRASP' and sample(logistic(0.15, 100, z)):
         return 'MOVE_TO_TARGET'
     return ha
 
@@ -41,13 +41,13 @@ def get_action(observation, past_action, ha) -> str:
     elif ha == 'MOVE_TO_TARGET':
         action = [tx2 * 4.0, ty2 * 4.0, tz2 * 4.0, -1]
         if action[2] < 0:
-            action[2] = max(past_action[2] - 0.05, action[2])
+            action[2] = max(past_action[2] - 0.15, action[2])
     elif ha == 'LIFT':
         action = [0, 0, 0.5, 1]
     elif ha == 'MOVE_TO_CUBE_TOP':
         action = [bx2 * 4.0, by2 * 4.0, bz2 * 4.0, 1]
         if action[2] < 0:
-            action[2] = max(past_action[2] - 0.05, action[2])
+            action[2] = max(past_action[2] - 0.15, action[2])
     elif ha == 'GRASP':
         action = [0, 0, 0.5, -1]
 

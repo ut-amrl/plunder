@@ -286,13 +286,13 @@ def motor_model(ha, data, data_prev):
     elif ha == 1:
         action = [tx2 * 4.0, ty2 * 4.0, tz2 * 4.0, -1]
         if action[2] < 0:
-            action[2] = max(data_prev["LA.vz"] - 0.05, action[2])
+            action[2] = max(data_prev["LA.vz"] - 0.15, action[2])
     elif ha == 2:
         action = [0, 0, 0.5, 1]
     elif ha == 3:
         action = [bx2 * 4.0, by2 * 4.0, bz2 * 4.0, 1]
         if action[2] < 0:
-            action[2] = max(data_prev["LA.vz"] - 0.05, action[2])
+            action[2] = max(data_prev["LA.vz"] - 0.15, action[2])
     elif ha == 4:
         action = [0, 0, 0.5, -1]
 
