@@ -235,11 +235,11 @@ import numpy as np
 
 
 # Setting: panda-stack
-training_set = 5
-validation_set = 10 # including training_set
+training_set = 10
+validation_set = 20 # including training_set
 train_time = 15000
-patience = 5000
-sim_time = 175
+patience = 0
+sim_time = 150
 samples = 50
 folder = "panda-stack/"
 vars_used = [
@@ -253,9 +253,9 @@ vars_used = [
     "bx2",
     "by2"
     "bz2",
-    "tx1",
-    "ty1",
-    "tz1",
+    "tx2",
+    "ty2",
+    "tz2",
     "LA.vx",
     "LA.vy",
     "LA.vz",
@@ -263,17 +263,17 @@ vars_used = [
 ]
 pred_var = ["LA.vx", "LA.vy", "LA.vz", "LA.end"]
 pv_range = [
-    [-2, 2],
-    [-2, 2],
-    [-2, 2],
-    [-2, 2]
+    [-4, 4],
+    [-4, 4],
+    [-4, 4],
+    [-4, 4]
 ]
 pv_stddev = [0.3, 0.3, 0.3, 0.3]
 
 numHA = 5
 
 def bound(x):
-    return min(max(x, -2), 2)
+    return min(max(x, -4), 4)
 
 def motor_model(ha, data, data_prev):
     bx1, by1, bz1, bx2, by2, bz2 = data["bx1"], data["by1"], data["bz1"], data["bx2"], data["by2"], data["bz2"]
@@ -296,5 +296,5 @@ def motor_model(ha, data, data_prev):
     elif ha == 4:
         action = [0, 0, 0.5, -1]
 
-    action = [bound(i) for i in action]
+    # action = [bound(i) for i in action]
     return action
