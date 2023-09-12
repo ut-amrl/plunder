@@ -37,26 +37,26 @@ vector<string> LA_vars = {
     "end"
 };
 
-// Obs: Defines the world state of a robot. Units: [m_x, m_y, m_z]
+// Obs: Defines the world state of a robot. Units: [m, t, deg]
 vector<Var> Obs_vars = {
     Var ("x", Dimension(1, 0, 0), true),
-    Var ("y", Dimension(0, 1, 0), true),
-    Var ("z", Dimension(0, 0, 1), true),
+    Var ("y", Dimension(1, 0, 0), true),
+    Var ("z", Dimension(1, 0, 0), true),
     Var ("end_width", Dimension(1, 0, 0), false),
     Var ("bx1", Dimension(1, 0, 0), true),
-    Var ("by1", Dimension(0, 1, 0), true),
-    Var ("bz1", Dimension(0, 0, 1), true),
+    Var ("by1", Dimension(1, 0, 0), true),
+    Var ("bz1", Dimension(1, 0, 0), true),
     Var ("bx2", Dimension(1, 0, 0), true),
-    Var ("by2", Dimension(0, 1, 0), true),
-    Var ("bz2", Dimension(0, 0, 1), true),
-    Var ("tx1", Dimension(1, 0, 0), true),
-    Var ("ty1", Dimension(0, 1, 0), true),
-    Var ("tz1", Dimension(0, 0, 1), true),
-    Var ("tx2", Dimension(1, 0, 0), false),
-    Var ("ty2", Dimension(0, 1, 0), false),
-    Var ("tz2", Dimension(0, 0, 1), false),
-    Var ("vx", Dimension(1, 0, 0), false),
-    Var ("vy", Dimension(0, 1, 0), false),
-    Var ("vz", Dimension(0, 0, 1), false),
-    Var ("end", Dimension(1, 0, 0), false),
+    Var ("by2", Dimension(1, 0, 0), true),
+    Var ("bz2", Dimension(1, 0, 0), true),
+    Var ("tx1", Dimension(1, 0, 0), false),
+    Var ("ty1", Dimension(1, 0, 0), false),
+    Var ("tz1", Dimension(1, 0, 0), false),
+    Var ("tx2", Dimension(1, 0, 0), true),
+    Var ("ty2", Dimension(1, 0, 0), true),
+    Var ("tz2", Dimension(1, 0, 0), true),
+    Var ("vx", Dimension(1, -1, 0), false),
+    Var ("vy", Dimension(1, -1, 0), false),
+    Var ("vz", Dimension(1, -1, 0), false),
+    Var ("end", Dimension(1, -1, 0), false),
 };

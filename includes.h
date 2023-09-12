@@ -77,7 +77,7 @@ const int STRUCT_CHANGE_FREQ = 1;       // Only enumerate over new program struc
 const int PLOT_TIME = 300;              // Maximum time step plotted
 
 // EMDIPS parameters
-const int PROG_ENUM = 256;              // Number of programs to enumerate and optimize per iteration. For more complex program spaces, this may need to be higher
+const int PROG_ENUM = 384;              // Number of programs to enumerate and optimize per iteration. For more complex program spaces, this may need to be higher
 const int BASE_FEAT_DEPTH = 2;          // Feature (expression) depth in the first iteration. If your expressions are particularly complex, it may help to increase this. We suggest between 2 and 3
 
 // Particle filter parameters

@@ -73,19 +73,19 @@ HA ASP_model(State state){
         ty2 = state.get("ty2"),
         tz2 = state.get("tz2");
 
-    if(ha == MOVE_TO_CUBE_BOTTOM && bz1 > -0.002) {
+    if(ha == MOVE_TO_CUBE_BOTTOM && bz1 > -0.005) {
         return MOVE_TO_TARGET;
     }
-    if(ha == MOVE_TO_TARGET && abs(tx2) < 0.002 && abs(ty2) < 0.002) {
+    if(ha == MOVE_TO_TARGET && abs(tx2) + abs(ty2) < 0.003) {
         return LIFT;
     }
-    if(ha == LIFT && flip(logistic(0.15, 100, state.get("z"))) && bz2 - bz1 < 0.03) {
+    if(ha == LIFT && flip(logistic(0.15, 200, state.get("z")))) {
         return MOVE_TO_CUBE_TOP;
     }
-    if(ha == MOVE_TO_CUBE_TOP && bz2 > -0.002) {
+    if(ha == MOVE_TO_CUBE_TOP && bz2 > -0.005) {
         return GRASP;
     }
-    if(ha == GRASP && flip(logistic(0.15, 100, state.get("z")))) {
+    if(ha == GRASP && flip(logistic(0.15, 200, state.get("z")))) {
         return MOVE_TO_TARGET;
     }
     return ha;

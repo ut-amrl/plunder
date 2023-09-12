@@ -1,6 +1,6 @@
 [
     {
-        "op": "Minus",
+        "op": "Plus",
         "inputType": ["NUM","NUM"],
         "inputDim": [[1, 0, 0], [1, 0, 0]],
         "outputType": "NUM",

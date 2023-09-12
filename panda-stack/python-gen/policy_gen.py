@@ -17,15 +17,15 @@ def asp(observation, ha) -> str:
     bx1, by1, bz1, bx2, by2, bz2 = observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
     tx2, ty2, tz2 = observation[13], observation[14], observation[15]
 
-    if ha == 'MOVE_TO_CUBE_BOTTOM' and bz1 > -0.002:
+    if ha == 'MOVE_TO_CUBE_BOTTOM' and bz1 > -0.005:
         return 'MOVE_TO_TARGET'
-    elif ha == 'MOVE_TO_TARGET' and abs(tx2) < 0.002 and abs(ty2) < 0.002:
+    elif ha == 'MOVE_TO_TARGET' and abs(tx2) + abs(ty2) < 0.003:
         return 'LIFT'
-    elif ha == 'LIFT' and sample(logistic(0.15, 100, z)) and bz2 - bz1 < 0.03:
+    elif ha == 'LIFT' and sample(logistic(0.15, 200, z)):
         return 'MOVE_TO_CUBE_TOP'
-    elif ha == 'MOVE_TO_CUBE_TOP' and bz2 > -0.002:
+    elif ha == 'MOVE_TO_CUBE_TOP' and bz2 > -0.005:
         return 'GRASP'
-    elif ha == 'GRASP' and sample(logistic(0.15, 100, z)):
+    elif ha == 'GRASP' and sample(logistic(0.15, 200, z)):
         return 'MOVE_TO_TARGET'
     return ha
 
@@ -67,7 +67,7 @@ for iter in range(20):
     ha = 'MOVE_TO_CUBE_BOTTOM'
     action = [0, 0, 0, 0]
 
-    for _ in range(175):
+    for _ in range(150):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
