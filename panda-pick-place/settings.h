@@ -22,14 +22,14 @@ namespace SETTINGS {
     const double GEN_ACCURACY = -1;             // Probability of a correct high-level transition in the simulation
 
     // ----- EM Loop parameters -----
-    const int NUM_ITER = 15;                    // Number of iterations in the expectation-maximization loop
+    const int NUM_ITER = 20;                    // Number of iterations in the expectation-maximization loop
 
     // ----- Parallelization Parameters -----
-    const int BATCH_SIZE = 16;                  // Number of programs to optimize in parallel
+    const int BATCH_SIZE = 4;                  // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                    // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
 
     // ----- Important hyperparameters -----
-    const double PROG_COMPLEXITY_LOSS_BASE = 0.001;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double PROG_COMPLEXITY_LOSS = 0.01;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
+    const double PROG_COMPLEXITY_LOSS_BASE = 0.002;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.03;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
     const double ALPHA_LOSS_UPPER = 0.0001;             // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 }
