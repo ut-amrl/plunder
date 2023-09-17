@@ -1,8 +1,12 @@
-import gym
+import gymnasium as gym
+import highway_env
+from stable_baselines3 import DQN
+from highway_env.envs import ControlledVehicle, Vehicle
+from highway_env.envs.common.observation import KinematicObservation
 import numpy as np
 import random
 
-env = gym.make('highway-v0')
+env = gym.make('highway-v0', render_mode='rgb_array')
 
 # Probabilistic functions
 def logistic(offset, slope, x):

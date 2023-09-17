@@ -15,7 +15,7 @@ steer_err = 0.01
 acc_err = 2
 
 env.config['simulation_frequency']=24
-env.config['policy_frequency']=8 # Runs once every 2 simulation steps
+env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
 
 # Observations
