@@ -10,18 +10,10 @@ from typing import Union
 env = gym.make("highway-fast-v0")
 
 ######## Configuration ########
-lane_diff = 4 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
-use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
-env.config['simulation_frequency']=24
-env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
-
-# Observations
-# ego vehicle:      presence, x, y, vx, vy, heading
-# 9 other vehicles: presence, x, y, vx, vy, heading        (x and y relative to ego)
 env.config['observation']={
     'type': 'Kinematics',
     'vehicles_count': 10,
@@ -42,7 +34,7 @@ model = DQN('MlpPolicy', env,
               target_update_interval=50,
               verbose=1,
               tensorboard_log="highway_dqn/")
-model.learn(20000)
+model.learn(200000)
 model.save("highway_dqn/model")
 
 # Load and test saved model
