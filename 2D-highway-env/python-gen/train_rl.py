@@ -32,5 +32,5 @@ model.set_env(env)
 #               target_update_interval=50,
 #               verbose=1,
 #               tensorboard_log="highway_dqn/")
-model.learn(int(1e5))
+model.learn(int(3e5))
 model.save("highway_dqn/model")
