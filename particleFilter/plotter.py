@@ -169,7 +169,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
 # Plots low-level actions
 def plotSingleLA(inF, outP, gtF, iter, robot):
     global trajectories, gtTrajectory, gtLA
-
+    
     gtFile = gtF + str(robot) + ".csv"
     la_names = readLA(gtFile)
     outPath = outP + "LA-" + str(iter) + "-" + str(robot) + "-"
@@ -212,17 +212,22 @@ def plotSingleLA(inF, outP, gtF, iter, robot):
             axs.legend(handles=handles, loc='upper right')
         else:
             axs[name].set_ylabel(label_name)
-            axs[name].plot(times, gtLA[name], color=colors[color_count], linewidth=1.5)
-            handles.append(Line2D([0], [0], label='actual', color=colors[color_count]))
-            handles.append(Line2D([0], [0], label='predicted', color=colors[color_count+1]))
+            axs[name].plot(times, gtLA[name], color=colors[0], linewidth=1.5)
+            handles.append(Line2D([0], [0], label='actual', color=colors[0]))
+            handles.append(Line2D([0], [0], label='predicted', color=colors[1]))
             color_count += 1
 
             for p in range(PARTICLES_PLOTTED):
-                axs[name].plot(times, trajectories[p], color=colors[color_count], alpha=(1/PARTICLES_PLOTTED), linewidth=2.5)
+                axs[name].plot(times, trajectories[p], color=colors[1], alpha=(1/PARTICLES_PLOTTED), linewidth=2.5)
             color_count += 1
 
             axs[name].grid(linestyle='dotted')
             axs[name].legend(handles=handles, loc='upper right')
+
+            for tick in axs[name].xaxis.get_major_ticks():
+                tick.label.set_fontsize(15)
+            for tick in axs[name].yaxis.get_major_ticks():
+                tick.label.set_fontsize(15)
 
     fig.tight_layout()
     plt.grid(linestyle='dotted')
