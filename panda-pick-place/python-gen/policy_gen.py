@@ -8,20 +8,62 @@ import random
 def logistic(offset, slope, x):
     return 1.0/(1.0+np.exp(-slope*(x-offset)))
 
+def logistic2(x, offset, slope):
+    return 1.0/(1.0+np.exp(-slope*(x-offset)))
+
 def sample(p):
     return random.random()<p
+
+def Plus(x, y):
+    return x + y
+
+def Abs(x):
+    return abs(x)
+
+def Minus(x, y):
+    return x - y
+
+def And(x, y):
+    return x and y
+
+def Or(x, y):
+    return x or y
+
+def Lt(x, y):
+    return x < y
+
+def Gt(x, y):
+    return x > y
 
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.02, -1000, abs(x - bx))) and sample(logistic(0.02, -1000, abs(y - by))):
-        # return "MOVE_TO_TARGET"
-    
-    if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
+    if ha == "MOVE_TO_CUBE" and sample(logistic(0.02, -1000, abs(x - bx))) and sample(logistic(0.02, -1000, abs(y - by))):
         return "MOVE_TO_TARGET"
     
+    # if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
+    #     return "MOVE_TO_TARGET"
+    
     # if ha == "MOVE_TO_CUBE" and (bz - (z + abs(z))) - (abs(z) - abs(ty)) > -0.024638: # PLUNDER-synthesized transition condition
-        # return "MOVE_TO_TARGET"
+    #     return "MOVE_TO_TARGET"
+
+    # OneShot
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
+    #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(tz, 31.5688, 0.6107)):
+    #     return "MOVE_TO_CUBE"
+    
+    # Greedy
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.051493, -107.756088)) and sample(logistic2(bx, -0.139345, 366.401428)):
+    #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(by, -0.151964, -320.393646)):
+    #     return "MOVE_TO_CUBE"
+
+    # if ha == "MOVE_TO_CUBE" and bz - z > -0.01756:
+    #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and y > 0.0781:
+    #     return "MOVE_TO_CUBE"
+
     return ha
 
 def get_action(observation, past_action, ha) -> str:
@@ -47,7 +89,8 @@ def bound(x):
 
 env = gym.make("PandaPickAndPlace-v3", render_mode="human")
 
-for iter in range(30):
+success = 0
+for iter in range(100):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
@@ -79,11 +122,11 @@ for iter in range(30):
         elif ha == 'MOVE_TO_TARGET':
             obs_out.write("1\n")
         
-        time.sleep(0.01)
-        # if terminated or truncated:
-            # break
+        if terminated:
+            success += 1
+            break
     
     obs_out.close()
     
-
+print(success)
 env.close()
