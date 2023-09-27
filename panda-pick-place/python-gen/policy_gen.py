@@ -38,7 +38,7 @@ def Gt(x, y):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic(0.0015, -1000, abs(x - bx))) and sample(logistic(0.0015, -1000, abs(y - by))):
+    if ha == "MOVE_TO_CUBE" and sample(logistic(0.0015, -5000, abs(x - bx))) and sample(logistic(0.0015, -5000, abs(y - by))):
         return "MOVE_TO_TARGET"
     
     # RL-based

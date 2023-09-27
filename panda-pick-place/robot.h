@@ -80,8 +80,8 @@ HA ASP_model(State state){
 
     // Policy-based
     if(ha == MOVE_TO_CUBE && 
-        flip(logistic(0.0015, -1000, abs(state.get("bx") - state.get("x")))) && 
-        flip(logistic(0.0015, -1000, abs(state.get("by") - state.get("y"))))) {
+        flip(logistic(0.0015, -5000, abs(state.get("bx") - state.get("x")))) && 
+        flip(logistic(0.0015, -5000, abs(state.get("by") - state.get("y"))))) {
         return MOVE_TO_TARGET;
     }
     return ha;
