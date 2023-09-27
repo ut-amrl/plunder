@@ -14,7 +14,10 @@ def sample(p):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic(0.02, -1000, abs(x - bx))) and sample(logistic(0.02, -1000, abs(y - by))):
+    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.02, -1000, abs(x - bx))) and sample(logistic(0.02, -1000, abs(y - by))):
+        # return "MOVE_TO_TARGET"
+    
+    if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
         return "MOVE_TO_TARGET"
     
     # if ha == "MOVE_TO_CUBE" and (bz - (z + abs(z))) - (abs(z) - abs(ty)) > -0.024638: # PLUNDER-synthesized transition condition
