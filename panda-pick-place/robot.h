@@ -8,10 +8,10 @@ using namespace SETTINGS;
 
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
-    { "vx", normal_distribution<double>(0.0, 0.3) },
-    { "vy", normal_distribution<double>(0.0, 0.3) },
-    { "vz", normal_distribution<double>(0.0, 0.3) },
-    { "end", normal_distribution<double>(0.0, 0.3) }
+    { "vx", normal_distribution<double>(0.0, 0.2) },
+    { "vy", normal_distribution<double>(0.0, 0.2) },
+    { "vz", normal_distribution<double>(0.0, 0.2) },
+    { "end", normal_distribution<double>(0.0, 0.2) }
 };
 double la_error_scaler = 1.0;
 
@@ -39,26 +39,26 @@ Obs motorModel(State state, bool error){
         state.put("vx", 5 * (state.get("bx") - state.get("x")));
         state.put("vy", 5 * (state.get("by") - state.get("y")));
         state.put("vz", 5 * (state.get("bz") - state.get("z")));
-        state.put("end", 0.5);
+        state.put("end", 0.6);
     } else if (ha == MOVE_TO_TARGET) {
-        double t_end = -0.5;
+        double t_end = -0.6;
         state.put("vx", 5 * (state.get("tx") - state.get("x")));
         state.put("vy", 5 * (state.get("ty") - state.get("y")));
         state.put("vz", 5 * (state.get("tz") - state.get("z")));
 
-        if (state.get("end") >= -0.1) {
-            t_end = -0.3;
+        if (state.get("end") >= -0.3) {
+            t_end = -0.6;
             state.put("vx", 5 * (state.get("bx") - state.get("x")));
             state.put("vy", 5 * (state.get("by") - state.get("y")));
             state.put("vz", 5 * (state.get("bz") - state.get("z")));
         }
-        if (state.get("end") >= 0.1) {
-            t_end = -0.1;
+        if (state.get("end") >= 0) {
+            t_end = -0.3;
         }
         if (state.get("end") >= 0.3) {
-            t_end = 0.1;
+            t_end = 0;
         }
-        if (state.get("end") >= 0.5) {
+        if (state.get("end") >= 0.6) {
             t_end = 0.3;
         } 
 
@@ -80,8 +80,8 @@ HA ASP_model(State state){
 
     // Policy-based
     if(ha == MOVE_TO_CUBE && 
-        flip(logistic(0.02, -1000, abs(state.get("bx") - state.get("x")))) && 
-        flip(logistic(0.02, -1000, abs(state.get("by") - state.get("y"))))) {
+        flip(logistic(0.0015, -1000, abs(state.get("bx") - state.get("x")))) && 
+        flip(logistic(0.0015, -1000, abs(state.get("by") - state.get("y"))))) {
         return MOVE_TO_TARGET;
     }
     return ha;
