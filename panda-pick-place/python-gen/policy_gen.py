@@ -67,10 +67,10 @@ def asp(observation, ha) -> str:
     #     return "MOVE_TO_CUBE"
 
 
-
     # Policy-based
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(abs(y) - abs(by), -0.002256, 274.001251)):
-        # return "MOVE_TO_TARGET"
+    # PLUNDER
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(Minus(Abs(x), Abs(bx)), Plus(Minus(z, bz), Minus(Abs(Minus(z, Abs(bx))), Abs(x)))), 0.011845, 539.856995)):
+    #     return "MOVE_TO_TARGET"
     return ha
 
 def get_action(observation, past_action, ha) -> str:
@@ -86,16 +86,16 @@ def get_action(observation, past_action, ha) -> str:
         
     # Policy-based
     if ha == 'MOVE_TO_CUBE':
-        return [bx * 5.0, by * 5.0, bz * 5.0 - 0.1, 0.6]
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
     
     if past_action[3] >= 0.6:
-        return [bx * 5.0, by * 5.0, bz * 5.0 - 0.1, 0.3]
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
     elif past_action[3] >= 0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0 - 0.1, 0]
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0]
     elif past_action[3] >= 0:
-        return [bx * 5.0, by * 5.0, bz * 5.0 - 0.1, -0.3]
+        return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
     elif past_action[3] >= -0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0 - 0.1, -0.6]
+        return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
     
     return [tx * 5.0, ty * 5.0, tz * 5.0, -0.6]
 
@@ -105,7 +105,7 @@ def bound(x):
 env = gym.make("PandaPickAndPlace-v3", render_mode="human")
 
 success = 0
-for iter in range(30):
+for iter in range(100):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
@@ -114,7 +114,7 @@ for iter in range(30):
     ha = 'MOVE_TO_CUBE'
     action = [0, 0, 0, 0]
 
-    for _ in range(50):
+    for _ in range(80):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
@@ -137,9 +137,9 @@ for iter in range(30):
         elif ha == 'MOVE_TO_TARGET':
             obs_out.write("1\n")
         
-        # if terminated:
-        #     success += 1
-        #     break
+        if terminated:
+            success += 1
+            break
     
     obs_out.close()
     
