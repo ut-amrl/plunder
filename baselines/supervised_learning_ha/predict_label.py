@@ -228,7 +228,9 @@ def makePredictions(full_set, training_size):
 
     # Fit network
     history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
-    model.save(settings.folder + "model")
+    # model.save(settings.folder + "model")
+    model = keras.models.load_model(settings.folder + "model", compile=False)
+    model.compile(loss=CustomAccuracy(), optimizer='adam')
 
     # Plot history
     pyplot.plot(history.history['loss'], label='train_loss')
@@ -244,7 +246,6 @@ def makePredictions(full_set, training_size):
     test_la = util.gen_traj(yhat_test, df_train_Y)
     valid_la = util.gen_traj(yhat_valid, Y_validation)
 
-    
     #### METRICS: WEIGHTED BY SOFTMAX ####
     print("######## Metrics: Weighted by softmax ########")
 

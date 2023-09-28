@@ -45,8 +45,10 @@ def log_obs(expected, actual, var, scaler):
 
 def cum_log_obs(expected, actual_transposed):
     actual = []
+    idx = 0
     for var in range(len(settings.pred_var)):
-        actual.append(actual_transposed[:, var])
+        actual.append(actual_transposed[:, idx])
+        idx += settings.numHA + 1
     
     scalers = []
     for var in range(len(settings.pred_var)):
@@ -57,5 +59,5 @@ def cum_log_obs(expected, actual_transposed):
     for i in range(len(actual_transposed)):
         for var in range(len(settings.pred_var)):
             error += log_obs(expected[var][i], actual[var][i], var, scalers[var])
-        
+
     return error / len(actual_transposed)
