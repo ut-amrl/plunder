@@ -261,8 +261,8 @@ def motor_model(ha, data, data_prev):
 # Setting: panda-stack
 # training_set = 10
 # validation_set = 20 # including training_set
-# train_time = 15000
-# patience = 10000
+# train_time = 10
+# patience = 0
 # sim_time = 150
 # samples = 50
 # folder = "panda-stack/"
