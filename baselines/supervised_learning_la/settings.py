@@ -112,13 +112,13 @@ import numpy as np
 # training_set = 10
 # validation_set = 30 # including training_set
 # train_time = 15000
-# patience = 100
+# patience = 600
 # sim_time = 75
 # samples = 50
 # # folder = "merge-easy-data/"
-# # folder = "merge-medium-data/"
+# folder = "merge-medium-data/"
 # # folder = "merge-hard-data/"
-# folder = "merge-impossible-data/"
+# # folder = "merge-impossible-data/"
 # vars_used = [
 #     "HA",
 #     "x",
@@ -187,7 +187,7 @@ import numpy as np
 training_set = 5
 validation_set = 20 # including training_set
 train_time = 10000
-patience = 0
+patience = 150
 sim_time = 50
 samples = 50
 # folder = "panda-pick-place/"
