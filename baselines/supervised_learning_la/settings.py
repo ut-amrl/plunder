@@ -183,15 +183,71 @@ import numpy as np
 
 #     return [target_steer, target_acc]
 
-# Setting: panda-pick-place
+# Setting: panda-pick-place (policy)
+# training_set = 5
+# validation_set = 20 # including training_set
+# train_time = 10
+# patience = 0
+# sim_time = 50
+# samples = 50
+# folder = "panda-pick-place-policy/"
+# vars_used = [
+#     "HA",
+#     "x",
+#     "y",
+#     "z",
+#     "bx",
+#     "by",
+#     "bz",
+#     "tx",
+#     "ty",
+#     "tz",
+#     "LA.vx",
+#     "LA.vy",
+#     "LA.vz",
+#     "LA.end"
+# ]
+# pred_var = ["LA.vx", "LA.vy", "LA.vz", "LA.end"]
+# pv_range = [
+#     [-4, 4],
+#     [-4, 4],
+#     [-4, 4],
+#     [-4, 4]
+# ]
+# pv_stddev = [0.2, 0.2, 0.2, 0.2]
+
+# numHA = 2
+
+# def motor_model(ha, data, data_prev):
+#     bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
+    
+#     if ha == 0:
+#         return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
+    
+#     if data_prev["LA.end"] >= 0.5:
+#         return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
+#     elif data_prev["LA.end"] >= 0.3:
+#         return [bx * 5.0, by * 5.0, bz * 5.0, 0]
+#     elif data_prev["LA.end"] >= 0.1:
+#         return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
+#     elif data_prev["LA.end"] >= -0.1:
+#         return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
+    
+#     vx = 5 * (data["tx"] - data["x"])
+#     vy = 5 * (data["ty"] - data["y"])
+#     vz = 5 * (data["tz"] - data["z"])
+#     end = -0.6
+    
+#     return [vx, vy, vz, end]
+
+# Setting: panda-pick-place (RL)
 training_set = 5
-validation_set = 20 # including training_set
-train_time = 10000
-patience = 150
-sim_time = 50
+validation_set = 30 # including training_set
+train_time = 12000
+patience = 100
+sim_time = 30
 samples = 50
-# folder = "panda-pick-place/"
-folder = "panda-pick-place-policy/"
+folder = "panda-pick-place/"
 vars_used = [
     "HA",
     "x",
@@ -215,46 +271,25 @@ pv_range = [
     [-4, 4],
     [-4, 4]
 ]
-# pv_stddev = [0.5, 0.5, 0.5, 0.5]
-pv_stddev = [0.2, 0.2, 0.2, 0.2]
+pv_stddev = [0.5, 0.5, 0.5, 0.5]
 
 numHA = 2
 
-# def motor_model(ha, data, data_prev):
-#     if ha == 0:
-#         vx = 5 * (data["bx"] - data["x"])
-#         vy = 5 * (data["by"] - data["y"])
-#         vz = 5 * (data["bz"] - data["z"])
-#         end = 1
-#     else:
-#         vx = 5 * (data["tx"] - data["x"])
-#         vy = 5 * (data["ty"] - data["y"])
-#         vz = 5 * (data["tz"] - data["z"])
-#         end = -1
-    
-#     return [vx, vy, vz, end]
-
 def motor_model(ha, data, data_prev):
-    bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
-    
     if ha == 0:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
-    
-    if data_prev["LA.end"] >= 0.5:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
-    elif data_prev["LA.end"] >= 0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0]
-    elif data_prev["LA.end"] >= 0.1:
-        return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
-    elif data_prev["LA.end"] >= -0.1:
-        return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
-    
-    vx = 5 * (data["tx"] - data["x"])
-    vy = 5 * (data["ty"] - data["y"])
-    vz = 5 * (data["tz"] - data["z"])
-    end = -0.6
+        vx = 5 * (data["bx"] - data["x"])
+        vy = 5 * (data["by"] - data["y"])
+        vz = 5 * (data["bz"] - data["z"])
+        end = 1
+    else:
+        vx = 5 * (data["tx"] - data["x"])
+        vy = 5 * (data["ty"] - data["y"])
+        vz = 5 * (data["tz"] - data["z"])
+        end = -1
     
     return [vx, vy, vz, end]
+
+
 
 
 

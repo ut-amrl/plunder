@@ -46,8 +46,8 @@ def asp(observation, ha) -> str:
     # if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
     #     return "MOVE_TO_TARGET"
     
-    # if ha == "MOVE_TO_CUBE" and (bz - (z + abs(z))) - (abs(z) - abs(ty)) > -0.024638: # PLUNDER-synthesized transition condition
-        # return "MOVE_TO_TARGET"
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(Minus(bz, Plus(z, Abs(z))), Minus(Abs(z), Abs(ty))), -0.026349, 275.813293)): # PLUNDER-synthesized transition condition
+    #     return "MOVE_TO_TARGET"
 
     # OneShot
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
@@ -61,6 +61,7 @@ def asp(observation, ha) -> str:
     # elif ha == "MOVE_TO_TARGET" and sample(logistic2(by, -0.151964, -320.393646)):
     #     return "MOVE_TO_CUBE"
 
+    # LDIPS
     # if ha == "MOVE_TO_CUBE" and bz - z > -0.01756:
     #     return "MOVE_TO_TARGET"
     # elif ha == "MOVE_TO_TARGET" and y > 0.0781:
@@ -98,10 +99,10 @@ def get_action(observation, past_action, ha) -> str:
     tx, ty, tz = tx - x, ty - y, tz - z
 
     # RL-based
-    # if ha == 'MOVE_TO_CUBE':
-    #     return [bx * 5.0, by * 5.0, bz * 5.0, 1] 
-    # else:
-    #     return [tx * 5.0, ty * 5.0, tz * 5.0, -1] 
+    if ha == 'MOVE_TO_CUBE':
+        return [bx * 5.0, by * 5.0, bz * 5.0, 1] 
+    else:
+        return [tx * 5.0, ty * 5.0, tz * 5.0, -1] 
         
     # Policy-based
     if ha == 'MOVE_TO_CUBE':
