@@ -70,7 +70,26 @@ def asp(observation, ha) -> str:
     # Policy-based
     # PLUNDER
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(Minus(Abs(x), Abs(bx)), Plus(Minus(z, bz), Minus(Abs(Minus(z, Abs(bx))), Abs(x)))), 0.011845, 539.856995)):
+        # return "MOVE_TO_TARGET"
+
+    # OneShot
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(x, bx), -0.004424, 341.041840)) and sample(logistic2(z, 0.002698, -184.910858)):
     #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(Minus(y, bx), -0.265226, -31.038519)):
+    #     return "MOVE_TO_CUBE"
+    
+    # Greedy
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(bz, 0.028010, 202.720947)):
+    #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(Minus(Abs(bx), Abs(x)), 0.008767, 518.401184)):
+    #     return "MOVE_TO_CUBE"
+
+    # LDIPS
+    # if ha == "MOVE_TO_CUBE" and x + abs(bx) < 0.006822 or x > 0.099304:
+    #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and abs(bx) - abs(x) > 0.005853:
+    #     return "MOVE_TO_CUBE"
+
     return ha
 
 def get_action(observation, past_action, ha) -> str:
