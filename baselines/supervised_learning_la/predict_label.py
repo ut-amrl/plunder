@@ -210,7 +210,8 @@ def makePredictions(full_set, training_size):
 
     # Fit network
     history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
-
+    model.save(settings.folder + "model")
+    
     # Plot history
     pyplot.plot(history.history['loss'], label='train_loss')
     pyplot.plot(history.history['val_loss'], label='validation_loss')
