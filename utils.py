@@ -44,7 +44,7 @@ def convert_to_py():
         state2 = states[2]
 
         asp = asp.replace("Flip", "sample").replace("Logistic", "logistic2")
-        asp = asp.replace("fX1=[", "").replace("]", "").replace(", true", "")
+        asp = asp.replace("fX1=[", "").replace("]", "").replace(", true", "").replace("fX2=[", "").replace("pX1=[", "").replace("pX2=[", "")
 
         prog += "if ha == " + state1 + " and " + asp + ":\n"
         prog += "\treturn " + state2 + "\n"
