@@ -43,8 +43,11 @@ def asp(observation, ha) -> str:
     
     # RL-based
 
+    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.048491, -121.545876)):
+        return "MOVE_TO_TARGET"
+    
     # if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
-    #     return "MOVE_TO_TARGET"
+        # return "MOVE_TO_TARGET"
     
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(Minus(bz, Plus(z, Abs(z))), Minus(Abs(z), Abs(ty))), -0.026349, 275.813293)): # PLUNDER-synthesized transition condition
     #     return "MOVE_TO_TARGET"
@@ -98,12 +101,6 @@ def get_action(observation, past_action, ha) -> str:
     bx, by, bz = bx - x, by - y, bz - z
     tx, ty, tz = tx - x, ty - y, tz - z
 
-    # RL-based
-    if ha == 'MOVE_TO_CUBE':
-        return [bx * 5.0, by * 5.0, bz * 5.0, 1] 
-    else:
-        return [tx * 5.0, ty * 5.0, tz * 5.0, -1] 
-        
     # Policy-based
     if ha == 'MOVE_TO_CUBE':
         return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
@@ -157,6 +154,7 @@ for iter in range(100):
         elif ha == 'MOVE_TO_TARGET':
             obs_out.write("1\n")
         
+        time.sleep(0.02)
         if terminated:
             success += 1
             break
