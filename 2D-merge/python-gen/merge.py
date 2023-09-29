@@ -34,7 +34,7 @@ highway_env.HighwayEnv._create_vehicles = _create_vehicles
 
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
-lanes_count = 6 # Number of lanes
+lanes_count = 4 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
