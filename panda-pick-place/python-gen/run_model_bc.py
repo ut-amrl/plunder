@@ -21,7 +21,7 @@ training_set = 5
 validation_set = 20 # including training_set
 sim_time = 50
 samples = 50
-folder = "../../baselines/supervised_learning_ha/panda-pick-place-policy/"
+folder = "../../baselines/supervised_learning_la/panda-pick-place-policy/"
 vars_used = [
     "HA",
     "x",
@@ -75,25 +75,7 @@ def motor_model(ha, data, data_prev):
 
 # Load model
 
-# Custom metric
-mse = tensorflow.keras.losses.MeanSquaredError()
-class CustomAccuracy(keras.losses.Loss):
-    def __init__(self):
-        super().__init__()
-    def call(self, y_true, y_pred):
-        # Perform a weighted sum of all controllers
-        error = 0
-
-        idx = 1
-        for var in range(len(pred_var)):
-            sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, idx:idx+numHA]), 1)
-            error += mse(sum, y_true[:, idx-1])
-            idx += numHA + 1
-
-        return error
-
-model = keras.models.load_model(folder + "model_pp", compile=False)
-model.compile(loss=CustomAccuracy(), optimizer='adam')
+model = keras.models.load_model(folder + "model_pp")
 
 
 column_names = []
@@ -128,11 +110,13 @@ def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
 
     return agg
 
-scaler = MinMaxScaler(feature_range=(pv_range[0][0], pv_range[0][1]))
-scaler.fit(np.transpose([[0, 1]]))
+scalers = []
+for var in range(len(pred_var)):
+    scalers.append(MinMaxScaler(feature_range=(pv_range[var][0], pv_range[var][1])))
+    scalers[var].fit(np.transpose([[0, 1]]))
+
 def predict_next(_dataset:DataFrame):
     dataset = _dataset.copy()
-
     # Compute outputs from discrete motor controllers
     motor = np.empty((len(pred_var), numHA, len(dataset.index)))
     for ha in range(numHA):
@@ -183,9 +167,7 @@ def predict_next(_dataset:DataFrame):
     # Outputs: predicted variables and discrete motor controller outputs (for use in the loss function)
     for var in range(len(pred_var)):
         validation_Y[pred_var[var] + "(t)"] = dataset[pred_var[var] + "(t)"]
-        for ha in range(numHA):
-            validation_Y["controller-" + pred_var[var] + "-" + str(ha) + "(t)"] = dataset["controller-" + pred_var[var] + "-" + str(ha) + "(t)"]
-    
+
     # Inputs: everything else
     for col in dataset:
         if not col in validation_Y.columns:
@@ -197,17 +179,8 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
-
-    la = []
-
-    # Perform a weighted sum of all controllers
-    idx = 1
-    for var in range(len(pred_var)):
-        sum = tensorflow.reduce_sum(tensorflow.multiply(yhat, validation_Y[:, idx:idx+numHA]), 1).numpy()
-        la.append(sum[len(sum)-1])
-        idx += numHA + 1
-
-    la = [scaler.transform([[each]])[0][0] for each in la]
+    la = yhat[len(yhat)-1]
+    la = [scalers[i].transform([[la[i]]])[0][0] for i in range(len(la))]
     return la
 
 
@@ -215,7 +188,7 @@ def predict_next(_dataset:DataFrame):
 
 
 
-env = gym.make("PandaPickAndPlace-v3", render_mode="human")
+env = gym.make("PandaPickAndPlace-v3")
 dataset_base = pd.read_csv("temp.csv")
 
 success = 0
@@ -224,7 +197,7 @@ for iter in range(100):
     dataset = dataset_base.copy(deep=True)
 
     action = [0, 0, 0, 0]
-    for _ in range(80):
+    for _ in range(100):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
@@ -232,12 +205,11 @@ for iter in range(100):
 
         x, y, z, bx, by, bz, tx, ty, tz, end_width = world_state[0], world_state[1], world_state[2], world_state[7], world_state[8], world_state[9], target_pos[0], target_pos[1], target_pos[2], world_state[6]
 
-        obs_pruned = [x, y, z, bx, by, bz, tx, ty, tz, end_width, 0, 0, 0, 0, 0]
+        obs_pruned = [x, y, z, bx, by, bz, tx, ty, tz, end_width] + action + [0]
         dataset.loc[len(dataset)] = obs_pruned
 
         action = predict_next(dataset)
 
-        time.sleep(0.02)
         if terminated:
             success += 1
             break
