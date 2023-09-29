@@ -227,7 +227,7 @@ for iter in range(100):
     dataset = dataset_base.copy(deep=True)
 
     action = [0, 0, 0, 0]
-    for _ in range(5):
+    for _ in range(100):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
