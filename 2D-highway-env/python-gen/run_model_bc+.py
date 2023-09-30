@@ -114,7 +114,7 @@ class CustomAccuracy(keras.losses.Loss):
 
         return error
 
-model = keras.models.load_model(folder + "model_PT", compile=False)
+model = keras.models.load_model(folder + "model_pt", compile=False)
 model.compile(loss=CustomAccuracy(), optimizer='adam')
 
 

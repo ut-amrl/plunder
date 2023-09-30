@@ -98,7 +98,7 @@ def motor_model(ha, data, data_prev):
 
 
 # Load model
-model = keras.models.load_model(folder + "model_pt")
+model = keras.models.load_model(folder + "model_PT")
 
 column_names = []
 

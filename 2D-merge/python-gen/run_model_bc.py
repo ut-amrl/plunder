@@ -238,7 +238,7 @@ KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize value
 steer_err = 0.01
 acc_err = 1
 
-env = gym.make('highway-fast-v0")
+env = gym.make('highway-fast-v0')
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
