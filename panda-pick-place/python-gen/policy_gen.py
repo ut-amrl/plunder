@@ -38,19 +38,15 @@ def Gt(x, y):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
-        return "MOVE_TO_TARGET"
+    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
+    #     return "MOVE_TO_TARGET"
     
     # RL-based
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.048491, -121.545876)):
+    if ha == "MOVE_TO_CUBE" and sample(logistic2(Plus(Minus(z, bz), z), 0.085863, -790.177979)): # PLUNDER
         return "MOVE_TO_TARGET"
     
-    # if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
-        # return "MOVE_TO_TARGET"
     
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(Minus(bz, Plus(z, Abs(z))), Minus(Abs(z), Abs(ty))), -0.026349, 275.813293)): # PLUNDER-synthesized transition condition
-    #     return "MOVE_TO_TARGET"
 
     # OneShot
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
@@ -101,20 +97,31 @@ def get_action(observation, past_action, ha) -> str:
     bx, by, bz = bx - x, by - y, bz - z
     tx, ty, tz = tx - x, ty - y, tz - z
 
-    # Policy-based
+    # RL-based
     if ha == 'MOVE_TO_CUBE':
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0.7]
     
-    if past_action[3] >= 0.6:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
-    elif past_action[3] >= 0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0]
+    if past_action[3] >= 0.7:
+        return [bx * 15.0, by * 15.0, bz * 15.0, 0]
     elif past_action[3] >= 0:
-        return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
-    elif past_action[3] >= -0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
+        return [bx * 15.0, by * 15.0, bz * 15.0, -0.7]
     
-    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.6]
+    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.7]
+
+    # Policy-based
+    # if ha == 'MOVE_TO_CUBE':
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
+    
+    # if past_action[3] >= 0.6:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
+    # elif past_action[3] >= 0.3:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, 0]
+    # elif past_action[3] >= 0:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
+    # elif past_action[3] >= -0.3:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
+    
+    # return [tx * 5.0, ty * 5.0, tz * 5.0, -0.6]
 
 def bound(x):
     return max(min(x, 1), -1)
@@ -154,7 +161,6 @@ for iter in range(100):
         elif ha == 'MOVE_TO_TARGET':
             obs_out.write("1\n")
         
-        time.sleep(0.02)
         if terminated:
             success += 1
             break

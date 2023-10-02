@@ -66,9 +66,9 @@ Obs motorModel(State state, bool error){
 
         if (state.get("end") >= 0) {
             t_end = -0.7;
-            state.put("vx", 15 * (state.get("bx") - state.get("x")));
-            state.put("vy", 15 * (state.get("by") - state.get("y")));
-            state.put("vz", 15 * (state.get("bz") - state.get("z")));
+            state.put("vx", 5 * (state.get("bx") - state.get("x")));
+            state.put("vy", 5 * (state.get("by") - state.get("y")));
+            state.put("vz", 5 * (state.get("bz") - state.get("z")));
         }
         if (state.get("end") >= 0.7) {
             t_end = 0.0;
