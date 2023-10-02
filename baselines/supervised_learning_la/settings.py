@@ -112,13 +112,13 @@ import numpy as np
 # training_set = 10
 # validation_set = 30 # including training_set
 # train_time = 15000
-# patience = 600
+# patience = 200
 # sim_time = 75
 # samples = 50
 # # folder = "merge-easy-data/"
-# folder = "merge-medium-data/"
+# # folder = "merge-medium-data/"
 # # folder = "merge-hard-data/"
-# # folder = "merge-impossible-data/"
+# folder = "merge-impossible-data/"
 # vars_used = [
 #     "HA",
 #     "x",
@@ -241,13 +241,13 @@ import numpy as np
 #     return [vx, vy, vz, end]
 
 # Setting: panda-pick-place (RL)
-training_set = 5
+training_set = 10
 validation_set = 30 # including training_set
 train_time = 12000
-patience = 100
+patience = 50
 sim_time = 30
 samples = 50
-folder = "panda-pick-place/"
+folder = "panda-pick-place-rl/"
 vars_used = [
     "HA",
     "x",
@@ -276,20 +276,18 @@ pv_stddev = [0.5, 0.5, 0.5, 0.5]
 numHA = 2
 
 def motor_model(ha, data, data_prev):
+    bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
+    tx, ty, tz = data["tx"] - data["x"], data["ty"] - data["y"], data["tz"] - data["z"]
+
     if ha == 0:
-        vx = 5 * (data["bx"] - data["x"])
-        vy = 5 * (data["by"] - data["y"])
-        vz = 5 * (data["bz"] - data["z"])
-        end = 1
-    else:
-        vx = 5 * (data["tx"] - data["x"])
-        vy = 5 * (data["ty"] - data["y"])
-        vz = 5 * (data["tz"] - data["z"])
-        end = -1
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0.7]
     
-    return [vx, vy, vz, end]
-
-
+    if data_prev["LA.end"] >= 0.7:
+        return [bx * 15.0, by * 15.0, bz * 15.0, 0]
+    elif data_prev["LA.end"] >= 0:
+        return [bx * 15.0, by * 15.0, bz * 15.0, -0.7]
+    
+    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.7]
 
 
 
