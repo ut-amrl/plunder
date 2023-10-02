@@ -38,15 +38,19 @@ def Gt(x, y):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
-    #     return "MOVE_TO_TARGET"
+    if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
+        return "MOVE_TO_TARGET"
     
     # RL-based
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic2(Plus(Minus(z, bz), z), 0.085863, -790.177979)): # PLUNDER
-        return "MOVE_TO_TARGET"
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Plus(Minus(z, bz), z), 0.085863, -790.177979)): # PLUNDER
+    #     return "MOVE_TO_TARGET"
     
+    # if ha == "MOVE_TO_CUBE" and And(sample(logistic2(z, 0.055268, -57.456848)), sample(logistic2(y, -0.110480, 5071.638184))): # OneShot
+    #     return "MOVE_TO_TARGET"
     
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(bz, z), -0.042220, 64.181183)): # Greedy
+    #     return "MOVE_TO_TARGET"
 
     # OneShot
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):

@@ -52,6 +52,7 @@ for iter in range(30):
         obs_pruned = [x, y, z, bx, by, bz, tx, ty, tz, end_width]
 
         for each in obs_pruned:
+            with_err = np.random.normal(each, 0.005)
             obs_out.write(str(each)+", ")
         for each in action:
             with_err = bound(np.random.normal(each, 0.5))
@@ -59,7 +60,6 @@ for iter in range(30):
 
         obs_out.write("0\n")
         
-        time.sleep(0.03)
         if terminated:
             success += 1
             solved = True
