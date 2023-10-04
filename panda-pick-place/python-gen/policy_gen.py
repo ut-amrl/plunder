@@ -38,19 +38,26 @@ def Gt(x, y):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
-        return "MOVE_TO_TARGET"
+    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
+    #     return "MOVE_TO_TARGET"
     
     # RL-based
 
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Plus(Minus(z, bz), z), 0.085863, -790.177979)): # PLUNDER
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.050406, -991.791992)): # PLUNDER
     #     return "MOVE_TO_TARGET"
     
-    # if ha == "MOVE_TO_CUBE" and And(sample(logistic2(z, 0.055268, -57.456848)), sample(logistic2(y, -0.110480, 5071.638184))): # OneShot
-    #     return "MOVE_TO_TARGET"
+    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.044965, -53.224640)): # OneShot
+        return "MOVE_TO_TARGET"
+    elif ha == "MOVE_TO_TARGET" and sample(logistic2(Minus(z, bz), 0.075007, 84.593842)):
+        return "MOVE_TO_CUBE"
     
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(bz, z), -0.042220, 64.181183)): # Greedy
     #     return "MOVE_TO_TARGET"
+
+    # if ha == "MOVE_TO_CUBE" and Minus(bz, z) > -0.039647: # LDIPS
+    #     return "MOVE_TO_TARGET"
+    # elif ha == "MOVE_TO_TARGET" and Minus(Abs(ty), Abs(by)) > 0.101659:
+    #     return "MOVE_TO_CUBE"
 
     # OneShot
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
@@ -103,14 +110,14 @@ def get_action(observation, past_action, ha) -> str:
 
     # RL-based
     if ha == 'MOVE_TO_CUBE':
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.7]
+        return [bx * 10.0, by * 10.0, bz * 10.0, 0.7]
     
     if past_action[3] >= 0.7:
-        return [bx * 15.0, by * 15.0, bz * 15.0, 0]
+        return [bx * 10.0, by * 10.0, bz * 10.0, 0]
     elif past_action[3] >= 0:
-        return [bx * 15.0, by * 15.0, bz * 15.0, -0.7]
+        return [bx * 10.0, by * 10.0, bz * 10.0, -0.7]
     
-    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.7]
+    return [tx * 10.0, ty * 10.0, tz * 10.0, -0.7]
 
     # Policy-based
     # if ha == 'MOVE_TO_CUBE':
@@ -133,7 +140,7 @@ def bound(x):
 env = gym.make("PandaPickAndPlace-v3", render_mode="human")
 
 success = 0
-for iter in range(100):
+for iter in range(500):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
@@ -142,7 +149,7 @@ for iter in range(100):
     ha = 'MOVE_TO_CUBE'
     action = [0, 0, 0, 0]
 
-    for _ in range(80):
+    for _ in range(30):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
