@@ -41,10 +41,17 @@ for iter in range(50):
 
     for _ in range(30):
         observation, reward, terminated, truncated, info = env.step(action)
-        action, _states = model.predict(observation, deterministic=False)
+        next_action, _states = model.predict(observation, deterministic=False)
         if solved:
-            action = [0, 0, 0, -1]
+            next_action = [0, 0, 0, -1]
         
+        # Bound the next action to make it realistic
+        for i in range(len(action)):
+            if next_action[i] > action[i]:
+                action[i] = min(next_action[i], action[i] + 0.4)
+            else:
+                action[i] = max(next_action[i], action[i] - 0.4)
+            
         world_state = observation["observation"]
         target_pos = observation["desired_goal"][0:3]
 
@@ -52,7 +59,6 @@ for iter in range(50):
         obs_pruned = [x, y, z, bx, by, bz, tx, ty, tz, end_width]
 
         for each in obs_pruned:
-            with_err = np.random.normal(each, 0.01)
             obs_out.write(str(each)+", ")
         for each in action:
             with_err = bound(np.random.normal(each, 0.5))
