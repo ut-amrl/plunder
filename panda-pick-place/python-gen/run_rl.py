@@ -46,12 +46,13 @@ for iter in range(50):
             next_action = [0, 0, 0, -1]
         
         # Bound the next action to make it realistic
-        for i in range(len(action)):
+        for i in range(len(action) - 1):
             if next_action[i] > action[i]:
                 action[i] = min(next_action[i], action[i] + 0.4)
             else:
                 action[i] = max(next_action[i], action[i] - 0.4)
-            
+        action[len(action)-1] = next_action[len(action)-1]
+        
         world_state = observation["observation"]
         target_pos = observation["desired_goal"][0:3]
 

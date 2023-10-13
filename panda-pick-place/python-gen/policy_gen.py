@@ -43,22 +43,9 @@ def asp(observation, ha) -> str:
     
     # RL-based
 
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.050406, -991.791992)): # PLUNDER
-    #     return "MOVE_TO_TARGET"
-    
-    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.044965, -53.224640)): # OneShot
+    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.037726, -147.017349)): # PLUNDER
         return "MOVE_TO_TARGET"
-    elif ha == "MOVE_TO_TARGET" and sample(logistic2(Minus(z, bz), 0.075007, 84.593842)):
-        return "MOVE_TO_CUBE"
     
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(bz, z), -0.042220, 64.181183)): # Greedy
-    #     return "MOVE_TO_TARGET"
-
-    # if ha == "MOVE_TO_CUBE" and Minus(bz, z) > -0.039647: # LDIPS
-    #     return "MOVE_TO_TARGET"
-    # elif ha == "MOVE_TO_TARGET" and Minus(Abs(ty), Abs(by)) > 0.101659:
-    #     return "MOVE_TO_CUBE"
-
     # OneShot
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
     #     return "MOVE_TO_TARGET"
@@ -103,21 +90,27 @@ def asp(observation, ha) -> str:
 
     return ha
 
+def return_closer(next, cur):
+    if next > cur:
+        return min(next, cur + 0.4)
+    return max(next, cur - 0.4)
+
 def get_action(observation, past_action, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
     bx, by, bz = bx - x, by - y, bz - z
     tx, ty, tz = tx - x, ty - y, tz - z
 
     # RL-based
-    if ha == 'MOVE_TO_CUBE':
-        return [bx * 10.0, by * 10.0, bz * 10.0, 0.7]
-    
-    if past_action[3] >= 0.7:
-        return [bx * 10.0, by * 10.0, bz * 10.0, 0]
-    elif past_action[3] >= 0:
-        return [bx * 10.0, by * 10.0, bz * 10.0, -0.7]
-    
-    return [tx * 10.0, ty * 10.0, tz * 10.0, -0.7]
+    vx, vy, vz, end = bx * 5, by * 5, bz * 5, 1
+    if ha == "MOVE_TO_TARGET":
+        vx, vy, vz, end = 5 * tx, 5 * ty, 5 * tz, -1
+
+    vx = return_closer(vx, past_action[0])
+    vy = return_closer(vy, past_action[1])
+    vz = return_closer(vz, past_action[2])
+    end = return_closer(end, past_action[3])
+
+    return [vx, vy, vz, end]
 
     # Policy-based
     # if ha == 'MOVE_TO_CUBE':
@@ -172,6 +165,7 @@ for iter in range(500):
         elif ha == 'MOVE_TO_TARGET':
             obs_out.write("1\n")
         
+        time.sleep(0.02)
         if terminated:
             success += 1
             break
