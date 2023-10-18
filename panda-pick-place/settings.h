@@ -12,8 +12,8 @@ namespace SETTINGS {
     
     // ----- General configuration -----
     const bool DEBUG = false;
-    const int TRAINING_SET = 10;                // Number of robots to train on
-    const int VALIDATION_SET = 30;              // Number of total robots in the full set (including the training set)
+    const int TRAINING_SET = 5;                // Number of robots to train on
+    const int VALIDATION_SET = 10;              // Number of total robots in the full set (including the training set)
     const bool USE_SAFE_TRANSITIONS = false;    // "Safe" transitions (only allow user-specified transitions). 
                                                 // Optional modification to improve performance on policies with sparse transitions
     // ----- Simulation parameters -----
@@ -22,14 +22,14 @@ namespace SETTINGS {
     const double GEN_ACCURACY = -1;             // Probability of a correct high-level transition in the simulation
 
     // ----- EM Loop parameters -----
-    const int NUM_ITER = 20;                    // Number of iterations in the expectation-maximization loop
+    const int NUM_ITER = 50;                    // Number of iterations in the expectation-maximization loop
 
     // ----- Parallelization Parameters -----
     const int BATCH_SIZE = 8;                  // Number of programs to optimize in parallel
     const int NUM_CORES = 4;                    // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
 
     // ----- Important hyperparameters -----
-    const double PROG_COMPLEXITY_LOSS_BASE = 0.003;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double PROG_COMPLEXITY_LOSS = 0;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
+    const double PROG_COMPLEXITY_LOSS_BASE = 0.03;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.03;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
     const double ALPHA_LOSS_UPPER = 0.0000001;             // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 }

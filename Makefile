@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= panda-stack
+target_dir ?= panda-pick-place
 
 # export OMP_NUM_THREADS := 16 # Turn this on when running LDIPS
 

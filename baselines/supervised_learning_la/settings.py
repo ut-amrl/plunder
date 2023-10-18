@@ -29,7 +29,7 @@ def motor_model(ha, data, data_prev):
     elif ha == 1:
         if data_prev["LA.acc"] < 0:
             return [min(data_prev["LA.acc"] + 1, 0)]
-        elif data_prev["LA.acc"] > 0:
+        elif data_prev["LA.acc"] >= 0:
             return [max(data_prev["LA.acc"] - 1, 0)]
     else:
         return [max(data_prev["LA.acc"] - 1, data["decMax"])]
