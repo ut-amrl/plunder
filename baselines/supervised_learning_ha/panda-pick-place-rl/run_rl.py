@@ -30,7 +30,7 @@ def bound(x):
     return max(min(x, 1), -1)
 
 success = 0
-for iter in range(30):
+for iter in range(50):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
@@ -41,9 +41,17 @@ for iter in range(30):
 
     for _ in range(30):
         observation, reward, terminated, truncated, info = env.step(action)
-        action, _states = model.predict(observation, deterministic=False)
+        next_action, _states = model.predict(observation, deterministic=False)
         if solved:
-            action = [0, 0, 0, -1]
+            next_action = [0, 0, 0, -1]
+        
+        # Bound the next action to make it realistic
+        for i in range(len(action) - 1):
+            if next_action[i] > action[i]:
+                action[i] = min(next_action[i], action[i] + 0.4)
+            else:
+                action[i] = max(next_action[i], action[i] - 0.4)
+        action[len(action)-1] = next_action[len(action)-1]
         
         world_state = observation["observation"]
         target_pos = observation["desired_goal"][0:3]
@@ -59,7 +67,7 @@ for iter in range(30):
 
         obs_out.write("0\n")
         
-        time.sleep(0.03)
+        time.sleep(0.04)
         if terminated:
             success += 1
             solved = True

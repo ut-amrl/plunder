@@ -17,13 +17,13 @@ from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from scipy.stats import norm
 
-training_set = 5
-validation_set = 10 # including training_set
+training_set = 10
+validation_set = 30 # including training_set
 train_time = 12000
-patience = 500
+patience = 50
 sim_time = 30
 samples = 50
-folder = "../../baselines/supervised_learning_ha/panda-pick-place-rl/"
+folder = "../../baselines/supervised_learning_la/panda-pick-place-rl/"
 vars_used = [
     "HA",
     "x",
@@ -51,48 +51,24 @@ pv_stddev = [0.5, 0.5, 0.5, 0.5]
 
 numHA = 2
 
-def return_closer(next, cur):
-    if next > cur:
-        return min(next, cur + 0.4)
-    return max(next, cur - 0.4)
-
 def motor_model(ha, data, data_prev):
     bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
     tx, ty, tz = data["tx"] - data["x"], data["ty"] - data["y"], data["tz"] - data["z"]
 
     if ha == 0:
-        res = [bx * 5.0, by * 5.0, bz * 5.0, 1]
-    else:
-        res = [tx * 5.0, ty * 5.0, tz * 5.0, -1]
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0.7]
     
-    res[0] = return_closer(res[0], data_prev["LA.vx"])
-    res[1] = return_closer(res[1], data_prev["LA.vy"])
-    res[2] = return_closer(res[2], data_prev["LA.vz"])
-
-    return res
+    if data_prev["LA.end"] >= 0.7:
+        return [bx * 15.0, by * 15.0, bz * 15.0, 0]
+    elif data_prev["LA.end"] >= 0:
+        return [bx * 15.0, by * 15.0, bz * 15.0, -0.7]
+    
+    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.7]
 
 
 # Load model
 
-# Custom metric
-mse = tensorflow.keras.losses.MeanSquaredError()
-class CustomAccuracy(keras.losses.Loss):
-    def __init__(self):
-        super().__init__()
-    def call(self, y_true, y_pred):
-        # Perform a weighted sum of all controllers
-        error = 0
-
-        idx = 1
-        for var in range(len(pred_var)):
-            sum = tensorflow.reduce_sum(tensorflow.multiply(y_pred, y_true[:, idx:idx+numHA]), 1)
-            error += mse(sum, y_true[:, idx-1])
-            idx += numHA + 1
-
-        return error
-
-model = keras.models.load_model(folder + "model_pprl", compile=False)
-model.compile(loss=CustomAccuracy(), optimizer='adam')
+model = keras.models.load_model(folder + "model_pprl")
 
 
 column_names = []
@@ -184,9 +160,7 @@ def predict_next(_dataset:DataFrame):
     # Outputs: predicted variables and discrete motor controller outputs (for use in the loss function)
     for var in range(len(pred_var)):
         validation_Y[pred_var[var] + "(t)"] = dataset[pred_var[var] + "(t)"]
-        for ha in range(numHA):
-            validation_Y["controller-" + pred_var[var] + "-" + str(ha) + "(t)"] = dataset["controller-" + pred_var[var] + "-" + str(ha) + "(t)"]
-    
+
     # Inputs: everything else
     for col in dataset:
         if not col in validation_Y.columns:
@@ -198,18 +172,8 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
-    yhat = yhat[len(yhat)-1]
-
-    la = []
-    # Perform a weighted sum of all controllers
-    idx = 1
-    for var in range(len(pred_var)):
-        sum = np.sum(np.multiply(yhat, validation_Y[len(validation_Y)-1, idx:idx+numHA]))
-        la.append(sum)
-        idx += numHA + 1
-
+    la = yhat[len(yhat)-1]
     la = [scalers[i].transform([[la[i]]])[0][0] for i in range(len(la))]
-
     return la
 
 
@@ -226,7 +190,7 @@ for iter in range(100):
     dataset = dataset_base.copy(deep=True)
 
     action = [0, 0, 0, 0]
-    for _ in range(30):
+    for _ in range(100):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]

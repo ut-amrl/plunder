@@ -2,37 +2,37 @@ import pandas as pd
 import numpy as np
 
 # Setting: 1D-target
-training_set = 10
-validation_set = 30 # including training_set
-train_time = 10000
-patience = 500
-sim_time = 126
-samples = 100
-folder = "target/"
-vars_used = [
-    "HA",
-    "pos",
-    "decMax",
-    "accMax",
-    "vel",
-    "vMax",
-    "LA.acc",
-]
-pred_var = ["LA.acc"]
-pv_range = [[-50, 50]]
-pv_stddev = [0.5]
+# training_set = 10
+# validation_set = 30 # including training_set
+# train_time = 10000
+# patience = 500
+# sim_time = 126
+# samples = 100
+# folder = "target/"
+# vars_used = [
+#     "HA",
+#     "pos",
+#     "decMax",
+#     "accMax",
+#     "vel",
+#     "vMax",
+#     "LA.acc",
+# ]
+# pred_var = ["LA.acc"]
+# pv_range = [[-50, 50]]
+# pv_stddev = [0.5]
 
-numHA = 3
-def motor_model(ha, data, data_prev):
-    if ha == 0:
-        return [min(data_prev["LA.acc"] + 1, data["accMax"])]
-    elif ha == 1:
-        if data_prev["LA.acc"] < 0:
-            return [min(data_prev["LA.acc"] + 1, 0)]
-        elif data_prev["LA.acc"] >= 0:
-            return [max(data_prev["LA.acc"] - 1, 0)]
-    else:
-        return [max(data_prev["LA.acc"] - 1, data["decMax"])]
+# numHA = 3
+# def motor_model(ha, data, data_prev):
+#     if ha == 0:
+#         return [min(data_prev["LA.acc"] + 1, data["accMax"])]
+#     elif ha == 1:
+#         if data_prev["LA.acc"] < 0:
+#             return [min(data_prev["LA.acc"] + 1, 0)]
+#         elif data_prev["LA.acc"] >= 0:
+#             return [max(data_prev["LA.acc"] - 1, 0)]
+#     else:
+#         return [max(data_prev["LA.acc"] - 1, data["decMax"])]
 
 # Setting: 2D-highway-env
 # training_set = 10
@@ -241,53 +241,59 @@ def motor_model(ha, data, data_prev):
 #     return [vx, vy, vz, end]
 
 # Setting: panda-pick-place (RL)
-# training_set = 10
-# validation_set = 30 # including training_set
-# train_time = 12000
-# patience = 2000
-# sim_time = 30
-# samples = 50
-# folder = "panda-pick-place-rl/"
-# vars_used = [
-#     "HA",
-#     "x",
-#     "y",
-#     "z",
-#     "bx",
-#     "by",
-#     "bz",
-#     "tx",
-#     "ty",
-#     "tz",
-#     "LA.vx",
-#     "LA.vy",
-#     "LA.vz",
-#     "LA.end"
-# ]
-# pred_var = ["LA.vx", "LA.vy", "LA.vz", "LA.end"]
-# pv_range = [
-#     [-4, 4],
-#     [-4, 4],
-#     [-4, 4],
-#     [-4, 4]
-# ]
-# pv_stddev = [0.5, 0.5, 0.5, 0.5]
+training_set = 5
+validation_set = 10 # including training_set
+train_time = 12000
+patience = 500
+sim_time = 30
+samples = 50
+folder = "panda-pick-place-rl/"
+vars_used = [
+    "HA",
+    "x",
+    "y",
+    "z",
+    "bx",
+    "by",
+    "bz",
+    "tx",
+    "ty",
+    "tz",
+    "LA.vx",
+    "LA.vy",
+    "LA.vz",
+    "LA.end"
+]
+pred_var = ["LA.vx", "LA.vy", "LA.vz", "LA.end"]
+pv_range = [
+    [-4, 4],
+    [-4, 4],
+    [-4, 4],
+    [-4, 4]
+]
+pv_stddev = [0.5, 0.5, 0.5, 0.5]
 
-# numHA = 2
+numHA = 2
 
-# def motor_model(ha, data, data_prev):
-#     bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
-#     tx, ty, tz = data["tx"] - data["x"], data["ty"] - data["y"], data["tz"] - data["z"]
+def return_closer(next, cur):
+    if next > cur:
+        return min(next, cur + 0.4)
+    return max(next, cur - 0.4)
 
-#     if ha == 0:
-#         return [bx * 5.0, by * 5.0, bz * 5.0, 0.7]
+def motor_model(ha, data, data_prev):
+    bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
+    tx, ty, tz = data["tx"] - data["x"], data["ty"] - data["y"], data["tz"] - data["z"]
+
+    if ha == 0:
+        res = [bx * 5.0, by * 5.0, bz * 5.0, 1]
+    else:
+        res = [tx * 5.0, ty * 5.0, tz * 5.0, -1]
     
-#     if data_prev["LA.end"] >= 0.7:
-#         return [bx * 15.0, by * 15.0, bz * 15.0, 0]
-#     elif data_prev["LA.end"] >= 0:
-#         return [bx * 15.0, by * 15.0, bz * 15.0, -0.7]
-    
-#     return [tx * 5.0, ty * 5.0, tz * 5.0, -0.7]
+    res[0] = return_closer(res[0], data_prev["LA.vx"])
+    res[1] = return_closer(res[1], data_prev["LA.vy"])
+    res[2] = return_closer(res[2], data_prev["LA.vz"])
+
+    return res
 
 
 # Setting: panda-stack

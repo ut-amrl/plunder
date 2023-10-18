@@ -38,31 +38,31 @@ def Gt(x, y):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
+    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.007, -5000, abs(x - bx))) and sample(logistic(0.007, -5000, abs(y - by))):
     #     return "MOVE_TO_TARGET"
     
     # RL-based
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.037726, -147.017349)): # PLUNDER
-        return "MOVE_TO_TARGET"
+    # if ha == "MOVE_TO_CUBE" and (sample(logistic2(x, -0.091224, -353.972)) or sample(logistic2(z, 0.02349, -2419.06))):
+    #     return "MOVE_TO_TARGET"
     
     # OneShot
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.032951, -96.541489)): # PLUNDER
     #     return "MOVE_TO_TARGET"
-    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(tz, 31.5688, 0.6107)):
+    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(tz, -0.054478, -70.535027)):
     #     return "MOVE_TO_CUBE"
     
     # Greedy
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.051493, -107.756088)) and sample(logistic2(bx, -0.139345, 366.401428)):
+    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(z, bz), 0.029545, -41.118660)):
     #     return "MOVE_TO_TARGET"
-    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(by, -0.151964, -320.393646)):
+    # elif ha == "MOVE_TO_TARGET" and sample(logistic2(tz, -0.126017, -14.454493)):
     #     return "MOVE_TO_CUBE"
 
     # LDIPS
-    # if ha == "MOVE_TO_CUBE" and bz - z > -0.01756:
-    #     return "MOVE_TO_TARGET"
-    # elif ha == "MOVE_TO_TARGET" and y > 0.0781:
-    #     return "MOVE_TO_CUBE"
+    if ha == "MOVE_TO_CUBE" and (z < 0.044347 or abs(y) > 0.097483):
+        return "MOVE_TO_TARGET"
+    elif ha == "MOVE_TO_TARGET" and Minus(Abs(bx), Abs(x)) > 0.030193:
+        return "MOVE_TO_CUBE"
 
 
     # Policy-based
@@ -108,7 +108,6 @@ def get_action(observation, past_action, ha) -> str:
     vx = return_closer(vx, past_action[0])
     vy = return_closer(vy, past_action[1])
     vz = return_closer(vz, past_action[2])
-    end = return_closer(end, past_action[3])
 
     return [vx, vy, vz, end]
 
@@ -134,9 +133,6 @@ env = gym.make("PandaPickAndPlace-v3", render_mode="human")
 
 success = 0
 for iter in range(500):
-    obs_out = open("data" + str(iter) + ".csv", "w")
-    obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
-
     observation, info = env.reset()
 
     ha = 'MOVE_TO_CUBE'
@@ -154,23 +150,9 @@ for iter in range(500):
         ha = asp(obs_pruned, ha)
         action = get_action(obs_pruned, action, ha)
 
-        for each in obs_pruned:
-            obs_out.write(str(each)+", ")
-        for each in action:
-            with_err = bound(np.random.normal(each, 0.2))
-            obs_out.write(str(with_err)+", ")
-
-        if ha == 'MOVE_TO_CUBE':
-            obs_out.write("0\n")
-        elif ha == 'MOVE_TO_TARGET':
-            obs_out.write("1\n")
-        
-        time.sleep(0.02)
         if terminated:
             success += 1
             break
-    
-    obs_out.close()
-    
+        
 print(success)
 env.close()

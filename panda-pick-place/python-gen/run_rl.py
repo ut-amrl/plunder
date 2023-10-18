@@ -30,9 +30,9 @@ def bound(x):
     return max(min(x, 1), -1)
 
 success = 0
-for iter in range(50):
-    obs_out = open("data" + str(iter) + ".csv", "w")
-    obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
+for iter in range(500):
+    # obs_out = open("data" + str(iter) + ".csv", "w")
+    # obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
     observation, info = env.reset()
 
@@ -59,20 +59,19 @@ for iter in range(50):
         x, y, z, bx, by, bz, tx, ty, tz, end_width = world_state[0], world_state[1], world_state[2], world_state[7], world_state[8], world_state[9], target_pos[0], target_pos[1], target_pos[2], world_state[6]
         obs_pruned = [x, y, z, bx, by, bz, tx, ty, tz, end_width]
 
-        for each in obs_pruned:
-            obs_out.write(str(each)+", ")
-        for each in action:
-            with_err = bound(np.random.normal(each, 0.5))
-            obs_out.write(str(with_err)+", ")
+        # for each in obs_pruned:
+        #     obs_out.write(str(each)+", ")
+        # for each in action:
+        #     with_err = bound(np.random.normal(each, 0.5))
+        #     obs_out.write(str(with_err)+", ")
 
-        obs_out.write("0\n")
+        # obs_out.write("0\n")
         
-        time.sleep(0.04)
         if terminated:
             success += 1
-            solved = True
+            break
     
-    obs_out.close()
+    # obs_out.close()
     
 print(success)
 env.close()

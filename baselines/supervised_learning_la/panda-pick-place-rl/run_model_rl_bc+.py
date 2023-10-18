@@ -17,10 +17,10 @@ from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from scipy.stats import norm
 
-training_set = 5
-validation_set = 10 # including training_set
+training_set = 10
+validation_set = 30 # including training_set
 train_time = 12000
-patience = 500
+patience = 50
 sim_time = 30
 samples = 50
 folder = "../../baselines/supervised_learning_ha/panda-pick-place-rl/"
@@ -51,25 +51,19 @@ pv_stddev = [0.5, 0.5, 0.5, 0.5]
 
 numHA = 2
 
-def return_closer(next, cur):
-    if next > cur:
-        return min(next, cur + 0.4)
-    return max(next, cur - 0.4)
-
 def motor_model(ha, data, data_prev):
     bx, by, bz = data["bx"] - data["x"], data["by"] - data["y"], data["bz"] - data["z"]
     tx, ty, tz = data["tx"] - data["x"], data["ty"] - data["y"], data["tz"] - data["z"]
 
     if ha == 0:
-        res = [bx * 5.0, by * 5.0, bz * 5.0, 1]
-    else:
-        res = [tx * 5.0, ty * 5.0, tz * 5.0, -1]
+        return [bx * 5.0, by * 5.0, bz * 5.0, 0.7]
     
-    res[0] = return_closer(res[0], data_prev["LA.vx"])
-    res[1] = return_closer(res[1], data_prev["LA.vy"])
-    res[2] = return_closer(res[2], data_prev["LA.vz"])
-
-    return res
+    if data_prev["LA.end"] >= 0.7:
+        return [bx * 15.0, by * 15.0, bz * 15.0, 0]
+    elif data_prev["LA.end"] >= 0:
+        return [bx * 15.0, by * 15.0, bz * 15.0, -0.7]
+    
+    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.7]
 
 
 # Load model
@@ -226,7 +220,7 @@ for iter in range(100):
     dataset = dataset_base.copy(deep=True)
 
     action = [0, 0, 0, 0]
-    for _ in range(30):
+    for _ in range(100):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]

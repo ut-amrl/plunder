@@ -38,20 +38,14 @@ def Gt(x, y):
 def asp(observation, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
-        return "MOVE_TO_TARGET"
+    # if ha == "MOVE_TO_CUBE" and sample(logistic(0.005, -5000, abs(x - bx))) and sample(logistic(0.005, -5000, abs(y - by))):
+    #     return "MOVE_TO_TARGET"
     
     # RL-based
 
-    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.048491, -121.545876)):
+    if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.037726, -147.017349)): # PLUNDER
         return "MOVE_TO_TARGET"
     
-    # if ha == "MOVE_TO_CUBE" and x + bz - bx + z - bz < 0.058487:
-        # return "MOVE_TO_TARGET"
-    
-    # if ha == "MOVE_TO_CUBE" and sample(logistic2(Minus(Minus(bz, Plus(z, Abs(z))), Minus(Abs(z), Abs(ty))), -0.026349, 275.813293)): # PLUNDER-synthesized transition condition
-    #     return "MOVE_TO_TARGET"
-
     # OneShot
     # if ha == "MOVE_TO_CUBE" and sample(logistic2(z, 0.061405, -438.72968)) and sample(logistic2(x - bx, 0.026, -202.37)):
     #     return "MOVE_TO_TARGET"
@@ -96,25 +90,42 @@ def asp(observation, ha) -> str:
 
     return ha
 
+def return_closer(next, cur):
+    if next > cur:
+        return min(next, cur + 0.4)
+    return max(next, cur - 0.4)
+
 def get_action(observation, past_action, ha) -> str:
     x, y, z, bx, by, bz, tx, ty, tz, end_width = observation[0], observation[1], observation[2], observation[3], observation[4], observation[5], observation[6], observation[7], observation[8], observation[9]
     bx, by, bz = bx - x, by - y, bz - z
     tx, ty, tz = tx - x, ty - y, tz - z
 
+    # RL-based
+    vx, vy, vz, end = bx * 5, by * 5, bz * 5, 1
+    if ha == "MOVE_TO_TARGET":
+        vx, vy, vz, end = 5 * tx, 5 * ty, 5 * tz, -1
+
+    vx = return_closer(vx, past_action[0])
+    vy = return_closer(vy, past_action[1])
+    vz = return_closer(vz, past_action[2])
+    end = return_closer(end, past_action[3])
+
+    return [vx, vy, vz, end]
+
     # Policy-based
-    if ha == 'MOVE_TO_CUBE':
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
+    # if ha == 'MOVE_TO_CUBE':
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, 0.6]
     
-    if past_action[3] >= 0.6:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
-    elif past_action[3] >= 0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0, 0]
-    elif past_action[3] >= 0:
-        return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
-    elif past_action[3] >= -0.3:
-        return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
+    # if past_action[3] >= 0.6:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, 0.3]
+    # elif past_action[3] >= 0.3:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, 0]
+    # elif past_action[3] >= 0:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, -0.3]
+    # elif past_action[3] >= -0.3:
+    #     return [bx * 5.0, by * 5.0, bz * 5.0, -0.6]
     
-    return [tx * 5.0, ty * 5.0, tz * 5.0, -0.6]
+    # return [tx * 5.0, ty * 5.0, tz * 5.0, -0.6]
 
 def bound(x):
     return max(min(x, 1), -1)
@@ -122,7 +133,7 @@ def bound(x):
 env = gym.make("PandaPickAndPlace-v3", render_mode="human")
 
 success = 0
-for iter in range(100):
+for iter in range(500):
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, z, bx, by, bz, tx, ty, tz, end_width, LA.vx, LA.vy, LA.vz, LA.end, HA\n")
 
@@ -131,7 +142,7 @@ for iter in range(100):
     ha = 'MOVE_TO_CUBE'
     action = [0, 0, 0, 0]
 
-    for _ in range(80):
+    for _ in range(30):
         observation, reward, terminated, truncated, info = env.step(action)
 
         world_state = observation["observation"]
