@@ -217,7 +217,7 @@ def predict_next(_dataset:DataFrame):
 
 
 
-env = gym.make("PandaPickAndPlace-v3")
+env = gym.make("PandaPickAndPlace-v3", render_mode="human")
 dataset_base = pd.read_csv("temp.csv")
 
 success = 0
