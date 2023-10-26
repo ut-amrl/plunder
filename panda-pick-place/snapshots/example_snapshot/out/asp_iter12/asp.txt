@@ -1,0 +1,6 @@
+MOVE_TO_CUBE -> MOVE_TO_TARGET
+Loss: 0.100618
+fX1=[Flip(Logistic(Minus(Minus(Abs(x), Abs(bx)), Plus(Minus(z, bz), Minus(Abs(Minus(z, Abs(bx))), Abs(x)))), 0.011771, 545.662781), true)]
+MOVE_TO_TARGET -> MOVE_TO_CUBE
+Loss: 0.002
+fX1=[Flip(Logistic(bz, 1000000000.000000, 1.000000), true)]
