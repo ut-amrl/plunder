@@ -43,8 +43,19 @@ If you wish to run the highway environment yourself, you'll need highway-env and
 If you wish to run the robotic arm environment yourself, you'll also need panda-gym and its dependencies: https://panda-gym.readthedocs.io/en/latest/index.html
 
 ---
-# How to run
-To get the project running, you will need to do the following:
+# How to run examples
+We have provided five example tasks: 1D-target, 2D-highway-env, 2D-merge, panda-pick-place, and panda-stack.
+
+To run these tasks:
+1. Go into the Makefile and set the variable *target_dir* to the desired folder (default set to 1D-target).
+2. Run **make** to build the project.
+3. Run **make em** (for 1D-target) or **make emng** (for the other tasks) to run PLUNDER.
+
+Please see each of these folders for an extended usage guide.
+
+---
+# Further configuration
+To setup a custom environment, you will need to do the following:
 - Create a new folder to house your problem domain. 
 - In that directory, create the files **domain.h, robot.h, settings.h,** and **emdips_operations.json**. 
 - In **domain.h**, define your action space, observation space, and state space.
@@ -59,7 +70,7 @@ If you need to simulate your own demonstrations, you can also use our interface 
 An example setup is defined in *1D-target*; it may be easier to copy paste that folder and work from there.
 
 Then, you can use *make* commands to run the project:
-- **make <target_dir>** to build the project. (Alternatively, go into the Makefile and set the variable *target_dir* to the desired folder, then run *make*.)
+- **make** to build the project. (Go into the Makefile and set the variable *target_dir* to the desired folder, then run *make*.)
 - **make em** to run the full EM Synthesis algorithm, including simulating demonstrations
 - **make emng** to run the EM Synthesis algorithm, without simulating demonstrations
 - **make plt** to plot the algorithm outputs and store them in png format
@@ -70,14 +81,6 @@ Other *make* commands which are not commonly used alone:
 - **make gen** to run only the simulation
 - **make pf** to run only the particle filter (E-step)
 - **make settings** to compile settings
-
-
-
----
-# Example Usage
-We have provided five example tasks: 1D-target, 2D-highway-env, 2D-merge, panda-pick-place, and panda-stack.
-
-Please see each of these folders for an extended usage guide.
 
 ---
 ## Project Organization
