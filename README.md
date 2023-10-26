@@ -16,23 +16,23 @@ Publication: [https://arxiv.org/abs/2303.01440](https://arxiv.org/abs/2303.01440
 ## Description
 
 Our system is a *discrete-time Markov process* defined by:
-   - a **high-level action space** $H$ = a set of discrete high-level actions $h \in H$
-     - Ex: $h \in$ {ACC, DEC, CON}
-   - a **low-level action space** $L$ = a continuous domain of low-level actions $l \in L$: controlled joystick directives, motor inputs, etc.
-     - Ex: $l = acc \in \mathbb{R}$, where $a$ is the acceleration
-   - a **observed state space** $S$ = a continuous domain of constants or variables $c, y \in S$.
+   - an **action space** $A$ = a set of discrete action labels $a \in A$
+     - Ex: $a \in$ {ACC, DEC, CON}
+   - a **low-level observation space** $Z$ = a continuous domain of low-level observations $z \in Z$: controlled joystick directives, motor inputs, etc.
+     - Ex: $z = acc \in \mathbb{R}$, where $acc$ is the acceleration
+   - a **state space** $S$ = a continuous domain of constants or variables $c, y \in S$.
      - Ex: $c = accMax \in \mathbb{R}, y = pos \in \mathbb{R}$
-   - an **action-selection policy (ASP)** $\pi: H \times S \rightarrow H$ that maps the current high-level action and the current observed variables to the next high-level action
-   - a **motor model** $\phi: H \rightarrow L$ that maps discrete high-level actions to continuous low-level actions via discrete motor controllers
+   - an **action-selection policy (ASP)** $\pi: A \times S \rightarrow A$ that maps the current action label and the current observed variables to the next action label
+   - an **observation model** $O: A \rightarrow distr(Z)$ that maps discrete action labels to a distribution over low-level observations via discrete motor controllers
 
 ---
 ## Overall problem formulation:
 ### Inputs
-We know the problem domain $H, L, S$, as well as the motor model $\phi$. We are given a set of **demonstrations**, which are defined simply as trajectories with the high-level labels missing, i.e. $s_{1:t}$ and $l_{1:t}$.
+We know the problem domain $A, Z, S$, as well as the observation model $O$. We are given a set of **demonstrations**, which are defined simply as trajectories with the high-level labels missing, i.e. $s_{1:t}$ and $z_{1:t}$.
 
 ### Outputs
 We would like to:
-1. Infer the values of the high-level actions in the demonstrations ($h_{1:t}$)
+1. Infer the values of the high-level actions in the demonstrations ($a_{1:t}$)
 2. Synthesize an ASP that is maximally consistent with the demonstrations ($\pi^*$)
 
 ---
@@ -40,20 +40,21 @@ We would like to:
 See **pips/**. 
 In addition, this project requires Scipy: https://scipy.org/install/.
 If you wish to run the highway environment yourself, you'll need highway-env and its dependencies: https://highway-env.readthedocs.io/en/latest/installation.html
+If you wish to run the robotic arm environment yourself, you'll also need panda-gym and its dependencies: https://panda-gym.readthedocs.io/en/latest/index.html
 
 ---
 # How to run
 To get the project running, you will need to do the following:
 - Create a new folder to house your problem domain. 
 - In that directory, create the files **domain.h, robot.h, settings.h,** and **emdips_operations.json**. 
-- In **domain.h**, define your high-level action space, low-level action space, and state space.
-- In **robot.h**, define your motor model.
+- In **domain.h**, define your action space, observation space, and state space.
+- In **robot.h**, define your observation model.
 - In **settings.h**, tune the desired parameters and I/O paths.
 - In **emdips_operations**, define your desired operations (plus, minus, times, etc). See *pips/* for general tips and guidelines for defining operations and a list of existing operations.
 
 If you need to simulate your own demonstrations, you can also use our interface to:
-- Define the ground-truth ASP and the physics model in **robot.h**.
-- Set the desired demonstration robot(s) / initial states in another file **robotSets.h**.
+- Define the ground-truth ASP and the physical simulation model in **robot.h**.
+- Set the desired demonstration initial states in another file **robotSets.h**.
 
 An example setup is defined in *1D-target*; it may be easier to copy paste that folder and work from there.
 
@@ -74,15 +75,17 @@ Other *make* commands which are not commonly used alone:
 
 ---
 # Example Usage
-We have provided three example settings: 1D-target, 2D-highway-env, and 2D-merge. Please see each of these folders for an extended usage guide and example results.
+We have provided five example tasks: 1D-target, 2D-highway-env, 2D-merge, panda-pick-place, and panda-stack.
+
+Please see each of these folders for an extended usage guide.
 
 ---
 ## Project Organization
 This project is roughly split into the following components:
 
 - **simulation/** - for simulating demonstrations given a ground-truth ASP
-- **particleFilter/** (expectation step) - runs a particle filter to get a set of most likely high-level actions
-- **pips/** (maximization step) - runs a program synthesizer to generate the program that is maximally consistent with the given high-level actions
+- **particleFilter/** (expectation step) - runs a particle filter to get a set of most likely action labels
+- **pips/** (maximization step) - runs a program synthesizer to generate the program that is maximally consistent with the given action labels
 - **synthesis/** - runs the EM-loop, alternating between expectation and maximization steps
 - **system.h** - fully defines the discrete-time Markov process given *domain.h* and *robot.h*
 - **utils.h** - useful functions for general use
