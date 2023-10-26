@@ -1,0 +1,60 @@
+GRASP -> LIFT
+Loss: 0.00985331
+fX1=[Flip(Logistic(Plus(z, tz2), -0.259064, -73.931396), true)]
+GRASP -> MOVE_TO_CUBE_BOTTOM
+Loss: 0.002
+fX1=[Flip(Logistic(bz2, 1000000000.000000, 1.000000), true)]
+GRASP -> MOVE_TO_CUBE_TOP
+Loss: 0.002
+fX1=[Flip(Logistic(z, 1000000000.000000, 1.000000), true)]
+GRASP -> MOVE_TO_TARGET
+Loss: 0.245023
+fX1=[Flip(Logistic(tz2, -0.104956, -63.377987), true)]
+LIFT -> GRASP
+Loss: 0.002
+fX1=[Flip(Logistic(tz2, 1000000000.000000, 1.000000), true)]
+LIFT -> MOVE_TO_CUBE_BOTTOM
+Loss: 0.00369549
+fX1=[Flip(Logistic(tz2, 0.034226, 155.840393), true)]
+LIFT -> MOVE_TO_CUBE_TOP
+Loss: 0.295394
+fX1=[Flip(Logistic(bz1, -0.143792, -84.079880), true)]
+LIFT -> MOVE_TO_TARGET
+Loss: 0.00542625
+fX1=[Flip(Logistic(bx1, -0.096155, -77.090134), true)]
+MOVE_TO_CUBE_BOTTOM -> GRASP
+Loss: 0.00689178
+fX1=[Flip(Logistic(Abs(tx2), -0.390476, -63.079102), true)]
+MOVE_TO_CUBE_BOTTOM -> LIFT
+Loss: 0.00534112
+fX1=[Flip(Logistic(by2, 3.756484, 2.038399), true)]
+MOVE_TO_CUBE_BOTTOM -> MOVE_TO_CUBE_TOP
+Loss: 0.0144178
+fX1=[Flip(Logistic(bz2, 0.167719, 33.949795), true)]
+MOVE_TO_CUBE_BOTTOM -> MOVE_TO_TARGET
+Loss: 0.00631666
+fX1=[Flip(Logistic(Plus(bz2, bz2), -0.010034, 43977.105469), true)]
+MOVE_TO_CUBE_TOP -> GRASP
+Loss: 0.00328272
+fX1=[Flip(Logistic(bz2, -0.004959, 32783.207031), true)]
+MOVE_TO_CUBE_TOP -> LIFT
+Loss: 0.00649579
+fX1=[Flip(Logistic(tx2, 0.795622, 40.070736), true)]
+MOVE_TO_CUBE_TOP -> MOVE_TO_CUBE_BOTTOM
+Loss: 0.0130307
+fX1=[Flip(Logistic(z, -0.452782, -12.424044), true)]
+MOVE_TO_CUBE_TOP -> MOVE_TO_TARGET
+Loss: 0.002
+fX1=[Flip(Logistic(bz2, 1000000000.000000, 1.000000), true)]
+MOVE_TO_TARGET -> GRASP
+Loss: 0.00642461
+fX1=[Flip(Logistic(Plus(z, z), -0.517852, -36.536327), true)]
+MOVE_TO_TARGET -> LIFT
+Loss: 0.0303658
+fX1=[Flip(Logistic(Plus(Abs(tx2), Abs(ty2)), 0.002956, -16632.941406), true)]
+MOVE_TO_TARGET -> MOVE_TO_CUBE_BOTTOM
+Loss: 0.002
+fX1=[Flip(Logistic(by2, 1000000000.000000, 1.000000), true)]
+MOVE_TO_TARGET -> MOVE_TO_CUBE_TOP
+Loss: 0.00804336
+fX1=[Flip(Logistic(Plus(Abs(tx2), Abs(ty2)), 0.002934, -61622.554688), true)]

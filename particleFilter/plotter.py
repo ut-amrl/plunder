@@ -362,11 +362,11 @@ def main():
             plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["VALIDATION_SET"]))
             print("Plotting likelihoods, iteration " + str(iter))
             plotLikelihoods(settings["LOG_OBS_PATH"] + "-training.txt", settings["PLOT_PATH"]+"training-likelihoods.png", "Training Set Likelihoods", 'Log Obs. Likelihood')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'Log Obs. Likelihood')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-valid.txt", settings["PLOT_PATH"]+"validation-likelihoods.png", "Validation Set Likelihoods", 'Log Obs. Likelihood')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"validation-likelihoods.png", "Validation Set Likelihoods", 'Log Obs. Likelihood')
+            plotLikelihoods(settings["LOG_OBS_PATH"] + "-valid.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'Log Obs. Likelihood')
             plotLikelihoods(settings["PCT_ACCURACY"] + "-training.txt", settings["PLOT_PATH"]+"training-accuracy.png", "Training Set Accuracy", 'Percent Accuracy')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
+            plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
         
         # for robot in range(int(settings["VALIDATION_SET"])):
         #     plotSingle(validationInFile, validationOutPath, gtFile, 'Final Outputs', str(int(settings["NUM_ITER"]) - 1), robot)
