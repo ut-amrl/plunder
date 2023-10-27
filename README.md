@@ -22,17 +22,17 @@ Our system is a *discrete-time Markov process* defined by:
      - Ex: $z = acc \in \mathbb{R}$, where $acc$ is the acceleration
    - a **state space** $S$ = a continuous domain of constants or variables $c, y \in S$.
      - Ex: $c = accMax \in \mathbb{R}, y = pos \in \mathbb{R}$
-   - an **action-selection policy (ASP)** $\pi: A \times S \rightarrow A$ that maps the current action label and the current observed variables to the next action label
+   - an **action-selection policy (ASP)** $\pi: A \times S \rightarrow A$ that maps the current action label and the current state to the next action label
    - an **observation model** $O: A \rightarrow distr(Z)$ that maps discrete action labels to a distribution over low-level observations via discrete motor controllers
 
 ---
 ## Overall problem formulation:
 ### Inputs
-We know the problem domain $A, Z, S$, as well as the observation model $O$. We are given a set of **demonstrations**, which are defined simply as trajectories with the high-level labels missing, i.e. $s_{1:t}$ and $z_{1:t}$.
+We know the problem domain $A, Z, S$, as well as the observation model $O$. We are given a set of **demonstrations**, which are defined simply as trajectories with the action labels missing, i.e. $s_{1:t}$ and $z_{1:t}$.
 
 ### Outputs
 We would like to:
-1. Infer the values of the high-level actions in the demonstrations ($a_{1:t}$)
+1. Infer the values of the action labels in the demonstrations ($a_{1:t}$)
 2. Synthesize an ASP that is maximally consistent with the demonstrations ($\pi^*$)
 
 ---
