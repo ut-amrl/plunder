@@ -6,7 +6,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
 import time
 plt.rcParams.update({'font.size': 14})
-plt.grid(True)
+plt.grid(linestyle='dotted')
 
 # Initialization
 trajectories = []

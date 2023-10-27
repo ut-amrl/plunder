@@ -66,12 +66,12 @@ ax.plot(x, testing, label = "test set", linewidth=2)
 
 plt.xlabel("Iteration")
 plt.xticks(ren)
-plt.ylabel("Accuracy")
+plt.ylabel("Accuracy (%)")
 
 plt.legend(loc = 'lower right')
 plt.tight_layout()
 plt.grid(linestyle='dotted')
-plt.savefig(target + "-emloop.png", dpi=1200)
+plt.savefig(target + "-emloop.png")
 plt.show()
 
 # LDIPS tests

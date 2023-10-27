@@ -10,17 +10,10 @@ The most useful/informative outputs will be:
     MOVE_TO_CUBE -> MOVE_TO_TARGET
     Flip(Logistic(Minus(Minus(Abs(x), Abs(bx)), Plus(z, Minus(Abs(Minus(z, Abs(bx))), Abs(x)))), -0.007982, 555.460938))
     ```
-- **plots/training-accuracy.png** and **plots/training-likelihoods.png**, which shows the progress of the EM loop across iterations.
-For example: 
 
-    ![](snapshots/example_snapshot/plots/training-likelihoods.png)
-    ![](snapshots/example_snapshot/plots/training-accuracy.png)
+- **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-- **plots/testing-accuracy.png** and **plots/testing-likelihoods.png**, which shows the policy's test accuracy across iterations. 
-For example:
-
-    ![](snapshots/example_snapshot/plots/testing-likelihoods.png)
-    ![](snapshots/example_snapshot/plots/testing-accuracy.png)
+    ![](snapshots/example_snapshot/plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 

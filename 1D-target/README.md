@@ -13,16 +13,9 @@ The most useful/informative outputs will be:
     CON -> DEC
     Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.386174, -3.434230))
     ```
-- **plots/training-accuracy.png** and **plots/training-likelihoods.png**, which shows the progress of the EM loop across iterations.
-For example:
+- **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](snapshots/example_snapshot/plots/training-likelihoods.png)
-    ![](snapshots/example_snapshot/plots/training-accuracy.png)
-
-- **plots/testing-accuracy.png** and **plots/testing-likelihoods.png**, which shows the policy's test accuracy across iterations. For example:
-
-    ![](snapshots/example_snapshot/plots/testing-likelihoods.png)
-    ![](snapshots/example_snapshot/plots/testing-accuracy.png)
+    ![](snapshots/example_snapshot/plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
