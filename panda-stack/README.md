@@ -17,11 +17,13 @@ The most useful/informative outputs will be:
     ```
 - **plots/training-accuracy.png** and **plots/training-likelihoods.png**, which shows the progress of the EM loop across iterations.
 For example: 
+
     ![](snapshots/example_snapshot/plots/training-likelihoods.png)
     ![](snapshots/example_snapshot/plots/training-accuracy.png)
 
 - **plots/testing-accuracy.png** and **plots/testing-likelihoods.png**, which shows the policy's test accuracy across iterations. 
 For example:
+
     ![](snapshots/example_snapshot/plots/testing-likelihoods.png)
     ![](snapshots/example_snapshot/plots/testing-accuracy.png)
 

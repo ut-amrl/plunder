@@ -6,6 +6,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
 import time
 plt.rcParams.update({'font.size': 14})
+plt.grid(True)
 
 # Initialization
 trajectories = []
@@ -94,7 +95,7 @@ def readLA(gtPath):
         for i in range(len(la_indices)):
             gtLA[i].append(float(info[la_indices[i]]))
 
-    return la_names # Return names of low-level actions
+    return la_names # Return names of low-level observations
 
 def readSettings(sgPath):
     with open(sgPath) as f:
@@ -146,8 +147,8 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
     ax1b.imshow(np.array(color_graph), cmap=ListedColormap(colors[0:len(actions)]), origin="lower", vmin=0, aspect='auto', interpolation='none')
 
     plt.xlabel('Time (s)')
-    ax1.set_ylabel('high-level\nactions')
-    ax1b.set_ylabel('high-level\nactions')
+    ax1.set_ylabel('action\nlabels')
+    ax1b.set_ylabel('action\nlabels')
 
     if useGT:
         for i in range(len(gt)):
@@ -166,7 +167,7 @@ def figureHandler(outP, actions, gt, color_graph, title, iter, robot, useGT):
 
     return (actions, color_graph)
 
-# Plots low-level actions
+# Plots low-level observations
 def plotSingleLA(inF, outP, gtF, iter, robot):
     global trajectories, gtTrajectory, gtLA
     
@@ -175,7 +176,7 @@ def plotSingleLA(inF, outP, gtF, iter, robot):
     outPath = outP + "LA-" + str(iter) + "-" + str(robot) + "-"
 
     fig, axs = plt.subplots(len(gtLA))
-    fig.suptitle("Low-level actions")
+    fig.suptitle("observations")
     plt.xlabel('Time (s)')
 
     color_count = 0
@@ -296,22 +297,30 @@ def plotSingle(inF, outP, gtF, title, iter, robot):
 def plotSingleTimestep(inF, outP, gtF, title, iter, numRobots):
     for robot in range(numRobots):
         plotSingle(inF, outP, gtF, title, iter, robot)
-
+        
 def plotLikelihoods(likelihoodDataFile, likelihoodPlotFile, title, ylabel):
     vals = []
-    with open(likelihoodDataFile) as f:
-        lines = f.readlines()
-        gt = float(lines[0].strip())
-        for line in lines[1:]:
-            vals.append(float(line.strip()))
 
-    vals = vals[1:]
+    def readFile(dataFile):
+        with open(dataFile) as f:
+            vals_p = []
+            lines = f.readlines()
+            gt = float(lines[0].strip())
+            for line in lines[1:]:
+                vals_p.append(float(line.strip()))
+            vals.append(vals_p[1:])
     
+    readFile(likelihoodDataFile + "-training.txt")
+    readFile(likelihoodDataFile + "-testing.txt")
+    readFile(likelihoodDataFile + "-valid.txt")
+
     plt.suptitle(title)
     plt.xlabel('Iteration')
     plt.xticks(range(0,16,2))
     plt.ylabel(ylabel)
-    plt.plot(vals, linewidth=2, markersize=4, label="synthesized programs")
+    # plt.plot(vals[0], linewidth=2, markersize=4, marker='^', color='r', label="training set")
+    plt.plot(vals[1], linewidth=2, markersize=4, marker='.', color='g', label="training set")
+    plt.plot(vals[2], linewidth=2, markersize=4, marker='o', color='b', label="testing set")
     # plt.axhline(y = gt, color = 'green', label="ground truth")
     plt.legend(loc="lower right")
     plt.tight_layout()
@@ -361,13 +370,9 @@ def main():
             print("Plotting testing ASP graphs, iteration " + str(iter))
             plotSingleTimestep(graph2['inF'], graph2['outP'], graph2['gtF'], graph2['title'], iter, int(settings["VALIDATION_SET"]))
             print("Plotting likelihoods, iteration " + str(iter))
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-training.txt", settings["PLOT_PATH"]+"training-likelihoods.png", "Training Set Likelihoods", 'Log Obs. Likelihood')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-testing.txt", settings["PLOT_PATH"]+"validation-likelihoods.png", "Validation Set Likelihoods", 'Log Obs. Likelihood')
-            plotLikelihoods(settings["LOG_OBS_PATH"] + "-valid.txt", settings["PLOT_PATH"]+"testing-likelihoods.png", "Testing Set Likelihoods", 'Log Obs. Likelihood')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-training.txt", settings["PLOT_PATH"]+"training-accuracy.png", "Training Set Accuracy", 'Percent Accuracy')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-testing.txt", settings["PLOT_PATH"]+"validation-accuracy.png", "Validation Set Accuracy", 'Percent Accuracy')
-            plotLikelihoods(settings["PCT_ACCURACY"] + "-valid.txt", settings["PLOT_PATH"]+"testing-accuracy.png", "Testing Set Accuracy", 'Percent Accuracy')
-        
+            plotLikelihoods(settings["PCT_ACCURACY"], settings["PLOT_PATH"]+"accuracy.png", "Accuracy", 'Accuracy (%)')
+            plotLikelihoods(settings["LOG_OBS_PATH"], settings["PLOT_PATH"]+"likelihoods.png", "Likelihoods", 'Log Obs. Likelihood')
+
         # for robot in range(int(settings["VALIDATION_SET"])):
         #     plotSingle(validationInFile, validationOutPath, gtFile, 'Final Outputs', str(int(settings["NUM_ITER"]) - 1), robot)
             
