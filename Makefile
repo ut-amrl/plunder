@@ -1,5 +1,5 @@
 # Set target directory here OR pass in through command line
-target_dir ?= 1D-target
+target_dir ?= 2D-highway-manual
 
 # export OMP_NUM_THREADS := 16 # Turn this on when running LDIPS
 
