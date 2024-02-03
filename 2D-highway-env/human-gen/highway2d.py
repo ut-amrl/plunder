@@ -7,7 +7,7 @@ import random
 from typing import Union
 import pygame
 
-env = gym.make('highway-fast-v0', render_mode='rgb_array')
+env = gym.make('highway-v0', render_mode='rgb_array')
 
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
@@ -111,7 +111,7 @@ def run_la(self, action: Union[dict, str] = None, step = True) -> None:
     global input_acceleration, input_steering, max_velocity, min_velocity
     
     if input_acceleration > -0.01:
-        input_acceleration = 8
+        input_acceleration = 4
     if self.speed > max_velocity:
         input_acceleration = min(input_acceleration, 0)
     if self.speed < min_velocity:
@@ -145,8 +145,8 @@ def runSim(iter):
             joystick = pygame.joystick.Joystick(0)
             joystick.init()
 
-            k_acc = 8
-            k_steer = 0.03
+            k_acc = 4
+            k_steer = 0.02
 
             input_acceleration = -joystick.get_axis(1) * k_acc
             input_steering = joystick.get_axis(3) * k_steer
