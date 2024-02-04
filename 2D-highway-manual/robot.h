@@ -39,7 +39,7 @@ Obs motorModel(State state, bool error){
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
         double target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
-        target_steer = max(min(target_heading - state.get("heading"), 0.02), -0.02);
+        target_steer = max(min(target_heading - state.get("heading"), 0.01), -0.01);
     } else if (ha == SLOWER) {
         // Attain min speed
         target_acc = -4;
@@ -47,7 +47,7 @@ Obs motorModel(State state, bool error){
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
         double target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
-        target_steer = max(min(target_heading - state.get("heading"), 0.02), -0.02);
+        target_steer = max(min(target_heading - state.get("heading"), 0.01), -0.01);
     } else if (ha == LANE_LEFT) {
         target_acc = 4;
         target_steer = -0.02;
@@ -56,10 +56,10 @@ Obs motorModel(State state, bool error){
         target_steer = 0.02;
     }
 
-    if(state.get("vx") >= max_velocity) {
+    if(state.get("vx") >= max_velocity - 0.01) {
         target_acc = min(target_acc, 0.0);
     }
-    if(state.get("vx") <= min_velocity) {
+    if(state.get("vx") <= min_velocity + 0.01) {
         target_acc = max(target_acc, 0.0);
     }
 
