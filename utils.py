@@ -48,12 +48,6 @@ def convert_to_py():
 
         prog += "if ha == " + state1 + " and " + asp + ":\n"
         prog += "\treturn " + state2 + "\n"
-
-    prog = prog.replace("FASTER", "env.action_type.actions_indexes['FASTER']")
-    prog = prog.replace("SLOWER", "env.action_type.actions_indexes['SLOWER']")
-    prog = prog.replace("LANE_LEFT", "env.action_type.actions_indexes['LANE_LEFT']")
-    prog = prog.replace("LANE_RIGHT", "env.action_type.actions_indexes['LANE_RIGHT']")
-
     print(prog)
 
 convert_to_py()
