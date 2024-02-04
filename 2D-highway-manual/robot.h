@@ -13,8 +13,8 @@ map<string, normal_distribution<double>> la_error = {
 };
 double la_error_scaler = 1.0;
 
-double TURN_HEADING = 0.15;
-double TURN_TARGET = 30;
+double TURN_HEADING = 0.1;
+double TURN_TARGET = 10;
 double max_velocity = 25;
 double min_velocity = 20;
 
@@ -38,7 +38,7 @@ Obs motorModel(State state, bool error){
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
         double target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
-        target_steer = max(min(target_heading - state.get("heading"), 0.01), -0.01);
+        target_steer = max(min(target_heading - state.get("heading"), 0.015), -0.015);
     } else if (ha == SLOWER) {
         // Attain min speed
         target_acc = -4;
@@ -46,7 +46,7 @@ Obs motorModel(State state, bool error){
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
         double target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
-        target_steer = max(min(target_heading - state.get("heading"), 0.01), -0.01);
+        target_steer = max(min(target_heading - state.get("heading"), 0.015), -0.015);
     } else if (ha == LANE_LEFT) {
         target_acc = 4;
         target_steer = -0.02;
@@ -60,6 +60,13 @@ Obs motorModel(State state, bool error){
     }
     if(state.get("vx") <= min_velocity + 0.01) {
         target_acc = max(target_acc, 0.0);
+    }
+
+    if(target_steer > 0) {
+        target_steer = min(target_steer, TURN_HEADING - state.get("heading"));
+    }
+    if(target_steer < 0) {
+        target_steer = max(target_steer, -TURN_HEADING - state.get("heading"));
     }
 
     state.put("steer", target_steer);

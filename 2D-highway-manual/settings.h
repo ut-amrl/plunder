@@ -30,6 +30,6 @@ namespace SETTINGS {
 
     // ----- Important hyperparameters -----
     const double PROG_COMPLEXITY_LOSS_BASE = 0.001;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double PROG_COMPLEXITY_LOSS = 0.003;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
+    const double PROG_COMPLEXITY_LOSS = 0.002;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
     const double ALPHA_LOSS_UPPER = 0.000001;             // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 }
