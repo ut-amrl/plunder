@@ -15,7 +15,6 @@ double la_error_scaler = 1.0;
 
 double TURN_HEADING = 0.15;
 double TURN_TARGET = 30;
-double turn_velocity = 25;
 double max_velocity = 25;
 double min_velocity = 20;
 
