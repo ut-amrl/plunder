@@ -378,7 +378,7 @@ def runSim(iter):
         closest = closestVehicles(obs, lane_class)
 
         # Run ASP
-        ha = gt(obs[0], closest, ha)
+        ha = ldips(obs[0], closest, ha)
         # Run motor model
         la = run_la(env.vehicle, ACTIONS_ALL[ha], False, closest)
 
@@ -397,9 +397,8 @@ def runSim(iter):
         obs_out.write(str(ACTION_REORDER[ha]))
         obs_out.write("\n")
 
-    if(obs[0][3] > 10):
+    if(obs[0][3] > 10 and obs[0][2] > -4 and obs[0][2] < 25):
         success += 1
-        print(success)
     dist += obs[0][1] - start
     obs_out.close()
 
