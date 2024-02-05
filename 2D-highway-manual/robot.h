@@ -14,7 +14,7 @@ map<string, normal_distribution<double>> la_error = {
 double la_error_scaler = 1.0;
 
 double TURN_HEADING = 0.1;
-double TURN_TARGET = 10;
+double TURN_TARGET = 30;
 double max_velocity = 25;
 double min_velocity = 20;
 

@@ -71,7 +71,7 @@ const int EX_SAMPLED = 2000;            // Number of examples to be optimized ov
 
 // EM Loop parameters
 const double POINT_ACCURACY = 0.9;      // randSwitch() parameter
-const int STRUCT_CHANGE_FREQ = 3;       // Only enumerate over new program structures after this many iterations, else tune parameters for previous best structure
+const int STRUCT_CHANGE_FREQ = 1;       // Only enumerate over new program structures after this many iterations, else tune parameters for previous best structure
 
 // Plot parameters
 const int PLOT_TIME = 300;              // Maximum time step plotted

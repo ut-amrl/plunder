@@ -110,8 +110,6 @@ input_steering = 0
 def run_la(self, action: Union[dict, str] = None, step = True) -> None:
     global input_acceleration, input_steering, max_velocity, min_velocity
     
-    if input_acceleration > -0.01:
-        input_acceleration = 4
     if self.speed > max_velocity:
         input_acceleration = min(input_acceleration, 0)
     if self.speed < min_velocity:
