@@ -13,7 +13,7 @@ namespace SETTINGS {
     // ----- General configuration -----
     const bool DEBUG = false;
     const int TRAINING_SET = 9;                // Number of robots to train on
-    const int VALIDATION_SET = 10;              // Number of total robots in the full set (including the training set)
+    const int VALIDATION_SET = 19;              // Number of total robots in the full set (including the training set)
     const bool USE_SAFE_TRANSITIONS = false;    // "Safe" transitions (only allow user-specified transitions). 
                                                 // Optional modification to improve performance on policies with sparse transitions
     // ----- Simulation parameters -----

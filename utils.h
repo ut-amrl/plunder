@@ -113,3 +113,47 @@ inline void trim(string &s) {
     rtrim(s);
     ltrim(s);
 }
+
+double logistic2(double x, double mid, double slope) {
+    return logistic(mid, slope, x);
+}
+
+bool sample(double p) {
+    return flip(p);
+}
+
+double Plus(double x, double y) {
+    return x + y;
+}
+
+double Minus(double x, double y) {
+    return x - y;
+}
+
+double Abs(double x) {
+    return abs(x);
+}
+
+double Times(double x, double y) {
+    return x * y;
+}
+
+double DividedBy(double x, double y) {
+    return x / y;
+}
+
+double And(bool x, bool y) {
+    return x && y;
+}
+
+double Or(bool x, bool y) {
+    return x || y;
+}
+
+bool Lt(double x, double y) {
+    return x < y;
+}
+
+bool Gt(double x, double y) {
+    return x > y;
+}
