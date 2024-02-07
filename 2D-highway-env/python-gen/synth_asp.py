@@ -10,7 +10,7 @@ env = gym.make('highway-fast-v0')
 
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
-lanes_count = 4 # Number of lanes
+lanes_count = 8 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
@@ -365,8 +365,6 @@ def runSim(iter):
     global success, dist
     env.reset()
     ha = env.action_type.actions_indexes["FASTER"]
-    obs_out = open("data" + str(iter) + ".csv", "w")
-    obs_out.write("x, y, vx, vy, heading, l_x, l_y, l_vx, l_vy, l_heading, f_x, f_y, f_vx, f_vy, f_heading, r_x, r_y, r_vx, r_vy, r_heading, LA.steer, LA.acc, HA\n")
 
     start = -1
     for t_step in range(150):
@@ -378,32 +376,19 @@ def runSim(iter):
         closest = closestVehicles(obs, lane_class)
 
         # Run ASP
-        ha = ldips(obs[0], closest, ha)
+        ha = gt(obs[0], closest, ha)
         # Run motor model
         la = run_la(env.vehicle, ACTIONS_ALL[ha], False, closest)
 
-        # Ego vehicle
-        for prop in obs[0][1:]:
-            obs_out.write(str(round(prop, 3))+", ")
-        
         if start < 0:
             start = obs[0][1]
-        # Nearby vehicles
-        for v in closest:
-            for prop in v[1:]:
-                obs_out.write(str(round(prop, 3))+", ")
-        obs_out.write(str(round(la['steering'], 3))+", ")
-        obs_out.write(str(round(la['acceleration'], 3))+", ")
-        obs_out.write(str(ACTION_REORDER[ha]))
-        obs_out.write("\n")
 
-    if(obs[0][3] > 10 and obs[0][2] > -4 and obs[0][2] < 25):
+    if(obs[0][3] > 10 and laneFinder(obs[0][2]) >= 0 and laneFinder(obs[0][2]) <= 7): # Positive velocity and in an existing lane
         success += 1
     dist += obs[0][1] - start
-    obs_out.close()
 
-for iter in range(100):
+for iter in range(200):
     runSim(iter)
 
 print(success)
-print(dist / 100)
+print(dist / 200)

@@ -365,7 +365,7 @@ for iter in range(100):
         action = predict_next(dataset)
         last_la = {"steering": action[0], "acceleration": action[1]}
 
-    if(obs[0][3] > 10 and obs[0][2] > -4 and obs[0][2] < 25):
+    if(obs[0][3] > 10 and laneFinder(obs[0][2]) >= 0 and laneFinder(obs[0][2]) <= 7): # Positive velocity and in an existing lane
         success += 1
         print(success)
         
