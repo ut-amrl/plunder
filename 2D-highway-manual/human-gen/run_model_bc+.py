@@ -29,7 +29,7 @@ train_time = 15000
 patience = 800
 sim_time = 150
 samples = 50
-folder = "../../baselines/supervised_learning_ha/highway/"
+folder = "../../baselines/supervised_learning_ha/highway_manual/"
 vars_used = [
     "HA",
     "x",
@@ -49,15 +49,13 @@ pv_range = [
     [-0.3, 0.3],
     [-30, 30]
 ]
-pv_stddev = [0.01, 2]
 
 numHA = 4
 
-KP_H = 0.5 # Turning rate
-TURN_HEADING = 0.15 # Target heading when turning
+TURN_HEADING = 0.1 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 40 # Maximum velocity
-turn_velocity = 30 # Turning velocity
+max_velocity = 25 # Maximum velocity
+min_velocity = 20 # Turning velocity
 
 def laneFinder(y):
     return round(y / 4)
@@ -66,32 +64,35 @@ def motor_model(ha, data, data_prev):
     target_acc = 0.0
     target_heading = 0.0
     if ha == 0:
-        target_acc = max_velocity - data["vx"]
+        target_acc = 4
 
-        target_y = laneFinder(data["y"]) * 4
+        # Follow current lane
+        target_y = laneFinder(data["y"]) * lane_diff
         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+        target_steer = max(min(target_heading - data["heading"], 0.015), -0.015)
     elif ha == 1:
-        target_acc = data["f_vx"] - data["vx"]
+        target_acc = -4
 
-        target_y = laneFinder(data["y"]) * 4
+        # Follow current lane
+        target_y = laneFinder(data["y"]) * lane_diff
         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+        target_steer = max(min(target_heading - data["heading"], 0.015), -0.015)
     elif ha == 2:
-        target_acc = turn_velocity - data["vx"]
-        target_heading = -TURN_HEADING
+        target_acc = 4
+        target_steer = 0.02
     else:
-        target_acc = turn_velocity - data["vx"]
-        target_heading = TURN_HEADING
+        target_acc = 4
+        target_steer = -0.02
 
-    target_steer = target_heading - data["heading"]
-    if(target_steer > data_prev["LA.steer"]):
-        target_steer = min(target_steer, data_prev["LA.steer"] + 0.04)
-    else:
-        target_steer = max(target_steer, data_prev["LA.steer"] - 0.04)
+    if data["vx"] >= max_velocity - 0.01:
+        target_acc = min(target_acc, 0.0)
+    if data["vx"] <= min_velocity + 0.01:
+        target_acc = max(target_acc, 0.0)
 
-    if(target_acc > data_prev["LA.acc"]):  
-        target_acc = min(target_acc, data_prev["LA.acc"] + 4)
-    else:
-        target_acc = max(target_acc, data_prev["LA.acc"] - 6)
+    if target_steer > 0:
+        target_steer = min(target_steer, TURN_HEADING - data["heading"])
+    if target_steer < 0:
+        target_steer = max(target_steer, -TURN_HEADING - data["heading"])
 
     return [target_steer, target_acc]
 
@@ -114,7 +115,7 @@ class CustomAccuracy(keras.losses.Loss):
 
         return error
 
-model = keras.models.load_model(folder + "model_pt", compile=False)
+model = keras.models.load_model(folder + "model_manual_pt", compile=False)
 model.compile(loss=CustomAccuracy(), optimizer='adam')
 
 
@@ -240,7 +241,7 @@ def predict_next(_dataset:DataFrame):
 
 
 lane_diff = 4 # Distance lanes are apart from each other
-lanes_count = 4 # Number of lanes
+lanes_count = 8 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
@@ -249,7 +250,7 @@ acc_err = 1
 
 env = gym.make('highway-fast-v0')
 env.config['simulation_frequency']=24
-env.config['policy_frequency']=8 # Runs once every 3 simulation steps
+env.config['policy_frequency']=6 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
 env.config['initial_lane_id'] = 0
 # env.configure({
@@ -323,12 +324,6 @@ def closestVehicles(obs, lane_class):
     
     return (closestLeft, closestFront, closestRight)
 
-# modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
-# in this version, no extra latent state is stored (target_lane, target_speed)
-TURN_HEADING = 0.15 # Target heading when turning
-TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 45 # Maximum velocity
-
 last_la = {"steering": 0, "acceleration": 0 }
 
 def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
@@ -344,7 +339,7 @@ ControlledVehicle.act = run_la
 
 dataset_base = pd.read_csv("temp.csv")
 success = 0
-for iter in range(100):
+for iter in range(200):
     obs, info = env.reset()
     dataset = dataset_base.copy(deep=True)
 
@@ -371,7 +366,7 @@ for iter in range(100):
         action = predict_next(dataset)
         last_la = {"steering": action[0], "acceleration": action[1]}
 
-    if(obs[0][3] > 10 and obs[0][2] > -4 and obs[0][2] < 25):
+    if(obs[0][3] > 10 and laneFinder(obs[0][2]) >= 0 and laneFinder(obs[0][2]) <= 7): # Positive velocity and in an existing lane
         success += 1
         print(success)
         
