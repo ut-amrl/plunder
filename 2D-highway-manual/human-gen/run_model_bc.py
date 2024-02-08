@@ -79,10 +79,10 @@ def motor_model(ha, data, data_prev):
         target_steer = max(min(target_heading - data["heading"], 0.015), -0.015)
     elif ha == 2:
         target_acc = 4
-        target_steer = 0.02
+        target_steer = -0.02
     else:
         target_acc = 4
-        target_steer = -0.02
+        target_steer = 0.02
 
     if data["vx"] >= max_velocity - 0.01:
         target_acc = min(target_acc, 0.0)

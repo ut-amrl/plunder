@@ -191,10 +191,10 @@ def makePredictions(full_set, training_size):
     # print(Y_validation)
 
     # Reshape input to be 3D [samples, timesteps, features]
-    df_train_X = df_train_X.reshape((df_train_X.shape[0], 1, df_train_X.shape[1]))
-    train_X = train_X.reshape((train_X.shape[0], 1, train_X.shape[1]))
-    test_X = test_X.reshape((test_X.shape[0], 1, test_X.shape[1]))
-    X_validation = X_validation.reshape((X_validation.shape[0], 1, X_validation.shape[1]))
+    df_train_X = df_train_X.reshape((df_train_X.shape[0], df_train_X.shape[1]))
+    train_X = train_X.reshape((train_X.shape[0], train_X.shape[1]))
+    test_X = test_X.reshape((test_X.shape[0], test_X.shape[1]))
+    X_validation = X_validation.reshape((X_validation.shape[0], X_validation.shape[1]))
 
     # Custom metric
     mse = tensorflow.keras.losses.MeanSquaredError()
@@ -218,17 +218,17 @@ def makePredictions(full_set, training_size):
 
     # Design network
     model = Sequential()
-    model.add(Dense(128, input_shape=(train_X.shape[1], train_X.shape[2])))
+    model.add(Dense(128, activation=keras.activations.sigmoid))
     model.add(Dense(64, activation=keras.activations.sigmoid))
     model.add(Dense(16, activation=keras.activations.sigmoid))
     model.add(Dense(settings.numHA, activation=keras.activations.sigmoid)) # Output: one-hot encoding of each HA
     model.add(Dense(settings.numHA, activation=keras.activations.softmax)) # Softmax to convert to a vector of weights
     model.compile(loss=CustomAccuracy(), optimizer='adam')
-    print(model.summary())
 
     # Fit network
     history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
     model.save("model_" + settings.setting)
+    print(model.summary())
     # model = keras.models.load_model(settings.folder + "model", compile=False)
     # model.compile(loss=CustomAccuracy(), optimizer='adam')
 

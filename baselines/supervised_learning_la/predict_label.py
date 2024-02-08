@@ -188,11 +188,11 @@ def makePredictions(full_set, training_size):
     # print(X_validation)
     # print(Y_validation)
 
-    # Reshape input to be 3D [samples, timesteps, features]
-    df_train_X = df_train_X.reshape((df_train_X.shape[0], 1, df_train_X.shape[1]))
-    train_X = train_X.reshape((train_X.shape[0], 1, train_X.shape[1]))
-    test_X = test_X.reshape((test_X.shape[0], 1, test_X.shape[1]))
-    X_validation = X_validation.reshape((X_validation.shape[0], 1, X_validation.shape[1]))
+    # Reshape input to be 2D [samples, features]
+    df_train_X = df_train_X.reshape((df_train_X.shape[0], df_train_X.shape[1]))
+    train_X = train_X.reshape((train_X.shape[0], train_X.shape[1]))
+    test_X = test_X.reshape((test_X.shape[0], test_X.shape[1]))
+    X_validation = X_validation.reshape((X_validation.shape[0], X_validation.shape[1]))
 
     # Early stopping
     es = EarlyStopping(monitor='val_loss', verbose=1, patience=settings.patience)
@@ -201,16 +201,15 @@ def makePredictions(full_set, training_size):
     
     # Design network
     model = Sequential()
-    model.add(Dense(128, input_shape=(train_X.shape[1], train_X.shape[2])))
-    model.add(Dense(64, activation=keras.activations.sigmoid))
+    model.add(Dense(128, activation=keras.activations.sigmoid))
     model.add(Dense(64, activation=keras.activations.sigmoid))
     model.add(Dense(numVar, activation=keras.activations.sigmoid))
     model.compile(loss="mae", optimizer='adam')
-    print(model.summary())
 
     # Fit network
     history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
     model.save("model_" + settings.setting)
+    print(model.summary())
     # model = keras.models.load_model(settings.folder + "model")
 
     # Plot history
@@ -242,12 +241,12 @@ def makePredictions(full_set, training_size):
 
     # Metrics for testing set
     log_obs = util.cum_log_obs(test_la, df_train_Y)
-    print("Testing set average log obs: " + str(log_obs))
+    print("Training set average log obs: " + str(log_obs))
 
     # Metrics for validation set
     log_obs_valid = util.cum_log_obs(valid_la, Y_validation)
     log_obs_valid = (log_obs_valid * settings.validation_set - log_obs * settings.training_set) / (settings.validation_set - settings.training_set)
-    print("Validation set average log obs: " + str(log_obs_valid))
+    print("Testing set average log obs: " + str(log_obs_valid))
 
     print("", flush=True)
     plotter.plotLA(valid_la, Y_validation)

@@ -115,9 +115,9 @@ if setting == "PT":
 if setting == "PT_hand":
     training_set = 9
     validation_set = 19 # including training_set
-    train_time = 15000
-    patience = 800
-    sim_time = 150
+    train_time = 30000
+    patience = 10000
+    sim_time = 145
     samples = 50
     folder = "../../2D-highway-manual/human-gen/"
     vars_used = [
@@ -170,10 +170,10 @@ if setting == "PT_hand":
             target_steer = max(min(target_heading - data["heading"], 0.015), -0.015)
         elif ha == 2:
             target_acc = 4
-            target_steer = 0.02
+            target_steer = -0.02
         else:
             target_acc = 4
-            target_steer = -0.02
+            target_steer = 0.02
 
         if data["vx"] >= max_velocity - 0.01:
             target_acc = min(target_acc, 0.0)
