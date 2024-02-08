@@ -1,12 +1,13 @@
-import gym
-from highway_env.envs import MDPVehicle, ControlledVehicle, Vehicle, highway_env
+import gymnasium as gym
+import highway_env
+from highway_env.envs import ControlledVehicle, Vehicle, highway_env
 from highway_env.envs.common.observation import KinematicObservation
 from highway_env.envs.common import graphics
 from highway_env.utils import near_split, class_from_path
-from matplotlib import pyplot as plt
 import numpy as np
 import random
 from typing import List, Tuple, Union, Optional
+import pygame
 
 def _create_vehicles(self) -> None:
         """Create some new random vehicles of a given type, and add them on the road."""
@@ -32,6 +33,8 @@ def _create_vehicles(self) -> None:
 
 highway_env.HighwayEnv._create_vehicles = _create_vehicles
 
+env = gym.make('highway-v0', render_mode='rgb_array')
+
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
@@ -41,14 +44,15 @@ KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize value
 steer_err = 0.01
 acc_err = 1
 
-env = gym.make('highway-v0')
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
 env.config['initial_lane_id'] = 0
-# env.configure({
-    # "manual_control": True
-# })
+env.config['manual_control'] = True
+
+# Pygame config
+pygame.init()
+pygame.joystick.init()
 
 # Observations
 # ego vehicle:      presence, x, y, vx, vy, heading
@@ -150,82 +154,29 @@ def prob_asp(ego, closest, ha):
     # Nowhere to go: decelerate
     return env.action_type.actions_indexes["SLOWER"]
 
-# modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
-# in this version, no extra latent state is stored (target_lane, target_speed)
-TURN_HEADING = 0.15 # Target heading when turning
-TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 45 # Maximum velocity
+max_velocity = 25 # Maximum velocity
+min_velocity = 20 # Minimum velocity
+
+# Inputs from controller
+input_acceleration = 0 
+input_steering = 0
 
 last_action = "FASTER"
 last_target = 0
 last_la = {"steering": 0, "acceleration": 0 }
 
-def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
-    global last_action, last_la, last_target
+def run_la(self, action: Union[dict, str] = None, step = True) -> None:
+    global input_acceleration, input_steering, max_velocity, min_velocity
+    
+    if self.speed > max_velocity:
+        input_acceleration = min(input_acceleration, 0)
+    if self.speed < min_velocity:
+        input_acceleration = max(input_acceleration, 0)
+
+    la = {"acceleration" : input_acceleration, "steering": input_steering}
 
     if step:
-        Vehicle.act(self, last_la)
-        return last_la
-
-    target_acc = 0.0
-    target_heading = 0.0
-
-    if action == None:
-        action = last_action
-        
-    last_action = action
-
-    if action == "FASTER":
-        # Attain max speed
-        target_acc = max_velocity - self.speed
-
-        # Follow current lane
-        target_y = laneFinder(self.position[1]) * lane_diff
-        target_heading = np.arctan((target_y - self.position[1]) / TURN_TARGET)
-    elif action == "SLOWER":
-        # Attain speed of vehicle in front
-        if closest == None:
-            front_speed = last_target
-        else:
-            front_speed = closest[1][3]
-
-        last_target = front_speed
-        target_acc = (last_target - self.speed)
-
-        # Follow current lane
-        target_y = laneFinder(self.position[1]) * lane_diff
-        target_heading = np.arctan((target_y - self.position[1]) / TURN_TARGET)
-    elif action == "LANE_RIGHT":
-        target_acc = -0.5
-
-        # Attain rightmost heading
-        target_heading = TURN_HEADING
-    elif action == "LANE_LEFT":
-        target_acc = -0.5
-
-        # Attain leftmost heading
-        target_heading = -TURN_HEADING
-
-    target_steer = target_heading - self.heading
-
-    if target_steer > last_la["steering"]:
-        target_steer = min(target_steer, last_la["steering"] + 0.08)
-    else:
-        target_steer = max(target_steer, last_la["steering"] - 0.08)
-
-    if target_acc > last_la["acceleration"]:
-        target_acc = min(target_acc, last_la["acceleration"] + 4)
-    else:
-        target_acc = max(target_acc, last_la["acceleration"] - 6)
-
-    la = {"steering": target_steer, "acceleration": target_acc }
-
-    # Add error
-    la['steering'] = np.random.normal(la['steering'], steer_err)
-    la['acceleration'] = np.random.normal(la['acceleration'], acc_err)
-
-    if not closest == None:
-        last_la = la
+        Vehicle.act(self, la)
 
     return la
 
@@ -233,27 +184,40 @@ ControlledVehicle.act = run_la
 
 ######## Simulation ########
 def runSim(iter):
+    global input_acceleration, input_steering
     env.reset()
-    graphics.LAST_HA = "FASTER"
-    ha = env.action_type.actions_indexes[graphics.LAST_HA]
     obs_out = open("data" + str(iter) + ".csv", "w")
     obs_out.write("x, y, vx, vy, heading, l_x, l_y, l_vx, l_vy, l_heading, f_x, f_y, f_vx, f_vy, f_heading, r_x, r_y, r_vx, r_vy, r_heading, LA.steer, LA.acc, HA\n")
 
-    for _ in range(75):
+    for _ in range(80):
 
-        obs, reward, done, truncated, info = env.step(ha)
+        for _ in pygame.event.get(): # User did something.
+            pass
+
+        # Get count of joysticks.
+        joystick_count = pygame.joystick.get_count()
+        assert joystick_count <= 1, "Multiple joysticks detected"
+        if joystick_count > 0:
+            joystick = pygame.joystick.Joystick(0)
+            joystick.init()
+
+            k_acc = 4
+            k_steer = 0.02
+
+            input_acceleration = -joystick.get_axis(1) * k_acc
+            input_steering = joystick.get_axis(3) * k_steer
+
+            print(str(input_acceleration) + " & " + str(input_steering))
+
+        obs, reward, done, truncated, info = env.step(0)
         env.render()
 
         # Pre-process observations
         lane_class = classifyLane(obs)
         closest = closestVehicles(obs, lane_class)
 
-        # # Run ASP
-        # ha = env.action_type.actions_indexes[graphics.LAST_HA]
-        ha = prob_asp(obs[0], closest, ha)
-
         # Run motor model
-        la = run_la(env.vehicle, ACTIONS_ALL[ha], False, closest)
+        la = run_la(env.vehicle, ACTIONS_ALL[0], False)
 
         # Ego vehicle
         for prop in obs[0][1:]:
@@ -265,31 +229,11 @@ def runSim(iter):
                 obs_out.write(str(round(prop, 3))+", ")
         obs_out.write(str(round(la['steering'], 3))+", ")
         obs_out.write(str(round(la['acceleration'], 3))+", ")
-        obs_out.write(str(ACTION_REORDER[ha]))
+        obs_out.write(str(ACTION_REORDER[0]))
         obs_out.write("\n")
 
 
     obs_out.close()
 
-for iter in range(25):
+for iter in range(20):
     runSim(iter)
-iter = 25
-# Run generalized simulations involving more vehicles, lanes, etc.
-
-env.config['lanes_count']=lanes_count+2
-env.config['observation']={
-    'type': 'Kinematics',
-    'vehicles_count': 50,
-    'features': ['presence', 'x', 'y', 'vx', 'vy', 'heading'],
-    'absolute': True
-}
-runSim(iter)
-iter += 1
-runSim(iter)
-iter += 1
-runSim(iter)
-iter += 1
-runSim(iter)
-iter += 1
-runSim(iter)
-iter += 1
