@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-setting = "SS"
+setting = "PT_hand"
 
 # Setting: 1D-target
 if setting == "SS":
@@ -108,6 +108,83 @@ if setting == "PT":
             target_acc = min(target_acc, data_prev["LA.acc"] + 4)
         else:
             target_acc = max(target_acc, data_prev["LA.acc"] - 6)
+
+        return [target_steer, target_acc]
+
+
+# Setting: 2D-highway-env, hand controlled demonstrations
+if setting == "PT_hand":
+    training_set = 9
+    validation_set = 19 # including training_set
+    train_time = 15000
+    patience = 800
+    sim_time = 150
+    samples = 50
+    folder = "../../2D-highway-manual/human-gen/"
+    vars_used = [
+        "HA",
+        "x",
+        "y",
+        "l_x",
+        "f_x",
+        "r_x",
+        "v_x",
+        "l_vx",
+        "f_vx",
+        "r_vx",
+        "LA.steer",
+        "LA.acc"
+    ]
+    pred_var = ["LA.steer", "LA.acc"]
+    pv_range = [
+        [-0.3, 0.3],
+        [-30, 30]
+    ]
+    pv_stddev = [0.02, 4]
+
+    numHA = 4
+
+    TURN_HEADING = 0.1 # Target heading when turning
+    TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
+    max_velocity = 25 # Maximum velocity
+    min_velocity = 20 # Turning velocity
+
+    def laneFinder(y):
+        return round(y / 4)
+
+    def motor_model(ha, data, data_prev):
+        target_acc = 0.0
+        target_heading = 0.0
+        if ha == 0:
+            target_acc = 4
+
+            # Follow current lane
+            target_y = laneFinder(data["y"]) * 4
+            target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+            target_steer = max(min(target_heading - data["heading"], 0.015), -0.015)
+        elif ha == 1:
+            target_acc = -4
+
+            # Follow current lane
+            target_y = laneFinder(data["y"]) * 4
+            target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+            target_steer = max(min(target_heading - data["heading"], 0.015), -0.015)
+        elif ha == 2:
+            target_acc = 4
+            target_steer = 0.02
+        else:
+            target_acc = 4
+            target_steer = -0.02
+
+        if data["vx"] >= max_velocity - 0.01:
+            target_acc = min(target_acc, 0.0)
+        if data["vx"] <= min_velocity + 0.01:
+            target_acc = max(target_acc, 0.0)
+
+        if target_steer > 0:
+            target_steer = min(target_steer, TURN_HEADING - data["heading"])
+        if target_steer < 0:
+            target_steer = max(target_steer, -TURN_HEADING - data["heading"])
 
         return [target_steer, target_acc]
 

@@ -5,7 +5,7 @@ import pandas as pd
 import tensorflow
 from tensorflow import keras
 from keras.models import Sequential
-from keras.layers import Dense, LSTM
+from keras.layers import Dense
 from keras.callbacks import EarlyStopping
 import math
 from matplotlib import pyplot
@@ -22,7 +22,7 @@ import util
 column_names = []
 
 # Convert series to supervised learning
-def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
+def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     df = DataFrame(data)
     cols, names = list(), list()
 
@@ -201,7 +201,7 @@ def makePredictions(full_set, training_size):
     
     # Design network
     model = Sequential()
-    model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2])))
+    model.add(Dense(128, input_shape=(train_X.shape[1], train_X.shape[2])))
     model.add(Dense(64, activation=keras.activations.sigmoid))
     model.add(Dense(64, activation=keras.activations.sigmoid))
     model.add(Dense(numVar, activation=keras.activations.sigmoid))
@@ -210,7 +210,7 @@ def makePredictions(full_set, training_size):
 
     # Fit network
     history = model.fit(train_X, train_Y, epochs=settings.train_time, batch_size=128, validation_data=(test_X, test_Y), verbose=0, shuffle=False, callbacks=[es])  # validation_split= 0.2)
-    model.save(settings.folder + "model")
+    model.save("model_" + settings.setting)
     # model = keras.models.load_model(settings.folder + "model")
 
     # Plot history
