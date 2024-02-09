@@ -33,6 +33,37 @@ def _create_vehicles(self) -> None:
 
 highway_env.HighwayEnv._create_vehicles = _create_vehicles
 
+# Allow vehicle to see vehicles behind it as well
+def close_vehicles_to(
+    self,
+    vehicle: "kinematics.Vehicle",
+    distance: float,
+    count: Optional[int] = None,
+    see_behind: bool = True,
+    sort: bool = True,
+    vehicles_only: bool = False,
+) -> object:
+    vehicles = [
+        v
+        for v in self.vehicles
+        if np.linalg.norm(v.position - vehicle.position) < distance
+        and v is not vehicle
+        and (see_behind or -5 * vehicle.LENGTH < vehicle.lane_distance_to(v))
+    ]
+
+    objects_ = vehicles
+
+    if sort:
+        objects_ = sorted(objects_, key=lambda o: abs(vehicle.lane_distance_to(o)))
+    if count:
+        objects_ = objects_[:count]
+    return objects_
+
+highway_env.Road.close_vehicles_to = close_vehicles_to
+
+
+env = gym.make('highway-fast-v0', render_mode='rgb_array')
+
 ######## Configuration ########
 lane_diff = 4 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
@@ -42,7 +73,6 @@ KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize value
 steer_err = 0.01
 acc_err = 1
 
-env = gym.make('highway-fast-v0')
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
 env.config['lanes_count']=lanes_count
@@ -160,7 +190,7 @@ def gt(ego, closest, ha):
     front_clear = sample(logistic(1, 40, (f_x - x) / vx))
 
     if ha == env.action_type.actions_indexes["LANE_RIGHT"]:
-        right_clear = sample(logistic(0.5, 40, (r_x - x) / vx)) # time to collision
+        right_clear = sample(logistic(-5, -40, r_x - x)) or sample(logistic(0.5, 40, (r_x - x) / vx)) # time to collision
         if right_clear: # No car on the right: merge right
             return env.action_type.actions_indexes["LANE_RIGHT"]
         if front_clear: 
@@ -169,7 +199,7 @@ def gt(ego, closest, ha):
         # Nowhere to go: decelerate
         return env.action_type.actions_indexes["SLOWER"]
 
-    right_clear = sample(logistic(1, 40, (r_x - x) / vx)) # time to collision
+    right_clear = sample(logistic(-5, -40, r_x - x)) or sample(logistic(1, 40, (r_x - x) / vx)) # time to collision
     if right_clear: # No car on the right: merge right
         return env.action_type.actions_indexes["LANE_RIGHT"]
     if front_clear: 
@@ -185,31 +215,30 @@ def plunder(ego, closest, ha):
     l_vx = closest[0][3]
     r_vx = closest[2][3]
 
-    if ha == env.action_type.actions_indexes["FASTER"] and sample(logistic2(f_vx, 1000000000.000000, 1.000000)):
-        return env.action_type.actions_indexes["LANE_LEFT"]
-    if ha == env.action_type.actions_indexes["FASTER"] and sample(logistic2(DividedBy(Minus(x, r_x), vx), -1.028642, -35.895672)):
-        return env.action_type.actions_indexes["LANE_RIGHT"]
-    if ha == env.action_type.actions_indexes["FASTER"] and sample(logistic2(Minus(r_x, f_x), -38.665745, 0.395329)):
-        return env.action_type.actions_indexes["SLOWER"]
-    if ha == env.action_type.actions_indexes["LANE_LEFT"] and sample(logistic2(f_x, 1000000000.000000, 1.000000)):
-        return env.action_type.actions_indexes["FASTER"]
-    if ha == env.action_type.actions_indexes["LANE_LEFT"] and sample(logistic2(f_x, 1000000000.000000, 1.000000)):
-        return env.action_type.actions_indexes["LANE_RIGHT"]
-    if ha == env.action_type.actions_indexes["LANE_LEFT"] and sample(logistic2(vx, 1000000000.000000, 1.000000)):
-        return env.action_type.actions_indexes["SLOWER"]
-    if ha == env.action_type.actions_indexes["LANE_RIGHT"] and sample(logistic2(Minus(r_x, x), 8.462489, -0.367737)):
-        return env.action_type.actions_indexes["FASTER"]
-    if ha == env.action_type.actions_indexes["LANE_RIGHT"] and sample(logistic2(r_vx, 1000000000.000000, 1.000000)):
-        return env.action_type.actions_indexes["LANE_LEFT"]
-    if ha == env.action_type.actions_indexes["LANE_RIGHT"] and sample(logistic2(DividedBy(Minus(x, r_x), l_vx), -0.377488, 10.546384)):
-        return env.action_type.actions_indexes["SLOWER"]
-    if ha == env.action_type.actions_indexes["SLOWER"] and sample(logistic2(Minus(x, f_x), -39.469845, -0.228033)):
-        return env.action_type.actions_indexes["FASTER"]
-    if ha == env.action_type.actions_indexes["SLOWER"] and sample(logistic2(vx, 1000000000.000000, 1.000000)):
-        return env.action_type.actions_indexes["LANE_LEFT"]
-    if ha == env.action_type.actions_indexes["SLOWER"] and sample(logistic2(Minus(x, r_x), -43.102879, -0.396746)):
-        return env.action_type.actions_indexes["LANE_RIGHT"]
-
+    if ha == env.action_type.actions_indexes['FASTER'] and sample(logistic2(l_vx, -94.389435, -0.184717)):
+        return env.action_type.actions_indexes['LANE_LEFT']
+    if ha == env.action_type.actions_indexes['FASTER'] and Or(sample(logistic2(Minus(r_x, x), -11.896732, -0.532189)), sample(logistic2(DividedBy(l_x, f_vx), 7.015400, -0.423839))):
+        return env.action_type.actions_indexes['LANE_RIGHT']
+    if ha == env.action_type.actions_indexes['FASTER'] and And(sample(logistic2(Minus(f_x, r_x), 29.689947, -0.053622)), sample(logistic2(DividedBy(r_x, vx), 19.390617, 0.619561))):
+        return env.action_type.actions_indexes['SLOWER']
+    if ha == env.action_type.actions_indexes['LANE_LEFT'] and Or(sample(logistic2(Minus(r_x, f_x), -41.787289, -0.054907)), sample(logistic2(DividedBy(l_x, vx), 13.490392, -23.824293))):
+        return env.action_type.actions_indexes['FASTER']
+    if ha == env.action_type.actions_indexes['LANE_LEFT'] and sample(logistic2(f_x, 313.147400, -1.157651)):
+        return env.action_type.actions_indexes['LANE_RIGHT']
+    if ha == env.action_type.actions_indexes['LANE_LEFT'] and Or(sample(logistic2(Minus(f_x, r_x), 12.702980, -11.320992)), sample(logistic2(vx, 23.080847, -5.325421))):
+        return env.action_type.actions_indexes['SLOWER']
+    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and sample(logistic2(Plus(Minus(f_x, l_x), r_x), 10.982537, -0.009538)):
+        return env.action_type.actions_indexes['FASTER']
+    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and sample(logistic2(r_vx, 38.333366, 0.432104)):
+        return env.action_type.actions_indexes['LANE_LEFT']
+    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and sample(logistic2(r_vx, 27.594072, 0.551679)):
+        return env.action_type.actions_indexes['SLOWER']
+    if ha == env.action_type.actions_indexes['SLOWER'] and Or(sample(logistic2(Plus(f_vx, f_vx), 49.854290, 0.542539)), sample(logistic2(DividedBy(l_x, vx), 4.024220, -0.310264))):
+        return env.action_type.actions_indexes['FASTER']
+    if ha == env.action_type.actions_indexes['SLOWER'] and sample(logistic2(f_vx, 44.006332, 0.325543)):
+        return env.action_type.actions_indexes['LANE_LEFT']
+    if ha == env.action_type.actions_indexes['SLOWER'] and And(sample(logistic2(l_vx, 23.108271, -0.946435)), sample(logistic2(DividedBy(x, vx), 7.694846, -0.629001))):
+        return env.action_type.actions_indexes['LANE_RIGHT']
     return ha
 
 def oneshot(ego, closest, ha):
@@ -313,80 +342,58 @@ def ldips(ego, closest, ha):
 
 # modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
 # in this version, no extra latent state is stored (target_lane, target_speed)
-TURN_HEADING = 0.15 # Target heading when turning
+TURN_HEADING = 0.1 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 45 # Maximum velocity
+max_velocity = 25 # Maximum velocity
+min_velocity = 15 # Turning velocity
 
 last_action = "FASTER"
-last_target = 0
-last_la = {"steering": 0, "acceleration": 0 }
-
 def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
-    global last_action, last_la, last_target
-
-    if step:
-        Vehicle.act(self, last_la)
-        return last_la
+    global last_action
 
     target_acc = 0.0
-    target_heading = 0.0
+    target_steer = 0.0
 
     if action == None:
         action = last_action
-        
+
     last_action = action
 
     if action == "FASTER":
         # Attain max speed
-        target_acc = max_velocity - self.speed
+        target_acc = 4
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
         target_heading = np.arctan((target_y - self.position[1]) / TURN_TARGET)
+        target_steer = max(min(target_heading - self.heading, 0.02), -0.02)
     elif action == "SLOWER":
-        # Attain speed of vehicle in front
-        if closest == None:
-            front_speed = last_target
-        else:
-            front_speed = closest[1][3]
-
-        last_target = front_speed
-        target_acc = (last_target - self.speed)
+        target_acc = -4
 
         # Follow current lane
         target_y = laneFinder(self.position[1]) * lane_diff
         target_heading = np.arctan((target_y - self.position[1]) / TURN_TARGET)
+        target_steer = max(min(target_heading - self.heading, 0.02), -0.02)
     elif action == "LANE_RIGHT":
-        target_acc = -0.5
-
-        # Attain rightmost heading
-        target_heading = TURN_HEADING
+        target_acc = 4
+        target_steer = max(min(0.1 - self.heading, 0.04), -0.04)
     elif action == "LANE_LEFT":
-        target_acc = -0.5
+        target_acc = 4
+        target_steer = max(min(-0.1 - self.heading, 0.04), -0.04)
 
-        # Attain leftmost heading
-        target_heading = -TURN_HEADING
+    if self.velocity[0] >= max_velocity - 0.01:
+        target_acc = min(target_acc, 0.0)
+    if self.velocity[0] <= min_velocity + 0.01:
+        target_acc = max(target_acc, 0.0)
 
-    target_steer = target_heading - self.heading
-
-    if target_steer > last_la["steering"]:
-        target_steer = min(target_steer, last_la["steering"] + 0.08)
-    else:
-        target_steer = max(target_steer, last_la["steering"] - 0.08)
-
-    if target_acc > last_la["acceleration"]:
-        target_acc = min(target_acc, last_la["acceleration"] + 4)
-    else:
-        target_acc = max(target_acc, last_la["acceleration"] - 6)
+    if target_steer > 0:
+        target_steer = min(target_steer, TURN_HEADING - self.heading)
+    if target_steer < 0:
+        target_steer = max(target_steer, -TURN_HEADING - self.heading)
 
     la = {"steering": target_steer, "acceleration": target_acc }
-
-    # Add error
-    la['steering'] = np.random.normal(la['steering'], steer_err)
-    la['acceleration'] = np.random.normal(la['acceleration'], acc_err)
-
-    if not closest == None:
-        last_la = la
+    if step:
+            Vehicle.act(self, la)
 
     return la
 
@@ -397,12 +404,9 @@ success = 0
 def runSim(iter):
     global success
     env.reset()
-    graphics.LAST_HA = "FASTER"
-    ha = env.action_type.actions_indexes[graphics.LAST_HA]
-    obs_out = open("data" + str(iter) + ".csv", "w")
-    obs_out.write("x, y, vx, vy, heading, l_x, l_y, l_vx, l_vy, l_heading, f_x, f_y, f_vx, f_vy, f_heading, r_x, r_y, r_vx, r_vy, r_heading, LA.steer, LA.acc, HA\n")
+    ha = env.action_type.actions_indexes["FASTER"]
 
-    for _ in range(75):
+    for _ in range(150):
 
         obs, reward, done, truncated, info = env.step(ha)
         env.render()
@@ -411,33 +415,16 @@ def runSim(iter):
         lane_class = classifyLane(obs)
         closest = closestVehicles(obs, lane_class)
 
-        # # Run ASP
-        # ha = env.action_type.actions_indexes[graphics.LAST_HA]
-        ha = greedy(obs[0], closest, ha)
-
+        # Run ASP
+        ha = plunder(obs[0], closest, ha)
         # Run motor model
         la = run_la(env.vehicle, ACTIONS_ALL[ha], False, closest)
-
-        # Ego vehicle
-        for prop in obs[0][1:]:
-            obs_out.write(str(round(prop, 3))+", ")
-        
-        # Nearby vehicles
-        for v in closest:
-            for prop in v[1:]:
-                obs_out.write(str(round(prop, 3))+", ")
-        obs_out.write(str(round(la['steering'], 3))+", ")
-        obs_out.write(str(round(la['acceleration'], 3))+", ")
-        obs_out.write(str(ACTION_REORDER[ha]))
-        obs_out.write("\n")
 
     if(laneFinder(obs[0][2]) == 3):
         success += 1
         print(success)
 
-    obs_out.close()
-
-for iter in range(100):
+for iter in range(200):
     runSim(iter)
 
 print(success)

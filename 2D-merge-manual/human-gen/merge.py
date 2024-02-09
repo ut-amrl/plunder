@@ -160,32 +160,6 @@ def closestVehicles(obs, lane_class):
     
     return (closestLeft, closestFront, closestRight)
 
-# ASP (probabilistic)
-def prob_asp(ego, closest, ha):
-    x, l_x, f_x, r_x = ego[1], closest[0][1], closest[1][1], closest[2][1]
-    vx = ego[3]
-
-    front_clear = sample(logistic(1, 40, (f_x - x) / vx))
-
-    if ha == env.action_type.actions_indexes["LANE_RIGHT"]:
-        right_clear = sample(logistic(0.5, 40, (r_x - x) / vx)) # time to collision
-        if right_clear: # No car on the right: merge right
-            return env.action_type.actions_indexes["LANE_RIGHT"]
-        if front_clear: 
-            return env.action_type.actions_indexes["FASTER"]
-
-        # Nowhere to go: decelerate
-        return env.action_type.actions_indexes["SLOWER"]
-
-    right_clear = sample(logistic(1, 40, (r_x - x) / vx)) # time to collision
-    if right_clear: # No car on the right: merge right
-        return env.action_type.actions_indexes["LANE_RIGHT"]
-    if front_clear: 
-        return env.action_type.actions_indexes["FASTER"]
-
-    # Nowhere to go: decelerate
-    return env.action_type.actions_indexes["SLOWER"]
-
 max_velocity = 25 # Maximum velocity
 min_velocity = 15 # Minimum velocity
 
