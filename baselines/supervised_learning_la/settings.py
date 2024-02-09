@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-setting = "PT_hand"
+setting = "PT_manual"
 
 # Setting: 1D-target
 if setting == "SS":
@@ -11,7 +11,7 @@ if setting == "SS":
     patience = 100
     sim_time = 126
     samples = 100
-    folder = "target/"
+    folder = "../../1D-target/example_data/"
     vars_used = [
         "HA",
         "pos",
@@ -45,7 +45,7 @@ if setting == "PT":
     patience = 800
     sim_time = 150
     samples = 50
-    folder = "highway/"
+    folder = "../../2D-highway-env/python-gen/"
     vars_used = [
         "HA",
         "x",
@@ -115,8 +115,8 @@ if setting == "PT":
 if setting == "PT_hand":
     training_set = 9
     validation_set = 19 # including training_set
-    train_time = 30000
-    patience = 10000
+    train_time = 4000
+    patience = 500
     sim_time = 145
     samples = 50
     folder = "../../2D-highway-manual/human-gen/"
@@ -192,14 +192,14 @@ if setting == "PT_hand":
 if setting == "MG":
     training_set = 10
     validation_set = 30 # including training_set
-    train_time = 15000
-    patience = 200
+    train_time = 3000
+    patience = 500
     sim_time = 75
     samples = 50
-    # folder = "merge-easy-data/"
-    # folder = "merge-medium-data/"
-    # folder = "merge-hard-data/"
-    folder = "merge-impossible-data/"
+    # folder = "../../2D-merge/gen-easy/"
+    # folder = "../../2D-merge/gen-medium/"
+    # folder = "../../2D-merge/gen-hard/"
+    folder = "../../2D-merge/gen-impossible/"
     vars_used = [
         "HA",
         "x",
@@ -268,11 +268,11 @@ if setting == "MG":
 if setting == "PP":
     training_set = 5
     validation_set = 20 # including training_set
-    train_time = 10
-    patience = 0
+    train_time = 12000
+    patience = 200
     sim_time = 50
     samples = 50
-    folder = "panda-pick-place-policy/"
+    folder = "../../panda-pick-place/gen-policy/"
     vars_used = [
         "HA",
         "x",
@@ -387,7 +387,7 @@ if setting == "ST":
     patience = 500
     sim_time = 150
     samples = 50
-    folder = "panda-stack/"
+    folder = "../../panda-stack/python-gen/"
     vars_used = [
         "HA",
         "x",
