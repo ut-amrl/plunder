@@ -1,3 +1,3 @@
-# 2D Merge (Merge)
+# 2D Merge (Manual)
 
 ## TODO

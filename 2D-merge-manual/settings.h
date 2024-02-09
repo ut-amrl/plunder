@@ -7,13 +7,13 @@ using namespace std;
 namespace SETTINGS {
 
     // ----- I/O parameters -----
-    const string SIM_DATA = "python-gen/data";          // Generated data from simulation, contains HA, LA, and observed state sequences
+    const string SIM_DATA = "human-gen/data";          // Generated data from simulation, contains HA, LA, and observed state sequences
                                                         // Default: sim/data, is where our provided generator will store these files
     
     // ----- General configuration -----
     const bool DEBUG = false;
     const int TRAINING_SET = 10;                // Number of robots to train on
-    const int VALIDATION_SET = 30;              // Number of total robots in the full set (including the training set)
+    const int VALIDATION_SET = 20;              // Number of total robots in the full set (including the training set)
     const bool USE_SAFE_TRANSITIONS = false;    // "Safe" transitions (only allow user-specified transitions). 
                                                 // Optional modification to improve performance on policies with sparse transitions
     // ----- Simulation parameters -----
@@ -29,8 +29,8 @@ namespace SETTINGS {
     const int NUM_CORES = 8;                    // Number of cores to use per program: NUM_CORES * BATCH_SIZE = total number of cores used at once
 
     // ----- Important hyperparameters -----
-    const double PROG_COMPLEXITY_LOSS_BASE = 0.01;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
-    const double PROG_COMPLEXITY_LOSS = 0.06;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
+    const double PROG_COMPLEXITY_LOSS_BASE = 0.0005;     // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS )
+    const double PROG_COMPLEXITY_LOSS = 0.001;          // adds L1 loss ( AST.size * PROG_COMPLEXITY_LOSS * loss )
     const double ALPHA_LOSS_UPPER = 0.0001;             // adds L2 loss ( alpha^2 * ALPHA_LOSS_UPPER )
 
 }
