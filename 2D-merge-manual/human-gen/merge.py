@@ -74,7 +74,7 @@ use_absolute_lanes = True # Whether or not to label lanes as absolute or relativ
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
 steer_err = 0.01
-acc_err = 2
+acc_err = 1
 
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
