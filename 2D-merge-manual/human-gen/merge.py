@@ -4,6 +4,7 @@ from highway_env.envs import ControlledVehicle, Vehicle, highway_env
 from highway_env.envs.common.observation import KinematicObservation
 from highway_env.envs.common import graphics
 from highway_env.utils import near_split, class_from_path
+from highway_env.road.road import Road
 import numpy as np
 import random
 from typing import List, Tuple, Union, Optional
@@ -33,6 +34,37 @@ def _create_vehicles(self) -> None:
 
 highway_env.HighwayEnv._create_vehicles = _create_vehicles
 
+# Allow vehicle to see vehicles behind it as well
+def close_vehicles_to(
+    self,
+    vehicle: "kinematics.Vehicle",
+    distance: float,
+    count: Optional[int] = None,
+    see_behind: bool = True,
+    sort: bool = True,
+    vehicles_only: bool = False,
+) -> object:
+    vehicles = [
+        v
+        for v in self.vehicles
+        if np.linalg.norm(v.position - vehicle.position) < distance
+        and v is not vehicle
+        and (see_behind or -5 * vehicle.LENGTH < vehicle.lane_distance_to(v))
+    ]
+
+    objects_ = vehicles
+
+    if sort:
+        objects_ = sorted(objects_, key=lambda o: abs(vehicle.lane_distance_to(o)))
+    if count:
+        objects_ = objects_[:count]
+    return objects_
+
+highway_env.Road.close_vehicles_to = close_vehicles_to
+
+
+
+
 env = gym.make('highway-v0', render_mode='rgb_array')
 
 ######## Configuration ########
@@ -42,7 +74,7 @@ use_absolute_lanes = True # Whether or not to label lanes as absolute or relativ
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
 steer_err = 0.01
-acc_err = 1
+acc_err = 2
 
 env.config['simulation_frequency']=24
 env.config['policy_frequency']=8 # Runs once every 3 simulation steps
@@ -155,7 +187,7 @@ def prob_asp(ego, closest, ha):
     return env.action_type.actions_indexes["SLOWER"]
 
 max_velocity = 25 # Maximum velocity
-min_velocity = 20 # Minimum velocity
+min_velocity = 15 # Minimum velocity
 
 # Inputs from controller
 input_acceleration = 0 
@@ -218,6 +250,8 @@ def runSim(iter):
 
         # Run motor model
         la = run_la(env.vehicle, ACTIONS_ALL[0], False)
+        la['steering'] = np.random.normal(la['steering'], steer_err)
+        la['acceleration'] = np.random.normal(la['acceleration'], acc_err)
 
         # Ego vehicle
         for prop in obs[0][1:]:
