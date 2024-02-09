@@ -174,15 +174,16 @@ last_la = {"steering": 0, "acceleration": 0 }
 def run_la(self, action: Union[dict, str] = None, step = True) -> None:
     global input_acceleration, input_steering, max_velocity, min_velocity
     
-    if self.speed > max_velocity:
-        input_acceleration = min(input_acceleration, 0)
-    if self.speed < min_velocity:
-        input_acceleration = max(input_acceleration, 0)
-
     la = {"acceleration" : input_acceleration, "steering": input_steering}
 
     if step:
-        Vehicle.act(self, la)
+        sp = input_acceleration
+        if self.speed > max_velocity:
+            sp = min(input_acceleration, 0)
+        if self.speed < min_velocity:
+            sp = max(input_acceleration, 0)
+        act = {"acceleration" : sp, "steering": input_steering}
+        Vehicle.act(self, act)
 
     return la
 
@@ -208,7 +209,7 @@ def runSim(iter):
             joystick.init()
 
             k_acc = 4
-            k_steer = 0.02
+            k_steer = 0.03
 
             input_acceleration = -joystick.get_axis(1) * k_acc
             input_steering = joystick.get_axis(3) * k_steer
