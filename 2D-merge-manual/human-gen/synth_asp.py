@@ -219,23 +219,23 @@ def plunder(ego, closest, ha):
     l_vx = closest[0][3]
     r_vx = closest[2][3]
 
-    if ha == env.action_type.actions_indexes['FASTER'] and sample(logistic2(f_y, -115.765190, -0.184774)):
+    if ha == env.action_type.actions_indexes['FASTER'] and sample(logistic2(x, 1043.003418, 0.010987)):
         return env.action_type.actions_indexes['LANE_LEFT']
-    if ha == env.action_type.actions_indexes['FASTER'] and Or(sample(logistic2(Plus(y, Plus(x, f_y)), 219.315826, -6.545621)), Or(sample(logistic2(Minus(r_x, x), 58.532146, 0.102469)), sample(logistic2(Minus(r_x, x), -7.087198, -11.564011)))):
+    if ha == env.action_type.actions_indexes['FASTER'] and Or(sample(logistic2(Minus(r_x, x), 24.256481, 0.261414)), sample(logistic2(Minus(r_x, x), -7.083443, -10.012507))):
         return env.action_type.actions_indexes['LANE_RIGHT']
-    if ha == env.action_type.actions_indexes['FASTER'] and sample(logistic2(Times(Minus(r_x, f_x), Minus(f_x, r_x)), -29.042141, 7.861295)):
+    if ha == env.action_type.actions_indexes['FASTER'] and And(sample(logistic2(Minus(r_x, f_x), -5.321127, 27.355986)), sample(logistic2(Minus(y, r_y), -2.810756, 45.921741))):
         return env.action_type.actions_indexes['SLOWER']
-    if ha == env.action_type.actions_indexes['LANE_LEFT'] and And(sample(logistic2(Plus(y, r_y), 1.688283, 0.333300)), Or(sample(logistic2(y, 10.840342, -4.720146)), sample(logistic2(f_x, 400.538452, 7.071193)))):
+    if ha == env.action_type.actions_indexes['LANE_LEFT'] and And(sample(logistic2(Plus(y, r_y), 27.675999, -28.561993)), Or(sample(logistic2(Minus(r_y, y), 4.606244, -14.761892)), Or(sample(logistic2(Minus(f_x, r_x), 131.751694, 4.325001)), sample(logistic2(f_x, 364.858917, -1.114238))))):
         return env.action_type.actions_indexes['FASTER']
     if ha == env.action_type.actions_indexes['LANE_LEFT'] and sample(logistic2(f_y, 1000000000.000000, 1.000000)):
         return env.action_type.actions_indexes['LANE_RIGHT']
-    if ha == env.action_type.actions_indexes['LANE_LEFT'] and sample(logistic2(x, 310.039307, 0.281148)):
+    if ha == env.action_type.actions_indexes['LANE_LEFT'] and sample(logistic2(f_x, 389.029755, -1.134043)):
         return env.action_type.actions_indexes['SLOWER']
-    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and Or(sample(logistic2(Minus(r_y, Plus(x, f_y)), -407.203644, -6.550301)), sample(logistic2(f_y, 13.495234, 0.505567))):
+    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and Or(sample(logistic2(Minus(r_y, Plus(x, f_y)), -407.739685, -2.902149)), sample(logistic2(f_y, 13.234916, 0.499033))):
         return env.action_type.actions_indexes['FASTER']
-    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and And(sample(logistic2(y, 3.154641, 14.994084)), sample(logistic2(Minus(f_x, x), 132.020691, 0.845566))):
+    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and sample(logistic2(Minus(f_x, r_x), 168.824478, 0.089852)):
         return env.action_type.actions_indexes['LANE_LEFT']
-    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and And(sample(logistic2(Times(x, x), 135919.843750, 0.002314)), sample(logistic2(Times(f_y, r_x), 4408.694336, 0.946293))):
+    if ha == env.action_type.actions_indexes['LANE_RIGHT'] and sample(logistic2(Times(x, y), 4744.125977, 0.026073)):
         return env.action_type.actions_indexes['SLOWER']
     return ha
 
