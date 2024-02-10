@@ -29,7 +29,7 @@ train_time = 15000
 patience = 800
 sim_time = 150
 samples = 50
-folder = "../../baselines/supervised_learning_ha/highway_manual/"
+folder = "../../baselines/supervised_learning_ha/model_PT_hand/"
 vars_used = [
     "HA",
     "x",
@@ -115,14 +115,14 @@ class CustomAccuracy(keras.losses.Loss):
 
         return error
 
-model = keras.models.load_model(folder + "model_manual_pt", compile=False)
+model = keras.models.load_model(folder, compile=False)
 model.compile(loss=CustomAccuracy(), optimizer='adam')
 
 
 column_names = []
 
 # Convert series to supervised learning
-def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
+def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     df = DataFrame(data)
     cols, names = list(), list()
 
@@ -219,7 +219,7 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.to_numpy()
     validation_Y = validation_Y.to_numpy()
 
-    validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
+    validation_X = validation_X.reshape((validation_X.shape[0], validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
     yhat = yhat[len(yhat)-1]

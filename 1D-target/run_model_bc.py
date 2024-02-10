@@ -25,7 +25,7 @@ train_time = 10000
 patience = 500
 sim_time = 126
 samples = 100
-folder = "../baselines/supervised_learning_la/target/"
+folder = "../baselines/supervised_learning_la/model_SS/"
 vars_used = [
     "HA",
     "pos",
@@ -53,13 +53,13 @@ def motor_model(ha, data, data_prev):
 
 # Load model
 
-model = keras.models.load_model(folder + "model_ss")
+model = keras.models.load_model(folder)
 
 
 column_names = []
 
 # Convert series to supervised learning
-def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
+def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     df = DataFrame(data)
     cols, names = list(), list()
 
@@ -154,7 +154,7 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.to_numpy()
     validation_Y = validation_Y.to_numpy()
 
-    validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
+    validation_X = validation_X.reshape((validation_X.shape[0], validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
     la = yhat[len(yhat)-1]

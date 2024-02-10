@@ -176,7 +176,7 @@ def runSim(iter):
 
     obs_out.close()
 
-for iter in range(10):
+for iter in range(20):
     runSim(iter)
 
 pygame.quit()

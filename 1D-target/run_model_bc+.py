@@ -25,7 +25,7 @@ train_time = 10000
 patience = 500
 sim_time = 126
 samples = 100
-folder = "../baselines/supervised_learning_ha/target/"
+folder = "../baselines/supervised_learning_ha/model_SS/"
 vars_used = [
     "HA",
     "pos",
@@ -72,7 +72,7 @@ class CustomAccuracy(keras.losses.Loss):
 
         return error
 
-model = keras.models.load_model(folder + "model_ss", compile=False)
+model = keras.models.load_model(folder, compile=False)
 model.compile(loss=CustomAccuracy(), optimizer='adam')
 
 
@@ -176,7 +176,7 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.to_numpy()
     validation_Y = validation_Y.to_numpy()
 
-    validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
+    validation_X = validation_X.reshape((validation_X.shape[0], validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
     yhat = yhat[len(yhat)-1]
@@ -225,7 +225,7 @@ for _ in range(100):
         
         if vel < -10:
             break
-        if pos > 200:
+        if pos > 150:
             break
         if pos < 140 and pos > 60 and abs(vel) < 0.1:
             success += 1

@@ -29,7 +29,7 @@ train_time = 15000
 patience = 800
 sim_time = 150
 samples = 50
-folder = "../../baselines/supervised_learning_la/highway/"
+folder = "../../baselines/supervised_learning_la/model_PT/"
 vars_used = [
     "HA",
     "x",
@@ -97,12 +97,12 @@ def motor_model(ha, data, data_prev):
 
 
 # Load model
-model = keras.models.load_model(folder + "model_PT")
+model = keras.models.load_model(folder)
 
 column_names = []
 
 # Convert series to supervised learning
-def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
+def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     df = DataFrame(data)
     cols, names = list(), list()
 
@@ -197,7 +197,7 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.to_numpy()
     validation_Y = validation_Y.to_numpy()
 
-    validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
+    validation_X = validation_X.reshape((validation_X.shape[0], validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
     la = yhat[len(yhat)-1]
@@ -233,7 +233,7 @@ def _create_vehicles(self) -> None:
 highway_env.HighwayEnv._create_vehicles = _create_vehicles
 
 lane_diff = 4 # Distance lanes are apart from each other
-lanes_count = 4 # Number of lanes
+lanes_count = 8 # Number of lanes
 use_absolute_lanes = True # Whether or not to label lanes as absolute or relative to current vehicle lane
 KinematicObservation.normalize_obs = lambda self, df: df # Don't normalize values
 
@@ -328,6 +328,7 @@ def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -
     global last_la
 
     if step:
+        print(last_la)
         Vehicle.act(self, last_la)
         return last_la
     return last_la
