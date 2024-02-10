@@ -9,7 +9,7 @@ using namespace SETTINGS;
 // MOTOR (OBSERVATION) MODEL: known function mapping from high-level to low-level actions
 map<string, normal_distribution<double>> la_error = {
     { "steer", normal_distribution<double>(0.0, 0.02) },
-    { "acc", normal_distribution<double>(0.0, 4) }
+    { "acc", normal_distribution<double>(0.0, 2) }
 };
 double la_error_scaler = 1.0;
 
@@ -33,7 +33,7 @@ Obs motorModel(State state, bool error){
     
     if(ha == FASTER) {
         // Attain max speed
-        target_acc = 4;
+        target_acc = 4.0;
 
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
@@ -41,32 +41,18 @@ Obs motorModel(State state, bool error){
         target_steer = max(min(target_heading - state.get("heading"), 0.02), -0.02);
     } else if (ha == SLOWER) {
         // Attain min speed
-        target_acc = -4;
+        target_acc = -4.0;
 
         // Follow current lane
         double target_y = laneFinder(state.get("y")) * lane_diff;
         double target_heading = atan((target_y - state.get("y")) / TURN_TARGET);
         target_steer = max(min(target_heading - state.get("heading"), 0.02), -0.02);
     } else if (ha == LANE_LEFT) {
-        target_acc = 4;
-        target_steer = max(min(-0.1 - state.get("heading"), 0.04), -0.04);
+        target_acc = 0;
+        target_steer = max(min(-TURN_HEADING - state.get("heading"), 0.0), -0.03);
     } else if (ha == LANE_RIGHT) {
-        target_acc = 4;
-        target_steer = max(min(0.1 - state.get("heading"), 0.04), -0.04);
-    }
-
-    if(state.get("vx") >= max_velocity - 0.01) {
-        target_acc = min(target_acc, 0.0);
-    }
-    if(state.get("vx") <= min_velocity + 0.01) {
-        target_acc = max(target_acc, 0.0);
-    }
-
-    if(target_steer > 0) {
-        target_steer = min(target_steer, TURN_HEADING - state.get("heading"));
-    }
-    if(target_steer < 0) {
-        target_steer = max(target_steer, -TURN_HEADING - state.get("heading"));
+        target_acc = 0;
+        target_steer = max(min(TURN_HEADING - state.get("heading"), 0.03), 0.0);
     }
 
     state.put("steer", target_steer);
