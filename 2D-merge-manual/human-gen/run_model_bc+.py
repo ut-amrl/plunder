@@ -23,23 +23,21 @@ from highway_env.utils import near_split, class_from_path
 from typing import List, Tuple, Union, Optional
 
 
-training_set = 10
-validation_set = 30 # including training_set
-train_time = 15000
-patience = 3000
-sim_time = 75
+training_set = 9
+validation_set = 18 # including training_set
+sim_time = 70
 samples = 50
-folder = "../../baselines/supervised_learning_ha/merge-impossible-data/"
+folder = "../../baselines/supervised_learning_ha/model_MG_hand/"
 vars_used = [
     "HA",
     "x",
     "l_x",
     "f_x",
     "r_x",
-    "v_x",
-    "l_vx",
-    "f_vx",
-    "r_vx",
+    "y",
+    "l_y",
+    "f_y",
+    "r_y",
     "LA.steer",
     "LA.acc"
 ]
@@ -48,13 +46,14 @@ pv_range = [
     [-0.3, 0.3],
     [-30, 30]
 ]
-pv_stddev = [0.03, 3]
+pv_stddev = [0.02, 2]
 
 numHA = 4
 
-TURN_HEADING = 0.15 # Target heading when turning
+TURN_HEADING = 0.1 # Target heading when turning
 TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 45 # Maximum velocity
+max_velocity = 25 # Maximum velocity
+min_velocity = 15 # Turning velocity
 
 def laneFinder(y):
     return round(y / 4)
@@ -62,35 +61,26 @@ def laneFinder(y):
 def motor_model(ha, data, data_prev):
     target_acc = 0.0
     target_heading = 0.0
-
     if ha == 0:
-        target_acc = max_velocity - data["vx"]
+        target_acc = 4
 
+        # Follow current lane
         target_y = laneFinder(data["y"]) * 4
         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+        target_steer = max(min(target_heading - data["heading"], 0.02), -0.02)
     elif ha == 1:
-        target_acc = data["f_vx"] - data["vx"]
+        target_acc = -4
 
+        # Follow current lane
         target_y = laneFinder(data["y"]) * 4
         target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+        target_steer = max(min(target_heading - data["heading"], 0.02), -0.02)
     elif ha == 2:
-        target_acc = -0.5
-        target_heading = -TURN_HEADING
+        target_acc = 0
+        target_steer = max(min(-TURN_HEADING - data["heading"], 0.0), -0.03)
     else:
-        target_acc = -0.5
-        target_heading = TURN_HEADING
-
-    target_steer = target_heading - data["heading"]
-
-    if target_steer > data_prev["LA.steer"]:
-        target_steer = min(target_steer, data_prev["LA.steer"] + 0.08)
-    else:
-        target_steer = max(target_steer, data_prev["LA.steer"] - 0.08)
-
-    if target_acc > data_prev["LA.acc"]:
-        target_acc = min(target_acc, data_prev["LA.acc"] + 4)
-    else:
-        target_acc = max(target_acc, data_prev["LA.acc"] - 6)
+        target_acc = 0
+        target_steer = max(min(TURN_HEADING - data["heading"], 0.03), 0.0)
 
     return [target_steer, target_acc]
 
@@ -113,14 +103,14 @@ class CustomAccuracy(keras.losses.Loss):
 
         return error
 
-model = keras.models.load_model(folder + "model_MG_impossible", compile=False)
+model = keras.models.load_model(folder, compile=False)
 model.compile(loss=CustomAccuracy(), optimizer='adam')
 
 
 column_names = []
 
 # Convert series to supervised learning
-def series_to_supervised(data, n_in=4, n_out=1, dropnan=True):
+def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     df = DataFrame(data)
     cols, names = list(), list()
 
@@ -217,7 +207,7 @@ def predict_next(_dataset:DataFrame):
     validation_X = validation_X.to_numpy()
     validation_Y = validation_Y.to_numpy()
 
-    validation_X = validation_X.reshape((validation_X.shape[0], 1, validation_X.shape[1]))
+    validation_X = validation_X.reshape((validation_X.shape[0], validation_X.shape[1]))
 
     yhat = model.predict(validation_X)
     yhat = yhat[len(yhat)-1]
@@ -262,6 +252,34 @@ def _create_vehicles(self) -> None:
                 self.road.vehicles.append(vehicle)
 
 highway_env.HighwayEnv._create_vehicles = _create_vehicles
+
+# Allow vehicle to see vehicles behind it as well
+def close_vehicles_to(
+    self,
+    vehicle: "kinematics.Vehicle",
+    distance: float,
+    count: Optional[int] = None,
+    see_behind: bool = True,
+    sort: bool = True,
+    vehicles_only: bool = False,
+) -> object:
+    vehicles = [
+        v
+        for v in self.vehicles
+        if np.linalg.norm(v.position - vehicle.position) < distance
+        and v is not vehicle
+        and (see_behind or -5 * vehicle.LENGTH < vehicle.lane_distance_to(v))
+    ]
+
+    objects_ = vehicles
+
+    if sort:
+        objects_ = sorted(objects_, key=lambda o: abs(vehicle.lane_distance_to(o)))
+    if count:
+        objects_ = objects_[:count]
+    return objects_
+
+highway_env.Road.close_vehicles_to = close_vehicles_to
 
 lane_diff = 4 # Distance lanes are apart from each other
 lanes_count = 4 # Number of lanes
@@ -347,12 +365,6 @@ def closestVehicles(obs, lane_class):
     
     return (closestLeft, closestFront, closestRight)
 
-# modified from https://github.com/eleurent/highway-env/blob/31881fbe45fd05dbd3203bb35419ff5fb1b7bc09/highway_env/vehicle/controller.py
-# in this version, no extra latent state is stored (target_lane, target_speed)
-TURN_HEADING = 0.15 # Target heading when turning
-TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
-max_velocity = 45 # Maximum velocity
-
 last_la = {"steering": 0, "acceleration": 0 }
 
 def run_la(self, action: Union[dict, str] = None, step = True, closest = None) -> None:
@@ -368,12 +380,12 @@ ControlledVehicle.act = run_la
 
 dataset_base = pd.read_csv("temp.csv")
 success = 0
-for iter in range(100):
+for iter in range(200):
     obs, info = env.reset()
     dataset = dataset_base.copy(deep=True)
 
     action = [0, 0]
-    for _ in range(75):
+    for _ in range(150):
         obs, reward, done, truncated, info = env.step(0)
 
         # Pre-process observations

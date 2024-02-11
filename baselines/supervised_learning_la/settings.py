@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-setting = "PT_manual"
+setting = "MG_hand"
 
 # Setting: 1D-target
 if setting == "SS":
@@ -263,6 +263,74 @@ if setting == "MG":
             target_acc = max(target_acc, data_prev["LA.acc"] - 6)
 
         return [target_steer, target_acc]
+
+
+# Setting: 2D-merge, joysticked demos
+if setting == "MG_hand":
+    training_set = 9
+    validation_set = 18 # including training_set
+    train_time = 3000
+    patience = 1000
+    sim_time = 70
+    samples = 50
+    folder = "../../2D-merge-manual/human-gen/"
+    vars_used = [
+        "HA",
+        "x",
+        "l_x",
+        "f_x",
+        "r_x",
+        "y",
+        "l_y",
+        "f_y",
+        "r_y",
+        "LA.steer",
+        "LA.acc"
+    ]
+    pred_var = ["LA.steer", "LA.acc"]
+    pv_range = [
+        [-0.3, 0.3],
+        [-30, 30]
+    ]
+    pv_stddev = [0.02, 2]
+
+
+    numHA = 4
+
+    TURN_HEADING = 0.1 # Target heading when turning
+    TURN_TARGET = 30 # How much to adjust when targeting a lane (higher = smoother)
+    max_velocity = 25 # Maximum velocity
+    min_velocity = 15 # Turning velocity
+
+    def laneFinder(y):
+        return round(y / 4)
+
+    def motor_model(ha, data, data_prev):
+        target_acc = 0.0
+        target_heading = 0.0
+        if ha == 0:
+            target_acc = 4
+
+            # Follow current lane
+            target_y = laneFinder(data["y"]) * 4
+            target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+            target_steer = max(min(target_heading - data["heading"], 0.02), -0.02)
+        elif ha == 1:
+            target_acc = -4
+
+            # Follow current lane
+            target_y = laneFinder(data["y"]) * 4
+            target_heading = np.arctan((target_y - data["y"]) / TURN_TARGET)
+            target_steer = max(min(target_heading - data["heading"], 0.02), -0.02)
+        elif ha == 2:
+            target_acc = 0
+            target_steer = max(min(-TURN_HEADING - data["heading"], 0.0), -0.03)
+        else:
+            target_acc = 0
+            target_steer = max(min(TURN_HEADING - data["heading"], 0.03), 0.0)
+
+        return [target_steer, target_acc]
+
 
 # Setting: panda-pick-place (policy)
 if setting == "PP":
