@@ -1,11 +1,18 @@
 
 
-<link rel="stylesheet" type="text/css" href="assets/style.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href='//fonts.googleapis.com/css?family=Lustria|Lato:400,700,400italic|Playfair+Display:700,400italic' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="assets/style.css">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
 
 ---
+<center>
+<h1><span class="smallcaps">Plunder</span>: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations</h1>
 
-<h2><span class="smallcaps">PLUNDER</span>: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations</h2>
+<p>Jimmy Xin, Linus Zheng, Jiayi Wei, Kia Rahmani, Jarrett Holtz, Isil Dillig, Joydeep Biswas</p>
+</center>
 
 ![](assets/asp_8.gif)
 

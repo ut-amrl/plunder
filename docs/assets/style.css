@@ -2,6 +2,10 @@ h1, h2, h3, h4, body {
   font-family: 'Helvetica Nueue', sans-serif;
 }
 
+h1 {
+  font-weight: 500;
+}
+
 .smallcaps {
   font-variant: small-caps;
 }
@@ -10,7 +14,6 @@ h1, h2, h3, h4, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
 
 .icon-button {
@@ -20,7 +23,7 @@ h1, h2, h3, h4, body {
   margin: 0 15px; /* Spacing between buttons */
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for color and background */
   padding: 10px 20px; /* Padding inside the button */
-  border: 1px solid transparent; /* Button border */
+  border: 1px solid; /* Button border */
   border-radius: 5px; /* Rounded corners */
   text-align: center; /* Center the text icon */
   display: inline-block; /* Necessary for the width to wrap content */
