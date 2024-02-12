@@ -1,0 +1,6 @@
+
+machine + human
+step 1853 total_reward +284.27
+
+machine
+step 614 total_reward +1.14
