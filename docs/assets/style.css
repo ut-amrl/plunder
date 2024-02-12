@@ -1,6 +1,63 @@
+body {
+  font-family: 'Helvetica Nueue', sans-serif;
+}
+
 .icon-container {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+.icon-button {
+  font-size: 24px; /* Icon size */
+  color: #333; /* Icon color */
+  text-decoration: none;
+  margin: 0 15px; /* Spacing between buttons */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for color and background */
+  padding: 10px 20px; /* Padding inside the button */
+  border: 1px solid transparent; /* Button border */
+  border-radius: 5px; /* Rounded corners */
+  text-align: center; /* Center the text icon */
+  display: inline-block; /* Necessary for the width to wrap content */
+}
+
+.icon-button:hover, .icon-button:focus {
+  color: #fff; /* Text color on hover/focus */
+  background-color: #007bff; /* Background color on hover/focus */
+  border-color: #007bff; /* Border color on hover/focus */
+  text-decoration: none; /* No underline on hover/focus */
+}
+
+.icon-button i {
+  margin-bottom: 4px; /* Space between icon and text */
+  display: block; /* Ensures that the icon is above the text */
+}
+
+/* You can customize the hover color for each button based on brand */
+.icon-button.github:hover, .icon-button.github:focus {
+  background-color: #6e5494;
+  border-color: #6e5494;
+}
+
+.icon-button.dataset:hover, .icon-button.dataset:focus {
+background-color: #28a745; /* Example green background for datasets */
+border-color: #28a745;
+}
+
+.icon-button.youtube:hover, .icon-button.youtube:focus {
+  background-color: #FF0000;
+  border-color: #FF0000;
+}
+
+.icon-button.arxiv:hover, .icon-button.arxiv:focus {
+  background-color: #B31B1B;
+  border-color: #B31B1B;
+}
+
+/* Responsive text size */
+@media (max-width: 768px) {
+  .icon-button {
+    font-size: 20px;
+  }
 }
