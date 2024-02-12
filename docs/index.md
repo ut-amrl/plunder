@@ -1,5 +1,7 @@
 
 
+<link rel="stylesheet" type="text/css" href="assets/style.css">
+
 ---
 
 # PLUNDER: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations
@@ -9,7 +11,6 @@
 Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels. 
 
 
-<link rel="stylesheet" href="assets/style.css">
 
 <div class="icon-container">
 
