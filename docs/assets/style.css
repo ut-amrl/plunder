@@ -38,8 +38,8 @@ h1, h2, h3, h4, p {
 
 .icon-button:hover, .icon-button:focus {
   color: #fff; /* Text color on hover/focus */
-  background-color: #007bff; /* Background color on hover/focus */
-  border-color: #007bff; /* Border color on hover/focus */
+  background-color: #3fc15d; /* Background color on hover/focus */
+  border-color: #3fc15d; /* Border color on hover/focus */
   text-decoration: none; /* No underline on hover/focus */
 }
 
@@ -54,19 +54,14 @@ h1, h2, h3, h4, p {
   border-color: #aa8bd9;
 }
 
-.icon-button.dataset:hover, .icon-button.dataset:focus {
-background-color: #3fc15d; /* Example green background for datasets */
-border-color: #3fc15d;
-}
-
 .icon-button.youtube:hover, .icon-button.youtube:focus {
   background-color: #ff6f6f;
   border-color: #ff6f6f;
 }
 
 .icon-button.arxiv:hover, .icon-button.arxiv:focus {
-  background-color: #B31B1B;
-  border-color: #B31B1B;
+  background-color: #ecad4f;
+  border-color: #ecad4f;
 }
 
 /* Responsive text size */
