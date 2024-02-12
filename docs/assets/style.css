@@ -1,5 +1,9 @@
-markdown-body {
+h1, h2, h3, h4, body {
   font-family: 'Helvetica Nueue', sans-serif;
+}
+
+.smallcaps {
+  font-variant: small-caps;
 }
 
 .icon-container {
