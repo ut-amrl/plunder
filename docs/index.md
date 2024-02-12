@@ -1,9 +1,40 @@
 
 # PLUNDER: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations
 
-![](../2D-highway-env/snapshots/example_snapshot/asp_8.gif)
+![](assets/asp_8.gif)
 
 Our goal is to synthesize a programmatic state machine policy from time-series data while simultaneously inferring a set of high-level action labels. 
+
+
+<link rel="stylesheet" href="assets/style.css">
+
+<div class="icon-container">
+          <!-- ArXiv Paper URL -->
+          <a href="https://arxiv.org/abs/2309.13549" class="icon-button arxiv" target="_blank" title="ArXiv Paper">
+            <i class="fas fa-scroll"></i>
+            <span>Paper</span>
+          </a>
+           <!-- Dataset URL -->
+          <a href="https://doi.org/10.18738/T8/BBOQMV" class="icon-button dataset" target="_blank" title="Dataset">
+            <i class="fas fa-database"></i>
+            <span>Dataset</span>
+          </a>
+          <!-- GitHub Profile -->
+          <a href="https://github.com/ut-amrl/coda-devkit" class="icon-button github" target="_blank" title="GitHub Profile">
+            <i class="fab fa-github"></i>
+            <span>DevKit</span>
+          </a>
+          <!-- GitHub Repository -->
+          <a href="https://github.com/ut-amrl/coda-models" class="icon-button github" target="_blank" title="GitHub Repository">
+            <i class="fab fa-github"></i>
+            <span>Models</span>
+          </a>
+          <!-- YouTube Video -->
+          <a href="https://youtu.be/WSvygHg5aYM?si=Vt3RDAPxVGlLIl0B" class="icon-button youtube" target="_blank" title="YouTube Video">
+            <i class="fab fa-youtube"></i>
+            <span>Presentation</span>
+          </a>
+        </div>
 
 ---
 ## Abstract
