@@ -5,7 +5,7 @@
 
 ---
 
-# PLUNDER: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations
+<h2><span class="smallcaps">PLUNDER</span>: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations</h2>
 
 ![](assets/asp_8.gif)
 

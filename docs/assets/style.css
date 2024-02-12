@@ -24,6 +24,7 @@ h1, h2, h3, h4, body {
   border-radius: 5px; /* Rounded corners */
   text-align: center; /* Center the text icon */
   display: inline-block; /* Necessary for the width to wrap content */
+  opacity: .8;
 }
 
 .icon-button:hover, .icon-button:focus {
