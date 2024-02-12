@@ -9,7 +9,7 @@
 <center>
 <p class="title"><span class="smallcaps">Plunder</span>: Probabilistic Program Synthesis for Learning from Unlabeled and Noisy Demonstrations</p>
 
-<p class="authors">Jimmy Xin, Linus Zheng, Jiayi Wei, Kia Rahmani, Jarrett Holtz, Isil Dillig, Joydeep Biswas</p>
+<p class="authors">Jimmy Xin, Linus Zheng, Kia Rahmani, Jiayi Wei, Jarrett Holtz, Isil Dillig, Joydeep Biswas</p>
 </center>
 
 ![](assets/asp_8.gif)
@@ -49,15 +49,15 @@ Imitation Learning (IL) is a popular approach for teaching robots how to perform
 <center>
 <figure>
 <img src="assets/overview.png" style="width: 500px"/>
-<figurecaption style="font-size: 12px"><i>Overview of the <span class="smallcaps">Plunder algorithm</span></i></figurecaption>
+<br>
+<figurecaption style="font-size: 12px"><i>Overview of the <span class="smallcaps">Plunder</span> algorithm</i></figurecaption>
 </figure>
 </center>
 
 
 ## Experiments
 <div style="display: flex;">
-<p>We evaluated our algorithm on the following experiments:
-<br><b>Stop Sign (SS)</b>: acceleration control in a straight line.
+<p><b>Stop Sign (SS)</b>: acceleration control in a straight line.
 <br><b>Pass Traffic (PT)</b>: switching lanes in highway traffic.
 <br><b>Merge (MG)</b>: merging from the leftmost to the rightmost lane in highway traffic.
 <br><b>Pick and Place (PP)</b>: controlling a robot arm to grab and object and move it to a designated location.
@@ -66,7 +66,19 @@ Imitation Learning (IL) is a popular approach for teaching robots how to perform
 <img src="assets/stack.gif" style="width: 400px; padding-left: 50px;"/>
 </div>
 
-
+## Citation
+<p class="code-block">
+@misc{plunder2023,<br>
+      &ensp;&ensp;title={Programmatic Imitation Learning from Unlabeled and Noisy Demonstrations}, <br>
+      &ensp;&ensp;author={Jimmy Xin and Linus Zheng and Kia Rahmani and Jiayi Wei and Jarrett Holtz and Isil Dillig and Joydeep Biswas},<br>
+      &ensp;&ensp;year={2023},<br>
+      &ensp;&ensp;eprint={2303.01440},<br>
+      &ensp;&ensp;archivePrefix={arXiv},<br>
+      &ensp;&ensp;primaryClass={cs.RO},<br>
+      &ensp;&ensp;doi={10.48550/arXiv.2303.01440}<br>
+      &ensp;&ensp;url={https://doi.org/10.48550/arXiv.2303.01440}<br>
+}
+</p>
   
 
 
