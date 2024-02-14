@@ -7,36 +7,37 @@ This module is the setup for a simple vehicle driving in a straight line. The go
 Try running the algorithm on the setup by running **make** and **make emng** (or see **snapshots/** for a selection of pre-acquired results).
 
 The most useful/informative outputs will be:
-- **out/aspx/**, which stores the synthesized policies. For example, in **out/asp_iter19/asp.txt**, we can see the final policy:
+- **out/aspx/**, which stores the synthesized policies. For example, we can see the final policy (which we have cleaned up here for presentation):
     ```
-    ACC -> CON
-    Flip(Logistic(Minus(vMax, vel), 0.254044, -1.066688))
-    ACC -> DEC
-    Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), -4.124995, -4.151130))
-    CON -> DEC
-    Flip(Logistic(Minus(dns, DistTraveled(vel, decMax)), 3.386174, -3.434230))
+   if ha == ACC and flp(lgs(Minus(v, v_max), -0.456573, 1.388253)):
+       return CON
+   if ha == ACC and flp(lgs(Minus(dns, DistTraveled(v, a_min)), -6.926392, -2.609171)):
+       return DEC
+   if ha == CON and flp(lgs(Minus(DistTraveled(v, a_min), dns), -2.829544, 0.814321)):
+       return DEC
+   return ha
     ```
 - **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](snapshots/example_snapshot/plots/accuracy-alt.png)
+    ![](../../1D-target/snapshots/example_snapshot/plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
 
-    ![](snapshots/example_snapshot/plots/1-0-graph.png)
+    ![](../../1D-target/snapshots/example_snapshot/plots/1-0-graph.png)
 
     Iteration 2:
 
-    ![](snapshots/example_snapshot/plots/2-0-graph.png)
+    ![](../../1D-target/snapshots/example_snapshot/plots/2-0-graph.png)
     
     Iteration 9:
 
-    ![](snapshots/example_snapshot/plots/9-0-graph.png)
+    ![](../../1D-target/snapshots/example_snapshot/plots/9-0-graph.png)
 
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 9:
 
-    ![](snapshots/example_snapshot/plots/LA-9-0-graph.png)
+    ![](../../1D-target/snapshots/example_snapshot/plots/LA-9-0-graph.png)
 
 Other outputs include:
 - **sim/** - contains the simulated trajectories for each robot

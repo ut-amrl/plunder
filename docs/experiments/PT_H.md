@@ -2,57 +2,54 @@
 <link rel="stylesheet" type="text/css" href="../assets/style.css">
 
 # 2D Highway, Human Demonstrations (Pass Traffic - Hand)
-This module is the setup for a vehicle performing lane-changing maneuvers. The goal is to travel as far as possible without crashing.
-
-Note that this setup differs from the 1D-target example in that the demonstrations are provided by the python programs in **python-gen** (try running **highway2d.py**). Demonstrations will be placed into that folder automatically. 
-As a result, the setup does *not* require filling out *robotSets.h*, a simulation ASP, a physics model, or their corresponding settings.
+This module is roughly the same as PT, but the demonstrations are provided by a human joysticking the controls, so the behavior is significantly less predictable.
 
 Try running the algorithm on the setup (or see **snapshots/** for pre-acquired results).
 
-The most useful/informative outputs will be:
-- **out/aspx/**, which stores the synthesized policies. For example, in **out/asp_iter19/asp.txt**, we can see the final policy:
+Results are stored in **out/**. For example, we can see the final policy:
     ```
-    FASTER -> LANE_LEFT
-        And(fX1=[Flip(Logistic(Minus(r_x, l_x), -42.283489, -10.954515), true)], fX1=[Flip(Logistic(Minus(x, f_x), -39.995296, 0.641205), true)])
-    FASTER -> LANE_RIGHT
-        And(fX1=[Flip(Logistic(Minus(r_x, f_x), 2.816547, 1.569943), true)], fX1=[Flip(Logistic(Minus(x, f_x), -38.728283, 0.874972), true)])
-    FASTER -> SLOWER
-        fX1=[Flip(Logistic(DividedBy(Minus(f_x, x), vx), 0.971556, -26.162355), true)]
-    ...
+    if ha == FASTER and And(flp(lgs(f_vx, 35.021538, -21.117664)), And(flp(lgs(Minus(f_x, l_x), -28.455282, -0.111654)), And(flp(lgs(f_vx, 21.367447, -32.117924)), flp(lgs(Minus(f_x, x), 22.931559, -0.621136))))):
+       return LANE_LEFT
+    if ha == FASTER and flp(lgs(DividedBy(Minus(f_x, x), f_vx), 0.903634, -9.377876)):
+       return LANE_RIGHT
+    if ha == FASTER and Or(flp(lgs(Minus(r_x, l_x), 142.693558, 26.650047)), Or(flp(lgs(Plus(f_vx, r_vx), -108.861458, -0.039834)), And(flp(lgs(vx, 24.874939, -61.811741)), flp(lgs(Minus(f_x, Plus(l_x, r_x)), -557.253906, -0.012443))))):
+       return SLOWER
+    if ha == LANE_LEFT and And(flp(lgs(r_vx, 19.766947, 2.068509)), flp(lgs(Minus(x, f_x), -31.710594, -0.294839))):
+       return FASTER
+    if ha == LANE_LEFT and Or(flp(lgs(DividedBy(x, l_vx), 34.269012, 245.851440)), And(flp(lgs(x, 235.960114, -0.653907)), Or(flp(lgs(l_vx, 126.732285, -0.239940)), flp(lgs(Plus(l_vx, r_vx), 44.333492, 2.931920))))):
+       return LANE_RIGHT
+    if ha == LANE_LEFT and flp(lgs(vx, 24.829386, -86.008926)):
+       return SLOWER
+    if ha == LANE_RIGHT and And(flp(lgs(l_vx, 20.476099, 0.709218)), flp(lgs(Minus(x, f_x), -26.473980, -0.609106))):
+       return FASTER
+    if ha == LANE_RIGHT and And(flp(lgs(vx, 25.023340, 8.410436)), And(flp(lgs(Plus(l_vx, r_vx), 41.128242, -2.412731)), flp(lgs(f_vx, 20.260880, -5.940400)))):
+       return LANE_LEFT
+    if ha == LANE_RIGHT and flp(lgs(Times(vx, Plus(Plus(vx, Plus(vx, l_vx)), f_vx)), 2233.293213, -0.184224)):
+       return SLOWER
+    if ha == SLOWER and flp(lgs(Times(vx, Plus(Plus(vx, vx), f_vx)), 1764.555542, 0.051010)):
+       return FASTER
+    if ha == SLOWER and And(flp(lgs(DividedBy(Minus(r_x, f_x), l_vx), 1.813058, 0.469895)), flp(lgs(vx, 24.549904, 27.209173))):
+       return LANE_LEFT
+    if ha == SLOWER and Or(flp(lgs(Plus(r_vx, r_vx), 37.099731, -12.132344)), flp(lgs(vx, 25.158022, 46.733471))):
+       return LANE_RIGHT
+    return ha
     ```
 
-- **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
-
-    ![](snapshots/example_snapshot/plots/accuracy-alt.png)
-
-- **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
+Plots are stored in **plots/**. See:
+- **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. For example:
 
     Iteration 1:
 
-    ![](snapshots/example_snapshot/plots/1-0-graph.png)
+    ![](../../2D-highway-manual/snapshots/example_snapshot/plots/1-9-graph.png)
 
     Iteration 2:
 
-    ![](snapshots/example_snapshot/plots/2-0-graph.png)
+    ![](../../2D-highway-manual/snapshots/example_snapshot/plots/2-9-graph.png)
 
-    Iteration 14:
+    Iteration 5:
 
-    ![](snapshots/example_snapshot/plots/14-0-graph.png)
+    ![](../../2D-highway-manual/snapshots/example_snapshot/plots/5-9-graph.png)
     
-- **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 14:
+- **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 5:
 
-    ![](snapshots/example_snapshot/plots/LA-14-0-graph.png)
-
-We also show the behavior of the synthesized policy directly in the simulator.
-
-Iteration 1:
-
-![](snapshots/example_snapshot/asp_1.gif)
-
-Iteration 3:
-
-![](snapshots/example_snapshot/asp_3.gif)
-
-Iteration 8:
-
-![](snapshots/example_snapshot/asp_8.gif)
+    ![](../../2D-highway-manual/snapshots/example_snapshot/plots/LA-5-9-graph.png)

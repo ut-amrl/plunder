@@ -10,49 +10,67 @@ As a result, the setup does *not* require filling out *robotSets.h*, a simulatio
 Try running the algorithm on the setup (or see **snapshots/** for pre-acquired results).
 
 The most useful/informative outputs will be:
-- **out/aspx/**, which stores the synthesized policies. For example, in **out/asp_iter19/asp.txt**, we can see the final policy:
+- **out/aspx/**, which stores the synthesized policies. For example, we can see the final policy (which we have cleaned up here for presentation):
     ```
-    FASTER -> LANE_LEFT
-        And(fX1=[Flip(Logistic(Minus(r_x, l_x), -42.283489, -10.954515), true)], fX1=[Flip(Logistic(Minus(x, f_x), -39.995296, 0.641205), true)])
-    FASTER -> LANE_RIGHT
-        And(fX1=[Flip(Logistic(Minus(r_x, f_x), 2.816547, 1.569943), true)], fX1=[Flip(Logistic(Minus(x, f_x), -38.728283, 0.874972), true)])
-    FASTER -> SLOWER
-        fX1=[Flip(Logistic(DividedBy(Minus(f_x, x), vx), 0.971556, -26.162355), true)]
-    ...
+   if ha == FASTER and And(flp(lgs(Minus(r_x, l_x), -42.325607, -11.322358)), flp(lgs(Minus(x, f_x), -39.853004, 0.471738))):
+       return LANE_LEFT
+   if ha == FASTER and And(flp(lgs(Minus(r_x, f_x), 2.268923, 1.691306)), flp(lgs(Minus(x, f_x), -37.500061, 0.498594))):
+       return LANE_RIGHT
+   if ha == FASTER and flp(lgs(DividedBy(Minus(f_x, x), vx), 0.977072, -31.665253)):
+       return SLOWER
+   if ha == LANE_LEFT and flp(lgs(DividedBy(Minus(f_x, x), r_vx), 2.090207, 93.243362)):
+       return FASTER
+   if ha == LANE_LEFT and false:
+       return LANE_RIGHT
+   if ha == LANE_LEFT and flp(lgs(Minus(l_x, x), 30.264160, -3.164596)):
+       return SLOWER
+   if ha == LANE_RIGHT and flp(lgs(DividedBy(Minus(f_x, x), vx), 1.538538, 14.793274)):
+       return FASTER
+   if ha == LANE_RIGHT and false:
+       return LANE_LEFT
+   if ha == LANE_RIGHT and flp(lgs(DividedBy(Minus(x, r_x), vx), -0.984751, 182.378754)):
+       return SLOWER
+   if ha == SLOWER and flp(lgs(DividedBy(Minus(f_x, x), vx), 1.495547, 73.774384)):
+       return FASTER
+   if ha == SLOWER and flp(lgs(Minus(l_x, f_x), 5.026824, 4.910437)):
+       return LANE_LEFT
+   if ha == SLOWER and flp(lgs(Minus(r_x, f_x), 1.479489, 1.003578)):
+       return LANE_RIGHT
+   return ha
     ```
 
 - **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](snapshots/example_snapshot/plots/accuracy-alt.png)
+    ![](../../2D-highway-env/snapshots/example_snapshot/plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
 
-    ![](snapshots/example_snapshot/plots/1-0-graph.png)
+    ![](../../2D-highway-env/snapshots/example_snapshot/plots/1-0-graph.png)
 
     Iteration 2:
 
-    ![](snapshots/example_snapshot/plots/2-0-graph.png)
+    ![](../../2D-highway-env/snapshots/example_snapshot/plots/2-0-graph.png)
 
     Iteration 14:
 
-    ![](snapshots/example_snapshot/plots/14-0-graph.png)
+    ![](../../2D-highway-env/snapshots/example_snapshot/plots/14-0-graph.png)
     
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 14:
 
-    ![](snapshots/example_snapshot/plots/LA-14-0-graph.png)
+    ![](../../2D-highway-env/snapshots/example_snapshot/plots/LA-14-0-graph.png)
 
 We also show the behavior of the synthesized policy directly in the simulator.
 
 Iteration 1:
 
-![](snapshots/example_snapshot/asp_1.gif)
+![](../../2D-highway-env/snapshots/example_snapshot/asp_1.gif)
 
 Iteration 3:
 
-![](snapshots/example_snapshot/asp_3.gif)
+![](../../2D-highway-env/snapshots/example_snapshot/asp_3.gif)
 
 Iteration 8:
 
-![](snapshots/example_snapshot/asp_8.gif)
+![](../../2D-highway-env/snapshots/example_snapshot/asp_8.gif)

@@ -1,58 +1,49 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" type="text/css" href="../assets/style.css">
 
-# 2D Merge (Merge)
-This module is the setup for a vehicle dealing with lane-merges. The goal is to quickly move from the leftmost lane to the rightmost lane without crashing into other vehicles.
-
-Note that this setup differs from the 1D-target example in that the demonstrations are provided by the python programs in **python-gen** (try running **merge.py**). Demonstrations will be placed into that folder automatically. 
-As a result, the setup does *not* require filling out *robotSets.h*, a simulation ASP, a physics model, or their corresponding settings.
+# 2D Merge, Human Demonstrations (Merge - Hand)
+This module is roughly the same as MG, but the demonstrations are provided by a human joysticking the controls, so the behavior is significantly less predictable.
 
 Try running the algorithm on the setup (or see **snapshots/** for pre-acquired results).
 
-The most useful/informative outputs will be:
-- **out/aspx/**, which stores the synthesized policies. For example, in **out/asp_iter14/asp.txt**, we can see the final policy:
+Results are stored in **out/**. For example, we can see the final policy:
     ```
-    FASTER -> LANE_RIGHT
-        Flip(Logistic(Minus(r_x, x), 29.547829, 3.164191))
-    FASTER -> SLOWER
-        Flip(Logistic(DividedBy(Minus(f_x, x), vx), 1.028897, -87.824547))
-    LANE_RIGHT -> FASTER
-        And(Flip(Logistic(Minus(x, f_x), -118.362206, 14.191378)), Flip(Logistic(Minus(r_x, x), 27.394236, -13.803990)))
-    ...
+   if ha == FASTER and flp(lgs(x, 1043.003418, 0.010987)):
+       return LANE_LEFT
+   if ha == FASTER and Or(flp(lgs(Minus(r_x, x), 24.256481, 0.261414)), flp(lgs(Minus(r_x, x), -7.083443, -10.012507))):
+       return LANE_RIGHT
+   if ha == FASTER and And(flp(lgs(Minus(r_x, f_x), -5.321127, 27.355986)), flp(lgs(Minus(y, r_y), -2.810756, 45.921741))):
+       return SLOWER
+   if ha == LANE_LEFT and And(flp(lgs(Plus(y, r_y), 27.675999, -28.561993)), Or(flp(lgs(Minus(r_y, y), 4.606244, -14.761892)), Or(flp(lgs(Minus(f_x, r_x), 131.751694, 4.325001)), flp(lgs(f_x, 364.858917, -1.114238))))):
+       return FASTER
+   if ha == LANE_LEFT and flp(lgs(f_y, 1000000000.000000, 1.000000)):
+       return LANE_RIGHT
+   if ha == LANE_LEFT and flp(lgs(f_x, 389.029755, -1.134043)):
+       return SLOWER
+   if ha == LANE_RIGHT and Or(flp(lgs(Minus(r_y, Plus(x, f_y)), -407.739685, -2.902149)), flp(lgs(f_y, 13.234916, 0.499033))):
+       return FASTER
+   if ha == LANE_RIGHT and flp(lgs(Minus(f_x, r_x), 168.824478, 0.089852)):
+       return LANE_LEFT
+   if ha == LANE_RIGHT and flp(lgs(Times(x, y), 4744.125977, 0.026073)):
+       return SLOWER
+   return ha
     ```
 
-- **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
-
-    ![](snapshots/example_snapshot/plots/accuracy-alt.png)
-
-- **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
+Plots are stored in **plots/**. See:
+- **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. For example:
 
     Iteration 1:
 
-    ![](snapshots/example_snapshot/plots/testing/1-0-graph.png)
+    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/1-2-graph.png)
 
     Iteration 2:
 
-    ![](snapshots/example_snapshot/plots/testing/2-0-graph.png)
+    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/2-2-graph.png)
 
-    Iteration 9:
+    Iteration 5:
 
-    ![](snapshots/example_snapshot/plots/testing/9-0-graph.png)
+    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/5-2-graph.png)
     
-- **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 9:
+- **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 5:
 
-    ![](snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
-
-We also show the behavior of the synthesized policy directly in the simulator.
-
-Iteration 1:
-
-![](snapshots/example_snapshot/asp_1.gif)
-
-Iteration 3:
-
-![](snapshots/example_snapshot/asp_3.gif)
-
-Iteration 8:
-
-![](snapshots/example_snapshot/asp_8.gif)
+    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/LA-5-2-graph.png)
