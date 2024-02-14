@@ -73,6 +73,9 @@ Obs motorModel(State state, bool error){
     state.put("steer", target_steer);
     state.put("acc", target_acc);
 
+    // state.put("acc", state.get("acc") + (la_error["acc"])(gen));
+    // state.put("steer", state.get("steer") + (la_error["steer"])(gen));
+
     return state.obs;
 }
 
@@ -98,6 +101,42 @@ HA ASP_model(State state){
     else if (state.ha != LANE_LEFT && right_clear)
         return LANE_RIGHT;
     return SLOWER;
+
+    // HA ha = state.ha;
+    // double x = state.get("x");
+    // double l_x = state.get("l_x");
+    // double f_x = state.get("f_x");
+    // double r_x = state.get("r_x");
+    // double vx = state.get("vx");
+    // double l_vx = state.get("l_vx");
+    // double f_vx = state.get("f_vx");
+    // double r_vx = state.get("r_vx");
+
+    // if (ha == FASTER && And(sample(logistic2(Minus(r_x, l_x), -42.325607, -11.322358)), sample(logistic2(Minus(x, f_x), -39.853004, 0.471738))))
+    //     return LANE_LEFT;
+    // if (ha == FASTER && And(sample(logistic2(Minus(r_x, f_x), 2.268923, 1.691306)), sample(logistic2(Minus(x, f_x), -37.500061, 0.498594))))
+    //     return LANE_RIGHT;
+    // if (ha == FASTER && sample(logistic2(DividedBy(Minus(f_x, x), vx), 0.977072, -31.665253)))
+    //     return SLOWER;
+    // if (ha == LANE_LEFT && sample(logistic2(DividedBy(Minus(f_x, x), r_vx), 2.090207, 93.243362)))
+    //     return FASTER;
+    // if (ha == LANE_LEFT && sample(logistic2(f_vx, 1000000000.000000, 1.000000)))
+    //     return LANE_RIGHT;
+    // if (ha == LANE_LEFT && sample(logistic2(Minus(l_x, x), 30.264160, -3.164596)))
+    //     return SLOWER;
+    // if (ha == LANE_RIGHT && sample(logistic2(DividedBy(Minus(f_x, x), vx), 1.538538, 14.793274)))
+    //     return FASTER;
+    // if (ha == LANE_RIGHT && sample(logistic2(r_vx, 1000000000.000000, 1.000000)))
+    //     return LANE_LEFT;
+    // if (ha == LANE_RIGHT && sample(logistic2(DividedBy(Minus(x, r_x), vx), -0.984751, 182.378754)))
+    //     return SLOWER;
+    // if (ha == SLOWER && sample(logistic2(DividedBy(Minus(f_x, x), vx), 1.495547, 73.774384)))
+    //     return FASTER;
+    // if (ha == SLOWER && sample(logistic2(Minus(l_x, f_x), 5.026824, 4.910437)))
+    //     return LANE_LEFT;
+    // if (ha == SLOWER && sample(logistic2(Minus(r_x, f_x), 1.479489, 1.003578)))
+    //     return LANE_RIGHT;
+    // return ha;
 }
 
 Obs physicsModel(State state, double t_step){}

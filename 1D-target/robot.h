@@ -32,6 +32,13 @@ HA ASP_model(State state){
         if(cond2) ha=DEC;                   // CON -> DEC
     }
 
+    // if (ha == ACC && sample(logistic2(Minus(state.get("vel"), state.get("vMax")), -0.456573, 1.388253)))
+    //     return CON;
+    // if (ha == ACC && sample(logistic2(Minus(state.get("dns"), DistTraveled(state.get("vel"), state.get("decMax"))), -6.926392, -2.609171)))
+    //     return DEC;
+    // if (ha == CON && sample(logistic2(Minus(DistTraveled(state.get("vel"), state.get("decMax")), state.get("dns")), -2.829544, 0.814321)))
+    //     return DEC;
+
     return ha;
 }
 

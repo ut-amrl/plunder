@@ -27,55 +27,62 @@ Obs motorModel(State state, bool error){
     HA ha = state.ha;
 
     // Policy-based
-    // if(ha == MOVE_TO_CUBE) {
-    //     state.put("vx", 5 * (state.get("bx") - state.get("x")));
-    //     state.put("vy", 5 * (state.get("by") - state.get("y")));
-    //     state.put("vz", 5 * (state.get("bz") - state.get("z")));
-    //     state.put("end", 0.6);
-    // } else if (ha == MOVE_TO_TARGET) {
-    //     double t_end = -0.6;
-    //     state.put("vx", 5 * (state.get("tx") - state.get("x")));
-    //     state.put("vy", 5 * (state.get("ty") - state.get("y")));
-    //     state.put("vz", 5 * (state.get("tz") - state.get("z")));
+    if(ha == MOVE_TO_CUBE) {
+        state.put("vx", 5 * (state.get("bx") - state.get("x")));
+        state.put("vy", 5 * (state.get("by") - state.get("y")));
+        state.put("vz", 5 * (state.get("bz") - state.get("z")));
+        state.put("end", 0.6);
+    } else if (ha == MOVE_TO_TARGET) {
+        double t_end = -0.6;
+        state.put("vx", 5 * (state.get("tx") - state.get("x")));
+        state.put("vy", 5 * (state.get("ty") - state.get("y")));
+        state.put("vz", 5 * (state.get("tz") - state.get("z")));
 
-    //     if (state.get("end") >= -0.3) {
-    //         t_end = -0.6;
-    //         state.put("vx", 5 * (state.get("bx") - state.get("x")));
-    //         state.put("vy", 5 * (state.get("by") - state.get("y")));
-    //         state.put("vz", 5 * (state.get("bz") - state.get("z")));
-    //     }
-    //     if (state.get("end") >= 0) {
-    //         t_end = -0.3;
-    //     }
-    //     if (state.get("end") >= 0.3) {
-    //         t_end = 0;
-    //     }
-    //     if (state.get("end") >= 0.6) {
-    //         t_end = 0.3;
-    //     } 
+        if (state.get("end") >= -0.3) {
+            t_end = -0.6;
+            state.put("vx", 5 * (state.get("bx") - state.get("x")));
+            state.put("vy", 5 * (state.get("by") - state.get("y")));
+            state.put("vz", 5 * (state.get("bz") - state.get("z")));
+        }
+        if (state.get("end") >= 0) {
+            t_end = -0.3;
+        }
+        if (state.get("end") >= 0.3) {
+            t_end = 0;
+        }
+        if (state.get("end") >= 0.6) {
+            t_end = 0.3;
+        } 
 
-    //     state.put("end", t_end);
-    // } else {
-    //     throw invalid_argument("Invalid high-level action label");
-    // }
-
-    // RL-based
-    double vx = 5 * (state.get("bx") - state.get("x")), vy = 5 * (state.get("by") - state.get("y")), vz = 5 * (state.get("bz") - state.get("z")), end = 1;
-    if(ha == MOVE_TO_TARGET) {
-        vx = 5 * (state.get("tx") - state.get("x"));
-        vy = 5 * (state.get("ty") - state.get("y"));
-        vz = 5 * (state.get("tz") - state.get("z"));
-        end = -1;
+        state.put("end", t_end);
+    } else {
+        throw invalid_argument("Invalid high-level action label");
     }
 
-    vx = return_closer(vx, state.get("vx"));
-    vy = return_closer(vy, state.get("vy"));
-    vz = return_closer(vz, state.get("vz"));
+    // RL-based
+    // double vx = 5 * (state.get("bx") - state.get("x")), vy = 5 * (state.get("by") - state.get("y")), vz = 5 * (state.get("bz") - state.get("z")), end = 1;
+    // if(ha == MOVE_TO_TARGET) {
+    //     vx = 5 * (state.get("tx") - state.get("x"));
+    //     vy = 5 * (state.get("ty") - state.get("y"));
+    //     vz = 5 * (state.get("tz") - state.get("z"));
+    //     end = -1;
+    // }
 
-    state.put("vx", vx);
-    state.put("vy", vy);
-    state.put("vz", vz);
-    state.put("end", end);
+    // vx = return_closer(vx, state.get("vx"));
+    // vy = return_closer(vy, state.get("vy"));
+    // vz = return_closer(vz, state.get("vz"));
+
+    // state.put("vx", vx);
+    // state.put("vy", vy);
+    // state.put("vz", vz);
+    // state.put("end", end);
+
+
+    // state.put("vx", state.get("vx") + (la_error["vx"])(gen));
+    // state.put("vy", state.get("vy") + (la_error["vy"])(gen));
+    // state.put("vz", state.get("vz") + (la_error["vz"])(gen));
+    // state.put("end", state.get("end") + (la_error["end"])(gen));
+
     return state.obs;
 }
 
@@ -83,18 +90,25 @@ HA ASP_model(State state){
     HA ha = state.ha;
     
     // RL-based
-    if(ha == MOVE_TO_CUBE && abs(state.get("bx") - state.get("x")) < 0.05 && abs(state.get("by") - state.get("y")) < 0.05 && abs(state.get("bz") - state.get("z")) < 0.05) {
-        return MOVE_TO_TARGET;
-    }
-
-    // Policy-based
-    // if(ha == MOVE_TO_CUBE && 
-    //     flip(logistic(0.005, -5000, abs(state.get("bx") - state.get("x")))) && 
-    //     flip(logistic(0.005, -5000, abs(state.get("by") - state.get("y"))))) {
+    // if(ha == MOVE_TO_CUBE && abs(state.get("bx") - state.get("x")) < 0.05 && abs(state.get("by") - state.get("y")) < 0.05 && abs(state.get("bz") - state.get("z")) < 0.05) {
     //     return MOVE_TO_TARGET;
     // }
 
+    // Policy-based
+    if(ha == MOVE_TO_CUBE && 
+        flip(logistic(0.005, -5000, abs(state.get("bx") - state.get("x")))) && 
+        flip(logistic(0.005, -5000, abs(state.get("by") - state.get("y"))))) {
+        return MOVE_TO_TARGET;
+    }
     return ha;
+
+    // double x = state.get("x");
+    // double z = state.get("z");
+    // double bx = state.get("bx");
+    // double bz = state.get("bz");
+    // if (ha == MOVE_TO_CUBE && sample(logistic2(Minus(Minus(Abs(x), Abs(bx)), Plus(Minus(z, bz), Minus(Abs(Minus(z, Abs(bx))), Abs(x)))), 0.011845, 539.856995)))
+    //     return MOVE_TO_TARGET;
+    // return ha;
 }
 
 Obs physicsModel(State state, double t_step){}

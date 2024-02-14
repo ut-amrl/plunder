@@ -72,6 +72,9 @@ Obs motorModel(State state, bool error){
     state.put("steer", target_steer);
     state.put("acc", target_acc);
 
+    // state.put("acc", state.get("acc") + (la_error["acc"])(gen));
+    // state.put("steer", state.get("steer") + (la_error["steer"])(gen));
+
     return state.obs;
 }
 
@@ -95,6 +98,44 @@ HA ASP_model(State state){
         return FASTER;
 
     return SLOWER;
+
+    // HA ha = state.ha;
+    // double x = state.get("x");
+    // double l_x = state.get("l_x");
+    // double f_x = state.get("f_x");
+    // double r_x = state.get("r_x");
+    // double vx = state.get("vx");
+    // double l_vx = state.get("l_vx");
+    // double f_vx = state.get("f_vx");
+    // double r_vx = state.get("r_vx");
+
+
+    // if (ha == FASTER && sample(logistic2(f_vx, 1000000000.000000, 1.000000)))
+    //     return LANE_LEFT;
+    // if (ha == FASTER && sample(logistic2(DividedBy(Minus(x, r_x), vx), -1.028642, -35.895672)))
+    //     return LANE_RIGHT;
+    // if (ha == FASTER && sample(logistic2(Minus(r_x, f_x), -38.665745, 0.395329)))
+    //     return SLOWER;
+    // if (ha == LANE_LEFT && sample(logistic2(f_x, 1000000000.000000, 1.000000)))
+    //     return FASTER;
+    // if (ha == LANE_LEFT && sample(logistic2(f_x, 1000000000.000000, 1.000000)))
+    //     return LANE_RIGHT;
+    // if (ha == LANE_LEFT && sample(logistic2(vx, 1000000000.000000, 1.000000)))
+    //     return SLOWER;
+    // if (ha == LANE_RIGHT && sample(logistic2(Minus(r_x, x), 8.462489, -0.367737)))
+    //     return FASTER;
+    // if (ha == LANE_RIGHT && sample(logistic2(r_vx, 1000000000.000000, 1.000000)))
+    //     return LANE_LEFT;
+    // if (ha == LANE_RIGHT && sample(logistic2(DividedBy(Minus(x, r_x), l_vx), -0.377488, 10.546384)))
+    //     return SLOWER;
+    // if (ha == SLOWER && sample(logistic2(Minus(x, f_x), -39.469845, -0.228033)))
+    //     return FASTER;
+    // if (ha == SLOWER && sample(logistic2(vx, 1000000000.000000, 1.000000)))
+    //     return LANE_LEFT;
+    // if (ha == SLOWER && sample(logistic2(Minus(x, r_x), -43.102879, -0.396746)))
+    //     return LANE_RIGHT;
+
+    // return ha;
 }
 
 Obs physicsModel(State state, double t_step){}
