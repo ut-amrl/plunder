@@ -1,3 +1,3 @@
-# 2D Highway Env (Pass Traffic, Manual)
+# 2D Highway Env (Pass Traffic, Hand)
 
-## TODO
+See the [docs](../docs/experiments/PT_H.md).

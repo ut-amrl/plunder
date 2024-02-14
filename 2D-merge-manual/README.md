@@ -1,3 +1,3 @@
-# 2D Merge (Manual)
+# 2D Merge (Hand)
 
-## TODO
+See the [docs](../docs/experiments/MG_H.md).
