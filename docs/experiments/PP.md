@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="../assets/style.css">
+
 # Pick and Place (PP)
 
 This module is the setup for a robotic arm picking up a cube and placing it at the desired location.

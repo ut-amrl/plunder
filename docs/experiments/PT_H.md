@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="../assets/style.css">
+
 # 2D Highway, Human Demonstrations (Pass Traffic - Hand)
 This module is the setup for a vehicle performing lane-changing maneuvers. The goal is to travel as far as possible without crashing.
 
