@@ -57,11 +57,13 @@ Imitation Learning (IL) is a popular approach for teaching robots how to perform
 
 ## Experiments
 <div style="display: flex;">
-<p><b>Stop Sign (SS)</b>: acceleration control in a straight line.
-<br><b>Pass Traffic (PT)</b>: switching lanes in highway traffic.
-<br><b>Merge (MG)</b>: merging from the leftmost to the rightmost lane in highway traffic.
-<br><b>Pick and Place (PP)</b>: controlling a robot arm to grab and object and move it to a designated location.
-<br><b>Stack (ST)</b>: stacking two boxes on top of each other at a designated location.
+<p><b><a href="../1D-target/README.md">Stop Sign (SS)</a></b>: acceleration control in a straight line.
+<br><b><a href="../2D-highway-env/README.md">Pass Traffic (PT)</a></b>: switching lanes in highway traffic.
+<br><b><a href="../2D-highway-manual/README.md">Pass Traffic, Human Demonstration (PT-H)</a></b>: same as above, but with human demonstrations.
+<br><b><a href="../2D-merge/README.md">Merge (MG)</a></b>: merging from the leftmost to the rightmost lane in highway traffic.
+<br><b><a href="../2D-merge-manual/README.md">Merge, Human Demonstration (MG-H)</a></b>: same as above, but with human demonstrations.
+<br><b><a href="../panda-pick-place/README.md">Pick and Place (PP)</a></b>: controlling a robot arm to grab and object and move it to a designated location.
+<br><b><a href="../panda-stack/README.md">Stack (ST)</a></b>: stacking two boxes on top of each other at a designated location.
 </p>
 <img src="assets/stack.gif" style="width: 400px; padding-left: 50px;"/>
 </div>
