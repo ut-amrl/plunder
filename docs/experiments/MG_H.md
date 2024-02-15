@@ -32,16 +32,16 @@ Plots are stored in **plots/**. See:
 
     Iteration 1:
 
-    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/1-2-graph.png)
+    ![](../assets/MG_H_plots/1-2-graph.png)
 
     Iteration 2:
 
-    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/2-2-graph.png)
+    ![](../assets/MG_H_plots/2-2-graph.png)
 
     Iteration 5:
 
-    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/5-2-graph.png)
+    ![](../assets/MG_H_plots/5-2-graph.png)
     
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 5:
 
-    ![](../../2D-merge-manual/snapshots/example_snapshot/plots/LA-5-2-graph.png)
+    ![](../assets/MG_H_plots/LA-5-2-graph.png)

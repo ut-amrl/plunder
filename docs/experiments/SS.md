@@ -16,25 +16,25 @@ The most useful/informative outputs will be:
     ```
 - **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](../../1D-target/snapshots/example_snapshot/plots/accuracy-alt.png)
+    ![](../assets/SS_plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
 
-    ![](../../1D-target/snapshots/example_snapshot/plots/1-0-graph.png)
+    ![](../assets/SS_plots/1-0-graph.png)
 
     Iteration 2:
 
-    ![](../../1D-target/snapshots/example_snapshot/plots/2-0-graph.png)
+    ![](../assets/SS_plots/2-0-graph.png)
     
     Iteration 9:
 
-    ![](../../1D-target/snapshots/example_snapshot/plots/9-0-graph.png)
+    ![](../assets/SS_plots/9-0-graph.png)
 
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 9:
 
-    ![](../../1D-target/snapshots/example_snapshot/plots/LA-9-0-graph.png)
+    ![](../assets/SS_plots/LA-9-0-graph.png)
 
 Other outputs include:
 - **sim/** - contains the simulated trajectories for each robot

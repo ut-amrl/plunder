@@ -38,36 +38,36 @@ The most useful/informative outputs will be:
 
 - **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](../../2D-highway-env/snapshots/example_snapshot/plots/accuracy-alt.png)
+    ![](../assets/PT_plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
 
-    ![](../../2D-highway-env/snapshots/example_snapshot/plots/1-0-graph.png)
+    ![](../assets/PT_plots/1-0-graph.png)
 
     Iteration 2:
 
-    ![](../../2D-highway-env/snapshots/example_snapshot/plots/2-0-graph.png)
+    ![](../assets/PT_plots/2-0-graph.png)
 
     Iteration 14:
 
-    ![](../../2D-highway-env/snapshots/example_snapshot/plots/14-0-graph.png)
+    ![](../assets/PT_plots/14-0-graph.png)
     
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 14:
 
-    ![](../../2D-highway-env/snapshots/example_snapshot/plots/LA-14-0-graph.png)
+    ![](../assets/PT_plots/LA-14-0-graph.png)
 
 We also show the behavior of the synthesized policy directly in the simulator.
 
 Iteration 1:
 
-![](../../2D-highway-env/snapshots/example_snapshot/asp_1.gif)
+![](../assets/PT_plots/asp_1.gif)
 
 Iteration 3:
 
-![](../../2D-highway-env/snapshots/example_snapshot/asp_3.gif)
+![](../assets/PT_plots/asp_3.gif)
 
 Iteration 8:
 
-![](../../2D-highway-env/snapshots/example_snapshot/asp_8.gif)
+![](../assets/PT_plots/asp_8.gif)

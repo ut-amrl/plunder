@@ -38,36 +38,36 @@ The most useful/informative outputs will be:
 
 - **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](../../2D-merge/snapshots/example_snapshot/plots/accuracy-alt.png)
+    ![](../assets/MG_plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
 
-    ![](../../2D-merge/snapshots/example_snapshot/plots/testing/1-0-graph.png)
+    ![](../assets/MG_plots/testing/1-0-graph.png)
 
     Iteration 2:
 
-    ![](../../2D-merge/snapshots/example_snapshot/plots/testing/2-0-graph.png)
+    ![](../assets/MG_plots/testing/2-0-graph.png)
 
     Iteration 9:
 
-    ![](../../2D-merge/snapshots/example_snapshot/plots/testing/9-0-graph.png)
+    ![](../assets/MG_plots/testing/9-0-graph.png)
     
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 9:
 
-    ![](../../2D-merge/snapshots/example_snapshot/plots/testing/LA-9-0-graph.png)
+    ![](../assets/MG_plots/testing/LA-9-0-graph.png)
 
 We also show the behavior of the synthesized policy directly in the simulator.
 
 Iteration 1:
 
-![](../../2D-merge/snapshots/example_snapshot/asp_1.gif)
+![](../assets/MG_plots/asp_1.gif)
 
 Iteration 3:
 
-![](../../2D-merge/snapshots/example_snapshot/asp_3.gif)
+![](../assets/MG_plots/asp_3.gif)
 
 Iteration 8:
 
-![](../../2D-merge/snapshots/example_snapshot/asp_8.gif)
+![](../assets/MG_plots/asp_8.gif)

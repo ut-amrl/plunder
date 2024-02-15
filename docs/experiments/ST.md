@@ -30,25 +30,25 @@ The most useful/informative outputs will be:
 
 - **plots/accuracy.png** and **plots/likelihoods.png**, which shows the progress of the EM loop across iterations. Here is a (slightly prettified) version for this task:
 
-    ![](../../panda-stack/snapshots/example_snapshot/plots/accuracy-alt.png)
+    ![](../assets/ST_plots/accuracy-alt.png)
 
 - **plots/testing/xx-x-graph.png**, which gives a visual representation of the action labels selected by the policy on the testing set. The first number in the file name indicates the iteration. For example:
 
     Iteration 1:
 
-    ![](../../panda-stack/snapshots/example_snapshot/plots/1-18-graph.png)
+    ![](../assets/ST_plots/1-18-graph.png)
 
     Iteration 2:
 
-    ![](../../panda-stack/snapshots/example_snapshot/plots/2-18-graph.png)
+    ![](../assets/ST_plots/2-18-graph.png)
 
     Iteration 7:
 
-    ![](../../panda-stack/snapshots/example_snapshot/plots/7-18-graph.png)
+    ![](../assets/ST_plots/7-18-graph.png)
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example:
 
-    ![](../../panda-stack/snapshots/example_snapshot/plots/LA-7-18-graph.png)
+    ![](../assets/ST_plots/LA-7-18-graph.png)
 
 We also show the behavior of the synthesized policy directly in the simulator.
 
-![](../../panda-stack/snapshots/example_snapshot/plunder.gif)
+![](../assets/ST_plots/plunder.gif)
