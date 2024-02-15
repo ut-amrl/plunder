@@ -1,0 +1,36 @@
+FASTER -> LANE_LEFT
+Loss: 0.0092948
+fX1=[Flip(Logistic(x, -2232.698730, -0.002691), true)]
+FASTER -> LANE_RIGHT
+Loss: 0.0732206
+Or(fX1=[Flip(Logistic(Minus(r_x, x), -7.298310, -1.780703), true)], fX1=[Flip(Logistic(Minus(r_x, x), 43.343037, 0.120369), true)])
+FASTER -> SLOWER
+Loss: 0.0191083
+fX1=[Flip(Logistic(Minus(y, r_y), -2.254671, 4.623091), true)]
+LANE_LEFT -> FASTER
+Loss: 0.535628
+Or(fX1=[Flip(Logistic(Minus(f_x, r_x), 79.320961, 0.042405), true)], fX1=[Flip(Logistic(f_x, -0.000015, -0.005909), true)])
+LANE_LEFT -> LANE_RIGHT
+Loss: 0.285825
+Or(fX1=[Flip(Logistic(Minus(r_x, x), -7.720274, -1.734202), true)], fX1=[Flip(Logistic(r_y, 2.036872, -0.314328), true)])
+LANE_LEFT -> SLOWER
+Loss: 0.197798
+And(fX1=[Flip(Logistic(Minus(r_y, f_y), 4.524822, 2.147941), true)], fX1=[Flip(Logistic(y, 9.135906, 41.839565), true)])
+LANE_RIGHT -> FASTER
+Loss: 0.190035
+Or(fX1=[Flip(Logistic(Minus(r_y, x), -406.450043, -0.331728), true)], fX1=[Flip(Logistic(f_y, 13.110868, 0.475514), true)])
+LANE_RIGHT -> LANE_LEFT
+Loss: 0.0180589
+fX1=[Flip(Logistic(f_x, 783.367737, 0.014225), true)]
+LANE_RIGHT -> SLOWER
+Loss: 0.0106444
+fX1=[Flip(Logistic(y, 12.666399, 2.114430), true)]
+SLOWER -> FASTER
+Loss: 0.00430308
+fX1=[Flip(Logistic(Times(r_x, Minus(y, f_y)), -687.652649, -0.029893), true)]
+SLOWER -> LANE_LEFT
+Loss: 0.00532997
+fX1=[Flip(Logistic(r_x, 499.876617, 0.073845), true)]
+SLOWER -> LANE_RIGHT
+Loss: 0.00555748
+fX1=[Flip(Logistic(Times(f_y, r_x), 2539.520020, -0.201250), true)]

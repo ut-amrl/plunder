@@ -1,0 +1,973 @@
+-------------Setup----------------
+----Roots----
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+f_vx [1, -1, 0]
+r_x [1, 0, 0]
+r_vx [1, -1, 0]
+
+----Transitions----
+FASTER->LANE_LEFT
+FASTER->LANE_RIGHT
+FASTER->SLOWER
+LANE_LEFT->FASTER
+LANE_LEFT->LANE_RIGHT
+LANE_LEFT->SLOWER
+LANE_RIGHT->FASTER
+LANE_RIGHT->LANE_LEFT
+LANE_RIGHT->SLOWER
+SLOWER->FASTER
+SLOWER->LANE_LEFT
+SLOWER->LANE_RIGHT
+
+
+Reading demonstration and optionally running ground-truth ASP...
+Metrics (training):
+	Cumulative observation likelihood: e^0.00423323 = 1.00424
+	%% Accuracy: 7.95602%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.420436 = 1.52263
+	%% Accuracy: 8.17207%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.332094 = 1.39388
+	%% Accuracy: 14.1389%%
+
+|-------------------------------------|
+|                                     |
+|          Loop 0 EXPECTATION         |
+|                                     |
+|-------------------------------------|
+Running particle filter with 2000 particles
+Parameters: resample threshold=10, observation strength=1
+*********Metrics (training):
+	Cumulative observation likelihood: e^0.00370644 = 1.00371
+	%% Accuracy: 6.55633%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.113411 = 1.12009
+	%% Accuracy: 23.419%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.0141111 = 1.01421
+	%% Accuracy: 24.6042%%
+
+|-------------------------------------|
+|                                     |
+|         Loop 0 MAXIMIZATION         |
+|                                     |
+|-------------------------------------|
+---- Number of Features Enumerated ----
+67
+
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+...
+
+
+
+
+|--------- FASTER->LANE_LEFT ---------
+| Num transitions (pos|neg): 852|103774
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0443877
+| Final Solution: fX1=[Flip(Logistic(Minus(f_x, x), -66.465485, -0.042217), true)]
+| Time Elapsed: 33.655
+|----------------------------
+
+
+|--------- FASTER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 919|102855
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0469069
+| Final Solution: fX1=[Flip(Logistic(Minus(f_x, x), -18.594250, -0.076312), true)]
+| Time Elapsed: 39.758
+|----------------------------
+
+
+|--------- FASTER->SLOWER ---------
+| Num transitions (pos|neg): 456|102399
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0269415
+| Final Solution: fX1=[Flip(Logistic(Minus(f_x, x), -11.573380, -0.103408), true)]
+| Time Elapsed: 37.004
+|----------------------------
+
+
+|--------- LANE_LEFT->FASTER ---------
+| Num transitions (pos|neg): 729|7732
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.283612
+| Final Solution: fX1=[Flip(Logistic(Minus(x, f_x), -126.740005, -0.026320), true)]
+| Time Elapsed: 23.854
+|----------------------------
+
+
+|--------- LANE_LEFT->LANE_RIGHT ---------
+| Num transitions (pos|neg): 210|7522
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.123254
+| Final Solution: fX1=[Flip(Logistic(f_vx, 25.722481, 0.668411), true)]
+| Time Elapsed: 27.307
+|----------------------------
+
+
+|--------- LANE_LEFT->SLOWER ---------
+| Num transitions (pos|neg): 132|7390
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0857224
+| Final Solution: fX1=[Flip(Logistic(vx, 16.902475, -0.501594), true)]
+| Time Elapsed: 26.955
+|----------------------------
+
+
+|--------- LANE_RIGHT->FASTER ---------
+| Num transitions (pos|neg): 809|7735
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.300077
+| Final Solution: fX1=[Flip(Logistic(Minus(f_x, x), 125.011185, 0.027427), true)]
+| Time Elapsed: 21.678
+|----------------------------
+
+
+|--------- LANE_RIGHT->LANE_LEFT ---------
+| Num transitions (pos|neg): 188|7547
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.11202
+| Final Solution: fX1=[Flip(Logistic(f_vx, 16.412647, -0.895757), true)]
+| Time Elapsed: 24.628
+|----------------------------
+
+
+|--------- LANE_RIGHT->SLOWER ---------
+| Num transitions (pos|neg): 80|7467
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0567735
+| Final Solution: fX1=[Flip(Logistic(Times(vx, f_vx), 338.711548, -0.025851), true)]
+| Time Elapsed: 22.882
+|----------------------------
+
+
+|--------- SLOWER->FASTER ---------
+| Num transitions (pos|neg): 297|7672
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.12735
+| Final Solution: fX1=[Flip(Logistic(Plus(vx, f_vx), 48.270023, 0.617468), true)]
+| Time Elapsed: 21.236
+|----------------------------
+
+
+|--------- SLOWER->LANE_LEFT ---------
+| Num transitions (pos|neg): 67|7605
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0425283
+| Final Solution: fX1=[Flip(Logistic(vx, 29.303413, 0.729585), true)]
+| Time Elapsed: 22.147
+|----------------------------
+
+
+|--------- SLOWER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 79|7526
+| 
+|---- Number of Total Programs ----
+| 67
+| Final loss: 0.0477565
+| Final Solution: fX1=[Flip(Logistic(vx, 29.533470, 0.669596), true)]
+| Time Elapsed: 22.329
+|----------------------------
+--------------- Iteration 0 took 342.242 s ---------------
+
+|-------------------------------------|
+|                                     |
+|          Loop 1 EXPECTATION         |
+|                                     |
+|-------------------------------------|
+Running particle filter with 2000 particles
+Parameters: resample threshold=10, observation strength=1
+*********Metrics (training):
+	Cumulative observation likelihood: e^0.00428085 = 1.00429
+	%% Accuracy: 5.10802%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.343237 = 1.4095
+	%% Accuracy: 6.31636%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.179496 = 1.19661
+	%% Accuracy: 10.4236%%
+
+|-------------------------------------|
+|                                     |
+|         Loop 1 MAXIMIZATION         |
+|                                     |
+|-------------------------------------|
+---- Number of Features Enumerated ----
+67
+
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+...
+
+
+
+
+|--------- FASTER->LANE_LEFT ---------
+| Num transitions (pos|neg): 725|107914
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.0338078
+| Final Solution: fX1=[Flip(Logistic(Minus(f_x, x), 3.736505, -0.152325), true)]
+| Time Elapsed: 401.81
+|----------------------------
+
+
+|--------- FASTER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 854|107060
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.0332107
+| Final Solution: fX1=[Flip(Logistic(Minus(f_x, x), 11.189989, -0.203474), true)]
+| Time Elapsed: 332.45
+|----------------------------
+
+
+|--------- FASTER->SLOWER ---------
+| Num transitions (pos|neg): 340|106720
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.0156211
+| Final Solution: And(fX1=[Flip(Logistic(vx, 24.761505, -10.821762), true)], fX1=[Flip(Logistic(Minus(f_x, x), 25.786961, -0.313392), true)])
+| Time Elapsed: 330.075
+|----------------------------
+
+
+|--------- LANE_LEFT->FASTER ---------
+| Num transitions (pos|neg): 697|5901
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.298512
+| Final Solution: And(fX1=[Flip(Logistic(r_vx, 20.223166, 0.683765), true)], fX1=[Flip(Logistic(Minus(x, f_x), -42.880863, -0.099791), true)])
+| Time Elapsed: 173.045
+|----------------------------
+
+
+|--------- LANE_LEFT->LANE_RIGHT ---------
+| Num transitions (pos|neg): 128|5773
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.0971427
+| Final Solution: Or(fX1=[Flip(Logistic(l_vx, 25.919588, 1.957021), true)], fX1=[Flip(Logistic(f_vx, 23.883759, 1.143261), true)])
+| Time Elapsed: 217.538
+|----------------------------
+
+
+|--------- LANE_LEFT->SLOWER ---------
+| Num transitions (pos|neg): 60|5713
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.0561532
+| Final Solution: And(fX1=[Flip(Logistic(r_vx, 22.426107, 0.810971), true)], fX1=[Flip(Logistic(vx, 24.643841, -6.471308), true)])
+| Time Elapsed: 193.528
+|----------------------------
+
+
+|--------- LANE_RIGHT->FASTER ---------
+| Num transitions (pos|neg): 786|6114
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.302994
+| Final Solution: And(fX1=[Flip(Logistic(l_vx, 23.922258, 0.206097), true)], fX1=[Flip(Logistic(Minus(f_x, x), 36.385471, 0.128375), true)])
+| Time Elapsed: 186.126
+|----------------------------
+
+
+|--------- LANE_RIGHT->LANE_LEFT ---------
+| Num transitions (pos|neg): 141|5973
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.0892162
+| Final Solution: Or(fX1=[Flip(Logistic(f_vx, 17.977009, -1.580563), true)], fX1=[Flip(Logistic(f_vx, 19.147907, -30.223194), true)])
+| Time Elapsed: 183.523
+|----------------------------
+
+
+|--------- LANE_RIGHT->SLOWER ---------
+| Num transitions (pos|neg): 36|5937
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 233
+| Final loss: 0.0310322
+| Final Solution: fX1=[Flip(Logistic(Times(vx, f_vx), 439.925842, -0.069904), true)]
+| Time Elapsed: 164.24
+|----------------------------
+
+
+|--------- SLOWER->FASTER ---------
+| Num transitions (pos|neg): 159|7304
+| 
+| Extended Features Count: 148
+|---- Number of Total Programs ----
+| 318
+| Final loss: 0.056326
+| Final Solution: fX1=[Flip(Logistic(Plus(vx, f_vx), 46.528957, 1.273868), true)]
+| Time Elapsed: 186.841
+|----------------------------
+
+
+|--------- SLOWER->LANE_LEFT ---------
+| Num transitions (pos|neg): 41|7263
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.02447
+| Final Solution: fX1=[Flip(Logistic(Times(vx, Plus(vx, f_vx)), 1247.028320, 0.022569), true)]
+| Time Elapsed: 205.63
+|----------------------------
+
+
+|--------- SLOWER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 28|7235
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.0164512
+| Final Solution: Or(fX1=[Flip(Logistic(Minus(r_x, f_x), 64.978371, 0.150053), true)], fX1=[Flip(Logistic(vx, 26.121517, 2.624285), true)])
+| Time Elapsed: 190.814
+|----------------------------
+--------------- Iteration 1 took 2800.58 s ---------------
+
+|-------------------------------------|
+|                                     |
+|          Loop 2 EXPECTATION         |
+|                                     |
+|-------------------------------------|
+Running particle filter with 2000 particles
+Parameters: resample threshold=10, observation strength=1
+*********Metrics (training):
+	Cumulative observation likelihood: e^0.00447038 = 1.00448
+	%% Accuracy: 4.77701%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.391467 = 1.47915
+	%% Accuracy: 5.10417%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.245494 = 1.27825
+	%% Accuracy: 10.0972%%
+
+|-------------------------------------|
+|                                     |
+|         Loop 2 MAXIMIZATION         |
+|                                     |
+|-------------------------------------|
+---- Number of Features Enumerated ----
+67
+
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+...
+
+
+
+
+|--------- FASTER->LANE_LEFT ---------
+| Num transitions (pos|neg): 671|109367
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.0259855
+| Final Solution: And(fX1=[Flip(Logistic(f_vx, 17.950266, -0.600760), true)], fX1=[Flip(Logistic(Minus(f_x, x), 21.966200, -0.304560), true)])
+| Time Elapsed: 338.663
+|----------------------------
+
+
+|--------- FASTER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 804|108563
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.02582
+| Final Solution: fX1=[Flip(Logistic(Minus(x, f_x), -16.259418, 0.348291), true)]
+| Time Elapsed: 350.839
+|----------------------------
+
+
+|--------- FASTER->SLOWER ---------
+| Num transitions (pos|neg): 246|108317
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.00758829
+| Final Solution: Or(fX1=[Flip(Logistic(Plus(f_vx, r_vx), 871.162598, 0.006645), true)], And(fX1=[Flip(Logistic(vx, 24.835030, -159.965622), true)], fX1=[Flip(Logistic(Minus(f_x, x), 31.512691, -6.230563), true)]))
+| Time Elapsed: 675.434
+|----------------------------
+
+
+|--------- LANE_LEFT->FASTER ---------
+| Num transitions (pos|neg): 660|5524
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.253839
+| Final Solution: And(fX1=[Flip(Logistic(r_vx, 19.921682, 1.405882), true)], fX1=[Flip(Logistic(Minus(f_x, x), 36.023678, 0.178255), true)])
+| Time Elapsed: 374.362
+|----------------------------
+
+
+|--------- LANE_LEFT->LANE_RIGHT ---------
+| Num transitions (pos|neg): 105|5419
+| 
+| Extended Features Count: 203
+|---- Number of Total Programs ----
+| 368
+| Final loss: 0.0644365
+| Final Solution: And(fX1=[Flip(Logistic(x, 574.621643, -0.003336), true)], Or(fX1=[Flip(Logistic(l_vx, 21.833969, 709.543091), true)], fX1=[Flip(Logistic(f_vx, 23.895145, 1.392975), true)]))
+| Time Elapsed: 557.985
+|----------------------------
+
+
+|--------- LANE_LEFT->SLOWER ---------
+| Num transitions (pos|neg): 42|5377
+| 
+| Extended Features Count: 203
+|---- Number of Total Programs ----
+| 368
+| Final loss: 0.0398166
+| Final Solution: Or(fX1=[Flip(Logistic(r_vx, 22.329975, 3.390621), true)], fX1=[Flip(Logistic(vx, 24.824734, -68.983551), true)])
+| Time Elapsed: 754.688
+|----------------------------
+
+
+|--------- LANE_RIGHT->FASTER ---------
+| Num transitions (pos|neg): 761|5511
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.262471
+| Final Solution: And(fX1=[Flip(Logistic(l_vx, 21.810747, 0.318661), true)], fX1=[Flip(Logistic(Minus(f_x, x), 29.172899, 0.275426), true)])
+| Time Elapsed: 1069.47
+|----------------------------
+
+
+|--------- LANE_RIGHT->LANE_LEFT ---------
+| Num transitions (pos|neg): 126|5385
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 301
+| Final loss: 0.066494
+| Final Solution: And(fX1=[Flip(Logistic(Plus(l_vx, r_vx), 38.687870, -0.705143), true)], Or(fX1=[Flip(Logistic(f_vx, 20.030169, -3.257716), true)], fX1=[Flip(Logistic(f_vx, 19.196934, -71.902588), true)]))
+| Time Elapsed: 553.931
+|----------------------------
+
+
+|--------- LANE_RIGHT->SLOWER ---------
+| Num transitions (pos|neg): 13|5372
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 233
+| Final loss: 0.013622
+| Final Solution: fX1=[Flip(Logistic(Times(vx, Plus(vx, f_vx)), 1074.359985, -0.089362), true)]
+| Time Elapsed: 196.666
+|----------------------------
+
+
+|--------- SLOWER->FASTER ---------
+| Num transitions (pos|neg): 65|7041
+| 
+| Extended Features Count: 148
+|---- Number of Total Programs ----
+| 318
+| Final loss: 0.0211015
+| Final Solution: Or(fX1=[Flip(Logistic(vx, 25.419756, 4.305496), true)], fX1=[Flip(Logistic(Plus(vx, f_vx), 46.626240, 1.483577), true)])
+| Time Elapsed: 230.015
+|----------------------------
+
+
+|--------- SLOWER->LANE_LEFT ---------
+| Num transitions (pos|neg): 17|7024
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 256
+| Final loss: 0.00710323
+| Final Solution: fX1=[Flip(Logistic(vx, 25.481739, 3.796091), true)]
+| Time Elapsed: 220.63
+|----------------------------
+
+
+|--------- SLOWER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 16|7008
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 481
+| Final loss: 0.00510942
+| Final Solution: And(fX1=[Flip(Logistic(r_vx, 10.935126, 19.838909), true)], Or(fX1=[Flip(Logistic(Minus(r_x, f_x), 44.330517, 0.578040), true)], fX1=[Flip(Logistic(vx, 25.240980, 8.431153), true)]))
+| Time Elapsed: 684.994
+|----------------------------
+--------------- Iteration 2 took 6046.69 s ---------------
+
+|-------------------------------------|
+|                                     |
+|          Loop 3 EXPECTATION         |
+|                                     |
+|-------------------------------------|
+Running particle filter with 2000 particles
+Parameters: resample threshold=10, observation strength=1
+*********Metrics (training):
+	Cumulative observation likelihood: e^0.00453585 = 1.00455
+	%% Accuracy: 4.71991%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.417178 = 1.51767
+	%% Accuracy: 4.42438%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.271768 = 1.31228
+	%% Accuracy: 11.125%%
+
+|-------------------------------------|
+|                                     |
+|         Loop 3 MAXIMIZATION         |
+|                                     |
+|-------------------------------------|
+---- Number of Features Enumerated ----
+67
+
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+...
+
+
+
+
+|--------- FASTER->LANE_LEFT ---------
+| Num transitions (pos|neg): 751|109394
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.0244032
+| Final Solution: And(fX1=[Flip(Logistic(Minus(f_x, l_x), -2.844896, -0.096904), true)], And(fX1=[Flip(Logistic(f_vx, 19.877316, -1.115886), true)], fX1=[Flip(Logistic(Minus(f_x, x), 23.953960, -0.553456), true)]))
+| Time Elapsed: 663.958
+|----------------------------
+
+
+|--------- FASTER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 736|108658
+| 
+| Extended Features Count: 187
+|---- Number of Total Programs ----
+| 396
+| Final loss: 0.0201681
+| Final Solution: fX1=[Flip(Logistic(DividedBy(Minus(x, f_x), f_vx), -0.845048, 8.441195), true)]
+| Time Elapsed: 401.382
+|----------------------------
+
+
+|--------- FASTER->SLOWER ---------
+| Num transitions (pos|neg): 320|108338
+| 
+| Extended Features Count: 331
+|---- Number of Total Programs ----
+| 595
+| Final loss: 0.0161205
+| Final Solution: Or(fX1=[Flip(Logistic(Plus(f_vx, r_vx), -315.966248, -0.016682), true)], And(fX1=[Flip(Logistic(vx, 24.837364, -39.741188), true)], fX1=[Flip(Logistic(Minus(f_x, Plus(l_x, r_x)), -554.026062, -0.010558), true)]))
+| Time Elapsed: 1714.71
+|----------------------------
+
+
+|--------- LANE_LEFT->FASTER ---------
+| Num transitions (pos|neg): 652|5462
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.213416
+| Final Solution: And(fX1=[Flip(Logistic(r_vx, 19.748360, 1.993356), true)], fX1=[Flip(Logistic(Minus(f_x, x), 34.392784, 0.223893), true)])
+| Time Elapsed: 464.661
+|----------------------------
+
+
+|--------- LANE_LEFT->LANE_RIGHT ---------
+| Num transitions (pos|neg): 129|5333
+| 
+| Extended Features Count: 308
+|---- Number of Total Programs ----
+| 503
+| Final loss: 0.0406011
+| Final Solution: Or(fX1=[Flip(Logistic(DividedBy(x, l_vx), 34.267857, 239.096649), true)], And(fX1=[Flip(Logistic(x, 729.960144, -0.007418), true)], Or(fX1=[Flip(Logistic(l_vx, 21.837999, 103.724709), true)], fX1=[Flip(Logistic(f_vx, 23.012774, 3.116200), true)])))
+| Time Elapsed: 851.126
+|----------------------------
+
+
+|--------- LANE_LEFT->SLOWER ---------
+| Num transitions (pos|neg): 72|5261
+| 
+| Extended Features Count: 203
+|---- Number of Total Programs ----
+| 368
+| Final loss: 0.0338411
+| Final Solution: Or(fX1=[Flip(Logistic(r_vx, 21.585873, 12.802530), true)], fX1=[Flip(Logistic(vx, 24.770674, -38.795151), true)])
+| Time Elapsed: 568.601
+|----------------------------
+
+
+|--------- LANE_RIGHT->FASTER ---------
+| Num transitions (pos|neg): 779|5326
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.217946
+| Final Solution: And(fX1=[Flip(Logistic(l_vx, 21.022484, 0.528658), true)], fX1=[Flip(Logistic(Minus(f_x, x), 27.226669, 0.420917), true)])
+| Time Elapsed: 534.283
+|----------------------------
+
+
+|--------- LANE_RIGHT->LANE_LEFT ---------
+| Num transitions (pos|neg): 78|5248
+| 
+| Extended Features Count: 213
+|---- Number of Total Programs ----
+| 416
+| Final loss: 0.0470711
+| Final Solution: And(fX1=[Flip(Logistic(vx, 25.163317, 6.482790), true)], And(fX1=[Flip(Logistic(Plus(l_vx, r_vx), 40.999653, -2.177807), true)], Or(fX1=[Flip(Logistic(f_vx, 20.384583, -5.964742), true)], fX1=[Flip(Logistic(f_vx, 19.194489, -113.893677), true)])))
+| Time Elapsed: 848.342
+|----------------------------
+
+
+|--------- LANE_RIGHT->SLOWER ---------
+| Num transitions (pos|neg): 31|5217
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 256
+| Final loss: 0.00658365
+| Final Solution: fX1=[Flip(Logistic(Times(vx, Plus(Plus(vx, f_vx), f_vx)), 1586.097168, -0.417814), true)]
+| Time Elapsed: 283.709
+|----------------------------
+
+
+|--------- SLOWER->FASTER ---------
+| Num transitions (pos|neg): 157|7079
+| 
+| Extended Features Count: 213
+|---- Number of Total Programs ----
+| 399
+| Final loss: 0.0300281
+| Final Solution: fX1=[Flip(Logistic(Times(vx, Plus(vx, f_vx)), 1145.552856, 0.045815), true)]
+| Time Elapsed: 1074.07
+|----------------------------
+
+
+|--------- SLOWER->LANE_LEFT ---------
+| Num transitions (pos|neg): 27|7052
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.00957111
+| Final Solution: And(fX1=[Flip(Logistic(DividedBy(r_x, l_vx), 16.337406, 6.483843), true)], fX1=[Flip(Logistic(vx, 25.347126, 5.258555), true)])
+| Time Elapsed: 617.17
+|----------------------------
+
+
+|--------- SLOWER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 33|7019
+| 
+| Extended Features Count: 321
+|---- Number of Total Programs ----
+| 564
+| Final loss: 0.00931785
+| Final Solution: fX1=[Flip(Logistic(vx, 25.142586, 22.947472), true)]
+| Time Elapsed: 848.08
+|----------------------------
+--------------- Iteration 3 took 8914.86 s ---------------
+
+|-------------------------------------|
+|                                     |
+|          Loop 4 EXPECTATION         |
+|                                     |
+|-------------------------------------|
+Running particle filter with 2000 particles
+Parameters: resample threshold=10, observation strength=1
+*********Metrics (training):
+	Cumulative observation likelihood: e^0.00452537 = 1.00454
+	%% Accuracy: 3.43364%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.429529 = 1.53653
+	%% Accuracy: 3.57948%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.299868 = 1.34968
+	%% Accuracy: 16.0347%%
+
+|-------------------------------------|
+|                                     |
+|         Loop 4 MAXIMIZATION         |
+|                                     |
+|-------------------------------------|
+---- Number of Features Enumerated ----
+67
+
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+...
+
+
+
+
+|--------- FASTER->LANE_LEFT ---------
+| Num transitions (pos|neg): 682|110456
+| 
+| Extended Features Count: 370
+|---- Number of Total Programs ----
+| 673
+| Final loss: 0.0194947
+| Final Solution: And(fX1=[Flip(Logistic(f_vx, 35.021538, -21.117664), true)], And(fX1=[Flip(Logistic(Minus(f_x, l_x), -28.455282, -0.111654), true)], And(fX1=[Flip(Logistic(f_vx, 21.367447, -32.117924), true)], fX1=[Flip(Logistic(Minus(f_x, x), 22.931559, -0.621136), true)])))
+| Time Elapsed: 1470.14
+|----------------------------
+
+
+|--------- FASTER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 749|109707
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 301
+| Final loss: 0.0203223
+| Final Solution: fX1=[Flip(Logistic(DividedBy(Minus(f_x, x), f_vx), 0.903634, -9.377876), true)]
+| Time Elapsed: 389.925
+|----------------------------
+
+
+|--------- FASTER->SLOWER ---------
+| Num transitions (pos|neg): 319|109388
+| 
+| Extended Features Count: 335
+|---- Number of Total Programs ----
+| 649
+| Final loss: 0.0145218
+| Final Solution: Or(fX1=[Flip(Logistic(Minus(r_x, l_x), 142.693558, 26.650047), true)], Or(fX1=[Flip(Logistic(Plus(f_vx, r_vx), -108.861458, -0.039834), true)], And(fX1=[Flip(Logistic(vx, 24.874939, -61.811741), true)], fX1=[Flip(Logistic(Minus(f_x, Plus(l_x, r_x)), -557.253906, -0.012443), true)])))
+| Time Elapsed: 1955.72
+|----------------------------
+
+
+|--------- LANE_LEFT->FASTER ---------
+| Num transitions (pos|neg): 456|3990
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.178612
+| Final Solution: And(fX1=[Flip(Logistic(r_vx, 19.766947, 2.068509), true)], fX1=[Flip(Logistic(Minus(x, f_x), -31.710594, -0.294839), true)])
+| Time Elapsed: 559.273
+|----------------------------
+
+
+|--------- LANE_LEFT->LANE_RIGHT ---------
+| Num transitions (pos|neg): 337|3653
+| 
+| Extended Features Count: 308
+|---- Number of Total Programs ----
+| 555
+| Final loss: 0.0176329
+| Final Solution: Or(fX1=[Flip(Logistic(DividedBy(x, l_vx), 34.269012, 245.851440), true)], And(fX1=[Flip(Logistic(x, 235.960114, -0.653907), true)], Or(fX1=[Flip(Logistic(l_vx, 126.732285, -0.239940), true)], fX1=[Flip(Logistic(Plus(l_vx, r_vx), 44.333492, 2.931920), true)])))
+| Time Elapsed: 1768.23
+|----------------------------
+
+
+|--------- LANE_LEFT->SLOWER ---------
+| Num transitions (pos|neg): 31|3622
+| 
+| Extended Features Count: 203
+|---- Number of Total Programs ----
+| 368
+| Final loss: 0.0180993
+| Final Solution: fX1=[Flip(Logistic(vx, 24.829386, -86.008926), true)]
+| Time Elapsed: 550.32
+|----------------------------
+
+
+|--------- LANE_RIGHT->FASTER ---------
+| Num transitions (pos|neg): 930|5865
+| 
+| Extended Features Count: 255
+|---- Number of Total Programs ----
+| 480
+| Final loss: 0.183478
+| Final Solution: And(fX1=[Flip(Logistic(l_vx, 20.476099, 0.709218), true)], fX1=[Flip(Logistic(Minus(x, f_x), -26.473980, -0.609106), true)])
+| Time Elapsed: 549.553
+|----------------------------
+
+
+|--------- LANE_RIGHT->LANE_LEFT ---------
+| Num transitions (pos|neg): 126|5739
+| 
+| Extended Features Count: 276
+|---- Number of Total Programs ----
+| 496
+| Final loss: 0.0720107
+| Final Solution: And(fX1=[Flip(Logistic(vx, 25.023340, 8.410436), true)], And(fX1=[Flip(Logistic(Plus(l_vx, r_vx), 41.128242, -2.412731), true)], fX1=[Flip(Logistic(f_vx, 20.260880, -5.940400), true)]))
+| Time Elapsed: 1482
+|----------------------------
+
+
+|--------- LANE_RIGHT->SLOWER ---------
+| Num transitions (pos|neg): 38|5701
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 280
+| Final loss: 0.00763471
+| Final Solution: fX1=[Flip(Logistic(Times(vx, Plus(Plus(vx, Plus(vx, l_vx)), f_vx)), 2233.293213, -0.184224), true)]
+| Time Elapsed: 314.435
+|----------------------------
+
+
+|--------- SLOWER->FASTER ---------
+| Num transitions (pos|neg): 147|7074
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 256
+| Final loss: 0.01949
+| Final Solution: fX1=[Flip(Logistic(Times(vx, Plus(Plus(vx, vx), f_vx)), 1764.555542, 0.051010), true)]
+| Time Elapsed: 391.201
+|----------------------------
+
+
+|--------- SLOWER->LANE_LEFT ---------
+| Num transitions (pos|neg): 20|7054
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 336
+| Final loss: 0.00805898
+| Final Solution: And(fX1=[Flip(Logistic(DividedBy(Minus(r_x, f_x), l_vx), 1.813058, 0.469895), true)], fX1=[Flip(Logistic(vx, 24.549904, 27.209173), true)])
+| Time Elapsed: 727.177
+|----------------------------
+
+
+|--------- SLOWER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 20|7034
+| 
+| Extended Features Count: 136
+|---- Number of Total Programs ----
+| 285
+| Final loss: 0.00391366
+| Final Solution: Or(fX1=[Flip(Logistic(Plus(r_vx, r_vx), 37.099731, -12.132344), true)], fX1=[Flip(Logistic(vx, 25.158022, 46.733471), true)])
+| Time Elapsed: 882.806
+|----------------------------
+--------------- Iteration 4 took 11090.4 s ---------------
+
+|-------------------------------------|
+|                                     |
+|          Loop 5 EXPECTATION         |
+|                                     |
+|-------------------------------------|
+Running particle filter with 2000 particles
+Parameters: resample threshold=10, observation strength=1
+*********Metrics (training):
+	Cumulative observation likelihood: e^0.0045533 = 1.00456
+	%% Accuracy: 3.38812%%
+Metrics (testing):
+	Cumulative observation likelihood: e^0.440609 = 1.55365
+	%% Accuracy: 3.36883%%
+Metrics (validation):
+	Cumulative observation likelihood: e^0.302777 = 1.35361
+	%% Accuracy: 15.9306%%
+
+|-------------------------------------|
+|                                     |
+|         Loop 5 MAXIMIZATION         |
+|                                     |
+|-------------------------------------|
+---- Number of Features Enumerated ----
+67
+
+x [1, 0, 0]
+vx [1, -1, 0]
+l_x [1, 0, 0]
+l_vx [1, -1, 0]
+f_x [1, 0, 0]
+...
+
+
+
+
+|--------- FASTER->LANE_LEFT ---------
+| Num transitions (pos|neg): 652|110421
+| 
+| Extended Features Count: 370
+|---- Number of Total Programs ----
+| 690
+| Final loss: 0.0142538
+| Final Solution: And(fX1=[Flip(Logistic(f_vx, 29.613182, -28.368158), true)], And(fX1=[Flip(Logistic(Minus(l_x, x), 50.887173, 0.104119), true)], And(fX1=[Flip(Logistic(f_vx, 21.487291, -35.869778), true)], fX1=[Flip(Logistic(Minus(f_x, x), 23.954346, -1.316563), true)])))
+| Time Elapsed: 2440.81
+|----------------------------
+
+
+|--------- FASTER->LANE_RIGHT ---------
+| Num transitions (pos|neg): 815|109606
+| 
+| Extended Features Count: 67
+|---- Number of Total Programs ----
+| 301
