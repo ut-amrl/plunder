@@ -57,11 +57,11 @@ Imitation Learning (IL) is a popular approach for teaching robots how to perform
 
 ## Experiments
 <div style="display: flex;">
-<p><b>[Stop Sign (SS)](/experiments/SS.md)</a></b>: acceleration control in a straight line.
-<br><b><a href="./experiments/PT.md">Pass Traffic (PT)</a></b>: switching lanes in highway traffic. <a href="./experiments/PT_H.md">See here for the version with human demonstrations.</a>
-<br><b><a href="./experiments/MG.md">Merge (MG)</a></b>: merging from the leftmost to the rightmost lane in highway traffic. <a href="./experiments/MG_H.md">See here for the version with human demonstrations.</a>
-<br><b><a href="./experiments/PP.md">Pick and Place (PP)</a></b>: controlling a robot arm to grab and object and move it to a designated location.
-<br><b><a href="./experiments/ST.md">Stack (ST)</a></b>: stacking two boxes on top of each other at a designated location.
+<p><b><a href="./experiments/SS.html">Stop Sign (SS)</a></b>: acceleration control in a straight line.
+<br><b><a href="./experiments/PT.html">Pass Traffic (PT)</a></b>: switching lanes in highway traffic. <a href="./experiments/PT_H.html">See here for the version with human demonstrations.</a>
+<br><b><a href="./experiments/MG.html">Merge (MG)</a></b>: merging from the leftmost to the rightmost lane in highway traffic. <a href="./experiments/MG_H.html">See here for the version with human demonstrations.</a>
+<br><b><a href="./experiments/PP.html">Pick and Place (PP)</a></b>: controlling a robot arm to grab and object and move it to a designated location.
+<br><b><a href="./experiments/ST.html">Stack (ST)</a></b>: stacking two boxes on top of each other at a designated location.
 </p>
 <img src="assets/stack.gif" style="width: 400px; padding-left: 50px;"/>
 </div>
