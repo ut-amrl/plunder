@@ -57,7 +57,7 @@ Imitation Learning (IL) is a popular approach for teaching robots how to perform
 
 ## Experiments
 <div style="display: flex;">
-<p><b><a href="./experiments/SS.md">Stop Sign (SS)</a></b>: acceleration control in a straight line.
+<p><b><a href="./experiments/SS.html">Stop Sign (SS)</a></b>: acceleration control in a straight line.
 <br><b><a href="./experiments/PT.md">Pass Traffic (PT)</a></b>: switching lanes in highway traffic. <a href="./experiments/PT_H.md">See here for the version with human demonstrations.</a>
 <br><b><a href="./experiments/MG.md">Merge (MG)</a></b>: merging from the leftmost to the rightmost lane in highway traffic. <a href="./experiments/MG_H.md">See here for the version with human demonstrations.</a>
 <br><b><a href="./experiments/PP.md">Pick and Place (PP)</a></b>: controlling a robot arm to grab and object and move it to a designated location.
