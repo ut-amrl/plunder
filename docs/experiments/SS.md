@@ -1,14 +1,8 @@
 # 1D Target (Stop Sign)
 This module is the setup for a simple vehicle driving in a straight line. The goal is to stop before some target stop sign.
-The following figures demonstrate how realistic demonstrations contain a significant amount of variation and error:
+The following figures for acceleration and velocity demonstrate how realistic demonstrations contain a significant amount of variation and error:
 
-Acceleration:
-
-![](../assets/acc-demo.png)
-
-Velocity:
-
-![](../assets/vel-demo.png)
+<img src="../assets/vel-demo.png" style="width: 400px"/><img src="../assets/acc-demo.png" style="width: 400px"/>
 
 Try running the algorithm on the setup by running **make** and **make emng** (or see **snapshots/** for a selection of pre-acquired results).
 
