@@ -12,8 +12,7 @@
 <p class="authors">Jimmy Xin, Linus Zheng, Kia Rahmani, Jiayi Wei, Jarrett Holtz, Isil Dillig, Joydeep Biswas</p>
 </center>
 
-![](assets/asp_8.gif)
-
+<img src="assets/asp_8.gif" style="width: 100%"/>
 
 <div class="icon-container">
 
