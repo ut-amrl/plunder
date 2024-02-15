@@ -1,12 +1,10 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" type="text/css" href="../assets/style.css">
-
 # 2D Merge, Human Demonstrations (Merge - Hand)
 This module is roughly the same as MG, but the demonstrations are provided by a human joysticking the controls, so the behavior is significantly less predictable.
 
 Try running the algorithm on the setup (or see **snapshots/** for pre-acquired results).
 
-Results are stored in **out/**. For example, we can see the final policy:
+Results are stored in **out/**. 
+- For example, we can see the final policy:
     ```
    if ha == FASTER and flp(lgs(x, 1043.003418, 0.010987)):
        return LANE_LEFT
@@ -16,7 +14,7 @@ Results are stored in **out/**. For example, we can see the final policy:
        return SLOWER
    if ha == LANE_LEFT and And(flp(lgs(Plus(y, r_y), 27.675999, -28.561993)), Or(flp(lgs(Minus(r_y, y), 4.606244, -14.761892)), Or(flp(lgs(Minus(f_x, r_x), 131.751694, 4.325001)), flp(lgs(f_x, 364.858917, -1.114238))))):
        return FASTER
-   if ha == LANE_LEFT and flp(lgs(f_y, 1000000000.000000, 1.000000)):
+   if ha == LANE_LEFT and false:
        return LANE_RIGHT
    if ha == LANE_LEFT and flp(lgs(f_x, 389.029755, -1.134043)):
        return SLOWER

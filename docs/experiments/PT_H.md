@@ -1,13 +1,11 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" type="text/css" href="../assets/style.css">
-
 # 2D Highway, Human Demonstrations (Pass Traffic - Hand)
 This module is roughly the same as PT, but the demonstrations are provided by a human joysticking the controls, so the behavior is significantly less predictable.
 
 Try running the algorithm on the setup (or see **snapshots/** for pre-acquired results).
 
-Results are stored in **out/**. For example, we can see the final policy:
-    ```
+Results are stored in **out/**. 
+- For example, we can see the final policy:
+   ```
     if ha == FASTER and And(flp(lgs(f_vx, 35.021538, -21.117664)), And(flp(lgs(Minus(f_x, l_x), -28.455282, -0.111654)), And(flp(lgs(f_vx, 21.367447, -32.117924)), flp(lgs(Minus(f_x, x), 22.931559, -0.621136))))):
        return LANE_LEFT
     if ha == FASTER and flp(lgs(DividedBy(Minus(f_x, x), f_vx), 0.903634, -9.377876)):
