@@ -34,7 +34,7 @@
 
   <a href="https://www.youtube.com/watch?v=Fy1P_46c54A" class="icon-button youtube" target="_blank" title="YouTube Video">
     <i class="fab fa-youtube"></i>
-    <span>Demo</span>
+    <span>Short Video</span>
   </a>
 
 
