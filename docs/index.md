@@ -107,9 +107,32 @@ Visualize convergence for each task. More graphs can be found on each module's p
 <img src="assets/convergence.png" style="width: 500px"/>
 
 ### Success Rates
-Each approach's policy was tested by running it in the environment 100 times, and the number of successful runs was recorded. The results are visualized below.
+Each approach's policy was tested by running it in the environment 100 times, and the number of successful runs was recorded. The results are visualized below, along with our metrics for what is considered a successful run.
 
 <img src="assets/success_results.png" style="width: 600px"/>
+
+| Task | Success Metric |
+| - | - |
+| SS | Coming to a stop near the target |
+| PT | Maintaining some minimum velocity and being in a valid lane for a specified period of time |
+| MG | Reaching the rightmost lane, starting from the leftmost lane |
+| PP | Placing a randomly-initialized cube at a randomly-initialized target position |
+| ST | Placing two randomly-initialized cubes in a stack at a randomly-initialized target position, in the correct order |
+
+### Particle Filter Implementation
+Our particle filter follows from a standard implementation and can be found here: https://github.com/ut-amrl/plunder/blob/main/particleFilter/pf.h
+
+The algorithm is as follows:
+
+```
+1. Initialize all particles to start with the default label.
+2. for i=1..n
+3.      Forward-propagate particles by acquiring new labels for each particle using the probabilistic policy π.
+4.      Reweight particles using the observation model.
+5.      Normalize weights.
+6.      Resample particles to remove ineffective particles.
+7. Trace back particle lineages to acquire full trajectories.
+```
 
 ## Citation
 <p class="code-block">
