@@ -27,14 +27,14 @@
   </a>
 
 
-  <a href="https://drive.google.com/drive/folders/1QaKtIvmKhZjxIwY9ANSPpjYl0teoNW5S" class="icon-button drive" target="_blank" title="Supplementary Videos and Tables">
+  <a href="https://drive.google.com/file/d/1qE9Qs9aG_vZYN_03yEw60iCD4J7PsKs6/view?usp=sharing" class="icon-button drive" target="_blank" title="Supplementary Videos and Tables">
     <i class="fab fa-google-drive"></i>
     <span>Supplements</span>
   </a>
 
   <a href="https://www.youtube.com/watch?v=Fy1P_46c54A" class="icon-button youtube" target="_blank" title="YouTube Video">
     <i class="fab fa-youtube"></i>
-    <span>Demo</span>
+    <span>Short Video</span>
   </a>
 
 
