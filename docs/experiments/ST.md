@@ -52,3 +52,27 @@ The most useful/informative outputs will be:
 We also show the behavior of the synthesized policy directly in the simulator.
 
 ![](../assets/ST_plots/plunder.gif)
+
+We provide the observation model below:
+```
+step(action):
+    if (action == MOVE_TO_CUBE_BOTTOM)
+        [vx, vy, vz] = 4 * [bx1 - x, by1 - y, bz1 - z]
+        end_eff = 1
+    else if (action == MOVE_TO_TARGET)
+        [vx, vy, vz] = 4 * [tx - x, ty - y, tz - z]
+        end_eff = -1
+        if (vz < 0)
+            vz = max(vz, vz_prev - 0.15)
+    else if (action == LIFT)
+        [vx, vy, vz] = [0, 0, 0.5]
+        end_eff = 1
+    else if (action == MOVE_TO_CUBE_TOP)
+        [vx, vy, vz] = 4 * [bx2 - x, by2 - y, bz2 - z]
+        end_eff = 1
+        if (vz < 0)
+            vz = max(vz, vz_prev - 0.15)
+    else if (action == GRASP)
+        [vx, vy, vz] = [0, 0, 0.5]
+        end_eff = -1
+```

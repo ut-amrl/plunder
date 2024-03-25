@@ -116,8 +116,8 @@ if setting == "PT":
 if setting == "PT_hand":
     training_set = 9
     validation_set = 19 # including training_set
-    train_time = 300000
-    patience = 100000
+    train_time = 3000
+    patience = 1000
     sim_time = 145
     samples = 50
     folder = "../../2D-highway-manual/human-gen/"

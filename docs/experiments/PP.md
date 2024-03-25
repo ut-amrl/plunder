@@ -39,3 +39,19 @@ The most useful/informative outputs will be:
 We also show the behavior of the synthesized policy directly in the simulator.
 
 ![](../assets/PP_plots/plunder.gif)
+
+
+We provide the observation model below:
+```
+step(action):
+    if (action == MOVE_TO_CUBE)
+        [vx, vy, vz] = 5 * [bx - x, by - y, bz - z]
+        end_eff = 0.6
+    else if (action == MOVE_TO_TARGET)
+        if (end_eff > -0.3)
+            [vx, vy, vz] = 5 * [bx - x, by - y, bz - z]
+            end_eff = -0.6
+        else
+            [vx, vy, vz] = 5 * [tx - x, ty - y, tz - z]
+            end_eff = max(-0.6, end_eff - 0.3)
+```

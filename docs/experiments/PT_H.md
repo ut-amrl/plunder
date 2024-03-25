@@ -51,3 +51,41 @@ Plots are stored in **plots/**. See:
 - **plots/testing/LA-xx-x-graph.png**, which gives a visual representation of the low-level observations predicted by the policy on the testing set. For example, here is iteration 5:
 
     ![](../assets/PT_H_plots/LA-5-9-graph.png)
+
+
+We provide the observation model below:
+```
+step(action):
+    target_acc = 0
+    target_heading = 0
+
+    if (action == FASTER)
+        target_acc = 4
+        target_heading = atan((round(y) - y) / 30)
+        target_steer = max(min(target_heading - heading), 0.015, -0.015)
+    else if (action == SLOWER)
+        target_acc = -4
+        target_heading = atan((round(y) - y) / 30)
+        target_steer = max(min(target_heading - heading), 0.015, -0.015)    
+    else if (action == LANE_LEFT)
+        target_acc = 4
+        target_heading = -0.02
+    else if (action == LANE_RIGHT)
+        target_acc = 4
+        target_heading = 0.02
+    
+    if (v > 25)
+        target_acc = min(target_acc, 0.0)
+    if (v < 20)
+        target_acc = max(target_acc, 0.0)
+
+    if (target_acc > acc)
+        acc = min(target_acc, acc + 4)
+    else
+        acc = max(target_acc, acc - 6)
+
+    if (target_steer > 0)
+        steer = min(target_steer, 0.1 - heading)
+    else
+        steer = max(target_steer, -0.1 - heading)
+``` 

@@ -71,3 +71,33 @@ Iteration 3:
 Iteration 8:
 
 ![](../assets/PT_plots/asp_8.gif)
+
+We provide the observation model below:
+```
+step(action):
+    target_acc = 0
+    target_heading = 0
+
+    if (action == FASTER)
+        target_acc = 40 - v
+        target_heading = atan((round(y) - y) / 30)
+    else if (action == SLOWER)
+        target_acc = v_front  - v
+        target_heading = atan((round(y) - y) / 30)
+    else if (action == LANE_LEFT)
+        target_acc = 30 - v
+        target_heading = -0.15
+    else if (action == LANE_RIGHT)
+        target_acc = 30 - v
+        target_heading = 0.15
+    
+    if (target_heading - heading > steer)
+        steer = min(steer + 0.04, target_heading - heading)
+    else 
+        steer = max(steer - 0.04, target_heading - heading)
+
+    if (target_acc > acc)
+        acc = min(target_acc, acc + 4)
+    else
+        acc = max(target_acc, acc - 6)
+``` 

@@ -45,3 +45,15 @@ Other outputs include:
 - **out/examples/** - contains the particle filter outputs at each iteration, in csv format
 - **out/states/** - contains pure ASP outputs, in csv format (i.e. the action labels acquired by running the given ASP at each time step)
 - **plots/** - contains plots of trajectories for pretty viewing
+
+We provide the observation model below:
+```
+step(action):
+    if (action == ACC)
+        acc = min(acc+1, acc_max)
+    else if (action == DEC)
+        acc = max(acc-1, acc_min)
+    else if (action == CON)
+        if (acc < 0) acc = min(acc+1, 0)
+        else acc = max(acc-1, 0)
+```
