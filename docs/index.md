@@ -136,26 +136,16 @@ The algorithm is as follows:
 
 ## Citation
 <p class="code-block">
-@misc{plunder2023,<br>
-      &ensp;&ensp;title={Programmatic Imitation Learning from Unlabeled and Noisy Demonstrations}, <br>
-      &ensp;&ensp;author={Jimmy Xin and Linus Zheng and Kia Rahmani and Jiayi Wei and Jarrett Holtz and Isil Dillig and Joydeep Biswas},<br>
-      &ensp;&ensp;year={2023},<br>
-      &ensp;&ensp;eprint={2303.01440},<br>
-      &ensp;&ensp;archivePrefix={arXiv},<br>
-      &ensp;&ensp;primaryClass={cs.RO},<br>
-      &ensp;&ensp;doi={10.48550/arXiv.2303.01440}<br>
-      &ensp;&ensp;url={https://doi.org/10.48550/arXiv.2303.01440}<br>
-}
-@ARTICLE{10493855,
-  author={Xin, Jimmy and Zheng, Linus and Rahmani, Kia and Wei, Jiayi and Holtz, Jarrett and Dillig, Isil and Biswas, Joydeep},
-  journal={IEEE Robotics and Automation Letters}, 
-  title={Programmatic Imitation Learning From Unlabeled and Noisy Demonstrations}, 
-  year={2024},
-  volume={},
-  number={},
-  pages={1-8},
-  keywords={Task analysis;Trajectory;Probabilistic logic;Noise measurement;Training data;Noise;Approximation algorithms},
-  doi={10.1109/LRA.2024.3385691}}
+@ARTICLE{10493855,<br>
+      &ensp;&ensp;author={Xin, Jimmy and Zheng, Linus and Rahmani, Kia and Wei, Jiayi and Holtz, Jarrett and Dillig, Isil and Biswas, Joydeep},<br>
+      &ensp;&ensp;journal={IEEE Robotics and Automation Letters}, <br>
+      &ensp;&ensp;={Programmatic Imitation Learning From Unlabeled and Noisy Demonstrations}, <br>
+      &ensp;&ensp;year={2024},<br>
+      &ensp;&ensp;volume={},<br>
+      &ensp;&ensp;number={},<br>
+      &ensp;&ensp;pages={1-8},<br>
+      &ensp;&ensp;keywords={Task analysis;Trajectory;Probabilistic logic;Noise measurement;Training data;Noise;Approximation algorithms},<br>
+      &ensp;&ensp;doi={10.1109/LRA.2024.3385691}}<br>
 </p>
   
 
