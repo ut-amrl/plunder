@@ -139,7 +139,7 @@ The algorithm is as follows:
 @ARTICLE{10493855,<br>
       &ensp;&ensp;author={Xin, Jimmy and Zheng, Linus and Rahmani, Kia and Wei, Jiayi and Holtz, Jarrett and Dillig, Isil and Biswas, Joydeep},<br>
       &ensp;&ensp;journal={IEEE Robotics and Automation Letters}, <br>
-      &ensp;&ensp;={Programmatic Imitation Learning From Unlabeled and Noisy Demonstrations}, <br>
+      &ensp;&ensp;title={Programmatic Imitation Learning From Unlabeled and Noisy Demonstrations}, <br>
       &ensp;&ensp;year={2024},<br>
       &ensp;&ensp;volume={},<br>
       &ensp;&ensp;number={},<br>
