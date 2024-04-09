@@ -146,6 +146,16 @@ The algorithm is as follows:
       &ensp;&ensp;doi={10.48550/arXiv.2303.01440}<br>
       &ensp;&ensp;url={https://doi.org/10.48550/arXiv.2303.01440}<br>
 }
+@ARTICLE{10493855,
+  author={Xin, Jimmy and Zheng, Linus and Rahmani, Kia and Wei, Jiayi and Holtz, Jarrett and Dillig, Isil and Biswas, Joydeep},
+  journal={IEEE Robotics and Automation Letters}, 
+  title={Programmatic Imitation Learning From Unlabeled and Noisy Demonstrations}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={1-8},
+  keywords={Task analysis;Trajectory;Probabilistic logic;Noise measurement;Training data;Noise;Approximation algorithms},
+  doi={10.1109/LRA.2024.3385691}}
 </p>
   
 
